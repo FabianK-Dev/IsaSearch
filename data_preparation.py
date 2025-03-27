@@ -1,4 +1,5 @@
 from git import repo
+from sentence_transformers import SentenceTransformer
 
 git_url = "https://foss.heptapod.net/isa-afp/afp-devel"
 output_folder = "afp-devel-branch-default"
