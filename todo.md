@@ -3,8 +3,10 @@
 # AFP downloader
 - [ ] Repository downloader (if does not already exist)
 - [ ] Choose specific version, branch, commit or devel via config
+- [ ] AFP loader
 
 ## Parser
+- [ ] LaTeX parser
 - [ ] RegEx parser
 - [ ] FindFacts with build_importer
 
