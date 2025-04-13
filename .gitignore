@@ -1,5 +1,6 @@
 # Folders
 .venv/
+.vscode/
 afp-*/
 
 # Files
