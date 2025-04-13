@@ -1,3 +1,7 @@
-.venv
+# Folders
+.venv/
+afp-*/
+
+# Files
 *.zip
-afp-devel-branch-default
+*.tar.gz
