@@ -34,14 +34,24 @@ def parse_latex(tex_path):
     if os.path.exists(tex_path):
         with open(tex_path, 'r') as tex_path:
             file_content = tex_path.read()
+    else:
+        raise ValueError(f"Path {tex_path} does not exist.")
     
     # pylatexenc currently does not support parsing documents with the \href command
     # As a result, we have to replace it globally before parsing the document
     # See: https://github.com/phfaist/pylatexenc/issues/94
     # TODO: Potential fix: https://github.com/phfaist/pylatexenc/issues/94#issuecomment-1527266657
-    file_content = re.sub(r'\\href\b', r'\\texttt', file_content)
+    #file_content = re.sub(r'\\href\b', r'\\texttt', file_content)
+    file_content = "\\texttt".join(file_content.split("\\href"))
+    plain_text = LatexNodes2Text().latex_to_text(file_content)
 
-    return LatexNodes2Text().latex_to_text(file_content)
+    # Replace two or more white spaces through single whitespace
+    plain_text = re.compile(r"\s+").sub(" ", plain_text).strip()
+    
+    # Replace multiple newlines through single newlines
+    plain_text = re.compile(r"\n+").sub("\n", plain_text)
+
+    return plain_text
 
 def get_entry_files(entry):
     entry_folder = AFP_FOLDER + "/thys/" + entry
@@ -66,5 +76,7 @@ def get_entry_files(entry):
 
     return { "thy_files": found_thy_files, "tex_files": found_tex_files }
 
-# featherweight_ocl = get_entry_files("Featherweight_OCL")
-parse_latex(AFP_FOLDER + "/thys/Featherweight_OCL/document/root.tex")
+for entry in entries:
+    print(f"Entry: {entry}")
+    entry_files = get_entry_files(entry)
+    print(entry_files)
