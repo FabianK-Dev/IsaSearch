@@ -35,7 +35,13 @@ def parse_latex(tex_path):
         with open(tex_path, 'r') as tex_path:
             file_content = tex_path.read()
     
-    print(LatexNodes2Text().latex_to_text(file_content))
+    # pylatexenc currently does nto support parsing documents with the \href command
+    # As a result, we have to replace it globally before parsing the document
+    # See: https://github.com/phfaist/pylatexenc/issues/94
+    # TODO: Potential fix: https://github.com/phfaist/pylatexenc/issues/94#issuecomment-1527266657
+    file_content = re.sub(r'\\href\b', r'\\texttt', file_content)
+
+    return LatexNodes2Text().latex_to_text(file_content)
 
 def get_entry_files(entry):
     entry_folder = AFP_FOLDER + "/thys/" + entry
@@ -60,4 +66,5 @@ def get_entry_files(entry):
 
     return { "thy_files": found_thy_files, "tex_files": found_tex_files }
 
-cyk = get_entry_files("CYK")
+# featherweight_ocl = get_entry_files("Featherweight_OCL")
+parse_latex(AFP_FOLDER + "/thys/Featherweight_OCL/document/root.tex")
