@@ -35,7 +35,7 @@ def parse_latex(tex_path):
         with open(tex_path, 'r') as tex_path:
             file_content = tex_path.read()
     
-    # pylatexenc currently does nto support parsing documents with the \href command
+    # pylatexenc currently does not support parsing documents with the \href command
     # As a result, we have to replace it globally before parsing the document
     # See: https://github.com/phfaist/pylatexenc/issues/94
     # TODO: Potential fix: https://github.com/phfaist/pylatexenc/issues/94#issuecomment-1527266657
