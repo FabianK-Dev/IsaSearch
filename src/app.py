@@ -1,3 +1,5 @@
+from pylatexenc.latex2text import LatexNodes2Text
+
 import os
 import re
 
@@ -28,6 +30,13 @@ def extract_theorems_regex(thy_path):
 
     return theorems
 
+def parse_latex(tex_path):
+    if os.path.exists(tex_path):
+        with open(tex_path, 'r') as tex_path:
+            file_content = tex_path.read()
+    
+    print(LatexNodes2Text().latex_to_text(file_content))
+
 def get_entry_files(entry):
     entry_folder = AFP_FOLDER + "/thys/" + entry
     found_thy_files = []
@@ -46,9 +55,9 @@ def get_entry_files(entry):
                     found_tex_files.append({
                         "root": root,
                         "file": file,
+                        "plain_text": parse_latex(root + "/" + file)
                     })
 
     return { "thy_files": found_thy_files, "tex_files": found_tex_files }
 
 cyk = get_entry_files("CYK")
-print(cyk)
