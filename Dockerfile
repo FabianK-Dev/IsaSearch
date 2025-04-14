@@ -22,7 +22,9 @@ RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/ap
 
 WORKDIR /app
 
-RUN git clone https://github.com/Dacit/findfacts.git
+RUN git clone https://github.com/Dacit/findfacts.git \
+    && cd findfacts/ \
+    && git checkout d9d1e3e9958bba63c0c2fd783c07399f5e4826dd 
 
 WORKDIR /app/findfacts
 
@@ -33,9 +35,10 @@ RUN git clone --depth 1 https://github.com/isabelle-prover/mirror-isabelle.git /
 
 ENV PATH="/app/findfacts/isabelle/bin:$PATH"
 
+RUN isabelle components -u importer-isabelle-build
+
 RUN ./sbt -Dgraal.CompilationFailureAction=Silent -Djdk.util.zip.disableZip64ExtraFieldValidation=true \
     "project importer-isabelle-base" assembly \
     "project search-jedit-base" assembly
 
-#CMD ["./sbt", "-Dgraal.CompilationFailureAction=Silent", "-Djdk.util.zip.disableZip64ExtraFieldValidation=true", "-Dprofiles=memory,loader", "project findfacts", "it:test"]
 CMD ["bash"]
