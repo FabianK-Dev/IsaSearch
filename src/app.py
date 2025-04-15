@@ -20,7 +20,7 @@ def extract_theorems_regex(thy_path):
             file_content = thy_file.read()
 
     # A simple RegEx for testing purposes that extracts and theorem code block from a .thy-file
-    theorem_pattern = r'theorem\s+\w+(\s+:|:)\n(.+\n)*\n\n'
+    theorem_pattern = r'(theorem|lemma|corollary)\s+\w+(\s+:|:)\n(.+\n)*\n\n'
     theorems = []
 
     for match in re.finditer(theorem_pattern, file_content):
