@@ -57,4 +57,5 @@ RUN mkdir -p /opt/solr/configsets/ \
 ENV SOLR_HOME=/opt/solr
 ENV PATH="$SOLR_HOME/bin:$PATH"
 
-CMD solr start -f -Djetty.host=0.0.0.0 -force && echo isabelle build_importer -C theorydata-0.5.0 -d mirror-afp-2022/thys/ -r localhost:8983 -i 2022_Isabelle2022_AFP2022 CYK && tail -F /opt/solr/server/logs/solr.log
+CMD ["sh", "-c", "solr start -f -Djetty.host=0.0.0.0 -force && tail -F /opt/solr/server/logs/solr.log"]
+# isabelle build_importer -C theorydata-0.5.0 -d mirror-afp-2022/thys/ -r localhost:8983 -i 2022_Isabelle2022_AFP2022 CYK
