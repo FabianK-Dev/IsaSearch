@@ -26,21 +26,21 @@ WORKDIR /app
 
 RUN git clone https://github.com/Dacit/findfacts.git \
     && cd findfacts/ \
-    && git checkout master 
+    && git checkout d9d1e3e9958bba63c0c2fd783c07399f5e4826dd 
 
 WORKDIR /app/findfacts
 
 RUN git clone --depth 1 https://github.com/isabelle-prover/mirror-isabelle.git /app/findfacts/isabelle \
     && isabelle/Admin/init \
     && echo 'ISABELLE_TOOL_JAVA_OPTIONS="-Xms1600m -Xmx2000m"' >> /root/.isabelle/etc/settings \
-    && echo 'ML_OPTIONS="--minheap 1800M --maxheap 1800M"' >> /root/.isabelle/etc/settings \
-    && isabelle/bin/isabelle components -u importer-isabelle-build \
-    && isabelle/bin/isabelle components -u search-jedit
+    && echo 'ML_OPTIONS="--minheap 1800M --maxheap 1800M"' >> /root/.isabelle/etc/settings
 
 ENV PATH="/app/findfacts/isabelle/bin:$PATH"
 
-RUN git clone --depth 1 https://github.com/isabelle-prover/mirror-afp-2024.git \
+RUN git clone --depth 1 https://github.com/isabelle-prover/mirror-afp-2022.git \
     && git clone https://github.com/Dacit/findfacts-deployment.git
+
+RUN isabelle components -u importer-isabelle-build
 
 RUN ./sbt -Dgraal.CompilationFailureAction=Silent -Djdk.util.zip.disableZip64ExtraFieldValidation=true \
     "project importer-isabelle-base" assembly \
@@ -57,4 +57,4 @@ RUN mkdir -p /opt/solr/configsets/ \
 ENV SOLR_HOME=/opt/solr
 ENV PATH="$SOLR_HOME/bin:$PATH"
 
-CMD solr start -f -Djetty.host=0.0.0.0 -force && echo isabelle build_importer -C theorydata-0.5.0 -d mirror-afp-2024/thys/ -r localhost:8983 -i 2024_Isabelle2024_AFP2024 CYK && tail -F /opt/solr/server/logs/solr.log
+CMD solr start -f -Djetty.host=0.0.0.0 -force && echo isabelle build_importer -C theorydata-0.5.0 -d mirror-afp-2022/thys/ -r localhost:8983 -i 2022_Isabelle2022_AFP2022 CYK && tail -F /opt/solr/server/logs/solr.log
