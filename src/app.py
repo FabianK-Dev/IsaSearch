@@ -1,7 +1,11 @@
 from pylatexenc.latex2text import LatexNodes2Text
+from sentence_transformers import SentenceTransformer
 
+import json
 import os
+import os.path
 import re
+import torch
 
 AFP_FOLDER = "afp-2025-04-13"
 AFP_ROOTS = AFP_FOLDER + "/thys/ROOTS"
@@ -76,7 +80,34 @@ def get_entry_files(entry):
 
     return { "thy_files": found_thy_files, "tex_files": found_tex_files }
 
-for entry in entries:
-    print(f"Entry: {entry}")
-    entry_files = get_entry_files(entry)
-    print(entry_files)
+CACHE_FOLDER = ".cache"
+ENTRY_DB_CACHE = f"{CACHE_FOLDER}/entry_db_cache.json"
+entry_db = {}
+
+if os.path.isfile(ENTRY_DB_CACHE):
+    print("Cached entry_db_cache.json already exists. Loading...")
+
+    with open(ENTRY_DB_CACHE, 'r') as file:
+        data = file.read()
+
+    entry_db = json.loads(data)
+else:
+    print("Cached entry_db_cache.json does not already exist. Loading all entries...")
+
+    for entry in entries:
+        print(f"Loading entry: {entry}")
+        entry_files = get_entry_files(entry)
+        entry_db[entry] = entry_files
+
+    # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
+    if not os.path.exists(CACHE_FOLDER):
+        os.makedirs(CACHE_FOLDER)
+
+    with open(ENTRY_DB_CACHE, 'w') as file:
+        json.dump(entry_db, file)
+
+# Retrieve and Rerank pipeline
+# if not torch.cuda.is_available():
+#     print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
+
+# bi_encoder = SentenceTransformer()
