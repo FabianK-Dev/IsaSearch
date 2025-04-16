@@ -1,5 +1,5 @@
 from pylatexenc.latex2text import LatexNodes2Text
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder, util
 
 import json
 import os
@@ -91,6 +91,8 @@ if os.path.isfile(ENTRY_DB_CACHE):
         data = file.read()
 
     entry_db = json.loads(data)
+
+    print("Finished loading cached entry_db_cache.json")
 else:
     print("Cached entry_db_cache.json does not already exist. Loading all entries...")
 
@@ -106,8 +108,36 @@ else:
     with open(ENTRY_DB_CACHE, 'w') as file:
         json.dump(entry_db, file)
 
-# Retrieve and Rerank pipeline
-# if not torch.cuda.is_available():
-#     print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
+    print(f"Entries saved to {ENTRY_DB_CACHE}")
 
-# bi_encoder = SentenceTransformer()
+# Retrieve and Rerank pipeline
+if not torch.cuda.is_available():
+    print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
+
+bi_encoder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
+bi_encoder.max_seq_length = 512
+docs_to_retrieve = 100
+
+cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
+
+# Create a list of documents to encode
+# Each document consists of a theorem source code combined with the theorem's entry's parsed LaTeX document text
+# As the theorem code is 1. unique and 2. more meaningful than the LaTeX document, it will be added first
+print("Building documents list...")
+documents = []
+
+for entry in entry_db:
+    print(f"Processing entry: {entry}")
+    entry_document = ""
+
+    for tex_file in entry_db[entry]["tex_files"]:
+        if entry_document != "":
+            entry_document = entry_document + "\n\n" + tex_file["plain_text"]
+        else:
+            entry_document = tex_file["plain_text"]
+        
+    for thy_file in entry_db[entry]["thy_files"]: 
+        for theorem in thy_file["theorems"]:
+            documents.append(theorem + "\n\n" + entry_document)
+
+print(f"Built {len(documents)} documents.")
