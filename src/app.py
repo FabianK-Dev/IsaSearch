@@ -113,6 +113,7 @@ else:
 print("Building documents list...")
 documents = []
 max_characters = 0
+total_characters = 0
 
 for entry in entry_db:
     print(f"Processing entry: {entry}")
@@ -130,6 +131,7 @@ for entry in entry_db:
             documents.append(document_str)
             
             num_characters = len(document_str)
+            total_characters += num_characters
 
             if num_characters > max_characters:
                 max_characters = num_characters
@@ -137,12 +139,18 @@ for entry in entry_db:
 print(f"Built {len(documents)} documents.")
 print(f"Maximum number of characters found in a document: {max_characters}")
 
+avg_chars_per_doc = total_characters / len(documents)
+avg_tokens_per_doc = avg_chars_per_doc / 4 # 1 token ~= 4 characters in English according to OpenAI (https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them)
+
+print(f"Average number of characters per document: {avg_chars_per_doc}")
+print(f"Average number of tokens per document: {avg_tokens_per_doc}")
+
 # Retrieve and Rerank pipeline
 if not torch.cuda.is_available():
     print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
 
-bi_encoder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
-bi_encoder.max_seq_length = 256*8
+bi_encoder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+bi_encoder.max_seq_length = 256*2
 docs_to_retrieve = 100
 
 cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
