@@ -92,9 +92,9 @@ if os.path.isfile(ENTRY_DB_CACHE):
 
     entry_db = json.loads(data)
 
-    print("Finished loading cached entry_db_cache.json")
+    print(f"Finished loading {ENTRY_DB_CACHE}")
 else:
-    print("Cached entry_db_cache.json does not already exist. Loading all entries...")
+    print(f"{ENTRY_DB_CACHE} does not already exist. Loading all entries...")
 
     for entry in entries:
         print(f"Loading entry: {entry}")
@@ -141,3 +141,12 @@ for entry in entry_db:
             documents.append(theorem + "\n\n" + entry_document)
 
 print(f"Built {len(documents)} documents.")
+
+DOCS_CACHE = f"{CACHE_FOLDER}/embeddings_cache.pt"
+
+if os.path.exists(DOCS_CACHE):
+    encoded_embeddings = torch.load(DOCS_CACHE)
+    print("Finished loading cached embeddings.")
+else:
+    encoded_embeddings = bi_encoder.encode(documents, convert_to_tensor=True, show_progress_bar=True)
+    torch.save(encoded_embeddings, DOCS_CACHE)
