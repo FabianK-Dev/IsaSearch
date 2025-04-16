@@ -1,7 +1,11 @@
 from pylatexenc.latex2text import LatexNodes2Text
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 import json
+import nltk
 import os
 import os.path
 import re
@@ -11,6 +15,12 @@ AFP_FOLDER = "afp-2025-04-13"
 AFP_ROOTS = AFP_FOLDER + "/thys/ROOTS"
 
 entries = []
+
+# Required to remove stopwords
+nltk.download('stopwords')
+
+# Required for work tokenization
+nltk.download('punkt_tab')
 
 # Read the ROOTS file in $AFP/thys/ which contains a list of all entries in the AFP
 if os.path.exists(AFP_ROOTS):
@@ -34,7 +44,7 @@ def extract_theorems_regex(thy_path):
 
     return theorems
 
-def parse_latex(tex_path):
+def parse_latex(tex_path, stopwords_list):
     if os.path.exists(tex_path):
         with open(tex_path, 'r') as tex_path:
             file_content = tex_path.read()
@@ -49,18 +59,34 @@ def parse_latex(tex_path):
     file_content = "\\texttt".join(file_content.split("\\href"))
     plain_text = LatexNodes2Text().latex_to_text(file_content)
 
+    # Replace newlines through spaces
+    plain_text = re.compile(r"\n").sub(" ", plain_text)
+
     # Replace two or more white spaces through single whitespace
     plain_text = re.compile(r"\s+").sub(" ", plain_text).strip()
-    
-    # Replace multiple newlines through single newlines
-    plain_text = re.compile(r"\n+").sub("\n", plain_text)
 
+    # Only allow letters or spaces in text
+    plain_text = re.compile('[^a-zA-Z ]').sub("", plain_text) 
+
+    # Remove words with three characters or less
+    plain_text = re.compile(r'\b\w{1,3}\b').sub("", plain_text)
+
+    # Remove stop words like e.g. "the", "a", "and", etc.
+    plain_text_tokens = word_tokenize(plain_text)
+    tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
+    plain_text = (" ").join(tokens_without_stopwords)
+
+    print(plain_text)
     return plain_text
 
 def get_entry_files(entry):
     entry_folder = AFP_FOLDER + "/thys/" + entry
     found_thy_files = []
     found_tex_files = []
+
+    # stopwords will only be used once when parsing LaTeX documents which is why we
+    # only define it in this scope. It will automatically be removed from RAM afterwards
+    stopwords_list = stopwords.words() 
 
     if os.path.exists(entry_folder):
         for root, _, files in os.walk(entry_folder):
@@ -75,7 +101,7 @@ def get_entry_files(entry):
                     found_tex_files.append({
                         "root": root,
                         "file": file,
-                        "plain_text": parse_latex(root + "/" + file)
+                        "plain_text": parse_latex(root + "/" + file, stopwords_list)
                     })
 
     return { "thy_files": found_thy_files, "tex_files": found_tex_files }
