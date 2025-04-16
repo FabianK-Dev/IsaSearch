@@ -110,21 +110,9 @@ else:
 
     print(f"Entries saved to {ENTRY_DB_CACHE}")
 
-# Retrieve and Rerank pipeline
-if not torch.cuda.is_available():
-    print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
-
-bi_encoder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
-bi_encoder.max_seq_length = 512
-docs_to_retrieve = 100
-
-cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
-
-# Create a list of documents to encode
-# Each document consists of a theorem source code combined with the theorem's entry's parsed LaTeX document text
-# As the theorem code is 1. unique and 2. more meaningful than the LaTeX document, it will be added first
 print("Building documents list...")
 documents = []
+max_characters = 0
 
 for entry in entry_db:
     print(f"Processing entry: {entry}")
@@ -138,9 +126,26 @@ for entry in entry_db:
         
     for thy_file in entry_db[entry]["thy_files"]: 
         for theorem in thy_file["theorems"]:
-            documents.append(theorem + "\n\n" + entry_document)
+            document_str = theorem + "\n\n" + entry_document
+            documents.append(document_str)
+            
+            num_characters = len(document_str)
+
+            if num_characters > max_characters:
+                max_characters = num_characters
 
 print(f"Built {len(documents)} documents.")
+print(f"Maximum number of characters found in a document: {max_characters}")
+
+# Retrieve and Rerank pipeline
+if not torch.cuda.is_available():
+    print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
+
+bi_encoder = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
+bi_encoder.max_seq_length = 256*8
+docs_to_retrieve = 100
+
+cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
 
 DOCS_CACHE = f"{CACHE_FOLDER}/embeddings_cache.pt"
 
