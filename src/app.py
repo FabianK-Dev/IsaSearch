@@ -98,11 +98,18 @@ def get_entry_files(entry):
                         "theorems": extract_theorems_regex(root + "/" + file)
                     })
                 elif file.endswith(".tex"):
-                    found_tex_files.append({
+                    found_tex_file = {
                         "root": root,
                         "file": file,
                         "plain_text": parse_latex(root + "/" + file, stopwords_list)
-                    })
+                    }
+
+                    # root.tex is usually the most meaningful LaTeX document as it contains, the titel and abstract
+                    # which is why it should appear first in the returned list
+                    if file == "root.tex":
+                        found_tex_files.insert(0, found_tex_file)
+                    else:
+                        found_tex_files.append(found_tex_file)
 
     return { "thy_files": found_thy_files, "tex_files": found_tex_files }
 
