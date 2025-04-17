@@ -10,6 +10,7 @@ import os
 import os.path
 import re
 import torch
+import time
 
 AFP_FOLDER = "afp-2025-04-13"
 AFP_ROOTS = AFP_FOLDER + "/thys/ROOTS"
@@ -184,7 +185,7 @@ if not torch.cuda.is_available():
 
 bi_encoder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 bi_encoder.max_seq_length = 256*2
-docs_to_retrieve = 100
+docs_to_retrieve = 1000
 
 cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
 
@@ -196,3 +197,35 @@ if os.path.exists(DOCS_CACHE):
 else:
     encoded_embeddings = bi_encoder.encode(documents, convert_to_tensor=True, show_progress_bar=True)
     torch.save(encoded_embeddings, DOCS_CACHE)
+
+def search(search_query):
+    start = time.time()
+
+    # Bi-encoder search
+    question_encoded = bi_encoder.encode(search_query, convert_to_tensor=True)
+    question_encoded = question_encoded.cuda()
+
+    hits = util.semantic_search(question_encoded, encoded_embeddings, top_k=docs_to_retrieve)
+    hits = hits[0] # It is in theory possible to search multiple queries at once, however we only provided one search query and thus hits only contains one element
+
+    # Cross-encoder search
+    cross_encoder_input = [[search_query, documents[hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
+    cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
+
+    for idx in range(len(cross_encoder_scores)):
+        hits[idx]['cross-score'] = cross_encoder_scores[idx]
+
+    print("Top-3 Bi-Encoder Retrieval hits")
+    hits = sorted(hits, key=lambda x: x['score'], reverse=True)
+    for hit in hits[0:3]:
+        print(f"{hit['score']} === {documents[hit['corpus_id']][:100]}")
+
+    print("Top-3 Cross-Encoder Re-ranker hits")
+    hits = sorted(hits, key=lambda x: x['cross-score'], reverse=True)
+    for hit in hits[0:100]:
+        print(f"{hit['cross-score']} === {documents[hit['corpus_id']][:50]} ... {documents[hit['corpus_id']][-50:]}")
+
+    end = time.time()
+    print(f"Search duration: {end - start} sec")
+
+search("The continuum hypothesis can neither be proved nor refuted in ZFC")
