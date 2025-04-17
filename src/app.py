@@ -35,7 +35,7 @@ def extract_theorems_regex(thy_path):
             file_content = thy_file.read()
 
     # A simple RegEx for testing purposes that extracts all theorem code block from a .thy-file
-    theorem_pattern = r'(private)?\s+(theorem|lemma|corollary)(.+\n)*\n\n'
+    theorem_pattern = r'(lemma|theorem|corollary)(.+\n)*\n'
     theorems = []
 
     for match in re.finditer(theorem_pattern, file_content):
