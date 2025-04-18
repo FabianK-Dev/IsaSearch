@@ -212,20 +212,11 @@ def search(search_query):
     cross_encoder_input = [[search_query, documents[hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
     cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
 
-    for idx in range(len(cross_encoder_scores)):
-        hits[idx]['cross-score'] = cross_encoder_scores[idx]
-
-    print("Top-3 Bi-Encoder Retrieval hits")
-    hits = sorted(hits, key=lambda x: x['score'], reverse=True)
-    for hit in hits[0:3]:
-        print(f"{hit['score']} === {documents[hit['corpus_id']][:100]}")
-
-    print("Top-3 Cross-Encoder Re-ranker hits")
-    hits = sorted(hits, key=lambda x: x['cross-score'], reverse=True)
-    for hit in hits[0:100]:
-        print(f"{hit['cross-score']} === {documents[hit['corpus_id']][:50]} ... {documents[hit['corpus_id']][-50:]}")
-
     end = time.time()
-    print(f"Search duration: {end - start} sec")
+    print(f"Search time: {end - start} sec")
+
+    return {
+        "search_results": cross_encoder_scores
+    }
 
 search("The continuum hypothesis can neither be proved nor refuted in ZFC")
