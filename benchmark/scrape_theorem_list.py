@@ -15,3 +15,11 @@ if not os.path.exists(CACHE_FILE):
 
 with open(CACHE_FILE, "r") as file:
     soup = BeautifulSoup(file, "html.parser")
+
+with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
+    fieldnames = ['ID', 'Title', 'Theorem', 'Link']
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for h2 in soup.find_all("h2"):
+        print(h2)
