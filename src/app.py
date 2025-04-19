@@ -30,7 +30,7 @@ if os.path.exists(AFP_ROOTS):
             entries.append(line.rstrip())
 
 # TODO: This is experimental and will be replaced in future
-def extract_theorems_regex(thy_path):
+def extract_theorems_regex(thy_path, entry):
     if os.path.exists(thy_path):
         with open(thy_path, 'r') as thy_file:
             file_content = thy_file.read()
@@ -39,6 +39,9 @@ def extract_theorems_regex(thy_path):
     theorem_pattern = r'(lemma|theorem|corollary)(.+\n)*\n'
     theorem_name_pattern = r'^(lemma|theorem|corollary)\s+(\S+)'
     theorems = []
+
+    # Remove afp-XXXX-XX-XX/thys/ from path >= this is required for ID generation
+    subpath = entry + "".join(thy_path.split(entry)[1:])
 
     for code_match in re.finditer(theorem_pattern, file_content):
         code_match = code_match.group()
@@ -52,7 +55,7 @@ def extract_theorems_regex(thy_path):
         if id_match:
             theorem_type = id_match.group(1)
             theorem_name = id_match.group(2)
-            theorem_id = thy_path + "#" + theorem_type + "#" + theorem_name
+            theorem_id = subpath + "#" + theorem_type + "#" + theorem_name
         else:
             raise ValueError(f"Could not extract theorem type or theorem name in file {thy_path} in code block:\n{code_match}")
 
@@ -115,7 +118,7 @@ def get_entry_files(entry):
                     found_thy_files.append({
                         "root": root,
                         "file": file,
-                        "theorems": extract_theorems_regex(root + "/" + file)
+                        "theorems": extract_theorems_regex(root + "/" + file, entry)
                     })
                 elif file.endswith(".tex"):
                     found_tex_file = {
