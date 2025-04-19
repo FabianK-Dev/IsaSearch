@@ -9,3 +9,4 @@ benchmark/*.html
 # Files
 *.zip
 *.tar.gz
+*.pyc
