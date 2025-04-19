@@ -29,6 +29,7 @@ if os.path.exists(AFP_ROOTS):
         for line in entries_file:
             entries.append(line.rstrip())
 
+# TODO: This is experimental and will be replaced in future
 def extract_theorems_regex(thy_path):
     if os.path.exists(thy_path):
         with open(thy_path, 'r') as thy_file:
@@ -36,12 +37,30 @@ def extract_theorems_regex(thy_path):
 
     # A simple RegEx for testing purposes that extracts all theorem code block from a .thy-file
     theorem_pattern = r'(lemma|theorem|corollary)(.+\n)*\n'
+    theorem_name_pattern = r'^(lemma|theorem|corollary)\s+(\S+)'
     theorems = []
 
-    for match in re.finditer(theorem_pattern, file_content):
-        match = match.group()
-        match = match.strip()
-        theorems.append(match)
+    for code_match in re.finditer(theorem_pattern, file_content):
+        code_match = code_match.group()
+        code_match = code_match.strip()
+        
+        if not (code_match.startswith("theorem ") or code_match.startswith("lemma ") or code_match.startswith("corollary ")):
+            continue
+
+        id_match = re.search(theorem_name_pattern, code_match)
+
+        if id_match:
+            theorem_type = id_match.group(1)
+            theorem_name = id_match.group(2)
+            theorem_id = thy_path + "#" + theorem_type + "#" + theorem_name
+        else:
+            raise ValueError(f"Could not extract theorem type or theorem name in file {thy_path} in code block:\n{code_match}")
+
+        theorem = {
+            "id": theorem_id,
+            "code": code_match
+        }
+        theorems.append(theorem)
 
     return theorems
 
@@ -77,7 +96,7 @@ def parse_latex(tex_path, stopwords_list):
     tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
     plain_text = (" ").join(tokens_without_stopwords)
 
-    print(plain_text)
+    # print(plain_text)
     return plain_text
 
 def get_entry_files(entry):
@@ -146,6 +165,7 @@ else:
 
 print("Building documents list...")
 documents = []
+document_ids = []
 max_characters = 0
 total_characters = 0
 
@@ -161,8 +181,9 @@ for entry in entry_db:
         
     for thy_file in entry_db[entry]["thy_files"]: 
         for theorem in thy_file["theorems"]:
-            document_str = theorem + "\n\n" + entry_document
+            document_str = theorem["code"] + "\n\n" + entry_document
             documents.append(document_str)
+            document_ids.append(theorem["id"])
             
             num_characters = len(document_str)
             total_characters += num_characters
@@ -218,7 +239,8 @@ def search(search_query):
     for hit in hits:
         results.append({
             "score": hit["score"],
-            "document": documents[hit['corpus_id']]
+            "document": documents[hit['corpus_id']],
+            "id": document_ids[hit['corpus_id']]
         })
 
     end = time.time()
