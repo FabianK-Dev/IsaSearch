@@ -206,17 +206,28 @@ def search(search_query):
     question_encoded = question_encoded.cuda()
 
     hits = util.semantic_search(question_encoded, encoded_embeddings, top_k=docs_to_retrieve)
-    hits = hits[0] # It is in theory possible to search multiple queries at once, however we only provided one search query and thus hits only contains one element
+    hits = hits[0] # It is in theory possible to search multiple queries at once, however we only provided one search query and thus 'hits' only contains one element
 
     # Cross-encoder search
     cross_encoder_input = [[search_query, documents[hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
     cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
 
+    hits = sorted(hits, key=lambda x: x['score'], reverse=True)
+    results = []
+
+    for hit in hits:
+        results.append({
+            "score": hit["score"],
+            "document": documents[hit['corpus_id']]
+        })
+
     end = time.time()
+    search_duration  = end - start
     print(f"Search time: {end - start} sec")
 
     return {
-        "search_results": cross_encoder_scores
+        "results": results,
+        "duration": search_duration
     }
 
-search("The continuum hypothesis can neither be proved nor refuted in ZFC")
+print( search("The continuum hypothesis can neither be proved nor refuted in ZFC") )
