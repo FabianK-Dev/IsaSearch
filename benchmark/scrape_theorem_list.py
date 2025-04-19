@@ -18,7 +18,7 @@ with open(CACHE_FILE, "r") as file:
     soup = BeautifulSoup(file, "html.parser")
 
 with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
-    fieldnames = ['ID', 'Title', 'Theorem', 'Link']
+    fieldnames = ['ID', 'Title', 'Theorem', 'Link', 'Title query']
     writer = csv.DictWriter(file, fieldnames=fieldnames)
     writer.writeheader()
 
@@ -47,11 +47,12 @@ with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
             'ID': id_,
             'Title': title,
             'Theorem': inner_text,
-            'Link': href
+            'Link': href,
+            'Title query': title
         })
 
-        #print("ID:", id_)
-        #print("Titel:", title)
+        print("ID:", id_)
+        print("Titel:", title)
         print("Theorem:", inner_text)
-        #print("Link:", href)
+        print("Link:", href)
         print("-" * 40)
