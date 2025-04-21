@@ -1,8 +1,8 @@
 from pylatexenc.latex2text import LatexNodes2Text
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
-
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from benchmark import benchmark
 
 import json
 import nltk
@@ -255,4 +255,10 @@ def search(search_query):
         "duration": search_duration
     }
 
-print( search("The continuum hypothesis can neither be proved nor refuted in ZFC") )
+#print( search("The continuum hypothesis can neither be proved nor refuted in ZFC") )
+results = search("corollary ctm_ZFC_imp_ctm_not_CH")
+print( benchmark.top_k_accuracy(results, "Independence_CH/Not_CH.thy#corollary#ctm_ZFC_imp_ctm_not_CH:") )
+print( benchmark.discounted_cumulative_gain(results, "Independence_CH/Not_CH.thy#corollary#ctm_ZFC_imp_ctm_not_CH:") )
+
+# for r in search("Commutative Group")["results"][:10]:
+#     print(r["document"][:100] + "\n")
