@@ -11,6 +11,7 @@ import os.path
 import re
 import torch
 import time
+import pysolr
 
 AFP_FOLDER = "afp-2025-04-13"
 AFP_ROOTS = AFP_FOLDER + "/thys/ROOTS"
@@ -139,6 +140,10 @@ def get_entry_files(entry):
 CACHE_FOLDER = ".cache"
 ENTRY_DB_CACHE = f"{CACHE_FOLDER}/entry_db_cache.json"
 entry_db = {}
+
+solr = pysolr.Solr('http://localhost:8983/solr/', always_commit=True, timeout=10)
+results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=10000)
+exit()
 
 if os.path.isfile(ENTRY_DB_CACHE):
     print("Cached entry_db_cache.json already exists. Loading...")
