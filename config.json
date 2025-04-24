@@ -1,6 +1,7 @@
 {
     "isabelle_remote_url": "https://isabelle.in.tum.de/dist/Isabelle2025_linux.tar.gz",
     "isabelle_binary_file": "Isabelle2025/bin/isabelle",
+    "isabelle_version": "Isabelle2025",
     "afp_remote_url": "https://foss.heptapod.net/isa-afp/afp-2025/-/archive/branch/default/afp-2025-branch-default.tar.gz",
     "afp_folder": "afp-2025-branch-default"
 }
