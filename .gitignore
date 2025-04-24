@@ -2,11 +2,14 @@
 .cache/
 .venv/
 .vscode/
+
+# Downloaded
 afp-*/
-benchmark/*.csv
-benchmark/*.html
+Isabelle*/
 
 # Files
 *.zip
 *.tar.gz
 *.pyc
+benchmark/*.csv
+benchmark/*.html
