@@ -13,7 +13,12 @@ import torch
 import time
 import pysolr
 
-AFP_FOLDER = "afp-2025-04-13"
+print("Loading config...")
+with open("config.json", "r") as file:
+    data = file.read()
+    config = json.loads(data)
+
+AFP_FOLDER = config["afp_folder"]
 AFP_ROOTS = AFP_FOLDER + "/thys/ROOTS"
 
 entries = []
@@ -141,8 +146,12 @@ CACHE_FOLDER = ".cache"
 ENTRY_DB_CACHE = f"{CACHE_FOLDER}/entry_db_cache.json"
 entry_db = {}
 
-solr = pysolr.Solr('http://localhost:8983/solr/', always_commit=True, timeout=10)
-results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=10000)
+solr = pysolr.Solr(config["solr_core_url"], always_commit=True, timeout=10)
+solr.ping() # Health check
+
+results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=100)
+print(results)
+
 exit()
 
 if os.path.isfile(ENTRY_DB_CACHE):
