@@ -1,4 +1,5 @@
 #!/bin/bash
+# DEPRECATED => needs rework
 
 config="config.json"
 isabelle_binary_file=$(jq -r '.isabelle_binary_file' "$config")
@@ -11,7 +12,7 @@ python3 -m src.installation
 echo "Install Isabelle components"
 echo "Isabelle binary is located at $isabelle_binary_file"
 $isabelle_binary_file components -a
-$isabelle_binary_file find_facts_index -v -A "$afp_folder/" $(cat "$afp_folder/thys/ROOTS")
+$isabelle_binary_file find_facts_index -v -A "$afp_folder/" CYK #$(cat "$afp_folder/thys/ROOTS")
 
 echo "Start docker container if it already exists but is not running."
 docker start isabelle-solr || \
