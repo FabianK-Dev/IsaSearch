@@ -29,7 +29,7 @@ if os.path.exists(AFP_ROOTS):
         for line in entries_file:
             entries.append(line.rstrip())
 
-# DEPRECATED => I will remove this method soon
+# TODO: DEPRECATED => I will remove this method soon
 def extract_theorems_regex(thy_path, entry):
     if os.path.exists(thy_path):
         with open(thy_path, 'r') as thy_file:
