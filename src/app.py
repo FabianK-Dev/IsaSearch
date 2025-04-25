@@ -33,4 +33,4 @@ document_tree = build_document_tree(config, solr)
 encoded_embeddings = encode_embeddings(config, document_tree)
 bi_encoder, cross_encoder = load_encoders()
 
-search("CYK", encode_embeddings, bi_encoder, cross_encoder, document_tree)
+search("CYK", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
