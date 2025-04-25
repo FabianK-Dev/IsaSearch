@@ -18,7 +18,8 @@ echo "Start docker container if it already exists but is not running."
 docker start isabelle-solr || \
     docker run -d --name isabelle-solr \
         -p 8983:8983 \
-        -v "$HOME/.isabelle/$isabelle_version/find_facts/solr/isabelle:/opt/solr/server/solr/isabelle" \
-        solr:latest solr-precreate isabelle /opt/solr/server/solr/isabelle
+        -v /home/fabian/.isabelle/Isabelle2025/find_facts/solr/local:/opt/solr/server/solr/local \
+        solr:latest \
+        solr-precreate local /opt/solr/server/solr/local
 
 python3 -m src.app
