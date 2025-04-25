@@ -13,8 +13,8 @@ import torch
 import time
 import pysolr
 
-from solr import connect_solr
-from documents import build_document_tree
+from src.solr import connect_solr
+from src.documents import build_document_tree
 
 print("Downloading stopwords corpus and checking for updates...")
 nltk.download('stopwords')
