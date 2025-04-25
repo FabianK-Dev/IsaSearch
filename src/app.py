@@ -16,10 +16,10 @@ import pysolr
 from solr import connect_solr
 from documents import build_document_tree
 
-print("Downloading stopwords corpus and check for updates...")
+print("Downloading stopwords corpus and checking for updates...")
 nltk.download('stopwords')
 
-print("Downloading punkt_tab corpus for work tokenization and check for updates...")
+print("Downloading punkt_tab corpus for work tokenization and checking for updates...")
 nltk.download('punkt_tab')
 
 print("Loading config...")
