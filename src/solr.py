@@ -6,3 +6,5 @@ def connect_solr(config):
 
     print("Ping Solr for health check...")
     solr.ping() # Health check
+
+    return solr
