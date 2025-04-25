@@ -8,6 +8,7 @@ import json
 import nltk
 import os
 import os.path
+import re
 import torch
 import time
 import pysolr
@@ -36,7 +37,15 @@ print("Ping Solr for health check...")
 solr.ping() # Health check
 
 def extract_docs(doc):
-    doc_str = doc["theory"] + " " + doc["src"] # TODO
+    doc_str = doc["src"]
+
+    # Replace newlines through spaces
+    doc_str = re.compile(r"\n").sub(" ", doc_str)
+
+    # Replace two or more white spaces through single whitespace
+    doc_str = re.compile(r"\s+").sub(" ", doc_str).strip()
+    
+    doc_str = doc["theory"] + " " + doc_str # Prepend the theory name
     return doc["id"], doc_str
 
 def fetch_all_docs(solr):
