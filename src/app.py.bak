@@ -35,6 +35,79 @@ if os.path.exists(AFP_ROOTS):
         for line in entries_file:
             entries.append(line.rstrip())
 
+# TODO: DEPRECATED => I will remove this method soon
+def extract_theorems_regex(thy_path, entry):
+    if os.path.exists(thy_path):
+        with open(thy_path, 'r') as thy_file:
+            file_content = thy_file.read()
+
+    # A simple RegEx for testing purposes that extracts all theorem code block from a .thy-file
+    theorem_pattern = r'(lemma|theorem|corollary)(.+\n)*\n'
+    theorem_name_pattern = r'^(lemma|theorem|corollary)\s+(\S+)'
+    theorems = []
+
+    # Remove afp-XXXX-XX-XX/thys/ from path >= this is required for ID generation
+    subpath = entry + "".join(thy_path.split(entry)[1:])
+
+    for code_match in re.finditer(theorem_pattern, file_content):
+        code_match = code_match.group()
+        code_match = code_match.strip()
+        
+        if not (code_match.startswith("theorem ") or code_match.startswith("lemma ") or code_match.startswith("corollary ")):
+            continue
+
+        id_match = re.search(theorem_name_pattern, code_match)
+
+        if id_match:
+            theorem_type = id_match.group(1)
+            theorem_name = id_match.group(2)
+            theorem_id = subpath + "#" + theorem_type + "#" + theorem_name
+        else:
+            raise ValueError(f"Could not extract theorem type or theorem name in file {thy_path} in code block:\n{code_match}")
+
+        theorem = {
+            "id": theorem_id,
+            "code": code_match
+        }
+        theorems.append(theorem)
+
+    return theorems
+
+def parse_latex(tex_path, stopwords_list):
+    if os.path.exists(tex_path):
+        with open(tex_path, 'r') as tex_path:
+            file_content = tex_path.read()
+    else:
+        raise ValueError(f"Path {tex_path} does not exist.")
+    
+    # pylatexenc currently does not support parsing documents with the \href command
+    # As a result, we have to replace it globally before parsing the document
+    # See: https://github.com/phfaist/pylatexenc/issues/94
+    # TODO: Potential fix: https://github.com/phfaist/pylatexenc/issues/94#issuecomment-1527266657
+    #file_content = re.sub(r'\\href\b', r'\\texttt', file_content)
+    file_content = "\\texttt".join(file_content.split("\\href"))
+    plain_text = LatexNodes2Text().latex_to_text(file_content)
+
+    # Replace newlines through spaces
+    plain_text = re.compile(r"\n").sub(" ", plain_text)
+
+    # Replace two or more white spaces through single whitespace
+    plain_text = re.compile(r"\s+").sub(" ", plain_text).strip()
+
+    # Only allow letters or spaces in text
+    plain_text = re.compile('[^a-zA-Z ]').sub("", plain_text) 
+
+    # Remove words with three characters or less
+    plain_text = re.compile(r'\b\w{1,3}\b').sub("", plain_text)
+
+    # Remove stop words like e.g. "the", "a", "and", etc.
+    plain_text_tokens = word_tokenize(plain_text)
+    tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
+    plain_text = (" ").join(tokens_without_stopwords)
+
+    # print(plain_text)
+    return plain_text
+
 def get_entry_files(entry):
     entry_folder = AFP_FOLDER + "/thys/" + entry
     found_thy_files = []
