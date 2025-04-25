@@ -24,8 +24,10 @@ def fetch_all_docs(solr):
     max_docs = results.raw_response['response']['numFound']
 
     for result in results:
-        extract_docs(result)
-    
+        doc_id, doc_str = extract_docs(result)
+        document_ids.append(doc_id)
+        documents.append(doc_str)
+
     pages = math.ceil(max_docs / docs_per_page)
     for i in range(pages):
         print(f"Fetching page {i+1} of {pages} pages...")
@@ -35,6 +37,13 @@ def fetch_all_docs(solr):
             doc_id, doc_str = extract_docs(result)
             document_ids.append(doc_id)
             documents.append(doc_str)
+
+    document_tree = {
+        "document_ids": document_ids,
+        "documents": documents
+    }
+
+    return document_tree
 
 def build_document_tree(config, solr):
     CACHE_FOLDER = config["cache_folder"]
@@ -50,7 +59,6 @@ def build_document_tree(config, solr):
         print(f"Finished loading {DOCUMENT_TREE_CACHE}")
     else:
         print(f"{DOCUMENT_TREE_CACHE} does not already exist. Loading all entries...")
-
-        fetch_all_docs(solr)
+        document_tree = fetch_all_docs(solr)
 
     return document_tree
