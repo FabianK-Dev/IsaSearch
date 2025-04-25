@@ -36,7 +36,7 @@ print("Ping Solr for health check...")
 solr.ping() # Health check
 
 def extract_docs(doc):
-    doc_str = doc["session"] + doc["src"] # TODO
+    doc_str = doc["theory"] + " " + doc["src"] # TODO
     return doc["id"], doc_str
 
 def fetch_all_docs(solr):
