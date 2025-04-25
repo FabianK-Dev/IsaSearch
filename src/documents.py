@@ -58,7 +58,7 @@ def build_document_tree(config, solr):
         document_tree = json.loads(data)
         print(f"Finished loading {DOCUMENT_TREE_CACHE}")
     else:
-        print(f"{DOCUMENT_TREE_CACHE} does not already exist. Loading all entries...")
+        print(f"{DOCUMENT_TREE_CACHE} does not already exist. Fetching all documents...")
         document_tree = fetch_all_docs(solr)
 
     return document_tree
