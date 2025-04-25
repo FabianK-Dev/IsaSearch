@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from benchmark import benchmark
 
-from src.solr import connect_solr
+from src.solr import connect_solr, docs_by_ids
 from src.documents import build_document_tree
 from src.embeddings import encode_embeddings, load_encoders, search
 
@@ -33,4 +33,7 @@ document_tree = build_document_tree(config, solr)
 encoded_embeddings = encode_embeddings(config, document_tree)
 bi_encoder, cross_encoder = load_encoders()
 
-search("CYK", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+results = search("CYK", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+
+for result in docs_by_ids(solr, [results["results"][0]["id"]]):
+    print(result["id"])
