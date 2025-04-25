@@ -66,4 +66,22 @@ def build_document_tree(config, solr):
         print(f"{DOCUMENT_TREE_CACHE} does not already exist. Fetching all documents...")
         document_tree = fetch_all_docs(solr)
 
+    max_characters, max_characters_id = 0, None
+    total_characters = 0
+
+    for i, document in enumerate(document_tree["documents"]):
+            num_characters = len(document)
+            total_characters += num_characters
+
+            if num_characters > max_characters:
+                max_characters = num_characters
+                max_characters_id = document_tree["document_ids"][i]
+
+    avg_chars_per_doc = total_characters / len(document_tree["documents"])
+    avg_tokens_per_doc = avg_chars_per_doc / 4 # 1 token ~= 4 characters in English according to OpenAI (https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them)
+
+    print(f"Average number of characters per document: {avg_chars_per_doc}")
+    print(f"Average number of tokens per document: {avg_tokens_per_doc}")
+    print(f"Largest theorem document: {max_characters_id}")
+
     return document_tree
