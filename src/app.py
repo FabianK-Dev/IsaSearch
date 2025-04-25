@@ -13,28 +13,21 @@ import torch
 import time
 import pysolr
 
-print("Loading config...")
-with open("config.json", "r") as file:
-    data = file.read()
-    config = json.loads(data)
-
-AFP_FOLDER = config["afp_folder"]
-
 print("Downloading stopwords corpus and check for updates...")
 nltk.download('stopwords')
 
 print("Downloading punkt_tab corpus for work tokenization and check for updates...")
 nltk.download('punkt_tab')
 
+print("Loading config...")
+
+with open("config.json", "r") as file:
+    data = file.read()
+    config = json.loads(data)
+
+AFP_FOLDER = config["afp_folder"]
 CACHE_FOLDER = ".cache"
 ENTRY_DB_CACHE = f"{CACHE_FOLDER}/entry_db_cache.json"
-entry_db = {}
-
-print(f"Connect to Solr at " + config["solr_core_url"] + "...")
-solr = pysolr.Solr(config["solr_core_url"], always_commit=True, timeout=10)
-
-print("Ping Solr for health check...")
-solr.ping() # Health check
 
 def extract_docs(doc):
     doc_str = doc["src"]
