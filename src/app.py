@@ -35,44 +35,6 @@ if os.path.exists(AFP_ROOTS):
         for line in entries_file:
             entries.append(line.rstrip())
 
-# TODO: DEPRECATED => I will remove this method soon
-def extract_theorems_regex(thy_path, entry):
-    if os.path.exists(thy_path):
-        with open(thy_path, 'r') as thy_file:
-            file_content = thy_file.read()
-
-    # A simple RegEx for testing purposes that extracts all theorem code block from a .thy-file
-    theorem_pattern = r'(lemma|theorem|corollary)(.+\n)*\n'
-    theorem_name_pattern = r'^(lemma|theorem|corollary)\s+(\S+)'
-    theorems = []
-
-    # Remove afp-XXXX-XX-XX/thys/ from path >= this is required for ID generation
-    subpath = entry + "".join(thy_path.split(entry)[1:])
-
-    for code_match in re.finditer(theorem_pattern, file_content):
-        code_match = code_match.group()
-        code_match = code_match.strip()
-        
-        if not (code_match.startswith("theorem ") or code_match.startswith("lemma ") or code_match.startswith("corollary ")):
-            continue
-
-        id_match = re.search(theorem_name_pattern, code_match)
-
-        if id_match:
-            theorem_type = id_match.group(1)
-            theorem_name = id_match.group(2)
-            theorem_id = subpath + "#" + theorem_type + "#" + theorem_name
-        else:
-            raise ValueError(f"Could not extract theorem type or theorem name in file {thy_path} in code block:\n{code_match}")
-
-        theorem = {
-            "id": theorem_id,
-            "code": code_match
-        }
-        theorems.append(theorem)
-
-    return theorems
-
 def parse_latex(tex_path, stopwords_list):
     if os.path.exists(tex_path):
         with open(tex_path, 'r') as tex_path:
