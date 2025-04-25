@@ -1,3 +1,6 @@
+import json
+import os
+import math
 import re
 
 def extract_docs(doc):
@@ -32,3 +35,22 @@ def fetch_all_docs(solr):
             doc_id, doc_str = extract_docs(result)
             document_ids.append(doc_id)
             documents.append(doc_str)
+
+def build_document_tree(config, solr):
+    CACHE_FOLDER = config["cache_folder"]
+    DOCUMENT_TREE_CACHE = f"{CACHE_FOLDER}/document_tree.json"
+
+    if os.path.isfile(DOCUMENT_TREE_CACHE):
+        print("Cached {DOCUMENT_TREE_CACHE} already exists. Loading...")
+
+        with open(DOCUMENT_TREE_CACHE, 'r') as file:
+            data = file.read()
+
+        document_tree = json.loads(data)
+        print(f"Finished loading {DOCUMENT_TREE_CACHE}")
+    else:
+        print(f"{DOCUMENT_TREE_CACHE} does not already exist. Loading all entries...")
+
+        fetch_all_docs(solr)
+
+    return document_tree
