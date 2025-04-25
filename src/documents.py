@@ -15,6 +15,11 @@ def extract_docs(doc):
     doc_str = doc["theory"] + " " + doc_str # Prepend the theory name
     return doc["id"], doc_str
 
+# TODO
+def get_entry_metadata(config, entry):
+    metadata_folder = config["afp_folder"] + "/metadata/"
+    entry_toml = metadata_folder + "/entries/" + entry + ".toml"
+
 def fetch_all_docs(solr):
     document_ids = []
     documents = []
