@@ -4,15 +4,12 @@ import torch
 import os
 import time
 
-bi_encoder = None
-cross_encoder = None
-
 def load_encoders():
-    global bi_encoder, cross_encoder
-
     bi_encoder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
     bi_encoder.max_seq_length = 256*2
     cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
+
+    return bi_encoder, cross_encoder
 
 def encode_embeddings(config, documents_tree):
     CACHE_FOLDER = config["cache_folder"]
@@ -36,3 +33,40 @@ def encode_embeddings(config, documents_tree):
         torch.save(encoded_embeddings, EMBEDDINGS_CACHE)
 
     return encode_embeddings
+
+def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document_tree):
+    start = time.time()
+    docs_to_retrieve = 1000
+
+    # Bi-encoder search
+    question_encoded = bi_encoder.encode(search_query, convert_to_tensor=True)
+    question_encoded = question_encoded.cuda()
+
+    hits = util.semantic_search(question_encoded, encoded_embeddings, top_k=docs_to_retrieve)
+    hits = hits[0] # It is in theory possible to search multiple queries at once, however we only provided one search query and thus 'hits' only contains one element
+
+    # Cross-encoder search
+    cross_encoder_input = [[search_query, document_tree["documents"][hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
+    cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
+
+    # Assign each cross encoder score to hits list
+    for i in range(len(cross_encoder_scores)):
+        hits[i]['cross_encoder_score'] = cross_encoder_scores[i]
+
+    hits = sorted(hits, key=lambda x: x['cross_encoder_score'], reverse=True)
+    results = []
+
+    for hit in hits:
+        results.append({
+            "score": hit["cross_encoder_score"],
+            "id": document_tree["document_ids"][hit['corpus_id']]
+        })
+
+    end = time.time()
+    search_duration  = end - start
+    print(f"Search time: {end - start} sec")
+
+    return {
+        "results": results,
+        "duration": search_duration
+    }

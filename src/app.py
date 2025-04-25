@@ -5,7 +5,7 @@ from benchmark import benchmark
 
 from src.solr import connect_solr
 from src.documents import build_document_tree
-from src.embeddings import encode_embeddings, load_encoders
+from src.embeddings import encode_embeddings, load_encoders, search
 
 import math
 import json
@@ -31,4 +31,6 @@ with open("config.json", "r") as file:
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
 encoded_embeddings = encode_embeddings(config, document_tree)
-load_encoders()
+bi_encoder, cross_encoder = load_encoders()
+
+search("CYK", encode_embeddings, bi_encoder, cross_encoder, document_tree)
