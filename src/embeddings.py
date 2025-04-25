@@ -72,6 +72,6 @@ def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document
     print(f"Search time: {end - start} sec")
 
     return {
-        "results": results,
+        "results": results[:100], # Only return the top 100 results
         "duration": search_duration
     }
