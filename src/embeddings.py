@@ -2,6 +2,17 @@ from sentence_transformers import SentenceTransformer, CrossEncoder, util
 
 import torch
 import os
+import time
+
+bi_encoder = None
+cross_encoder = None
+
+def load_encoders():
+    global bi_encoder, cross_encoder
+
+    bi_encoder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    bi_encoder.max_seq_length = 256*2
+    cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
 
 def encode_embeddings(config, documents_tree):
     CACHE_FOLDER = config["cache_folder"]
