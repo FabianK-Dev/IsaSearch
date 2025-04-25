@@ -26,7 +26,7 @@ with open("config.json", "r") as file:
     config = json.loads(data)
 
 AFP_FOLDER = config["afp_folder"]
-CACHE_FOLDER = ".cache"
+CACHE_FOLDER = config["cache_folder"]
 ENTRY_DB_CACHE = f"{CACHE_FOLDER}/entry_db_cache.json"
 
 def extract_docs(doc):
