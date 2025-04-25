@@ -19,13 +19,13 @@ with open(CACHE_FILE, "r") as file:
     soup = BeautifulSoup(file, "html.parser")
 
 scrape_statistics = {
-    "unique_entries": [],
-    "unknown_entries": 0,
-    "unknwon_entry_urls": []
+    "unique_sessions": [],
+    "unknown_sessions": 0,
+    "unknwon_session_urls": []
 }
 
 with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
-    fieldnames = ['ID', 'Title', 'Theorem', 'Link', 'Entry', 'Title query']
+    fieldnames = ['ID', 'Title', 'Theorem', 'Link', 'Session', 'Title query']
     writer = csv.DictWriter(file, fieldnames=fieldnames)
     writer.writeheader()
 
@@ -43,23 +43,23 @@ with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
         href = prev_a.get("href", "") if prev_a else "?"
         
         if "/entries/" in href:
-            entry = href.split("/entries/")[1].split(".")[0]
+            session = href.split("/entries/")[1].split(".")[0]
             
-            if entry not in scrape_statistics["unique_entries"]:
-                scrape_statistics["unique_entries"] = scrape_statistics["unique_entries"] + [entry]
+            if session not in scrape_statistics["unique_sessions"]:
+                scrape_statistics["unique_sessions"] = scrape_statistics["unique_sessions"] + [session]
         else:
-            entry = "?"
-            scrape_statistics["unknown_entries"] += 1
+            session = "?"
+            scrape_statistics["unknown_sessions"] += 1
 
-            if href not in scrape_statistics["unknwon_entry_urls"]:
-                scrape_statistics["unknwon_entry_urls"] = scrape_statistics["unknwon_entry_urls"] + [href]
+            if href not in scrape_statistics["unknwon_session_urls"]:
+                scrape_statistics["unknwon_session_urls"] = scrape_statistics["unknwon_session_urls"] + [href]
 
         writer.writerow({
             'ID': id_,
             'Title': title,
             'Theorem': inner_text,
             'Link': href,
-            'Entry': entry,
+            'Sessions': session,
             'Title query': title
         })
 
