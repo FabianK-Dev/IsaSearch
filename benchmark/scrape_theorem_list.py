@@ -8,7 +8,7 @@ import re
 
 URL = "https://cgi.cse.unsw.edu.au/~kleing/top100/"
 CACHE_FILE = "top100.html"
-CSV_FILE = "top100_data.csv"
+CSV_FILE = "benchmark.csv"
 
 if not os.path.exists(CACHE_FILE):
     response = requests.get(URL)
