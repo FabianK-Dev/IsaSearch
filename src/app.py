@@ -35,41 +35,6 @@ if os.path.exists(AFP_ROOTS):
         for line in entries_file:
             entries.append(line.rstrip())
 
-def parse_latex(tex_path, stopwords_list):
-    if os.path.exists(tex_path):
-        with open(tex_path, 'r') as tex_path:
-            file_content = tex_path.read()
-    else:
-        raise ValueError(f"Path {tex_path} does not exist.")
-    
-    # pylatexenc currently does not support parsing documents with the \href command
-    # As a result, we have to replace it globally before parsing the document
-    # See: https://github.com/phfaist/pylatexenc/issues/94
-    # TODO: Potential fix: https://github.com/phfaist/pylatexenc/issues/94#issuecomment-1527266657
-    #file_content = re.sub(r'\\href\b', r'\\texttt', file_content)
-    file_content = "\\texttt".join(file_content.split("\\href"))
-    plain_text = LatexNodes2Text().latex_to_text(file_content)
-
-    # Replace newlines through spaces
-    plain_text = re.compile(r"\n").sub(" ", plain_text)
-
-    # Replace two or more white spaces through single whitespace
-    plain_text = re.compile(r"\s+").sub(" ", plain_text).strip()
-
-    # Only allow letters or spaces in text
-    plain_text = re.compile('[^a-zA-Z ]').sub("", plain_text) 
-
-    # Remove words with three characters or less
-    plain_text = re.compile(r'\b\w{1,3}\b').sub("", plain_text)
-
-    # Remove stop words like e.g. "the", "a", "and", etc.
-    plain_text_tokens = word_tokenize(plain_text)
-    tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
-    plain_text = (" ").join(tokens_without_stopwords)
-
-    # print(plain_text)
-    return plain_text
-
 def get_entry_files(entry):
     entry_folder = AFP_FOLDER + "/thys/" + entry
     found_thy_files = []
