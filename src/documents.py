@@ -55,7 +55,7 @@ def build_document_tree(config, solr):
     DOCUMENT_TREE_CACHE = f"{CACHE_FOLDER}/document_tree.json"
 
     if os.path.isfile(DOCUMENT_TREE_CACHE):
-        print("Cached {DOCUMENT_TREE_CACHE} already exists. Loading...")
+        print(f"Cached {DOCUMENT_TREE_CACHE} already exists. Loading...")
 
         with open(DOCUMENT_TREE_CACHE, 'r') as file:
             data = file.read()
