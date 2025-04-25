@@ -59,7 +59,7 @@ with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
             'Title': title,
             'Theorem': inner_text,
             'Link': href,
-            'Sessions': session,
+            'Session': session,
             'Title query': title
         })
 
