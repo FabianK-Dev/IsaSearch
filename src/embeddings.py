@@ -32,7 +32,7 @@ def encode_embeddings(config, documents_tree):
             show_progress_bar=True)
         torch.save(encoded_embeddings, EMBEDDINGS_CACHE)
 
-    return encode_embeddings
+    return encoded_embeddings
 
 def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document_tree):
     start = time.time()
