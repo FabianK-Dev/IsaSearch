@@ -66,6 +66,13 @@ def build_document_tree(config, solr):
         print(f"{DOCUMENT_TREE_CACHE} does not already exist. Fetching all documents...")
         document_tree = fetch_all_docs(solr)
 
+        # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
+        if not os.path.exists(CACHE_FOLDER):
+            os.makedirs(CACHE_FOLDER)
+
+        with open(DOCUMENT_TREE_CACHE, 'w') as file:
+            json.dump(document_tree, file)
+
     max_characters, max_characters_id = 0, None
     total_characters = 0
 

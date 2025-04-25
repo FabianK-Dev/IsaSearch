@@ -30,6 +30,11 @@ def encode_embeddings(config, documents_tree):
             documents_tree["documents"],
             convert_to_tensor=True,
             show_progress_bar=True)
+
+        # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
+        if not os.path.exists(CACHE_FOLDER):
+            os.makedirs(CACHE_FOLDER)
+
         torch.save(encoded_embeddings, EMBEDDINGS_CACHE)
 
     return encoded_embeddings
