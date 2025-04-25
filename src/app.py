@@ -5,7 +5,7 @@ from benchmark import benchmark
 
 from src.solr import connect_solr
 from src.documents import build_document_tree
-from src.embeddings import embeddings
+from src.embeddings import encode_embeddings
 
 import math
 import json
