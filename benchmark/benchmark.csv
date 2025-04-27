@@ -2,7 +2,7 @@ ID,Title,Theorem,Link,Session,Title query,Natural language query,Natual language
 square-root-of-2-is-irrational,Square Root of 2 is Irrational,"theorem sqrt_prime_irrational: ""prime p ⟹ sqrt (real p) ∉ ℚ""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ∉ ℚ""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL,Square Root of 2 is Irrational,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL,Square Root of 2 is Irrational,"“sqrt(2) is not rational"" by assuming that it is rational and then deriving a falsehood",https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality
 fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental_theorem_of_algebra:
   assumes nc: ""¬ constant (poly p)""
   shows ""∃z::complex. poly p z = 0""
