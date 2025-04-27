@@ -33,7 +33,15 @@ document_tree = build_document_tree(config, solr)
 encoded_embeddings = encode_embeddings(config, document_tree)
 bi_encoder, cross_encoder = load_encoders()
 
-results = search("CYK", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+results = search("\"sqrt(2) is not rational\" by assuming that it is rational and then deriving a falsehood", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+#results = search("Square Root of 2 is Irrational", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
 
-for result in docs_by_ids(solr, [results["results"][0]["id"]]):
-    print(result["id"])
+id_list = [ r["id"] for r in results["results"] ]
+print("IDs", id_list)
+i = 0
+for result in docs_by_ids(solr, id_list):
+    i += 1
+    if i > 10:
+        break
+
+    print(results["results"][0]["score"], result["id"], result["src"])
