@@ -2,7 +2,7 @@ ID,Title,Theorem,Link,Session,Title query,Natural language query,Natual language
 square-root-of-2-is-irrational,Square Root of 2 is Irrational,"theorem sqrt_prime_irrational: ""prime p ⟹ sqrt (real p) ∉ ℚ""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ∉ ℚ""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL,Square Root of 2 is Irrational,"“sqrt(2) is not rational"" by assuming that it is rational and then deriving a falsehood",https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL,Square Root of 2 is Irrational,sqrt(2) is not rational,https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality
 fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental_theorem_of_algebra:
   assumes nc: ""¬ constant (poly p)""
   shows ""∃z::complex. poly p z = 0""
@@ -10,7 +10,7 @@ fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental
 denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"theorem rat_denum: ""∃f :: nat ⇒ rat. surj f""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"
 
-Z (the set of all integers) and Q (the set of all rational numbers) are countable.",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
+Z (the set of all integers) and Q (the set of all rational numbers) are countable",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
 pythagorean-theorem,Pythagorean Theorem,"lemma pythagoras:
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
@@ -38,7 +38,7 @@ theorem Goedel_II:
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q − 1)/2) * q. Then the congruence x 2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,
 the-impossibility-of-trisecting-the-angle-and-doubling-the-cube,The Impossibility of Trisecting the Angle and Doubling the Cube,"theorem impossibility_of_doubling_the_cube:
   ""x^3 = 2 ⟹ (Point x 0) ∉ constructible""
 
