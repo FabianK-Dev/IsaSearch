@@ -6,9 +6,9 @@ corollary sqrt_2_not_rat: ""sqrt 2 ∉ ℚ""
 fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental_theorem_of_algebra:
   assumes nc: ""¬ constant (poly p)""
   shows ""∃z::complex. poly p z = 0""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements
 denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"theorem rat_denum: ""∃f :: nat ⇒ rat. surj f""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"The integers Z are countable because the […] rational numbers Q are countable because the function g : Z x N -> Q given by g(m, n) = m / (n+1) is a surjection [...].",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
 pythagorean-theorem,Pythagorean Theorem,"lemma pythagoras:
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
