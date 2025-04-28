@@ -34,9 +34,9 @@ def fetch_all_docs(solr):
         documents.append(doc_str)
 
     pages = math.ceil(max_docs / docs_per_page)
-    for i in range(pages):
+    for i in range(1, pages):
         print(f"Fetching page {i+1} of {pages} pages...")
-        results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=docs_per_page)
+        results = solr.search("command:theorem OR command:lemma OR command:corollary", start=i * docs_per_page, rows=docs_per_page)
 
         for result in results:
             doc_id, doc_str = extract_docs(result)
