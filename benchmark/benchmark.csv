@@ -6,7 +6,7 @@ corollary sqrt_2_not_rat: ""sqrt 2 ∉ ℚ""
 fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental_theorem_of_algebra:
   assumes nc: ""¬ constant (poly p)""
   shows ""∃z::complex. poly p z = 0""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,
 denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"theorem rat_denum: ""∃f :: nat ⇒ rat. surj f""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,,
 pythagorean-theorem,Pythagorean Theorem,"lemma pythagoras:
