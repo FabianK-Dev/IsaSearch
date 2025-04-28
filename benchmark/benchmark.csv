@@ -44,16 +44,17 @@ the-impossibility-of-trisecting-the-angle-and-doubling-the-cube,The Impossibilit
 
 theorem impossibility_of_trisecting_angle_pi_over_3:
   ""Point (cos (pi / 9)) 0 ∉ constructible""
-",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle and Doubling the Cube,"The angle pi/3 radians ([…] 60°) is constructible. […] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected.",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility
+",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle and Doubling the Cube,"The angle pi/3 radians ([…] 60°) is constructible. […] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility
 ,The Impossibility of Doubling the Cube,,,,,"Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",https://en.wikipedia.org/wiki/Doubling_the_cube
-the-area-of-a-circle,The Area of a Circle,"theorem content_ball:
+the-area-of-a-circle,The Volume of a Sphere,"theorem content_ball:
   fixes c :: ""'a :: euclidean_space""
   assumes ""r ≥ 0""
   shows   ""content (ball c r) = pi powr (DIM('a) / 2) / Gamma (DIM('a) / 2 + 1) * r ^ DIM('a)""
 
 corollary content_circle:
   ""r ≥ 0 ⟹ content (ball c r :: (real ^ 2) set) = r ^ 2 * pi""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Ball_Volume.html,HOL,The Area of a Circle,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Ball_Volume.html,HOL,The Area of a Circle,"In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",https://en.wikipedia.org/wiki/Sphere#Enclosed_volume
+,The Area of a Circle,,,,,"[…] The area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",https://en.wikipedia.org/wiki/Area_of_a_circle
 eulers-generalisation-of-fermats-little-theorem,Euler’s Generalisation of Fermat’s Little Theorem,"lemma euler_theorem:
   fixes a m :: nat
   assumes ""coprime a m""
