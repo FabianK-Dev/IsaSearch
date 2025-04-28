@@ -33,14 +33,5 @@ document_tree = build_document_tree(config, solr)
 encoded_embeddings = encode_embeddings(config, document_tree)
 bi_encoder, cross_encoder = load_encoders()
 
-results = search("\"sqrt(2) is not rational\" by assuming that it is rational and then deriving a falsehood", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
-
-for r in results["results"]:
-    print("-" * 40)
-    print(r)
-
-results = search("Square Root of 2 is Irrational", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
-
-for r in results["results"]:
-    print("-" * 40)
-    print(r)
+results = search("Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+#results = search("Square Root of 2 is Irrational", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
