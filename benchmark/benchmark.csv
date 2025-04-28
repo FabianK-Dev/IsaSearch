@@ -61,13 +61,13 @@ eulers-generalisation-of-fermats-little-theorem,Euler’s Generalisation of Ferm
   shows ""[a ^ totient m = 1] (mod m)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Euler’s Generalisation of Fermat’s Little Theorem,"[…] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",https://en.wikipedia.org/wiki/Euler%27s_theorem
 the-infinitude-of-primes,The Infinitude of Primes,"lemma primes_infinite: ""¬finite {p::nat. prime p}""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,The Infinitude of Primes,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,The Infinitude of Primes,[…] There are infinitely many prime numbers,https://en.wikipedia.org/wiki/Euclid%27s_theorem
 the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,"corollary Euler_relation:
   fixes p :: ""'n::euclidean_space set""
   assumes ""polytope p"" ""aff_dim p = 3"" ""DIM('n) = 3""
   shows ""(card {v. v face_of p ∧ aff_dim v = 0} + card {f. f face_of p ∧ aff_dim f = 2}) -
          card {e. e face_of p ∧ aff_dim e = 1} = 2""
-",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,,
+",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,"If a line segment intersects two straight lines forming two interior angles on the same side that are less than two right angles, then the two lines, if extended indefinitely, meet on that side […]",https://en.wikipedia.org/wiki/Parallel_postulate
 polyhedron-formula,Polyhedron Formula,"corollary Euler_relation:
   fixes p :: ""'n::euclidean_space set""
   assumes ""polytope p"" ""aff_dim p = 3"" ""DIM('n) = 3""
