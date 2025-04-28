@@ -8,17 +8,17 @@ fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental
   shows ""∃z::complex. poly p z = 0""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements
 denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"theorem rat_denum: ""∃f :: nat ⇒ rat. surj f""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"The integers Z are countable because the […] rational numbers Q are countable because the function g : Z x N -> Q given by g(m, n) = m / (n+1) is a surjection [...].",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"The integers Z are countable because the […] rational numbers Q are countable because the function g : Z x N -> Q given by g(m, n) = m / (n + 1) is a surjection […]",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
 pythagorean-theorem,Pythagorean Theorem,"lemma pythagoras:
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
   shows   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2""
-",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Pythagorean Theorem,,
+",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Pythagorean Theorem,"In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2",https://en.wikipedia.org/wiki/Pythagorean_theorem#Inner_product_spaces
 prime-number-theorem,Prime Number Theorem,"definition pi :: ""nat ⇒ real""
   where ""pi x = real (card {y::nat. y ≤ x ∧ prime y})""
 
 lemma PrimeNumberTheorem: ""(λx. pi x * ln (real x) / real x) ⇢ 1""
-",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Prime Number Theorem,,
+",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Prime Number Theorem,The […] theorem [...] states that x / log(x) is a good approximation to pi(x) in the sense that the limit of the quotient of  […] pi(x) and x / log(x) as x increases without bound is 1,https://en.wikipedia.org/wiki/Prime_number_theorem#Statement
 gödels-incompleteness-theorem,Gödel’s Incompleteness Theorem,"theorem Goedel_I:
   assumes ""¬ {} ⊢ Fls""
   obtains δ where
