@@ -8,7 +8,9 @@ fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"lemma fundamental
   shows ""∃z::complex. poly p z = 0""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements
 denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"theorem rat_denum: ""∃f :: nat ⇒ rat. surj f""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"The integers Z are countable because the […] rational numbers Q are countable because the function g : Z x N -> Q given by g(m, n) = m / (n + 1) is a surjection […]",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"
+
+Z (the set of all integers) and Q (the set of all rational numbers) are countable.",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
 pythagorean-theorem,Pythagorean Theorem,"lemma pythagoras:
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
@@ -18,8 +20,8 @@ prime-number-theorem,Prime Number Theorem,"definition pi :: ""nat ⇒ real""
   where ""pi x = real (card {y::nat. y ≤ x ∧ prime y})""
 
 lemma PrimeNumberTheorem: ""(λx. pi x * ln (real x) / real x) ⇢ 1""
-",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Prime Number Theorem,The […] theorem [...] states that x / log(x) is a good approximation to pi(x) in the sense that the limit of the quotient of  […] pi(x) and x / log(x) as x increases without bound is 1,https://en.wikipedia.org/wiki/Prime_number_theorem#Statement
-gödels-incompleteness-theorem,Gödel’s Incompleteness Theorem,"theorem Goedel_I:
+",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Prime Number Theorem,"Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. […] x / log x is a good approximation to pi(x)",https://en.wikipedia.org/wiki/Prime_number_theorem#Statement
+gödels-incompleteness-theorem,Gödel’s Incompleteness Theorem 1,"theorem Goedel_I:
   assumes ""¬ {} ⊢ Fls""
   obtains δ where
       ""{} ⊢ δ IFF Neg (PfP ⌈δ⌉)""
@@ -31,7 +33,8 @@ gödels-incompleteness-theorem,Gödel’s Incompleteness Theorem,"theorem Goedel
 theorem Goedel_II:
   assumes ""¬ {} ⊢ Fls""
     shows ""¬ {} ⊢ Neg (PfP ⌈Fls⌉)""
-",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem,,
+",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem,Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete […],https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem
+,Gödel’s Incompleteness Theorem 2,,,,,"[…] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
