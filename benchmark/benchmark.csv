@@ -38,13 +38,14 @@ theorem Goedel_II:
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q − 1)/2) * q. Then the congruence x 2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,
-the-impossibility-of-trisecting-the-angle-and-doubling-the-cube,The Impossibility of Trisecting the Angle and Doubling the Cube,"theorem impossibility_of_doubling_the_cube:
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q − 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,
+the-impossibility-of-trisecting-the-angle-and-doubling-the-cube,The Impossibility of Trisecting the Angle,"theorem impossibility_of_doubling_the_cube:
   ""x^3 = 2 ⟹ (Point x 0) ∉ constructible""
 
 theorem impossibility_of_trisecting_angle_pi_over_3:
   ""Point (cos (pi / 9)) 0 ∉ constructible""
-",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle and Doubling the Cube,,
+",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle and Doubling the Cube,"The angle pi/3 radians ([…] 60°) is constructible. […] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected.",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility
+,The Impossibility of Doubling the Cube,,,,,"Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",https://en.wikipedia.org/wiki/Doubling_the_cube
 the-area-of-a-circle,The Area of a Circle,"theorem content_ball:
   fixes c :: ""'a :: euclidean_space""
   assumes ""r ≥ 0""
