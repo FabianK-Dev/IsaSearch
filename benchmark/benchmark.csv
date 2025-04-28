@@ -59,7 +59,7 @@ eulers-generalisation-of-fermats-little-theorem,Euler’s Generalisation of Ferm
   fixes a m :: nat
   assumes ""coprime a m""
   shows ""[a ^ totient m = 1] (mod m)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Euler’s Generalisation of Fermat’s Little Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Euler’s Generalisation of Fermat’s Little Theorem,"[…] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",https://en.wikipedia.org/wiki/Euler%27s_theorem
 the-infinitude-of-primes,The Infinitude of Primes,"lemma primes_infinite: ""¬finite {p::nat. prime p}""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,The Infinitude of Primes,,
 the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,"corollary Euler_relation:
