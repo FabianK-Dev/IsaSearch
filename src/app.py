@@ -6,21 +6,15 @@ from benchmark import metrics
 from src.solr import connect_solr, docs_by_ids
 from src.documents import build_document_tree
 from src.embeddings import encode_embeddings, load_encoders, search
+from src.nltk_setup import init_nltk_corpora
 
 import math
 import json
-import nltk
 import os
 import os.path
 import re
 import time
 import pysolr
-
-print("Downloading stopwords corpus and checking for updates...")
-nltk.download('stopwords')
-
-print("Downloading punkt_tab corpus for work tokenization and checking for updates...")
-nltk.download('punkt_tab')
 
 print("Loading config...")
 
@@ -28,6 +22,7 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
+init_nltk_corpora()
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
 encoded_embeddings = encode_embeddings(config, document_tree)
