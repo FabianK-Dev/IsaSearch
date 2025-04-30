@@ -48,7 +48,7 @@ with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
             if session not in scrape_statistics["unique_sessions"]:
                 scrape_statistics["unique_sessions"] = scrape_statistics["unique_sessions"] + [session]
         elif "/library/" in href:
-            session = href.split("/library/")[1].split("/")[0]
+            session = href.split("/library/HOL/")[1].split("/")[0]
             
             if session not in scrape_statistics["unique_sessions"]:
                 scrape_statistics["unique_sessions"] = scrape_statistics["unique_sessions"] + [session]
