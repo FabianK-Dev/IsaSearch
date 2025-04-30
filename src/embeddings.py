@@ -4,10 +4,10 @@ import torch
 import os
 import time
 
-def load_encoders():
-    bi_encoder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+def load_encoders(bi_encoder_model, cross_encoder_model):
+    bi_encoder = SentenceTransformer(bi_encoder_model)
     bi_encoder.max_seq_length = 256*2
-    cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
+    cross_encoder = CrossEncoder(cross_encoder_model)
 
     return bi_encoder, cross_encoder
 
