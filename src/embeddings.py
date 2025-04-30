@@ -5,16 +5,10 @@ import torch
 import os
 import time
 
-def load_models(bi_encoder_model, cross_encoder_model=None):
-    print(f"Loading bi-encoder {bi_encoder_model} ...")
+def load_models(bi_encoder_model, cross_encoder_model):
     bi_encoder = SentenceTransformer(bi_encoder_model)
     bi_encoder.max_seq_length = 256*2
-
-    if cross_encoder_model:
-        cross_encoder = CrossEncoder(cross_encoder_model)
-    else:
-        cross_encoder = None
-        print("Skip loading cross-encoder because no argument passed to method.")
+    cross_encoder = CrossEncoder(cross_encoder_model)
 
     return bi_encoder, cross_encoder
 
@@ -43,7 +37,7 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
     return encoded_embeddings
 
-def search(search_query, encoded_embeddings, document_tree, bi_encoder, cross_encoder=None):
+def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document_tree):
     start = time.time()
     docs_to_retrieve = 1000
 
@@ -54,20 +48,15 @@ def search(search_query, encoded_embeddings, document_tree, bi_encoder, cross_en
     hits = util.semantic_search(question_encoded, encoded_embeddings, top_k=docs_to_retrieve)
     hits = hits[0] # It is in theory possible to search multiple queries at once, however we only provided one search query and thus 'hits' only contains one element
 
-    # Cross-encoder search is optional
-    if cross_encoder:
-        cross_encoder_input = [[search_query, document_tree["documents"][hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
-        cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
+    # Cross-encoder search
+    cross_encoder_input = [[search_query, document_tree["documents"][hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
+    cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
 
-        # Assign each cross encoder score to hits list
-        for i in range(len(cross_encoder_scores)):
-            hits[i]['cross_encoder_score'] = cross_encoder_scores[i]
+    # Assign each cross encoder score to hits list
+    for i in range(len(cross_encoder_scores)):
+        hits[i]['cross_encoder_score'] = cross_encoder_scores[i]
 
-        hits = sorted(hits, key=lambda x: x['cross_encoder_score'], reverse=True)
-    else:
-        # If no cross_encoder model is given, sort the hits by bi_encoder
-        hits = sorted(hits, key=lambda x: x['score'], reverse=True)
-
+    hits = sorted(hits, key=lambda x: x['cross_encoder_score'], reverse=True)
     results = {}
 
     for i, hit in enumerate(hits):
@@ -76,7 +65,7 @@ def search(search_query, encoded_embeddings, document_tree, bi_encoder, cross_en
 
         result_id = document_tree["document_ids"][hit['corpus_id']]
         results[result_id] = {
-            "score": hit["cross_encoder_score"] if cross_encoder else hit["score"],
+            "score": hit["cross_encoder_score"],
             "id": result_id
         }
 
