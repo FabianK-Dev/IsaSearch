@@ -5,7 +5,7 @@ from benchmark import metrics
 
 from src.solr import connect_solr, docs_by_ids
 from src.documents import build_document_tree
-from src.embeddings import encode_embeddings, load_models, search
+from src.embeddings import encode_embeddings, load_models, search, search_results_to_docs
 from src.nltk_setup import init_nltk_corpora
 
 import math
@@ -29,4 +29,4 @@ bi_encoder, cross_encoder = load_models('sentence-transformers/all-MiniLM-L6-v2'
 encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
 
 results = search("Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
-#results = search("Square Root of 2 is Irrational", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+print(search_results_to_docs(results, solr)["results"][0])

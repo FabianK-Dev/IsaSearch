@@ -1,4 +1,5 @@
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
+from src.solr import docs_by_ids
 
 import torch
 import os
@@ -56,19 +57,38 @@ def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document
         hits[i]['cross_encoder_score'] = cross_encoder_scores[i]
 
     hits = sorted(hits, key=lambda x: x['cross_encoder_score'], reverse=True)
-    results = []
+    results = {}
 
-    for hit in hits:
-        results.append({
+    for i, hit in enumerate(hits):
+        if i >= 100: # Only return the top 100 results
+            break
+
+        result_id = document_tree["document_ids"][hit['corpus_id']]
+        results[result_id] = {
             "score": hit["cross_encoder_score"],
-            "id": document_tree["document_ids"][hit['corpus_id']]
-        })
+            "id": result_id
+        }
 
     end = time.time()
     search_duration  = end - start
     print(f"Search time: {end - start} sec")
 
     return {
-        "results": results[:100], # Only return the top 100 results
+        "results": results, # Only return the top 100 results
         "duration": search_duration
     }
+
+def search_results_to_docs(search_results, solr):
+    result_ids = []
+    for result_id in search_results["results"]:
+        result_ids.append(result_id)
+
+    result_documents = docs_by_ids(solr, result_ids) # Get the Solr documents for each search result by ID i.e. map each search result that only consists of an ID so far to its corresponding Solr document
+
+    # Finally, update the search_results list and append data of the Solr document
+    for result in result_documents:
+        search_results["results"][result["id"]]["doc"] = result
+
+    # Convert search_results["results"] to a list => this makes sorting or receiving the nth result easier
+    search_results["results"] = [value for _, value in search_results["results"].items()]
+    return search_results
