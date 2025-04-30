@@ -11,16 +11,13 @@ def load_encoders():
 
     return bi_encoder, cross_encoder
 
-def encode_embeddings(config, documents_tree):
+def encode_embeddings(config, documents_tree, bi_encoder):
     CACHE_FOLDER = config["cache_folder"]
     EMBEDDINGS_CACHE = f"{CACHE_FOLDER}/embeddings_cache.pt"
 
     # Retrieve and Rerank pipeline
     if not torch.cuda.is_available():
         print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
-
-    bi_encoder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    bi_encoder.max_seq_length = 256*2
 
     if os.path.exists(EMBEDDINGS_CACHE):
         encoded_embeddings = torch.load(EMBEDDINGS_CACHE)
