@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from benchmark import benchmark
+from benchmark import metrics
 
 from src.solr import connect_solr, docs_by_ids
 from src.documents import build_document_tree
