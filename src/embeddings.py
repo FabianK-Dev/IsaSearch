@@ -4,7 +4,7 @@ import torch
 import os
 import time
 
-def load_encoders(bi_encoder_model, cross_encoder_model):
+def load_models(bi_encoder_model, cross_encoder_model):
     bi_encoder = SentenceTransformer(bi_encoder_model)
     bi_encoder.max_seq_length = 256*2
     cross_encoder = CrossEncoder(cross_encoder_model)
