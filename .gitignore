@@ -11,4 +11,5 @@ Isabelle*/
 *.zip
 *.tar.gz
 *.pyc
+*.log
 benchmark/*.html
