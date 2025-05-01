@@ -4,7 +4,10 @@ top_k = 10
 
 # For a given query, is the target among the top-k search results? => TRUE / FALSE
 def top_k_accuracy(results, target_id):
-    for result in results["results"]:
+    for i, result in enumerate(results["results"]):
+        if i >= top_k: # i starts at 0 => if i == top_k we can gurantee that the result was not within the first k results
+            return False
+
         if result["id"] == target_id:
             return True
     
