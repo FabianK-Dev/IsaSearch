@@ -19,12 +19,21 @@ encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
+query_columns = ['Title query', 'Natural language query']
 
 for i, row in benchmark_df.iterrows():
-    print(row['ID'], row['Natural language query'])
+    for query_type in query_columns:
+        query = row[query_type]
+        
+        if not pd.isna(query):
+            print(f"Searching: \"{query}\"")
 
-# results = search("Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
-# results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+            results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+            results_list = search_results_to_docs(results_dict, solr)["results"]
+
+            metrics = {
+            }
+    # results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
 
 # for i, result in enumerate(search_results_to_docs(results, solr)["results"][:100]):
 #     print("#" + str(i+1) + ": " + str(float(result["score"])) + ": " + result["id"])
