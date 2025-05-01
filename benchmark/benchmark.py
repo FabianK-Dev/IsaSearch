@@ -19,7 +19,9 @@ encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
-query_columns = ['Title query', 'Natural language query']
+
+skip_metrics = True
+query_columns = ['Title query']#, 'Natural language query']
 
 for i, row in benchmark_df.iterrows():
     for query_type in query_columns:
@@ -31,8 +33,16 @@ for i, row in benchmark_df.iterrows():
             results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
-            metrics = {
-            }
+            for i, result in enumerate(results_list):
+                if i >= 20: break
+                print(str(float(result["score"])) + ": " + result["doc"]["entity_kname"])
+
+            print()
+            print()
+
+            if not skip_metrics:
+                metrics = {}
+
     # results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
 
 # for i, result in enumerate(search_results_to_docs(results, solr)["results"][:100]):
