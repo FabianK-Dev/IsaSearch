@@ -21,3 +21,10 @@ def discounted_cumulative_gain(results, target_id):
             return 1 / math.log2(i + 2) # the first loop iteration starts at 0, not 1, thus we have to add 2 instead of 1
 
     return 0 # If the relevant target document (identified by target_id) is not in the search results
+
+def reciprocal_rank(results, target_id): 
+    for i, result in enumerate(results["results"]):
+        if result["id"] == target_id:
+            return 1 / (i + 1)
+
+    return 0
