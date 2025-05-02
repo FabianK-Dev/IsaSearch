@@ -11,11 +11,11 @@ denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,,"
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"
 
 Z (the set of all integers) and Q (the set of all rational numbers) are countable",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
-pythagorean-theorem,Pythagorean Theorem,,"lemma pythagoras:
+pythagorean-theorem,Pythagorean Theorem,"{""entity_kname"":""Triangle.Pythagoras|thm""}","lemma pythagoras:
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
   shows   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2""
-",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Pythagorean Theorem,"In an inner-product space, [...] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2",https://en.wikipedia.org/wiki/Pythagorean_theorem#Inner_product_spaces
+",,?,Pythagorean Theorem,"In an inner-product space, [...] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2",https://en.wikipedia.org/wiki/Pythagorean_theorem#Inner_product_spaces
 prime-number-theorem,Prime Number Theorem,,"definition pi :: ""nat ⇒ real""
   where ""pi x = real (card {y::nat. y ≤ x ∧ prime y})""
 
