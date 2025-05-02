@@ -16,25 +16,21 @@ pythagorean-theorem,Pythagorean Theorem,"{""entity_kname"":""Triangle.Pythagoras
   assumes ""orthogonal (b - a) (c - a)""
   shows   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2""
 ",,?,Pythagorean Theorem,"In an inner-product space, [...] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2",https://en.wikipedia.org/wiki/Pythagorean_theorem#Inner_product_spaces
-prime-number-theorem,Prime Number Theorem,,"definition pi :: ""nat ⇒ real""
-  where ""pi x = real (card {y::nat. y ≤ x ∧ prime y})""
+prime-number-theorem,Prime Number Theorem,"{""entity_kname"":""Prime_Number_Theorem.prime_number_theorem|thm""}","definition primes_pi :: ""real ⇒ real"" where
+  ""primes_pi x = real (card {p::nat. prime p ∧ p ≤ x})""
 
-lemma PrimeNumberTheorem: ""(λx. pi x * ln (real x) / real x) ⇢ 1""
-",http://www.andrew.cmu.edu/user/avigad/isabelle/NumberTheory/PrimeNumberTheorem.html,?,Prime Number Theorem,"Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",https://en.wikipedia.org/wiki/Prime_number_theorem#Statement
-gödels-incompleteness-theorem,Gödel’s Incompleteness Theorem 1,,"theorem Goedel_I:
+corollary prime_number_theorem: ""primes_pi ∼[at_top] (λx. x / ln x)""",https://www.isa-afp.org/entries/Prime_Number_Theorem.html,?,Prime Number Theorem,"Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",https://en.wikipedia.org/wiki/Prime_number_theorem#Statement
+gödels-incompleteness-theorem-1,Gödel’s Incompleteness Theorem 1,"{""entity_kname"":""Goedel_I.Goedel_I|thm""}","theorem Goedel_I:
   assumes ""¬ {} ⊢ Fls""
   obtains δ where
       ""{} ⊢ δ IFF Neg (PfP ⌈δ⌉)""
       ""¬ {} ⊢ δ""
       ""¬ {} ⊢ Neg δ""
       ""eval_fm e δ""
-      ""ground_fm δ""
-
-theorem Goedel_II:
+      ""ground_fm δ""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem 1,Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...],https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem
+gödels-incompleteness-theorem-2,Gödel’s Incompleteness Theorem 2,"{""entity_kname"":""Goedel_II.Goedel_II|thm""}","theorem Goedel_II:
   assumes ""¬ {} ⊢ Fls""
-    shows ""¬ {} ⊢ Neg (PfP ⌈Fls⌉)""
-",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem,Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...],https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem
-,Gödel’s Incompleteness Theorem 2,,,,,,"[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem
+    shows ""¬ {} ⊢ Neg (PfP ⌈Fls⌉)""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem 2,"[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,,"theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
