@@ -2,6 +2,7 @@ from src.solr import connect_solr, docs_by_ids
 from src.documents import build_document_tree
 from src.embeddings import encode_embeddings, load_models, search, search_results_to_docs
 from src.nltk_setup import init_nltk_corpora
+from benchmark.metrics import top_k_accuracy, discounted_cumulative_gain, reciprocal_rank
 
 import json
 import pandas as pd
@@ -20,13 +21,18 @@ encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
 
-skip_metrics = True
 query_columns = ['Title query', 'Natural language query']
+benchmark_results = {}
 
 for i, row in benchmark_df.iterrows():
     target_identifier = row["Target Identifier"]
     if pd.isna(target_identifier):
         continue
+
+    try:
+        target_identifier = json.loads(row["Target Identifier"])
+    except:
+        print("Warning: Target identifier JSON '" + row["Target Identifier"] + "' for row index " + str(i) + " and row ID '" + row["ID"] + "' could not be parsed. This benchmark entry will be skipped.")
 
     for query_type in query_columns:
         query = row[query_type]
@@ -34,20 +40,12 @@ for i, row in benchmark_df.iterrows():
         if not pd.isna(query):
             print(row)
             print()
-            # print(f"Searching: \"{query}\"")
+            print(f"Searching: \"{query}\"")
 
-            # results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
-            # results_list = search_results_to_docs(results_dict, solr)["results"]
+            results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
+            results_list = search_results_to_docs(results_dict, solr)["results"]
 
-            # for i, result in enumerate(results_list):
-            #     if i >= 20: break
-            #     print(str(float(result["score"])) + ": " + result["doc"]["entity_kname"])
-
-            # print()
-            # print()
-
-            # if not skip_metrics:
-            #     metrics = {}
+            #top_k_accuracy(results_list, )
 
     # results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
 
