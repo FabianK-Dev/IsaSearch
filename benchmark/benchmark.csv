@@ -35,7 +35,7 @@ law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,,"theorem Quadratic_Re
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q − 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,
-the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the Angle,,"theorem impossibility_of_trisecting_angle_pi_over_3:
+the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the Angle,"{""entity_kname"":""Impossible_Geometry.impossibility_of_trisecting_angle_pi_over_3|thm""}","theorem impossibility_of_trisecting_angle_pi_over_3:
   ""Point (cos (pi / 9)) 0 ∉ constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle,"The angle pi/3 radians ([...] 60°) is constructible. [...] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility
 the-impossibility-of-doubling-the-cube,The Impossibility of Doubling the Cube,"{""entity_kname"":""Impossible_Geometry.impossibility_of_doubling_the_cube|thm""}","theorem impossibility_of_doubling_the_cube:
   ""x^3 = 2 ⟹ (Point x 0) ∉ constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Doubling the Cube,"Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",https://en.wikipedia.org/wiki/Doubling_the_cube
@@ -55,13 +55,10 @@ eulers-generalisation-of-fermats-little-theorem,Euler’s Generalisation of Ferm
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Euler’s Generalisation of Fermat’s Little Theorem,"[...] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",https://en.wikipedia.org/wiki/Euler%27s_theorem
 the-infinitude-of-primes,The Infinitude of Primes,,"lemma primes_infinite: ""¬finite {p::nat. prime p}""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,The Infinitude of Primes,[...] There are infinitely many prime numbers,https://en.wikipedia.org/wiki/Euclid%27s_theorem
-the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,,"corollary Euler_relation:
-  fixes p :: ""'n::euclidean_space set""
-  assumes ""polytope p"" ""aff_dim p = 3"" ""DIM('n) = 3""
-  shows ""(card {v. v face_of p ∧ aff_dim v = 0} + card {f. f face_of p ∧ aff_dim f = 2}) -
-         card {e. e face_of p ∧ aff_dim e = 1} = 2""
-",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,"If a line segment intersects two straight lines forming two interior angles on the same side that are less than two right angles, then the two lines, if extended indefinitely, meet on that side [...]",https://en.wikipedia.org/wiki/Parallel_postulate
-polyhedron-formula,Polyhedron Formula,,"corollary Euler_relation:
+the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,https://search.isabelle.in.tum.de/#details/default_Isabelle2024_AFP2024/Tarskis_Geometry.Hyperbolic_Tarski.224664.224825,"theorem hyp2_not_tarski: ""¬ (tarski real_hyp2_C real_hyp2_B)""
+  using hyp2_axiom10_false
+  by (unfold tarski_def tarski_space_def tarski_space_axioms_def) simp",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,[…] The parallel postulate is independent of other axioms of Euclidean geometry,https://en.wikipedia.org/wiki/Parallel_postulate
+polyhedron-formula,Polyhedron Formula,"{""entity_kname"":""Euler_Formula.Euler_relation|thm""}","corollary Euler_relation:
   fixes p :: ""'n::euclidean_space set""
   assumes ""polytope p"" ""aff_dim p = 3"" ""DIM('n) = 3""
   shows ""(card {v. v face_of p ∧ aff_dim v = 0} + card {f. f face_of p ∧ aff_dim f = 2}) -
