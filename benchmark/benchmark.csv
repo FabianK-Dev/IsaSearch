@@ -1,4 +1,4 @@
-ID,Title,Target Theorem,Theorem,Link,Session,Title query,Natural language query,Natual language query source
+ID,Title,Target Identifier,Theorem,Link,Session,Title query,Natural language query,Natual language query source
 square-root-of-2-is-irrational,Square Root of 2 is Irrational,,"theorem sqrt_prime_irrational: ""prime p ⟹ sqrt (real p) ∉ ℚ""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ∉ ℚ""
