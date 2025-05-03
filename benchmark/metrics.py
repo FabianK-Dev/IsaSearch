@@ -22,6 +22,7 @@ def discounted_cumulative_gain(results, target_id):
 
     return 0 # If the relevant target document (identified by target_id) is not in the search results
 
+# reciprocal_rank = (1 / rank) where rank_i is the rank of the first relevant document
 def reciprocal_rank(results, target_id): 
     for i, result in enumerate(results["results"]):
         if result["id"] == target_id:
