@@ -11,16 +11,16 @@ denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,,"
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"
 
 Z (the set of all integers) and Q (the set of all rational numbers) are countable",https://en.wikipedia.org/wiki/Countable_set#cite_note-25
-pythagorean-theorem,Pythagorean Theorem,"{""entity_kname"":""Triangle.Pythagoras|thm""}","lemma pythagoras:
+pythagorean-theorem,Pythagorean Theorem,"{""theory"":""Triangle.Pythagoras""}","lemma pythagoras:
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
   shows   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2""
 ",,?,Pythagorean Theorem,"In an inner-product space, [...] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2",https://en.wikipedia.org/wiki/Pythagorean_theorem#Inner_product_spaces
-prime-number-theorem,Prime Number Theorem,"{""entity_kname"":""Prime_Number_Theorem.prime_number_theorem|thm""}","definition primes_pi :: ""real ⇒ real"" where
+prime-number-theorem,Prime Number Theorem,"{""theory"":""Prime_Number_Theorem.prime_number_theorem""}","definition primes_pi :: ""real ⇒ real"" where
   ""primes_pi x = real (card {p::nat. prime p ∧ p ≤ x})""
 
 corollary prime_number_theorem: ""primes_pi ∼[at_top] (λx. x / ln x)""",https://www.isa-afp.org/entries/Prime_Number_Theorem.html,?,Prime Number Theorem,"Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",https://en.wikipedia.org/wiki/Prime_number_theorem#Statement
-gödels-incompleteness-theorem-1,Gödel’s Incompleteness Theorem 1,"{""entity_kname"":""Goedel_I.Goedel_I|thm""}","theorem Goedel_I:
+gödels-incompleteness-theorem-1,Gödel’s Incompleteness Theorem 1,"{""theory"":""Goedel_I.Goedel_I""}","theorem Goedel_I:
   assumes ""¬ {} ⊢ Fls""
   obtains δ where
       ""{} ⊢ δ IFF Neg (PfP ⌈δ⌉)""
@@ -28,16 +28,16 @@ gödels-incompleteness-theorem-1,Gödel’s Incompleteness Theorem 1,"{""entity_
       ""¬ {} ⊢ Neg δ""
       ""eval_fm e δ""
       ""ground_fm δ""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem 1,Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...],https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem
-gödels-incompleteness-theorem-2,Gödel’s Incompleteness Theorem 2,"{""entity_kname"":""Goedel_II.Goedel_II|thm""}","theorem Goedel_II:
+gödels-incompleteness-theorem-2,Gödel’s Incompleteness Theorem 2,"{""theory"":""Goedel_II.Goedel_II""}","theorem Goedel_II:
   assumes ""¬ {} ⊢ Fls""
     shows ""¬ {} ⊢ Neg (PfP ⌈Fls⌉)""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,Gödel’s Incompleteness Theorem 2,"[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,,"theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q − 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,
-the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the Angle,"{""entity_kname"":""Impossible_Geometry.impossibility_of_trisecting_angle_pi_over_3|thm""}","theorem impossibility_of_trisecting_angle_pi_over_3:
+the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the Angle,"{""theory"":""Impossible_Geometry.impossibility_of_trisecting_angle_pi_over_3""}","theorem impossibility_of_trisecting_angle_pi_over_3:
   ""Point (cos (pi / 9)) 0 ∉ constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle,"The angle pi/3 radians ([...] 60°) is constructible. [...] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility
-the-impossibility-of-doubling-the-cube,The Impossibility of Doubling the Cube,"{""entity_kname"":""Impossible_Geometry.impossibility_of_doubling_the_cube|thm""}","theorem impossibility_of_doubling_the_cube:
+the-impossibility-of-doubling-the-cube,The Impossibility of Doubling the Cube,"{""theory"":""Impossible_Geometry.impossibility_of_doubling_the_cube""}","theorem impossibility_of_doubling_the_cube:
   ""x^3 = 2 ⟹ (Point x 0) ∉ constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Doubling the Cube,"Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",https://en.wikipedia.org/wiki/Doubling_the_cube
 the-area-of-a-circle,The Volume of a Sphere,,"theorem content_ball:
   fixes c :: ""'a :: euclidean_space""
@@ -58,7 +58,7 @@ the-infinitude-of-primes,The Infinitude of Primes,,"lemma primes_infinite: ""¬f
 the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,https://search.isabelle.in.tum.de/#details/default_Isabelle2024_AFP2024/Tarskis_Geometry.Hyperbolic_Tarski.224664.224825,"theorem hyp2_not_tarski: ""¬ (tarski real_hyp2_C real_hyp2_B)""
   using hyp2_axiom10_false
   by (unfold tarski_def tarski_space_def tarski_space_axioms_def) simp",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,[…] The parallel postulate is independent of other axioms of Euclidean geometry,https://en.wikipedia.org/wiki/Parallel_postulate
-polyhedron-formula,Polyhedron Formula,"{""entity_kname"":""Euler_Formula.Euler_relation|thm""}","corollary Euler_relation:
+polyhedron-formula,Polyhedron Formula,"{""theory"":""Euler_Formula.Euler_relation""}","corollary Euler_relation:
   fixes p :: ""'n::euclidean_space set""
   assumes ""polytope p"" ""aff_dim p = 3"" ""DIM('n) = 3""
   shows ""(card {v. v face_of p ∧ aff_dim v = 0} + card {f. f face_of p ∧ aff_dim f = 2}) -
@@ -85,7 +85,7 @@ all-primes-1-mod-4-equal-the-sum-of-two-squares,All Primes (1 mod 4) Equal the S
   assumes ""prime (p :: nat)""
   shows   ""(∃a b. p = a⇧2 + b⇧2) = [p ≠ 3] (mod 4)
 ",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,,
-greens-theorem,Green’s theorem,"{""entity_kname"":""Green.green_typeI_typeII_chain.GreenThm_typeI_typeII_divisible_region|fact""}","lemma GreenThm_typeI_typeII_divisible_region:
+greens-theorem,Green’s theorem,"{""theory"":""Green.green_typeI_typeII_chain.GreenThm_typeI_typeII_divisible_region""}","lemma GreenThm_typeI_typeII_divisible_region:
       assumes valid_typeI_div: ""valid_typeI_division s twoChain_typeI"" and
               valid_typeII_div: ""valid_typeII_division s twoChain_typeII"" and
               f_analytically_valid: ""∀twoC ∈ twoChain_typeI. analytically_valid (cubeImage twoC) (%x. (F x) ∙ i) j""
