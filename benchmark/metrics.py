@@ -46,7 +46,25 @@ def reciprocal_rank(results, target_identifier):
     return 0
 
 def calculate_mean_metrics(benchmark_results):
+    metrics = {}
 
     for target_id in benchmark_results:
-        for metric in benchmark_results[target_id]:
-            print(benchmark_results[target_id][metric])
+        for query_type in benchmark_results[target_id]:
+            if query_type == "skipped" and benchmark_results[target_id]["skipped"]:
+                print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True")
+                break
+
+            for metric in benchmark_results[target_id][query_type]:
+                metric_value = benchmark_results[target_id][query_type][metric]
+                if metric not in metrics:
+                    metrics[metric] = { "total": 0, "sample_size": 0 }
+                
+                metrics[metric]["total"] += metric_value
+                metrics[metric]["sample_size"] += 1
+
+    # Calculate the average
+    for metric in metrics:
+        metrics[metric]["average"] = metrics[metric]["total"] / metrics[metric]["sample_size"]
+        del metrics[metric]["total"]
+
+    print(metrics)
