@@ -1,12 +1,22 @@
-cross_encoder=cross-encoder/ms-marco-MiniLM-L6-v2,,,,
+"cross_encoder=
+cross-encoder/ms-marco-MiniLM-L6-v2",,,,
 bi_encoder=, ,flax-sentence-embeddings/st-codesearch-distilroberta-base,sentence-transformers/msmarco-distilbert-base-v4,
 ,top_k_accuracy,0.6428571428571429,0.5714285714285714,
 ,normalized_discounted_cumulative_gain,0.4929526653792781,0.4694885694208949,
 ,reciprocal_rank,0.4335374149659864,0.41964285714285715,
 ,,,,
 ,,,,
-cross_encoder=cross-encoder/ms-marco-MiniLM-L12-v2,,,,
+"cross_encoder=
+cross-encoder/ms-marco-MiniLM-L12-v2",,,,
 ,,flax-sentence-embeddings/st-codesearch-distilroberta-base,,multi-qa-mpnet-base-cos-v1
 ,,0.6428571428571429,,0.6428571428571429
 ,,0.5071612362766735,,0.4630631487640172
 ,,0.4515151515151515,,0.4079365079365079
+,,,,
+,,,,
+"cross_encoder=
+cross-encoder/ms-marco-electra-base",,,,
+,,flax-sentence-embeddings/st-codesearch-distilroberta-base,,
+,,0.5714285714285714,,
+,,0.45527004331039606,,
+,,0.4067549491706795,,
