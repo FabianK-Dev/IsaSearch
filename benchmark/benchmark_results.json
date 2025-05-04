@@ -19,15 +19,15 @@
         },
         "Natural language query": {
             "top_k_accuracy": 0,
-            "normalized_discounted_cumulative_gain": 0,
-            "reciprocal_rank": 0
+            "normalized_discounted_cumulative_gain": 0.15019048322368797,
+            "reciprocal_rank": 0.01
         }
     },
     "g\u00f6dels-incompleteness-theorem-1": {
         "Title query": {
-            "top_k_accuracy": 0,
-            "normalized_discounted_cumulative_gain": 0.27023815442731974,
-            "reciprocal_rank": 0.08333333333333333
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 0.43067655807339306,
+            "reciprocal_rank": 0.25
         },
         "Natural language query": {
             "top_k_accuracy": 0,
@@ -77,8 +77,8 @@
     "polyhedron-formula": {
         "Title query": {
             "top_k_accuracy": 1,
-            "normalized_discounted_cumulative_gain": 0.31546487678572877,
-            "reciprocal_rank": 0.125
+            "normalized_discounted_cumulative_gain": 0.3333333333333333,
+            "reciprocal_rank": 0.14285714285714285
         }
     },
     "greens-theorem": {
@@ -91,15 +91,15 @@
     "meta": {
         "top_k_accuracy": {
             "sample_size": 14,
-            "average": 0.5714285714285714
+            "average": 0.6428571428571429
         },
         "normalized_discounted_cumulative_gain": {
             "sample_size": 14,
-            "average": 0.4694885694208949
+            "average": 0.4929526653792781
         },
         "reciprocal_rank": {
             "sample_size": 14,
-            "average": 0.41964285714285715
+            "average": 0.4335374149659864
         }
     }
 }
