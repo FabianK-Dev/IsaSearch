@@ -4,7 +4,9 @@ top_k = 10
 
 def is_correct_target(result, target_identifier):
     for identifier in target_identifier:
-        print(result["id"])
+        print("OURS:", result["doc"][identifier])
+        print("GOLD:", target_identifier[identifier])
+        
         if result["doc"][identifier] == target_identifier[identifier]:
             print("YES :)")
             return True

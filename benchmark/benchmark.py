@@ -45,7 +45,7 @@ for i, row in benchmark_df.iterrows():
             results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
-            print(results_list[0]["doc"]["entity_kname"], results_list[0]["doc"]["entity_kname"], target_identifier)
+            print(results_list[0]["doc"]["theory"], target_identifier)
             top_k_accuracy(results_list, target_identifier)
     break
 
