@@ -56,7 +56,6 @@ for i, row in benchmark_df.iterrows():
                 "discounted_cumulative_gain": discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
             }
-    break
 
 with open("./benchmark/benchmark_results.json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
