@@ -1,7 +1,5 @@
 import math
 
-top_k = 10
-
 def is_correct_target(result, target_identifier):
     for identifier in target_identifier:
         if not identifier in result["doc"]:
@@ -19,9 +17,9 @@ def is_correct_target(result, target_identifier):
     return False
 
 # For a given query, is the target_identifier among the top-k search results? => TRUE / FALSE
-def top_k_accuracy(results, target_id):
+def top_k_accuracy(results, target_id, k):
     for i, result in enumerate(results):
-        if i >= top_k: # i starts at 0 => if i == top_k we can gurantee that the result was not within the first k results
+        if i >= k: # i starts at 0 => if i == top_k we can gurantee that the result was not within the first k results
             return False
 
         if is_correct_target(result, target_id):
@@ -45,3 +43,7 @@ def reciprocal_rank(results, target_identifier):
             return 1 / (i + 1)
 
     return 0
+
+def calculate_mean_metrics(benchmark_results):
+    for target_id in benchmark_results:
+        print(target_id)

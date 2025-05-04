@@ -2,7 +2,7 @@ from src.solr import connect_solr, docs_by_ids
 from src.documents import build_document_tree
 from src.embeddings import encode_embeddings, load_models, search, search_results_to_docs
 from src.nltk_setup import init_nltk_corpora
-from benchmark.metrics import top_k_accuracy, discounted_cumulative_gain, reciprocal_rank
+from benchmark.metrics import top_k_accuracy, discounted_cumulative_gain, reciprocal_rank, calculate_mean_metrics
 
 import json
 import pandas as pd
@@ -22,6 +22,7 @@ benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
 
 query_columns = ['Title query', 'Natural language query']
+top_k = 10
 benchmark_results = {}
 
 for i, row in benchmark_df.iterrows():
@@ -52,10 +53,13 @@ for i, row in benchmark_df.iterrows():
 
             benchmark_results[row["ID"]][query_type] = {
                 "query": query,
-                "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
+                f"top_{top_k}_accuracy": top_k_accuracy(results_list, target_identifier, top_k),
                 "discounted_cumulative_gain": discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
             }
+    break
 
 with open("./benchmark/benchmark_results.json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
+
+calculate_mean_metrics(benchmark_results)
