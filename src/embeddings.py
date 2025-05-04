@@ -39,7 +39,7 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
 def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document_tree):
     start = time.time()
-    docs_to_retrieve = 1000
+    docs_to_retrieve = 100
 
     # Bi-encoder search
     question_encoded = bi_encoder.encode(search_query, convert_to_tensor=True)
@@ -50,7 +50,7 @@ def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document
 
     # Cross-encoder search
     cross_encoder_input = [[search_query, document_tree["documents"][hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
-    cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
+    cross_encoder_scores = cross_encoder.predict(cross_encoder_input, batch_size=8)
 
     # Assign each cross encoder score to hits list
     for i in range(len(cross_encoder_scores)):
