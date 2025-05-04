@@ -54,7 +54,7 @@ for i, row in benchmark_df.iterrows():
             benchmark_results[row["ID"]][query_type] = {
                 "query": query,
                 f"top_{top_k}_accuracy": top_k_accuracy(results_list, target_identifier, top_k),
-                "discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
+                "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
             }
     break
