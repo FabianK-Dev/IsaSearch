@@ -4,8 +4,8 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                "reciprocal_rank": 0.5
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
@@ -24,8 +24,8 @@
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0
+                "normalized_discounted_cumulative_gain": 0.1505149978319906,
+                "reciprocal_rank": 0.010101010101010102
             }
         }
     },
@@ -34,8 +34,8 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.3010299956639812,
-                "reciprocal_rank": 0.1111111111111111
+                "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                "reciprocal_rank": 0.2
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
@@ -100,8 +100,8 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.2890648263178879,
-                "reciprocal_rank": 0.1
+                "normalized_discounted_cumulative_gain": 0.3010299956639812,
+                "reciprocal_rank": 0.1111111111111111
             }
         }
     },
@@ -122,11 +122,11 @@
         },
         "normalized_discounted_cumulative_gain": {
             "sample_size": 14,
-            "average": 0.4630631487640172
+            "average": 0.5071612362766735
         },
         "reciprocal_rank": {
             "sample_size": 14,
-            "average": 0.4079365079365079
+            "average": 0.4515151515151515
         }
     }
 }

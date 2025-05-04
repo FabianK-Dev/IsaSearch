@@ -6,7 +6,7 @@ bi_encoder=, ,flax-sentence-embeddings/st-codesearch-distilroberta-base,sentence
 ,,,,
 ,,,,
 cross_encoder=cross-encoder/ms-marco-MiniLM-L12-v2,,,,
-,,,,multi-qa-mpnet-base-cos-v1
-,,,,0.6428571428571429
-,,,,0.4630631487640172
-,,,,0.4079365079365079
+,,flax-sentence-embeddings/st-codesearch-distilroberta-base,,multi-qa-mpnet-base-cos-v1
+,,0.6428571428571429,,0.6428571428571429
+,,0.5071612362766735,,0.4630631487640172
+,,0.4515151515151515,,0.4079365079365079
