@@ -49,13 +49,14 @@ def calculate_mean_metrics(benchmark_results):
     metrics = {}
 
     for target_id in benchmark_results:
-        for query_type in benchmark_results[target_id]:
-            if query_type == "skipped" and benchmark_results[target_id]["skipped"]:
-                print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True")
-                break
+        is_skipped = "skipped" in benchmark_results[target_id]["metadata"] and benchmark_results[target_id]["metadata"]["skipped"]
+        if is_skipped:
+            print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True")
+            break
 
-            for metric in benchmark_results[target_id][query_type]:
-                metric_value = benchmark_results[target_id][query_type][metric]
+        for query_type in benchmark_results[target_id]["queries"]:
+            for metric in benchmark_results[target_id]["queries"][query_type]:
+                metric_value = benchmark_results[target_id]["queries"][query_type][metric]
                 if metric not in metrics:
                     metrics[metric] = { "total": 0, "sample_size": 0 }
                 
