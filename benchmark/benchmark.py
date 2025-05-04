@@ -45,7 +45,9 @@ for i, row in benchmark_df.iterrows():
             results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
-            #top_k_accuracy(results_list, )
+            print(results_list[0]["doc"]["entity_kname"], results_list[0]["doc"]["entity_kname"], target_identifier)
+            top_k_accuracy(results_list, target_identifier)
+    break
 
     # results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
 
