@@ -3,9 +3,9 @@
         "metadata": {},
         "queries": {
             "Title query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
@@ -19,13 +19,13 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 1.0,
-                "reciprocal_rank": 1.0
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0
+                "normalized_discounted_cumulative_gain": 0.1505149978319906,
+                "reciprocal_rank": 0.010101010101010102
             }
         }
     },
@@ -33,9 +33,9 @@
         "metadata": {},
         "queries": {
             "Title query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                "reciprocal_rank": 0.2
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
@@ -48,9 +48,9 @@
         "metadata": {},
         "queries": {
             "Title query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
@@ -83,9 +83,9 @@
                 "reciprocal_rank": 1.0
             },
             "Natural language query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0
             }
         }
     },
@@ -100,8 +100,8 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                "reciprocal_rank": 0.25
+                "normalized_discounted_cumulative_gain": 0.3010299956639812,
+                "reciprocal_rank": 0.1111111111111111
             }
         }
     },
@@ -118,15 +118,15 @@
     "summary": {
         "top_k_accuracy": {
             "sample_size": 14,
-            "average": 0.35714285714285715
+            "average": 0.6428571428571429
         },
         "normalized_discounted_cumulative_gain": {
             "sample_size": 14,
-            "average": 0.31647689700524234
+            "average": 0.5071612362766735
         },
         "reciprocal_rank": {
             "sample_size": 14,
-            "average": 0.30357142857142855
+            "average": 0.4515151515151515
         }
     }
 }
