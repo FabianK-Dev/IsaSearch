@@ -24,7 +24,7 @@ def fetch_all_docs(solr):
     document_ids = []
     documents = []
 
-    docs_per_page = 1000
+    docs_per_page = 10000
     results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=docs_per_page)
     max_docs = results.raw_response['response']['numFound']
 
