@@ -51,7 +51,6 @@ for i, row in benchmark_df.iterrows():
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
             benchmark_results[row["ID"]][query_type] = {
-                "query": query,
                 "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
                 "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
