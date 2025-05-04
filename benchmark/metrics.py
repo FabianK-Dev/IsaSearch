@@ -29,7 +29,7 @@ def top_k_accuracy(results, target_id, k):
 
 # Calculates a relevance scale of the retrieved documents
 # The reelvance value is reduced logarithmically depending on the result position
-def discounted_cumulative_gain(results, target_identifier):
+def normalized_discounted_cumulative_gain(results, target_identifier):
     for i in range(len( results )):
         if is_correct_target(results[i], target_identifier):
             return 1 / math.log2(i + 2) # the first loop iteration starts at 0, not 1, thus we have to add 2 instead of 1
@@ -45,5 +45,7 @@ def reciprocal_rank(results, target_identifier):
     return 0
 
 def calculate_mean_metrics(benchmark_results):
+
     for target_id in benchmark_results:
-        print(target_id)
+        for metric in benchmark_results[target_id]:
+            print(benchmark_results[target_id][metric])
