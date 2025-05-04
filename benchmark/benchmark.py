@@ -55,9 +55,8 @@ for i, row in benchmark_df.iterrows():
                 "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
             }
-    break
+
+benchmark_results["meta"] = calculate_mean_metrics(benchmark_results)
 
 with open("./benchmark/benchmark_results.json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
-
-calculate_mean_metrics(benchmark_results)

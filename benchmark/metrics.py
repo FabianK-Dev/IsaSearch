@@ -67,4 +67,4 @@ def calculate_mean_metrics(benchmark_results):
         metrics[metric]["average"] = metrics[metric]["total"] / metrics[metric]["sample_size"]
         del metrics[metric]["total"]
 
-    print(metrics)
+    return metrics
