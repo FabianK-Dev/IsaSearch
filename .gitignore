@@ -13,3 +13,4 @@ Isabelle*/
 *.pyc
 *.log
 benchmark/*.html
+benchmark/benchmark_results.json
