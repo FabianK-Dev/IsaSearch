@@ -50,14 +50,13 @@ for i, row in benchmark_df.iterrows():
             results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
-            benchmark_results[row["ID"]][query] = {
+            benchmark_results[row["ID"]][query_type] = {
+                "query": query,
                 "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
                 "discounted_cumulative_gain": discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
             }
     break
 
-    # results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
-
-# for i, result in enumerate(search_results_to_docs(results, solr)["results"][:100]):
-#     print("#" + str(i+1) + ": " + str(float(result["score"])) + ": " + result["id"])
+with open("./benchmark/benchmark_results.json", "w") as outfile:
+    json.dump(benchmark_results, outfile, indent=4)
