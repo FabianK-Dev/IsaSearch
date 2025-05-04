@@ -29,10 +29,15 @@ for i, row in benchmark_df.iterrows():
     if pd.isna(target_identifier):
         continue
 
+    if not row["ID"] in benchmark_results:
+        benchmark_results[row["ID"]] = {}
+
     try:
         target_identifier = json.loads(row["Target Identifier"])
     except:
         print("Warning: Target identifier JSON '" + row["Target Identifier"] + "' for row index " + str(i) + " and row ID '" + row["ID"] + "' could not be parsed. This benchmark entry will be skipped.")
+        benchmark_results[row["ID"]]["skipped"] = True
+        continue
 
     for query_type in query_columns:
         query = row[query_type]
@@ -45,8 +50,11 @@ for i, row in benchmark_df.iterrows():
             results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
-            print(results_list[0]["doc"]["theory"], target_identifier)
-            top_k_accuracy(results_list, target_identifier)
+            benchmark_results[row["ID"]][query] = {
+                "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
+                "discounted_cumulative_gain": discounted_cumulative_gain(results_list, target_identifier),
+                "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
+            }
     break
 
     # results = search("In an inner-product space, […] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2", encoded_embeddings, bi_encoder, cross_encoder, document_tree)
