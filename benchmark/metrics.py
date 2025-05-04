@@ -17,9 +17,10 @@ def is_correct_target(result, target_identifier):
     return False
 
 # For a given query, is the target_identifier among the top-k search results? => TRUE / FALSE
-def top_k_accuracy(results, target_id, k):
+top_k = 10
+def top_k_accuracy(results, target_id):
     for i, result in enumerate(results):
-        if i >= k: # i starts at 0 => if i == top_k we can gurantee that the result was not within the first k results
+        if i >= top_k: # i starts at 0 => if i == top_k we can gurantee that the result was not within the first k results
             return False
 
         if is_correct_target(result, target_id):

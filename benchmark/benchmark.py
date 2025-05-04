@@ -22,7 +22,6 @@ benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
 
 query_columns = ['Title query', 'Natural language query']
-top_k = 10
 benchmark_results = {}
 
 for i, row in benchmark_df.iterrows():
@@ -53,7 +52,7 @@ for i, row in benchmark_df.iterrows():
 
             benchmark_results[row["ID"]][query_type] = {
                 "query": query,
-                f"top_{top_k}_accuracy": top_k_accuracy(results_list, target_identifier, top_k),
+                "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
                 "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
                 "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
             }
