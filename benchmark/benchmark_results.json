@@ -1,0 +1,105 @@
+{
+    "pythagorean-theorem": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 1.0,
+            "reciprocal_rank": 1.0
+        },
+        "Natural language query": {
+            "top_k_accuracy": 0,
+            "normalized_discounted_cumulative_gain": 0,
+            "reciprocal_rank": 0
+        }
+    },
+    "prime-number-theorem": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 0.3562071871080222,
+            "reciprocal_rank": 0.16666666666666666
+        },
+        "Natural language query": {
+            "top_k_accuracy": 0,
+            "normalized_discounted_cumulative_gain": 0.15019048322368797,
+            "reciprocal_rank": 0.01
+        }
+    },
+    "g\u00f6dels-incompleteness-theorem-1": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 0.43067655807339306,
+            "reciprocal_rank": 0.25
+        },
+        "Natural language query": {
+            "top_k_accuracy": 0,
+            "normalized_discounted_cumulative_gain": 0,
+            "reciprocal_rank": 0
+        }
+    },
+    "g\u00f6dels-incompleteness-theorem-2": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 0.6309297535714575,
+            "reciprocal_rank": 0.5
+        },
+        "Natural language query": {
+            "top_k_accuracy": 0,
+            "normalized_discounted_cumulative_gain": 0,
+            "reciprocal_rank": 0
+        }
+    },
+    "the-impossibility-of-trisecting-the-angle": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 1.0,
+            "reciprocal_rank": 1.0
+        },
+        "Natural language query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 1.0,
+            "reciprocal_rank": 1.0
+        }
+    },
+    "the-impossibility-of-doubling-the-cube": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 1.0,
+            "reciprocal_rank": 1.0
+        },
+        "Natural language query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 1.0,
+            "reciprocal_rank": 1.0
+        }
+    },
+    "the-independence-of-the-parallel-postulate": {
+        "skipped": true
+    },
+    "polyhedron-formula": {
+        "Title query": {
+            "top_k_accuracy": 1,
+            "normalized_discounted_cumulative_gain": 0.3333333333333333,
+            "reciprocal_rank": 0.14285714285714285
+        }
+    },
+    "greens-theorem": {
+        "Title query": {
+            "top_k_accuracy": 0,
+            "normalized_discounted_cumulative_gain": 0,
+            "reciprocal_rank": 0
+        }
+    },
+    "meta": {
+        "top_k_accuracy": {
+            "sample_size": 14,
+            "average": 0.6428571428571429
+        },
+        "normalized_discounted_cumulative_gain": {
+            "sample_size": 14,
+            "average": 0.4929526653792781
+        },
+        "reciprocal_rank": {
+            "sample_size": 14,
+            "average": 0.4335374149659864
+        }
+    }
+}
