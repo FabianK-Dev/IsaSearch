@@ -15,7 +15,7 @@ with open("config.json", "r") as file:
 init_nltk_corpora()
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
-bi_encoder, cross_encoder = load_models('BAAI/bge-large-en-v1.5', 'cross-encoder/ms-marco-MiniLM-L12-v2')
+bi_encoder, cross_encoder = load_models('math-similarity/Bert-MLM_arXiv-MP-class_zbMath', 'cross-encoder/ms-marco-MiniLM-L12-v2')
 encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')

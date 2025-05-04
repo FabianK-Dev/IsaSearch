@@ -9,9 +9,9 @@ bi_encoder=, ,flax-sentence-embeddings/st-codesearch-distilroberta-base,sentence
 "cross_encoder=
 cross-encoder/ms-marco-MiniLM-L12-v2",,,,,,
 ,,flax-sentence-embeddings/st-codesearch-distilroberta-base,,multi-qa-mpnet-base-cos-v1,math-similarity/Bert-MLM_arXiv-MP-class_zbMath,BAAI/bge-large-en-v1.5
-,top_k_accuracy,0.6428571428571429,,0.6428571428571429,,0.6428571428571429
-,normalized_discounted_cumulative_gain,0.5071612362766735,,0.4630631487640172,,0.46546997810501567
-,reciprocal_rank,0.4515151515151515,,0.4079365079365079,,0.3977380952380952
+,top_k_accuracy,0.6428571428571429,,0.6428571428571429,0.2857142857142857,0.6428571428571429
+,normalized_discounted_cumulative_gain,0.5071612362766735,,0.4630631487640172,0.19393570353715286,0.46546997810501567
+,reciprocal_rank,0.4515151515151515,,0.4079365079365079,0.15155352921310367,0.3977380952380952
 ,,,,,,
 ,,,,,,
 "cross_encoder=
