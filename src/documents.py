@@ -28,11 +28,11 @@ def extract_docs(doc, config):
     src_str = re.compile(r"\s+").sub(" ", src_str).strip()
 
     max_seq_length = 128 * 4 # An English word is equal to about 4 characters on average
+    half_seq_length = int(max_seq_length / 2)
         
     src_str = doc["theory"] + ":\n" + src_str # Prepend the theory name
-    doc_str = metadata_str[:max_seq_length / 2] + "\n" + src_str[:max_seq_length / 2]
+    doc_str = metadata_str[:half_seq_length] + "\n" + src_str[:half_seq_length]
 
-    print("doc_str", doc_str)
     return doc["id"], doc_str
 
 def fetch_all_docs(solr, config):
