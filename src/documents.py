@@ -2,25 +2,40 @@ import json
 import os
 import math
 import re
+import tomllib
 
-def extract_docs(doc):
-    doc_str = doc["src"]
+def get_entry_metadata(entry, config):
+    metadata_folder = config["afp_folder"] + "/metadata/"
+    entry_toml = metadata_folder + "entries/" + entry + ".toml"
+
+    if os.path.isfile(entry_toml):
+        with open(entry_toml, "rb") as f:
+            toml = tomllib.load(f)
+            return toml
+    else:
+        print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
+        return {}
+
+def extract_docs(doc, config):
+    src_str = doc["src"]
+    metadata = get_entry_metadata(doc["session"], config)
+    metadata_str = metadata.get("title", "") + "\n" + metadata.get("abstract", "")
 
     # Replace newlines through spaces
-    doc_str = re.compile(r"\n").sub(" ", doc_str)
+    src_str = re.compile(r"\n").sub(" ", src_str)
 
     # Replace two or more white spaces through single whitespace
-    doc_str = re.compile(r"\s+").sub(" ", doc_str).strip()
-    
-    doc_str = doc["theory"] + " " + doc_str # Prepend the theory name
+    src_str = re.compile(r"\s+").sub(" ", src_str).strip()
+
+    max_seq_length = 128 * 4 # An English word is equal to about 4 characters on average
+        
+    src_str = doc["theory"] + ":\n" + src_str # Prepend the theory name
+    doc_str = metadata_str[:max_seq_length / 2] + "\n" + src_str[:max_seq_length / 2]
+
+    print("doc_str", doc_str)
     return doc["id"], doc_str
 
-# TODO
-def get_entry_metadata(config, entry):
-    metadata_folder = config["afp_folder"] + "/metadata/"
-    entry_toml = metadata_folder + "/entries/" + entry + ".toml"
-
-def fetch_all_docs(solr):
+def fetch_all_docs(solr, config):
     document_ids = []
     documents = []
 
@@ -29,7 +44,7 @@ def fetch_all_docs(solr):
     max_docs = results.raw_response['response']['numFound']
 
     for result in results:
-        doc_id, doc_str = extract_docs(result)
+        doc_id, doc_str = extract_docs(result, config)
         document_ids.append(doc_id)
         documents.append(doc_str)
 
@@ -39,7 +54,7 @@ def fetch_all_docs(solr):
         results = solr.search("command:theorem OR command:lemma OR command:corollary", start=i * docs_per_page, rows=docs_per_page)
 
         for result in results:
-            doc_id, doc_str = extract_docs(result)
+            doc_id, doc_str = extract_docs(result, config)
             document_ids.append(doc_id)
             documents.append(doc_str)
 
@@ -64,7 +79,7 @@ def build_document_tree(config, solr):
         print(f"Finished loading {DOCUMENT_TREE_CACHE}")
     else:
         print(f"{DOCUMENT_TREE_CACHE} does not already exist. Fetching all documents...")
-        document_tree = fetch_all_docs(solr)
+        document_tree = fetch_all_docs(solr, config)
 
         # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
         if not os.path.exists(CACHE_FOLDER):
