@@ -6,9 +6,6 @@ def is_correct_target(result, target_identifier):
             print("Warning: Identifier '" + identifier + "' does not exist in the document dictionary of result with ID " + result["id"] + ". Cannot verify if this is the target document.")
             continue
 
-        print("OURS:", result["doc"][identifier])
-        print("GOLD:", target_identifier[identifier])
-
         if result["doc"][identifier] == target_identifier[identifier]:
             print("YES :)")
             return True

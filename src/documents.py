@@ -18,8 +18,6 @@ def get_entry_metadata(entry, config):
 
 def extract_docs(doc, config):
     src_str = doc["src"]
-    metadata = get_entry_metadata(doc["session"], config)
-    metadata_str = metadata.get("title", "") + "\n" + metadata.get("abstract", "")
 
     # Replace newlines through spaces
     src_str = re.compile(r"\n").sub(" ", src_str)
@@ -27,13 +25,8 @@ def extract_docs(doc, config):
     # Replace two or more white spaces through single whitespace
     src_str = re.compile(r"\s+").sub(" ", src_str).strip()
 
-    max_seq_length = 128 * 4 # An English word is equal to about 4 characters on average
-    half_seq_length = int(max_seq_length / 2)
-        
-    src_str = doc["theory"] + ":\n" + src_str # Prepend the theory name
-    doc_str = metadata_str[:half_seq_length] + "\n" + src_str[:half_seq_length]
-
-    return doc["id"], doc_str
+    src_str = doc["theory"] + " " + src_str # Prepend the theory name
+    return doc["id"], src_str
 
 def fetch_all_docs(solr, config):
     document_ids = []
