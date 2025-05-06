@@ -85,7 +85,15 @@ all-primes-1-mod-4-equal-the-sum-of-two-squares,All Primes (1 mod 4) Equal the S
   assumes ""prime (p :: nat)""
   shows   ""(∃a b. p = a⇧2 + b⇧2) = [p ≠ 3] (mod 4)
 ",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,,
-greens-theorem,Green’s theorem,"{""entity_kname"":""Green.green_typeI_typeII_chain.GreenThm_typeI_typeII_divisible_region|fact""}","lemma GreenThm_typeI_typeII_divisible_region:
+greens-theorem,Green’s theorem,"[
+  { ""entity_kname"":""Green.green_typeI_typeII_chain.GreenThm_typeI_typeII_divisible_region|fact"" }
+  { ""entity_kname"": ""Green.R2.Greens_thm_type_II|fact"" },
+  { ""entity_kname"": ""Green.green_typeI_chain.GreenThm_typeI_two_chain|thm"" },
+  { ""entity_kname"": ""CircExample.circle.GreenThm_cirlce|thm"" },
+  { ""entity_kname"": ""Green.green_typeII_chain.GreenThm_typeII_twoChain|thm"" },
+  { ""entity_kname"": ""Green.green_typeI_cube.GreenThm_typeI_twoCube|fact"" }
+]
+","lemma GreenThm_typeI_typeII_divisible_region:
       assumes valid_typeI_div: ""valid_typeI_division s twoChain_typeI"" and
               valid_typeII_div: ""valid_typeII_division s twoChain_typeII"" and
               f_analytically_valid: ""∀twoC ∈ twoChain_typeI. analytically_valid (cubeImage twoC) (%x. (F x) ∙ i) j""
