@@ -7,10 +7,8 @@ def is_correct_target(result, target_identifier):
             continue
 
         if result["doc"][identifier] == target_identifier[identifier]:
-            print("YES :)")
             return True
 
-    print("NO :(")
     return False
 
 # For a given query, is the target_identifier among the top-k search results? => 1 (yes) / 0 (false)
