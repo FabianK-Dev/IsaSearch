@@ -53,6 +53,14 @@ for i, row in benchmark_df.iterrows():
             results_dict = search(query, encoded_embeddings, bi_encoder, cross_encoder, document_tree)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
+            print("Top 10 results:")
+            for i, result in enumerate(results_list[:10]):
+                score = result.get("score")
+                doc_id = result["doc"].get("id")
+                doc_src = result["doc"].get("src").split("proof")[0] if "proof" in result["doc"].get("src", "") else result["doc"].get("src")
+                doc_entity_kname = result["doc"].get("entity_kname")
+                print(f"{i + 1}. Score: {score}, ID: {doc_id}, KName: {doc_entity_kname} Src: {doc_src}")
+
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
                 "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
