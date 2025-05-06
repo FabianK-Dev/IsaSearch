@@ -23,7 +23,7 @@ def top_k_accuracy(results, target_id):
         if is_correct_target(result, target_id):
             return 1
     
-    return False
+    return 0
 
 # Calculates a relevance scale of the retrieved documents
 # The reelvance value is reduced logarithmically depending on the result position
@@ -41,6 +41,13 @@ def reciprocal_rank(results, target_identifier):
             return 1 / (i + 1)
 
     return 0
+
+def rank(results, target_identifier):
+    for i, result in enumerate(results):
+        if is_correct_target(result, target_identifier):
+            return i + 1
+
+    return len(results)
 
 def calculate_mean_metrics(benchmark_results):
     metrics = {}
