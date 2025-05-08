@@ -15,6 +15,7 @@ with open("config.json", "r") as file:
 init_nltk_corpora()
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
+# mixedbread-ai/mxbai-reraank-large-v1 => gives good results for natural language queries
 bi_encoder, cross_encoder = load_models('flax-sentence-embeddings/st-codesearch-distilroberta-base', 'cross-encoder/ms-marco-MiniLM-L12-v2')
 encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
 
