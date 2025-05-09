@@ -3,6 +3,7 @@ from src.documents import build_document_tree
 from src.embeddings import encode_embeddings, load_models, search, search_results_to_docs
 from src.nltk_setup import init_nltk_corpora
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
+from sentence_transformers import SentenceTransformer
 
 import json
 import pandas as pd
@@ -12,12 +13,9 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-init_nltk_corpora()
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
-# mixedbread-ai/mxbai-reraank-large-v1 => gives good results for natural language queries
-bi_encoder, cross_encoder = load_models('flax-sentence-embeddings/st-codesearch-distilroberta-base', 'cross-encoder/ms-marco-MiniLM-L12-v2')
-encoded_embeddings = encode_embeddings(config, document_tree, bi_encoder)
+bi_encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows

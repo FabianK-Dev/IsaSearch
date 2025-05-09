@@ -5,13 +5,6 @@ import torch
 import os
 import time
 
-def load_models(bi_encoder_model, cross_encoder_model):
-    bi_encoder = SentenceTransformer(bi_encoder_model)
-    bi_encoder.max_seq_length = 256*2
-    cross_encoder = CrossEncoder(cross_encoder_model)
-
-    return bi_encoder, cross_encoder
-
 def encode_embeddings(config, documents_tree, bi_encoder):
     CACHE_FOLDER = config["cache_folder"]
     EMBEDDINGS_CACHE = f"{CACHE_FOLDER}/embeddings_cache.pt"
