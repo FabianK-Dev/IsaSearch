@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 
 import json
 import pandas as pd
+import chromadb
 
 print("Loading config...")
 with open("config.json", "r") as file:
@@ -15,9 +16,28 @@ with open("config.json", "r") as file:
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
 document_tree = get_document_descriptions(config, document_tree)
-exit()
-bi_encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
+# Chroma setup
+chroma_client = chromadb.PersistentClient(path="chroma_storage")
+collection = chroma_client.get_or_create_collection("afp_docs")
+embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2').to('cuda')
+
+instruction = "Represent the given natural language explanation concatenated with its formal math statement written in Isabelle/HOL for retrieving related statements by natural language query:"
+
+for doc in document_tree["documents"]:
+    doc_src =  doc["llm_description"].strip() + "\n" + doc["src"].strip()
+    embedding = embedder.encode(instruction + "\n" + doc_src, convert_to_tensor=True).cpu().numpy()
+    print(instruction + "\n" + doc_src)
+
+    collection.add(
+        documents=[doc_src],
+        ids=[doc["id"]],
+        metadatas=[{"source": doc["id"]}],
+        embeddings=[embedding]
+    )
+    break
+
+exit()
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
 

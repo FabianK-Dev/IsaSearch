@@ -84,9 +84,6 @@ def get_document_descriptions(config, document_tree):
         if doc_id in document_tree["document_ids"]:
             document_id_index = document_tree["document_ids"].index(doc_id)
             document_tree["documents"][document_id_index]["llm_description"] = llm_description
-
-            document_string = llm_description + "\n\n" + document_tree["documents"][document_id_index]["src"].strip()
-            document_tree["documents"][document_id_index]["doc_str"] = document_string
         else:
             print(f"Warning: LLM description for document with id {doc_id} does not exit in document tree and will thus be ignored.")
 
