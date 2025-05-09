@@ -1,7 +1,6 @@
-from src.solr import connect_solr, docs_by_ids
+from src.solr import connect_solr
 from src.documents import build_document_tree, generate_document_descriptions
-from src.embeddings import encode_embeddings, load_models, search, search_results_to_docs
-from src.nltk_setup import init_nltk_corpora
+from src.embeddings import search, search_results_to_docs
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
 from sentence_transformers import SentenceTransformer
 
