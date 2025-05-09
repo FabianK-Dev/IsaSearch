@@ -58,7 +58,7 @@ def fetch_all_docs(solr, config):
 
 def generate_document_descriptions(config):
     CACHE_FOLDER = config["cache_folder"]
-    DOCUMENT_DESCRIPTIONS_CACHE = f"{CACHE_FOLDER}/{config["document_descriptions"]}"
+    DOCUMENT_DESCRIPTIONS_CACHE = CACHE_FOLDER + "/" + config["document_descriptions"]
 
     # TODO: Verify if all documents are generated
 
