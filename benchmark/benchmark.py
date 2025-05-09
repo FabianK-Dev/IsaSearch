@@ -29,7 +29,6 @@ print("Finished loading embedder.")
 instruction = "Represent the given natural language explanation concatenated with its formal math statement written in Isabelle/HOL for retrieving related statements by natural language query:"
 
 for doc in document_tree["documents"]:
-    print("doc")
     results = collection.get(
         where={"source": doc["id"]},
         include=["metadatas"])
