@@ -3,6 +3,7 @@ from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
 from sentence_transformers import SentenceTransformer
+from tqdm import tqdm
 
 import json
 import pandas as pd
@@ -28,10 +29,14 @@ print("Finished loading embedder.")
 
 instruction = "Represent the given natural language explanation concatenated with its formal math statement written in Isabelle/HOL for retrieving related statements by natural language query:"
 
-for doc in document_tree["documents"]:
-    results = collection.get(
-        where={"source": doc["id"]},
-        include=["metadatas"])
+# Get set of all already ecisting document IDs (saved at the source key)
+existing = set()
+for item in collection.get(include=["metadatas"])["metadatas"]:
+    existing.add(item["source"])
+
+for doc in tqdm(document_tree["documents"]):
+    if doc["id"] in existing:
+        continue
 
     doc_src =  doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
     embedding = embedder.encode(instruction + "\n" + doc_src, convert_to_tensor=True).cpu().numpy()
@@ -42,7 +47,6 @@ for doc in document_tree["documents"]:
         metadatas=[{"source": doc["id"]}],
         embeddings=[embedding])
 
-exit()
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
 
