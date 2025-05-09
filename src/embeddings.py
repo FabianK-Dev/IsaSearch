@@ -30,27 +30,19 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
     return encoded_embeddings
 
-def search(search_query, encoded_embeddings, bi_encoder, cross_encoder, document_tree):
+def search(search_query, collection, document_tree):
     start = time.time()
-    docs_to_retrieve = 1000
+    docs_to_retrieve = 100
+    instruction = ""
 
-    # Bi-encoder search
-    question_encoded = bi_encoder.encode(search_query, convert_to_tensor=True)
-    question_encoded = question_encoded.cuda()
+    results = collection.query(
+        query_texts=[instruction + "\n" + search_query],
+        n_results=docs_to_retrieve
+    )
 
-    hits = util.semantic_search(question_encoded, encoded_embeddings, top_k=docs_to_retrieve)
-    hits = hits[0] # It is in theory possible to search multiple queries at once, however we only provided one search query and thus 'hits' only contains one element
-
-    # Cross-encoder search
-    cross_encoder_input = [[search_query, document_tree["documents"][hit['corpus_id']]] for hit in hits] # corpus_id is the index of the original document in documents
-    cross_encoder_scores = cross_encoder.predict(cross_encoder_input)
-
-    # Assign each cross encoder score to hits list
-    for i in range(len(cross_encoder_scores)):
-        hits[i]['cross_encoder_score'] = cross_encoder_scores[i]
-
-    hits = sorted(hits, key=lambda x: x['cross_encoder_score'], reverse=True)
-    results = {}
+    for doc in results:
+        print(doc)
+    exit()
 
     for i, hit in enumerate(hits):
         if i >= 100: # Only return the top 100 results
