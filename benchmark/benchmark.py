@@ -34,19 +34,14 @@ for doc in document_tree["documents"]:
         where={"source": doc["id"]},
         include=["metadatas"])
 
-    print(results)
-    break
-
-    doc_src =  doc["llm_description"].strip() + "\n" + doc["src"].strip()
+    doc_src =  doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
     embedding = embedder.encode(instruction + "\n" + doc_src, convert_to_tensor=True).cpu().numpy()
-    print(instruction + "\n" + doc_src)
 
     collection.add(
         documents=[doc_src],
         ids=[doc["id"]],
         metadatas=[{"source": doc["id"]}],
         embeddings=[embedding])
-    break
 
 exit()
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
