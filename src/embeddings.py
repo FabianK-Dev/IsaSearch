@@ -32,7 +32,7 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
 def search(search_query, collection, document_tree):
     start = time.time()
-    docs_to_retrieve = 100
+    docs_to_retrieve = 10
     instruction = ""
 
     results = collection.query(
@@ -40,8 +40,8 @@ def search(search_query, collection, document_tree):
         n_results=docs_to_retrieve
     )
 
-    for doc in results:
-        print(doc)
+    for doc, metadata, distance in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
+        print(doc, metadata, distance)
     exit()
 
     for i, hit in enumerate(hits):
