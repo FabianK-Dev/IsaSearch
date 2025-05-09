@@ -1,5 +1,5 @@
 from src.solr import connect_solr
-from src.documents import build_document_tree, generate_document_descriptions
+from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
 from sentence_transformers import SentenceTransformer
@@ -14,7 +14,7 @@ with open("config.json", "r") as file:
 
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
-document_descriptions = generate_document_descriptions(config, document_tree)
+document_tree = get_document_descriptions(config, document_tree)
 exit()
 bi_encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 

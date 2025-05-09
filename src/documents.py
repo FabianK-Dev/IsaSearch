@@ -56,7 +56,7 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def generate_document_descriptions(config, document_tree):
+def get_document_descriptions(config, document_tree):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
 
@@ -66,21 +66,31 @@ def generate_document_descriptions(config, document_tree):
         with open(DOCUMENT_DESCRIPTIONS, 'r') as file:
             data = file.read()
 
-        document_tree = json.loads(data)
+        document_descriptions = json.loads(data)
         print(f"Finished loading {DOCUMENT_DESCRIPTIONS}")
     else:
         print(f"{DOCUMENT_DESCRIPTIONS} does not already exist. Generating all document descriptions...")
         exit()
         # TODO
 
-    with open(DOCUMENT_DESCRIPTIONS, "r") as file:
-        data = file.read()
-        document_descriptions = json.loads(data)
+    for doc_id in document_descriptions:
+        try:
+            llm_description = document_descriptions[doc_id].split("<BEGIN>")[1]
+            llm_description = llm_description.split("<END>")[0]
+        except Exception as err:
+            llm_description = document_descriptions[doc_id]
+            print(f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for document with id \"{doc_id}\", thus loading it as is.")
 
-    for doc in document_descriptions:
-        print(doc)
+        if doc_id in document_tree["document_ids"]:
+            document_id_index = document_tree["document_ids"].index(doc_id)
+            document_tree["documents"][document_id_index]["llm_description"] = llm_description
 
-    # TODO: Verify if all documents are generated
+            document_string = llm_description + "\n\n" + document_tree["documents"][document_id_index]["src"].strip()
+            document_tree["documents"][document_id_index]["doc_str"] = document_string
+        else:
+            print(f"Warning: LLM description for document with id {doc_id} does not exit in document tree and will thus be ignored.")
+
+    return document_tree
 
 def build_document_tree(config, solr):
     CACHE_FOLDER = config["cache_folder"]
