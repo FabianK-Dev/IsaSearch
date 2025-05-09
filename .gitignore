@@ -1,13 +1,15 @@
 # Folders
-.cache/
-.venv/
-.vscode/
+.cache
+.venv
+.vscode
+chroma_storage
 
 # Downloaded
-afp-*/
-Isabelle*/
+afp-*
+Isabelle*
 
 # Files
+.directory
 *.zip
 *.tar.gz
 *.pyc
