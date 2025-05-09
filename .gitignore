@@ -3,6 +3,7 @@
 .venv
 .vscode
 chroma_storage
+artifacts
 
 # Downloaded
 afp-*
