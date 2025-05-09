@@ -18,13 +18,25 @@ document_tree = build_document_tree(config, solr)
 document_tree = get_document_descriptions(config, document_tree)
 
 # Chroma setup
+print("Creating ChromaDB storage and afp_docs collection...")
 chroma_client = chromadb.PersistentClient(path="chroma_storage")
 collection = chroma_client.get_or_create_collection("afp_docs")
+
+print("Loading embedder...")
 embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2').to('cuda')
+print("Finished loading embedder.")
 
 instruction = "Represent the given natural language explanation concatenated with its formal math statement written in Isabelle/HOL for retrieving related statements by natural language query:"
 
 for doc in document_tree["documents"]:
+    print("doc")
+    results = collection.get(
+        where={"source": doc["id"]},
+        include=["metadatas"])
+
+    print(results)
+    break
+
     doc_src =  doc["llm_description"].strip() + "\n" + doc["src"].strip()
     embedding = embedder.encode(instruction + "\n" + doc_src, convert_to_tensor=True).cpu().numpy()
     print(instruction + "\n" + doc_src)
@@ -33,8 +45,7 @@ for doc in document_tree["documents"]:
         documents=[doc_src],
         ids=[doc["id"]],
         metadatas=[{"source": doc["id"]}],
-        embeddings=[embedding]
-    )
+        embeddings=[embedding])
     break
 
 exit()
