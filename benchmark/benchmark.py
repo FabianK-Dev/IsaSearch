@@ -14,7 +14,8 @@ with open("config.json", "r") as file:
 
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
-document_descriptions = generate_document_descriptions(document_tree)
+document_descriptions = generate_document_descriptions(config, document_tree)
+exit()
 bi_encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')

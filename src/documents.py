@@ -56,9 +56,29 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def generate_document_descriptions(config):
-    CACHE_FOLDER = config["cache_folder"]
-    DOCUMENT_DESCRIPTIONS_CACHE = CACHE_FOLDER + "/" + config["document_descriptions"]
+def generate_document_descriptions(config, document_tree):
+    ARTIFACTS_FOLDER = config["artifacts_folder"]
+    DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
+
+    if os.path.isfile(DOCUMENT_DESCRIPTIONS):
+        print(f"Artifact {DOCUMENT_DESCRIPTIONS} already exists. Loading...")
+
+        with open(DOCUMENT_DESCRIPTIONS, 'r') as file:
+            data = file.read()
+
+        document_tree = json.loads(data)
+        print(f"Finished loading {DOCUMENT_DESCRIPTIONS}")
+    else:
+        print(f"{DOCUMENT_DESCRIPTIONS} does not already exist. Generating all document descriptions...")
+        exit()
+        # TODO
+
+    with open(DOCUMENT_DESCRIPTIONS, "r") as file:
+        data = file.read()
+        document_descriptions = json.loads(data)
+
+    for doc in document_descriptions:
+        print(doc)
 
     # TODO: Verify if all documents are generated
 
