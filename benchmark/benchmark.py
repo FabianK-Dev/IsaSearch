@@ -1,5 +1,5 @@
 from src.solr import connect_solr, docs_by_ids
-from src.documents import build_document_tree
+from src.documents import build_document_tree, generate_document_descriptions
 from src.embeddings import encode_embeddings, load_models, search, search_results_to_docs
 from src.nltk_setup import init_nltk_corpora
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
@@ -15,6 +15,7 @@ with open("config.json", "r") as file:
 
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
+document_descriptions = generate_document_descriptions(document_tree)
 bi_encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')

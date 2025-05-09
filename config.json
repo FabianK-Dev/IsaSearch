@@ -5,5 +5,6 @@
     "afp_remote_url": "https://foss.heptapod.net/isa-afp/afp-2025/-/archive/branch/default/afp-2025-branch-default.tar.gz",
     "afp_folder": "afp-2025-branch-default",
     "solr_core_url": "http://localhost:8983/solr/local",
-    "cache_folder": ".cache"
+    "cache_folder": ".cache",
+    "document_descriptions": "document_descriptions.json"
 }

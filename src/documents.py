@@ -37,9 +37,8 @@ def fetch_all_docs(solr, config):
     max_docs = results.raw_response['response']['numFound']
 
     for result in results:
-        doc_id, doc_str = extract_docs(result, config)
-        document_ids.append(doc_id)
-        documents.append(doc_str)
+        document_ids.append(result["id"])
+        documents.append(result)
 
     pages = math.ceil(max_docs / docs_per_page)
     for i in range(1, pages):
@@ -47,9 +46,8 @@ def fetch_all_docs(solr, config):
         results = solr.search("command:theorem OR command:lemma OR command:corollary", start=i * docs_per_page, rows=docs_per_page)
 
         for result in results:
-            doc_id, doc_str = extract_docs(result, config)
-            document_ids.append(doc_id)
-            documents.append(doc_str)
+            document_ids.append(result["id"])
+            documents.append(result)
 
     document_tree = {
         "document_ids": document_ids,
@@ -57,6 +55,12 @@ def fetch_all_docs(solr, config):
     }
 
     return document_tree
+
+def generate_document_descriptions(config):
+    CACHE_FOLDER = config["cache_folder"]
+    DOCUMENT_DESCRIPTIONS_CACHE = f"{CACHE_FOLDER}/{config["document_descriptions"]}"
+
+    # TODO: Verify if all documents are generated
 
 def build_document_tree(config, solr):
     CACHE_FOLDER = config["cache_folder"]
