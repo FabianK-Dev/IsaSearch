@@ -35,16 +35,15 @@ def search(search_query, collection, document_tree):
     docs_to_retrieve = 10
     instruction = ""
 
-    results = collection.query(
+    query_result = collection.query(
         query_texts=[instruction + "\n" + search_query],
         n_results=docs_to_retrieve
     )
+    results = {}
 
-    results_list = {}
-
-    for doc, metadata, distance in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
+    for metadata, distance in zip(query_result["documents"][0], query_result["metadatas"][0], query_result["distances"][0]):
         result_id = metadata["source"]
-        results_list[result_id] = {
+        results[result_id] = {
             "score": distance,
             "id": result_id
         }
