@@ -9,10 +9,10 @@
                 "rank": 1
             },
             "Natural language query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0,
-                "rank": 10
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.5,
+                "reciprocal_rank": 0.3333333333333333,
+                "rank": 3
             }
         }
     },
@@ -23,13 +23,13 @@
                 "top_k_accuracy": 0,
                 "normalized_discounted_cumulative_gain": 0,
                 "reciprocal_rank": 0,
-                "rank": 10
+                "rank": 100
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
                 "normalized_discounted_cumulative_gain": 0,
                 "reciprocal_rank": 0,
-                "rank": 10
+                "rank": 100
             }
         }
     },
@@ -40,13 +40,13 @@
                 "top_k_accuracy": 0,
                 "normalized_discounted_cumulative_gain": 0,
                 "reciprocal_rank": 0,
-                "rank": 10
+                "rank": 100
             },
             "Natural language query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0,
-                "rank": 10
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.31546487678572877,
+                "reciprocal_rank": 0.125,
+                "rank": 8
             }
         }
     },
@@ -57,7 +57,7 @@
                 "top_k_accuracy": 0,
                 "normalized_discounted_cumulative_gain": 0,
                 "reciprocal_rank": 0,
-                "rank": 10
+                "rank": 100
             },
             "Natural language query": {
                 "top_k_accuracy": 1,
@@ -112,9 +112,9 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0,
-                "rank": 10
+                "normalized_discounted_cumulative_gain": 0.21533827903669653,
+                "reciprocal_rank": 0.041666666666666664,
+                "rank": 24
             }
         }
     },
@@ -132,19 +132,19 @@
     "summary": {
         "top_k_accuracy": {
             "sample_size": 14,
-            "average": 0.5
+            "average": 0.6428571428571429
         },
         "normalized_discounted_cumulative_gain": {
             "sample_size": 14,
-            "average": 0.4593340398623852
+            "average": 0.5329628367068442
         },
         "reciprocal_rank": {
             "sample_size": 14,
-            "average": 0.44642857142857145
+            "average": 0.48214285714285715
         },
         "rank": {
             "sample_size": 14,
-            "average": 5.714285714285714
+            "average": 31.785714285714285
         }
     }
 }

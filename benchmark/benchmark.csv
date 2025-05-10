@@ -15,7 +15,7 @@ pythagorean-theorem,Pythagorean Theorem,"[ {""entity_kname"":""Triangle.Pythagor
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
   shows   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2""
-",,?,Pythagorean Theorem,"In an inner-product space, [...] for any two orthogonal vectors v and w we have ‖v + w‖^2 = ‖v‖^2 + ‖w‖^2",https://en.wikipedia.org/wiki/Pythagorean_theorem#Inner_product_spaces
+",,?,Pythagorean Theorem,The sum of the areas of the two squares on the legs \(a and b\) equals the area of the square on the hypotenuse \(c\),https://en.wikipedia.org/wiki/Pythagorean_theorem
 prime-number-theorem,Prime Number Theorem,"[ {""entity_kname"":""Prime_Number_Theorem.prime_number_theorem|thm""} ]","definition primes_pi :: ""real ⇒ real"" where
   ""primes_pi x = real (card {p::nat. prime p ∧ p ≤ x})""
 
