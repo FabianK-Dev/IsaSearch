@@ -40,17 +40,12 @@ def search(search_query, collection, document_tree):
         n_results=docs_to_retrieve
     )
 
+    results_list = {}
+
     for doc, metadata, distance in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
-        print(doc, metadata, distance)
-    exit()
-
-    for i, hit in enumerate(hits):
-        if i >= 100: # Only return the top 100 results
-            break
-
-        result_id = document_tree["document_ids"][hit['corpus_id']]
-        results[result_id] = {
-            "score": hit["cross_encoder_score"],
+        result_id = metadata["source"]
+        results_list[result_id] = {
+            "score": distance,
             "id": result_id
         }
 
@@ -59,7 +54,7 @@ def search(search_query, collection, document_tree):
     print(f"Search time: {end - start} sec")
 
     return {
-        "results": results, # Only return the top 100 results
+        "results": results,
         "duration": search_duration
     }
 
