@@ -12,7 +12,7 @@
                 "top_k_accuracy": 0,
                 "normalized_discounted_cumulative_gain": 0,
                 "reciprocal_rank": 0,
-                "rank": 100
+                "rank": 10
             }
         }
     },
@@ -20,16 +20,16 @@
         "metadata": {},
         "queries": {
             "Title query": {
-                "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                "reciprocal_rank": 0.5,
-                "rank": 2
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 10
             },
             "Natural language query": {
                 "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0.1505149978319906,
-                "reciprocal_rank": 0.010101010101010102,
-                "rank": 99
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 10
             }
         }
     },
@@ -38,15 +38,15 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.38685280723454163,
-                "reciprocal_rank": 0.2,
-                "rank": 5
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
             },
             "Natural language query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0,
-                "rank": 100
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
             }
         }
     },
@@ -54,16 +54,16 @@
         "metadata": {},
         "queries": {
             "Title query": {
-                "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                "reciprocal_rank": 0.5,
-                "rank": 2
-            },
-            "Natural language query": {
                 "top_k_accuracy": 0,
                 "normalized_discounted_cumulative_gain": 0,
                 "reciprocal_rank": 0,
-                "rank": 100
+                "rank": 10
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
             }
         }
     },
@@ -112,9 +112,9 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.3010299956639812,
-                "reciprocal_rank": 0.1111111111111111,
-                "rank": 9
+                "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                "reciprocal_rank": 0.16666666666666666,
+                "rank": 6
             }
         }
     },
@@ -123,9 +123,9 @@
         "queries": {
             "Title query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 1.0,
-                "reciprocal_rank": 1.0,
-                "rank": 1
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5,
+                "rank": 2
             }
         }
     },
@@ -136,15 +136,15 @@
         },
         "normalized_discounted_cumulative_gain": {
             "sample_size": 14,
-            "average": 0.5785898077052449
+            "average": 0.6419383529056771
         },
         "reciprocal_rank": {
             "sample_size": 14,
-            "average": 0.5229437229437229
+            "average": 0.619047619047619
         },
         "rank": {
             "sample_size": 14,
-            "average": 30.214285714285715
+            "average": 4.0
         }
     }
 }

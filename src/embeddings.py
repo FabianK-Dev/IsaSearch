@@ -41,7 +41,7 @@ def search(search_query, collection, document_tree):
     )
     results = {}
 
-    for metadata, distance in zip(query_result["documents"][0], query_result["metadatas"][0], query_result["distances"][0]):
+    for metadata, distance in zip(query_result["metadatas"][0], query_result["distances"][0]):
         result_id = metadata["source"]
         results[result_id] = {
             "score": distance,
