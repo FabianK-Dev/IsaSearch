@@ -33,7 +33,7 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
 def search(search_query, collection, prompts, llm):
     start = time.time()
-    docs_to_retrieve = 10
+    docs_to_retrieve = 100
 
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
     outputs = llm.generate([llm_prompt], SamplingParams(temperature=0, max_tokens=512, stop=["<END>"]))
