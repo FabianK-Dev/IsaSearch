@@ -21,7 +21,7 @@ print("Loading prompts...")
 prompts = load_prompts(config)
 
 print("Loading LLM...")
-llm = LLM(model="microsoft/Phi-3-mini-4k-instruct", max_model_len=1024)
+llm = LLM(model="microsoft/Phi-3-mini-4k-instruct", max_model_len=1024, dtype="auto")
 
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
@@ -95,7 +95,7 @@ for i, row in benchmark_df.iterrows():
             for i, result in enumerate(results_list[:10]):
                 score = result.get("score")
                 doc_id = result["doc"].get("id")
-                doc_src = result["doc"].get("src").split("proof")[0] if "proof" in result["doc"].get("src", "") else result["doc"].get("src")
+                doc_src = result["doc"].get("src")[:200] + "..."
                 doc_entity_kname = result["doc"].get("entity_kname")
                 print(f"{i + 1}. Score: {score}, ID: {doc_id}, KName: {doc_entity_kname} Src: {doc_src}")
 
