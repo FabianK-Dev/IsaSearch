@@ -1,7 +1,9 @@
 from src.solr import connect_solr
 from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs
+from src.llm import load_prompts
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
+
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
@@ -14,6 +16,9 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
+print("Loading prompts...")
+prompts = load_prompts(config)
+exit()
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
 document_tree = get_document_descriptions(config, document_tree)

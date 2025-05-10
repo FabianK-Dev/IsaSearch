@@ -30,7 +30,7 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
     return encoded_embeddings
 
-def search(search_query, collection, document_tree):
+def search(search_query, collection, prompts):
     start = time.time()
     docs_to_retrieve = 10
     instruction = ""

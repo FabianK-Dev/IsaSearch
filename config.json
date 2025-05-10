@@ -6,5 +6,6 @@
     "afp_folder": "afp-2025-branch-default",
     "solr_core_url": "http://localhost:8983/solr/local",
     "cache_folder": ".cache",
-    "artifacts_folder": "artifacts"
+    "artifacts_folder": "artifacts",
+    "prompts_folder": "prompts"
 }
