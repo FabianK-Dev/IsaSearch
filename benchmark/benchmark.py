@@ -7,6 +7,7 @@ from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_g
 from vllm import LLM
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
+from pprint import pprint
 
 import json
 import pandas as pd
@@ -62,7 +63,7 @@ benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number 
 query_columns = ['Title query', 'Natural language query']
 benchmark_results = {}
 
-for i, row in benchmark_df.iterrows():
+for i, row in tqdm(benchmark_df.iterrows()):
     target_identifier = row["Target Identifier"]
     if pd.isna(target_identifier):
         continue
@@ -96,8 +97,17 @@ for i, row in benchmark_df.iterrows():
                 score = result.get("score")
                 doc_id = result["doc"].get("id")
                 doc_src = result["doc"].get("src")[:200] + "..."
+                doc_description = result.get("llm_description")
                 doc_entity_kname = result["doc"].get("entity_kname")
-                print(f"{i + 1}. Score: {score}, ID: {doc_id}, KName: {doc_entity_kname} Src: {doc_src}")
+
+                pprint({
+                    "Rank": i + 1,
+                    "Score": score,
+                    "ID": doc_id,
+                    "Descr.": doc_description,
+                    "KName": doc_entity_kname,
+                    "Src": doc_src
+                })
 
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
