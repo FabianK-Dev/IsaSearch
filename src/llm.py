@@ -1,5 +1,5 @@
-import glob
 from pathlib import Path
+import glob
 
 def load_prompts(config):
     prompts_folder = config["prompts_folder"]
