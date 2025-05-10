@@ -1,0 +1,26 @@
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to rewrite a short, vague input description of a mathematical theorem into a detailed, explicit statement of the theorem, first written in natural mathematical language, then in the formal language of Isabelle/HOL. Your output must contain exactly two parts. The first part is a natural mathematical language statement, starting with a theorem name, followed by the detailed statement of the theorem. The second part is an Isabelle/HOL code block, write the formal theorem statement directly without imports, proofs, or extra text. NO other paragraph is allowed to appear in the output.
+
+# Principles of Output:
+1. You should provide as much information and be as precise as possible.
+2. The natural language part should be accessible to mathematicians. Additionally, please express the mathematical formulas in LaTeX when necessary.
+3. Even in the case that the input is very vague, you should guess a most similar mathematical theorem and write it out explicitly.
+4. The formal statement can assume certain definitions and hypotheses are already formalized in Isabelle/HOL, even if you are not sure.
+5. If no theorem can be derived from the input description, only reply with: <BEGIN>false<END>
+
+# Example input description:
+degree of product of two polynomials equals to sum of degree
+
+# Output:
+<BEGIN>
+Theorem (Degree of the Product of Two Polynomials):
+Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree of the product \(p \cdot q\) is equal to the sum of the degrees of \(p\) and \(q\), that is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
+
+theorem degree_mult: 
+assumes "p ≠ 0" and "q ≠ 0" 
+shows "degree (p * q) = degree p + degree q"
+<END>
+
+Now, the statement for you to rewrite is:
+{search_query}
+
+# Output:
