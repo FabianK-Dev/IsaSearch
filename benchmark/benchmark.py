@@ -4,6 +4,7 @@ from src.embeddings import search, search_results_to_docs
 from src.llm import load_prompts
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
 
+from vllm import LLM
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
@@ -18,7 +19,10 @@ with open("config.json", "r") as file:
 
 print("Loading prompts...")
 prompts = load_prompts(config)
-exit()
+
+print("Loading LLM...")
+llm = LLM(model="microsoft/Phi-3-mini-4k-instruct", max_model_len=1024)
+
 solr = connect_solr(config)
 document_tree = build_document_tree(config, solr)
 document_tree = get_document_descriptions(config, document_tree)
@@ -84,7 +88,7 @@ for i, row in benchmark_df.iterrows():
             print()
             print(f"Searching: \"{query}\"")
 
-            results_dict = search(query, collection, document_tree)
+            results_dict = search(query, collection, prompts, llm)
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
             print("Top 10 results:")

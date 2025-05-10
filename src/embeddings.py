@@ -1,3 +1,4 @@
+from vllm import LLM, SamplingParams
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from src.solr import docs_by_ids
 
@@ -30,13 +31,19 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
     return encoded_embeddings
 
-def search(search_query, collection, prompts):
+def search(search_query, collection, prompts, llm):
     start = time.time()
     docs_to_retrieve = 10
-    instruction = ""
+
+    llm_prompt = prompts["search_refine"].format(search_query=search_query)
+    outputs = llm.generate([llm_prompt], SamplingParams(temperature=0, max_tokens=512, stop=["<END>"]))
+
+    refined_query = outputs[0].outputs[0].text
+    refined_query = refined_query.split("<BEGIN>")[1]
+    query_text = prompts["retrieve"].format(search_query=search_query)
 
     query_result = collection.query(
-        query_texts=[instruction + "\n" + search_query],
+        query_texts=[query_text],
         n_results=docs_to_retrieve
     )
     results = {}
