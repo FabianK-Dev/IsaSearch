@@ -430,17 +430,17 @@ assumes f: ""continuous_on UNIV f""
 sum-of-kth-powers,Sum of kth powers,,"lemma sum_of_powers:
   fixes m n :: nat
   shows ""(∑k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
-",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[…] expresses the sum of the p-th powers of the first n positive integers […] as a polynomial in n,
+",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[…] expresses the sum of the p-th powers of the first n positive integers […] as a polynomial in n,https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,,"theorem CauchySchwarzReal:
   fixes x::vector
   assumes ""vlen x = vlen y""
   shows ""¦x⋅y¦ ≤ ∥x∥*∥y∥""
-",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,The Cauchy-Schwarz Inequality,,
+",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,The Cauchy-Schwarz Inequality,[…] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms,https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality
 the-intermediate-value-theorem,The Intermediate Value Theorem,,"lemma IVT':
   fixes f :: ""real ⇒ real""
   assumes ""a ≤ b"" and ""y ∈ {f a..f b}"" and  ""continuous_on {a..b} f""
   obtains x where ""x ∈ {a..b}"" and ""f x = y""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Topological_Spaces.html,HOL,The Intermediate Value Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Topological_Spaces.html,HOL,The Intermediate Value Theorem,"if f is a continuous function whose domain contains the interval [a, b], then it takes on any given value between f(a) and f(b)",https://en.wikipedia.org/wiki/Intermediate_value_theorem
 fundamental-theorem-of-arithmetic,Fundamental Theorem of Arithmetic,,"lemma in_prime_factors_iff:
   ""p ∈ set_mset (prime_factors x) ⟷ x ≠ 0 ∧ p dvd x ∧ prime p""
 
@@ -451,10 +451,10 @@ lemma prod_mset_prime_factorization:
 lemma prime_factorization_unique:
   assumes ""x ≠ 0"" ""y ≠ 0""
   shows   ""prime_factorization x = prime_factorization y ⟷ normalize x = normalize y""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Factorial_Ring.html,HOL,Fundamental Theorem of Arithmetic,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Factorial_Ring.html,HOL,Fundamental Theorem of Arithmetic,"states that every integer greater than 1 can be represented uniquely as a product of prime numbers, up to the order of the factors",https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic#Proof
 divergence-of-the-prime-reciprocal-series,Divergence of the Prime Reciprocal Series,,"corollary prime_harmonic_series_diverges:
   ""¬convergent (λn. ∑p←primes_upto n. 1 / p)""
-",https://isa-afp.org/entries/Prime_Harmonic_Series.shtml,Prime_Harmonic_Series,Divergence of the Prime Reciprocal Series,,
+",https://isa-afp.org/entries/Prime_Harmonic_Series.shtml,Prime_Harmonic_Series,Divergence of the Prime Reciprocal Series,sum of the reciprocals of all prime numbers diverges,https://en.wikipedia.org/wiki/Divergence_of_the_sum_of_the_reciprocals_of_the_primes
 dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Littlewood’s “elegant” proof),,"theorem dissection_does_not_exist:
   ""∄ C. (∀ c ∈ C. is_valid c)
         ∧ disjoint (image to_set C)
