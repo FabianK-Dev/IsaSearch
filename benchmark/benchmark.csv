@@ -430,7 +430,7 @@ assumes f: ""continuous_on UNIV f""
 sum-of-kth-powers,Sum of kth powers,,"lemma sum_of_powers:
   fixes m n :: nat
   shows ""(∑k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
-",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,,
+",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[…] expresses the sum of the p-th powers of the first n positive integers […] as a polynomial in n,
 the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,,"theorem CauchySchwarzReal:
   fixes x::vector
   assumes ""vlen x = vlen y""
