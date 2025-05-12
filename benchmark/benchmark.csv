@@ -291,12 +291,12 @@ cayley-hamilton-theorem,Cayley-Hamilton Theorem,,"theorem Cayley_Hamilton:
 wilsons-theorem,Wilson’s Theorem,,"lemma wilson_theorem:
   assumes ""prime p""
   shows   ""[fact (p - 1) = -1] (mod p)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Wilson’s Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Wilson’s Theorem,"[…] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",https://en.wikipedia.org/wiki/Wilson%27s_theorem
 the-number-of-subsets-of-a-set,The Number of Subsets of a Set,,"lemma card_Pow:
   ""finite A ⟹ card (Pow A) = 2 ^ card A""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Power.html,HOL,The Number of Subsets of a Set,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Power.html,HOL,The Number of Subsets of a Set,"If S is a finite set with |S| = n, then the number of all the subsets of S is […] 2^n",https://en.wikipedia.org/wiki/Power_set#Properties
 pi-is-transcendental,Pi is Transcendental,,"theorem transcendental_pi: ""¬algebraic pi""
-",https://www.isa-afp.org/entries/Pi_Transcendental.html,Pi_Transcendental,Pi is Transcendental,,
+",https://www.isa-afp.org/entries/Pi_Transcendental.html,Pi_Transcendental,Pi is Transcendental,The best-known [numbers that are not algebraic] are pi and e,https://en.wikipedia.org/wiki/Transcendental_number
 the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,,"lemma eulerian_split:
   assumes ""nodes G1 ∩ nodes G2 = {}"" ""edges G1 ∩ edges G2={}""
     ""valid_unMultigraph G1"" ""valid_unMultigraph G2""
@@ -304,14 +304,14 @@ the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,,"lemma eulerian
     ""valid_unMultigraph.is_Eulerian_trail  G2 v2 ps2 v2'""
   shows ""valid_unMultigraph.is_Eulerian_trail ⦇nodes=nodes G1 ∪ nodes G2,
           edges=edges G1 ∪ edges G2 ∪ {(v1',w,v2),(v2,w,v1')}⦈ v1 (ps1@(v1',w,v2)#ps2) v2'""
-",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Koenigsberg Bridges Problem,,
+",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Koenigsberg Bridges Problem,"[…] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",https://en.wikipedia.org/wiki/Eulerian_path#Properties
 product-of-segments-of-chords,Product of Segments of Chords,,"theorem product_of_chord_segments:
   fixes S1 T1 S2 T2 X C :: ""'a :: euclidean_space""
   assumes ""between (S1, T1) X"" ""between (S2, T2) X""
   assumes ""dist C S1 = r"" ""dist C T1 = r""
   assumes ""dist C S2 = r"" ""dist C T2 = r""
   shows ""dist S1 X * dist X T1 = dist S2 X * dist X T2""
-",https://www.isa-afp.org/entries/Chord_Segments.shtml,Chord_Segments,Product of Segments of Chords,,
+",https://www.isa-afp.org/entries/Chord_Segments.shtml,Chord_Segments,Product of Segments of Chords,products of the lengths of the line segments on each chord are equal,https://en.wikipedia.org/wiki/Intersecting_chords_theorem
 the-hermite-lindemann-transcendence-theorem,The Hermite-Lindemann Transcendence Theorem,,"theorem Hermite_Lindemann:
   fixes α β :: ""'a ⇒ complex""
   assumes ""finite I""
@@ -327,36 +327,36 @@ corollary Hermite_Lindemann_original:
   assumes ""⋀i. i < n ⟹ algebraic (α i)""
   assumes ""linearly_independent_over_int (α ` {..<n})""
   shows   ""algebraically_independent_over_rat n (λi. exp (α i))""
-",https://www.isa-afp.org/entries/Hermite_Lindemann.html,Hermite_Lindemann,The Hermite-Lindemann Transcendence Theorem,,
+",https://www.isa-afp.org/entries/Hermite_Lindemann.html,Hermite_Lindemann,The Hermite-Lindemann Transcendence Theorem,"[…] the extension field Q(e^\alpha_1, ..., e^\alpha_n) has transcendence degree n over Q",https://en.wikipedia.org/wiki/Lindemann%E2%80%93Weierstrass_theorem
 herons-formula,Heron’s formula,,"theorem heron:
   fixes A B C :: ""real ^ 2""
   defines ""a ≡ dist B C"" and ""b ≡ dist A C"" and ""c ≡ dist A B""
   defines ""s ≡ (a + b + c) / 2""
   shows   ""content (convex hull {A, B, C}) = sqrt (s * (s - a) * (s - b) * (s - c))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Simplex_Content.html,HOL,Heron’s formula,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Simplex_Content.html,HOL,Heron’s formula,"the area of a triangle in terms of the three side lengths a, b, c",https://en.wikipedia.org/wiki/Heron%27s_formula
 formula-for-the-number-of-combinations,Formula for the Number of Combinations,,"theorem n_subsets:
   ""finite A ⟹ card {B. B ⊆ A ∧ card B = k} = (card A choose k)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Formula for the Number of Combinations,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Formula for the Number of Combinations,a k-combination of a set S is a subset of k distinct elements of S,https://en.wikipedia.org/wiki/Combination
 the-laws-of-large-numbers,The Laws of Large Numbers,," theorem (in prob_space) strong_law_of_large_numbers_iid:
    fixes X :: ""nat ⇒ 'a ⇒ real""
    assumes indep: ""indep_vars (λ_. borel) X UNIV""
    assumes distr: ""⋀i. distr M borel (X i) = distr M borel (X 0)""
    assumes L1:    ""integrable M (X 0)""
    shows ""AE x in M. (λn. (∑i<n. X i x) / n) ⇢ expectation (X 0)""
-",https://www.isa-afp.org/entries/Laws_of_Large_Numbers.html,Laws_of_Large_Numbers,The Laws of Large Numbers,,
+",https://www.isa-afp.org/entries/Laws_of_Large_Numbers.html,Laws_of_Large_Numbers,The Laws of Large Numbers,average of the results obtained from a large number of independent random samples converges to the true value,https://en.wikipedia.org/wiki/Law_of_large_numbers
 bezouts-theorem,Bezout’s Theorem,,"lemma bezout_gcd_nat:
   fixes a b :: nat
   shows ""∃x y. a * x - b * y = gcd a b ∨ b * x - a * y = gcd a b""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,Bezout’s Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,Bezout’s Theorem,Let a and b be integers with greatest common divisor d. Then there exist integers x and y such that ax + by = d,https://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity
 theorem-of-ceva,Theorem of Ceva,,"lemma Cevas:
   fixes a :: ""'a::euclidean_space""
   assumes MidCol : ""collinear {a,k,d} ∧ collinear {b,k,e} ∧ collinear {c,k,f}""
   assumes TriCol : ""collinear {a,f,b} ∧ collinear {a,e,c} ∧ collinear {b,d,c}""
   assumes Triangle : ""¬ collinear {a,b,c}""
   shows ""dist a f * dist b d * dist c e = dist f b * dist d c * dist e a""
-",https://www.isa-afp.org/entries/Ceva.html,Ceva,Theorem of Ceva,,
+",https://www.isa-afp.org/entries/Ceva.html,Ceva,Theorem of Ceva,"[…] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",https://en.wikipedia.org/wiki/Ceva%27s_theorem
 cantors-theorem,Cantor’s Theorem,,"lemma Cantors_paradox: ∄f. f ` A = Pow A
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Fun.html,HOL,Cantor’s Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Fun.html,HOL,Cantor’s Theorem,"[…] for any set A, the set of all subsets of A […] has a strictly greater cardinality than A itself",https://en.wikipedia.org/wiki/Cantor%27s_theorem
 lhôpitals-rule,L’Hôpital’s Rule,,"lemma lhopital:
   fixes f g f' g' :: ""real ⇒ real""
   assumes ""f ─x→ 0"" and ""g ─x→ 0""
@@ -366,48 +366,48 @@ lhôpitals-rule,L’Hôpital’s Rule,,"lemma lhopital:
   assumes ""∀⇩F u in at x. (g has_real_derivative g' u) (at u)""
   assumes ""filterlim (λx. f' x / g' x) F (at x)""
   shows   ""filterlim (λx. f x / g x) F (at x)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Deriv.html,HOL,L’Hôpital’s Rule,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Deriv.html,HOL,L’Hôpital’s Rule,evaluating limits of indeterminate forms using derivatives,https://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule
 isosceles-triangle-theorem,Isosceles Triangle Theorem,,"lemma isosceles_triangle:
   assumes ""dist a c = dist b c""
   shows   ""angle b a c = angle a b c""
-",https://isa-afp.org/entries/Triangle.shtml,Triangle,Isosceles Triangle Theorem,,
+",https://isa-afp.org/entries/Triangle.shtml,Triangle,Isosceles Triangle Theorem,triangle that has two sides of equal length and two angles of equal measure,https://en.wikipedia.org/wiki/Isosceles_triangle
 sum-of-a-geometric-series,Sum of a Geometric Series,,"lemma geometric_sums:
   ""norm c < 1 ⟹ (λn. c^n) sums (1 / (1 - c))""
 
 lemma suminf_geometric:
   ""norm c < 1 ⟹ (∑n. c ^ n) = 1 / (1 - c)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Series.html,HOL,Sum of a Geometric Series,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Series.html,HOL,Sum of a Geometric Series,"When summing infinitely many terms, the [series in question] can either be convergent or divergent",https://en.wikipedia.org/wiki/Geometric_series#Definition_and_examples
 e-is-transcendental,e is Transcendental,,"corollary e_transcendental_real: ""¬ algebraic (exp 1 :: real)""
-",https://www.isa-afp.org/entries/E_Transcendental.shtml,E_Transcendental,e is Transcendental,,
+",https://www.isa-afp.org/entries/E_Transcendental.shtml,E_Transcendental,e is Transcendental,The best-known [numbers that are not algebraic] are [e and] pi,https://en.wikipedia.org/wiki/Transcendental_number
 sum-of-an-arithmetic-series,Sum of an Arithmetic Series,,"lemma double_arith_series:
   fixes a d :: ""'a :: comm_semiring_1""
   shows ""2 * (∑i=0..n. a + of_nat i * d) = (of_nat n + 1) * (2 * a + of_nat n * d)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Sum of an Arithmetic Series,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Sum of an Arithmetic Series,"taking the number n of terms being added [...], multiplying by the sum of the first and last number in the progression [...], and dividing by 2",https://en.wikipedia.org/wiki/Arithmetic_progression#Sum
 greatest-common-divisor-algorithm,Greatest Common Divisor Algorithm,,"lemma gcd_dvd1:     ""gcd a b dvd a""
   and gcd_dvd2:     ""gcd a b dvd b""
   and gcd_greatest: ""c dvd a ⟹ c dvd b ⟹ c dvd gcd a b""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Greatest Common Divisor Algorithm,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Greatest Common Divisor Algorithm,[…] GCD [...] is the largest positive integer that divides each of the integers,https://en.wikipedia.org/wiki/Greatest_common_divisor
 perfect-number-theorem,Perfect Number Theorem,,"theorem perfect_number_theorem:
   assumes even: ""even m"" and perfect: ""perfect m""
   shows ""∃ n . m = 2^n*(2^(n+1) - 1) ∧ prime ((2::nat)^(n+1) - 1)""
-",https://isa-afp.org/entries/Perfect-Number-Thm.shtml,Perfect-Number-Thm,Perfect Number Theorem,,
+",https://isa-afp.org/entries/Perfect-Number-Thm.shtml,Perfect-Number-Thm,Perfect Number Theorem,"an even number is perfect iff it has the form 2^(p−1) * (2^p - 1), where 2^p − 1 is a prime number",https://en.wikipedia.org/wiki/Euclid%E2%80%93Euler_theorem
 order-of-a-subgroup,Order of a Subgroup,,"proposition (in group) lagrange_finite:
   assumes ""finite (carrier G)"" and ""subgroup H G""
   shows ""card (rcosets H) * card H = order G""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Coset.html,HOL,Order of a Subgroup,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Coset.html,HOL,Order of a Subgroup,"[…] if H is a subgroup of any finite group G, then |H| is a divisor of |G| […]",https://en.wikipedia.org/wiki/Lagrange%27s_theorem_(group_theory)
 sylows-theorem,Sylow’s Theorem,,"theorem sylow_thm:
   assumes ""prime p"" and ""group G"" and ""order G = p ^ a * m"" and ""finite (carrier G)""
   obtains H where ""subgroup H G"" and ""card H = p ^ a""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Sylow.html,HOL,Sylow’s Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Sylow.html,HOL,Sylow’s Theorem,"for every prime factor p of the order of a finite group G, there exists a […] p-subgroup of G of order p^n",https://en.wikipedia.org/wiki/Sylow_theorems
 ascending-or-descending-sequences,Ascending or Descending Sequences,,"lemma Erdoes_Szekeres:
   fixes f :: ""_ ⇒ 'a::linorder""
   shows ""(∃S. S ⊆ {0..m * n} ∧ card S = m + 1 ∧ mono_on f (op ≤) S) ∨
          (∃S. S ⊆ {0..m * n} ∧ card S = n + 1 ∧ mono_on f (op ≥) S)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Erdoes_Szekeres.html,HOL,Ascending or Descending Sequences,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Erdoes_Szekeres.html,HOL,Ascending or Descending Sequences,"given r, s, [...] contains a monotonically increasing subsequence of length r or a monotonically decreasing subsequence of length s",https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Szekeres_theorem
 the-principle-of-mathematical-induction,The Principle of Mathematical Induction,,"theorem nat_induct:
   assumes ""P 0"" and ""⋀n. P n ⟹ P (Suc n)""
   shows   ""P n""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Nat.html,HOL,The Principle of Mathematical Induction,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Nat.html,HOL,The Principle of Mathematical Induction,"first proving a simple case, then showing if we assume the claim is true for a given case, then the next case is also true",https://en.wikipedia.org/wiki/Mathematical_induction
 the-mean-value-theorem,The Mean Value Theorem,,"theorem MVT:
   fixes a b :: real and f :: ""real ⇒ real""
   assumes ""a < b""
@@ -421,12 +421,12 @@ lemma MVT2:
   assumes ""a < b""
       and ""∀x∈{a..b}. (f has_real_derivative f' x) (at x)""
   shows ""∃z::real. z ∈ {a<..<b} ∧ f b - f a = (b - a) * f' z""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Deriv.html,HOL,The Mean Value Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Deriv.html,HOL,The Mean Value Theorem,"for a given planar arc between two endpoints, at least one point at which the tangent to the arc is parallel to the secant through its endpoints",https://en.wikipedia.org/wiki/Mean_value_theorem
 fourier-series,Fourier Series,,"corollary Fourier_Fejer_Cesaro_summable_simple:
 assumes f: ""continuous_on UNIV f""
     and periodic: ""⋀x. f(x + 2*pi) = f x""
   shows ""(λn. (∑m<n. ∑k≤2*m. Fourier_coefficient f k * trigonometric_set k x) / n) \<longlonglongrightarrow> f x""
-",https://www.isa-afp.org/entries/Fourier.html,Fourier,Fourier Series,,
+",https://www.isa-afp.org/entries/Fourier.html,Fourier,Fourier Series,"[…] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",https://en.wikipedia.org/wiki/Fourier_series
 sum-of-kth-powers,Sum of kth powers,,"lemma sum_of_powers:
   fixes m n :: nat
   shows ""(∑k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
