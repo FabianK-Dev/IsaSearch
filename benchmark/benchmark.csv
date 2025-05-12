@@ -55,7 +55,7 @@ eulers-generalisation-of-fermats-little-theorem,Euler’s Generalisation of Ferm
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Euler’s Generalisation of Fermat’s Little Theorem,"[...] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",https://en.wikipedia.org/wiki/Euler%27s_theorem
 the-infinitude-of-primes,The Infinitude of Primes,,"lemma primes_infinite: ""¬finite {p::nat. prime p}""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,The Infinitude of Primes,[...] There are infinitely many prime numbers,https://en.wikipedia.org/wiki/Euclid%27s_theorem
-the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,https://search.isabelle.in.tum.de/#details/default_Isabelle2024_AFP2024/Tarskis_Geometry.Hyperbolic_Tarski.224664.224825,"theorem hyp2_not_tarski: ""¬ (tarski real_hyp2_C real_hyp2_B)""
+the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,"[ {""entity_kname"":""Hyperbolic_Tarski.hyp2_not_tarski|thm""} ]","theorem hyp2_not_tarski: ""¬ (tarski real_hyp2_C real_hyp2_B)""
   using hyp2_axiom10_false
   by (unfold tarski_def tarski_space_def tarski_space_axioms_def) simp",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,[…] The parallel postulate is independent of other axioms of Euclidean geometry,https://en.wikipedia.org/wiki/Parallel_postulate
 polyhedron-formula,Polyhedron Formula,"[ {""entity_kname"":""Euler_Formula.Euler_relation|thm""} ]","corollary Euler_relation:
@@ -76,12 +76,12 @@ demoivres-theorem,DeMoivre’s Theorem,,"lemma DeMoivre: ""(cis a) ^ n = cis (re
 
 lemma DeMoivre2: ""(rcis r a) ^ n = rcis (r ^ n) (real n * a)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Complex.html,HOL,DeMoivre’s Theorem,for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin ⁡ nx,https://en.wikipedia.org/wiki/De_Moivre%27s_formula
-liouvilles-theorem-and-the-construction-of-transcendental-numbers,Liouville’s Theorem and the Construction of Transcendental Numbers,,"corollary transcendental_liouville_constant:
+liouvilles-theorem-and-the-construction-of-transcendental-numbers,Liouville’s Theorem and the Construction of Transcendental Numbers,"[ {""entity_kname"":""Liouville_Numbers.transcendental_liouville_constant|thm""} ]","corollary transcendental_liouville_constant:
   ""¬algebraic (standard_liouville (λ_. 1) 10)""
 ",https://isa-afp.org/entries/Liouville_Numbers.shtml,Liouville_Numbers,Liouville’s Theorem and the Construction of Transcendental Numbers,"irrational but does not have this property, so it cannot be algebraic and must be transcendental",https://en.wikipedia.org/wiki/Liouville_number#Liouville_numbers_and_transcendence
-lagranges-four-square-theorem,Lagrange’s Four-Square Theorem,,"theorem four_squares: ""∃a b c d::nat. n = a⇧2 + b⇧2 + c⇧2 + d⇧2""
+lagranges-four-square-theorem,Lagrange’s Four-Square Theorem,"[ {""entity_kname"":""FourSquares.is_sum4sq_int_nat_eq|thm""} ]","theorem four_squares: ""∃a b c d::nat. n = a⇧2 + b⇧2 + c⇧2 + d⇧2""
 ",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,Lagrange’s Four-Square Theorem,every nonnegative integer can be represented as a sum of four non-negative integer squares,https://en.wikipedia.org/wiki/Lagrange%27s_four-square_theorem
-all-primes-1-mod-4-equal-the-sum-of-two-squares,All Primes (1 mod 4) Equal the Sum of Two Squares,,"theorem two_squares:
+all-primes-1-mod-4-equal-the-sum-of-two-squares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[ {""entity_kname"":""TwoSquares.sum_of_two_squares_prime|thm""} ]","theorem two_squares:
   assumes ""prime (p :: nat)""
   shows   ""(∃a b. p = a⇧2 + b⇧2) = [p ≠ 3] (mod 4)
 ",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[…] contains no factor p^k, where prime p ≡ 3 (mod 4) and k is odd",https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem
@@ -110,7 +110,7 @@ greens-theorem,Green’s theorem,"[
 ",https://www.isa-afp.org/entries/Green.html,Green,Green’s theorem,[…] line integral around a simple closed curve C to a double integral over the plane region D […] bounded by C,https://en.wikipedia.org/wiki/Green%27s_theorem#References
 the-non-denumerability-of-the-continuum,The Non-Denumerability of the Continuum,,"theorem real_non_denum: ""∄f :: nat ⇒ real. surj f""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Continuum_Not_Denumerable.html,HOL,The Non-Denumerability of the Continuum,[…] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers […],https://en.wikipedia.org/wiki/Cantor%27s_diagonal_argument
-formula-for-pythagorean-triples,Formula for Pythagorean Triples,,"theorem nat_euclid_pyth_triples:
+formula-for-pythagorean-triples,Formula for Pythagorean Triples,"[ {""entity_kname"":""Fermat4.nat_euclid_pyth_triples|thm"" } ]","theorem nat_euclid_pyth_triples:
   fixes a b c :: nat
   assumes ""coprime a b"" ""odd a"" ""a⇧2 + b⇧2 = c⇧2""
   shows   ""∃p q. a = p⇧2 - q⇧2 ∧ b = 2 * p * q ∧ c = p⇧2 + q⇧2 ∧ coprime p q""
