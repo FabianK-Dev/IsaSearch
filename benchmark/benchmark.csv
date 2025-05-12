@@ -114,7 +114,7 @@ formula-for-pythagorean-triples,Formula for Pythagorean Triples,,"theorem nat_eu
   fixes a b c :: nat
   assumes ""coprime a b"" ""odd a"" ""a⇧2 + b⇧2 = c⇧2""
   shows   ""∃p q. a = p⇧2 - q⇧2 ∧ b = 2 * p * q ∧ c = p⇧2 + q⇧2 ∧ coprime p q""
-",https://www.isa-afp.org/entries/Fermat3_4.html,Fermat3_4,Formula for Pythagorean Triples,,
+",https://www.isa-afp.org/entries/Fermat3_4.html,Fermat3_4,Formula for Pythagorean Triples,[…] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0,https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple
 the-undecidability-of-the-continuum-hypothesis,The Undecidability of the Continuum Hypothesis,,"corollary ctm_ZFC_imp_ctm_not_CH:
   assumes
     ""M ≈ ω"" ""Transset(M)"" ""M ⊨ ZFC""
@@ -122,24 +122,24 @@ the-undecidability-of-the-continuum-hypothesis,The Undecidability of the Continu
     ""∃N.
       M ⊆ N ∧ N ≈ ω ∧ Transset(N) ∧ N ⊨ ZFC ∪ {⋅¬⋅CH⋅⋅} ∧
       (∀α. Ord(α) ⟶ (α ∈ M ⟷ α ∈ N))""
-",https://www.isa-afp.org/entries/Independence_CH.html,Independence_CH,The Undecidability of the Continuum Hypothesis,,
+",https://www.isa-afp.org/entries/Independence_CH.html,Independence_CH,The Undecidability of the Continuum Hypothesis,There is no set whose cardinality is strictly between that of the integers and the real numbers,https://en.wikipedia.org/wiki/Continuum_hypothesis
 schroeder-bernstein-theorem,Schroeder-Bernstein Theorem,,"theorem Schroeder_Bernstein:
   fixes f :: ""'a ⇒ 'b"" and g :: ""'b ⇒ 'a""
     and A :: ""'a set"" and B :: ""'b set""
   assumes ""inj_on f A"" and ""f ` A ⊆ B""
     and   ""inj_on g B"" and ""g ` B ⊆ A""
   shows   ""∃h. bij_betw h A B""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Inductive.html,HOL,Schroeder-Bernstein Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Inductive.html,HOL,Schroeder-Bernstein Theorem,"there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A → B",https://en.wikipedia.org/wiki/Schr%C3%B6der%E2%80%93Bernstein_theorem
 leibnitzs-series-for-pi,Leibnitz’s Series for Pi,,"theorem pi_series:
   ""pi / 4 = (∑ k. (-1)^k * 1 / real (k*2+1))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Transcendental.html,HOL,Leibnitz’s Series for Pi,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Transcendental.html,HOL,Leibnitz’s Series for Pi,pi [...] as an alternating series,https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80
 sum-of-the-angles-of-a-triangle,Sum of the Angles of a Triangle,,"lemma angle_sum_triangle:
   assumes ""a ≠ b ∨ b ≠ c ∨ a ≠ c""
   shows   ""angle c a b + angle a b c + angle b c a = pi""
-",https://isa-afp.org/entries/Triangle.shtml,Triangle,Sum of the Angles of a Triangle,,
+",https://isa-afp.org/entries/Triangle.shtml,Triangle,Sum of the Angles of a Triangle,[…] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees,https://en.wikipedia.org/wiki/Triangle#Angles
 the-ballot-problem,The Ballot Problem,,"lemma
   ""valid_countings a b = (if a ≤ b then (if b = 0 then 1 else 0) else (a - b) / (a + b) * all_countings a b)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,candidate A receives p votes and candidate B receives q votes with p > q,https://en.wikipedia.org/wiki/Bertrand%27s_ballot_theorem
 ramseys-theorem,Ramsey’s Theorem,,"lemma ramsey: ""
   ∀(s::nat) (r::nat) (YY::'a set) (f::'a set => nat).
   infinite YY
@@ -149,10 +149,10 @@ ramseys-theorem,Ramsey’s Theorem,,"lemma ramsey: ""
   ∧ infinite Y'
   ∧ t' < s
   ∧ (∃X. X <= Y' ∧ finite X ∧ card X = r ⟶ f X = t'))""
-",https://isa-afp.org/entries/Ramsey-Infinite.shtml,Ramsey-Infinite,Ramsey’s Theorem,,
+",https://isa-afp.org/entries/Ramsey-Infinite.shtml,Ramsey-Infinite,Ramsey’s Theorem,how big must some structure be to guarantee that a particular property holds?,https://en.wikipedia.org/wiki/Ramsey_theory
 divergence-of-the-harmonic-series,Divergence of the Harmonic Series,,"theorem not_summable_harmonic:
   shows ""¬summable (λn. 1 / real (n + 1))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Summation_Tests.html,HOL,Divergence of the Harmonic Series,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Summation_Tests.html,HOL,Divergence of the Harmonic Series,the infinite series formed by summing all positive unit fractions,https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)
 taylors-theorem,Taylor’s Theorem,,"theorem taylor:
   fixes a :: real and n :: nat and f :: ""real ⇒ real""
   assumes ""n > 0"" and ""diff 0 = f""
@@ -160,14 +160,14 @@ taylors-theorem,Taylor’s Theorem,,"theorem taylor:
     and   ""c ∈ {a..b}"" and ""x ∈ {a..b} - {c}""
   shows ""∃t. t ∈ open_segment x c ∧
              f x = (∑m<n. (diff m c / fact m) * (x - c) ^ m) + (diff n t / fact n) * (x - c) ^ n""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/MacLaurin.html,HOL,Taylor’s Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/MacLaurin.html,HOL,Taylor’s Theorem,infinite sum of terms that are expressed in terms of the function's derivatives at a single point,https://en.wikipedia.org/wiki/Taylor_series
 brouwer-fixed-point-theorem,Brouwer Fixed Point Theorem,,"lemma brouwer:
   fixes f :: ""'a::euclidean_space ⇒ 'a""
   assumes ""compact S"" and ""convex S"" and ""S ≠ {}""
     and ""continuous_on S f""
     and ""f ` S ⊆ S""
   obtains x where ""x ∈ S"" and ""f x = x""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Brouwer_Fixpoint.html,HOL,Brouwer Fixed Point Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Brouwer_Fixpoint.html,HOL,Brouwer Fixed Point Theorem,for any continuous function f [...] there is a point x_0 such that f(x_0) = x_0,https://en.wikipedia.org/wiki/Brouwer_fixed-point_theorem
 the-solution-of-a-cubic,The Solution of a Cubic,,"lemma cubic:
   assumes a0: ""a ≠ 0""
   shows ""
@@ -188,12 +188,12 @@ the-solution-of-a-cubic,The Solution of a Cubic,,"lemma cubic:
             x = s1 - p / s1 - b / (3 * a) ∨
             x = s2 - p / s2 - b / (3 * a) ∨
             x = s3 - p / s3 - b / (3 * a))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Cubic_Quartic.html,HOL,The Solution of a Cubic,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Cubic_Quartic.html,HOL,The Solution of a Cubic,"If all of the coefficients a, b, c, and d of the cubic equation are real numbers, then it has at least one real root […]",https://en.wikipedia.org/wiki/Cubic_equation
 arithmetic-mean-geometric-mean,Arithmetic Mean / Geometric Mean,,"  theorem CauchysMeanTheorem:
   fixes z::""real list""
   assumes ""pos z""
   shows ""gmean z ≤ mean z""
-",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,Arithmetic Mean / Geometric Mean,,
+",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,Arithmetic Mean / Geometric Mean,the arithmetic mean of a list of non-negative real numbers is greater than or equal to the geometric mean of the same list,https://en.wikipedia.org/wiki/AM%E2%80%93GM_inequality
 solutions-to-pells-equation,Solutions to Pell’s Equation,,"theorem pell_solutions:
   fixes D :: nat
   assumes ""∄k. D = k⇧2""
@@ -206,33 +206,46 @@ corollary pell_solutions_infinite:
   fixes D :: nat
   assumes ""∄k. D = k⇧2""
   shows   ""infinite {(x :: int, y :: int). x⇧2 - D * y⇧2 = 1}""
-",https://www.isa-afp.org/entries/Pell.html,Pell,Solutions to Pell’s Equation,,
+",https://www.isa-afp.org/entries/Pell.html,Pell,Solutions to Pell’s Equation,accurately approximate the square root of n by rational numbers of the form x/y,https://en.wikipedia.org/wiki/Pell's_equation
+solutions-to-pells-equation,Infinitely many solutions to Pell’s Equation,,"theorem pell_solutions:
+  fixes D :: nat
+  assumes ""∄k. D = k⇧2""
+  obtains ""x⇩0"" ""y⇩0"" :: nat
+  where   ""∀(x::int) (y::int).
+             x⇧2 - D * y⇧2 = 1 ⟷
+            (∃n::nat. nat ¦x¦ + sqrt D * nat ¦y¦ = (x⇩0 + sqrt D * y⇩0) ^ n)""
+
+corollary pell_solutions_infinite:
+  fixes D :: nat
+  assumes ""∄k. D = k⇧2""
+  shows   ""infinite {(x :: int, y :: int). x⇧2 - D * y⇧2 = 1}""
+",https://www.isa-afp.org/entries/Pell.html,Pell,Solutions to Pell’s Equation,"as long as n is not a perfect square, [x^2 – ny^2 = 1] has infinitely many distinct integer solutions",https://en.wikipedia.org/wiki/Pell's_equation
 minkowskis-fundamental-theorem,Minkowski’s Fundamental Theorem,,"theorem minkowski:
   fixes B :: ""(real ^ 'n) set""
   assumes ""convex B"" and symmetric: ""uminus ` B ⊆ B""
   assumes meas_B [measurable]: ""B ∈ sets lebesgue""
   assumes measure_B: ""emeasure lebesgue B > 2 ^ CARD('n)""
   obtains x where ""x ∈ B"" and ""x ≠ 0"" and ""⋀i. x $ i ∈ ℤ""
-",https://www.isa-afp.org/entries/Minkowskis_Theorem.shtml,Minkowskis_Theorem,Minkowski’s Fundamental Theorem,,
+",https://www.isa-afp.org/entries/Minkowskis_Theorem.shtml,Minkowskis_Theorem,Minkowski’s Fundamental Theorem,every convex set in R^n which is symmetric to the origin and has volume greater than 2^n contains a non-zero integer point,https://en.wikipedia.org/wiki/Minkowski%27s_theorem
 puiseuxs-theorem,Puiseux’s Theorem,,"definition is_fpxs :: ""(rat ⇒ 'a :: zero) ⇒ bool"" where
   ""is_fpxs f ⟷ bdd_below (supp f) ∧ (LCM r∈supp f. snd (quotient_of r)) ≠ 0""
 
 typedef (overloaded) 'a fpxs = ""{f::rat ⇒ 'a :: zero. is_fpxs f}""
    morphisms fpxs_nth Abs_fpxs
-",https://www.isa-afp.org/entries/Formal_Puiseux_Series.html,Formal_Puiseux_Series,Puiseux’s Theorem,,
+",https://www.isa-afp.org/entries/Formal_Puiseux_Series.html,Formal_Puiseux_Series,Puiseux’s Theorem,generalization of power series that allow for negative and fractional exponents of the indeterminate,https://en.wikipedia.org/wiki/Puiseux_series
 sum-of-the-reciprocals-of-the-triangular-numbers,Sum of the Reciprocals of the Triangular Numbers,,"definition triangle_num :: ""nat ⇒ nat"" where
   ""triangle_num n = (n * (n + 1)) div 2""
 
 theorem inverse_triangle_num_sums:
   ""(λn. 1 / triangle_num (Suc n)) sums 2""
-",https://isabelle.in.tum.de/library/HOL/HOL-ex/Triangular_Numbers.html,HOL,Sum of the Reciprocals of the Triangular Numbers,,
+",https://isabelle.in.tum.de/library/HOL/HOL-ex/Triangular_Numbers.html,HOL,Sum of the Reciprocals of the Triangular Numbers,nth number is the number of dots in the triangular arrangement with n dots on each side,https://en.wikipedia.org/wiki/Triangular_number
 the-binomial-theorem,The Binomial Theorem,,"theorem binomial_ring:
   fixes a b :: ""'a :: comm_ring_1""
   shows ""(a + b) ^ n = (∑k=0..n. of_nat (n choose k) * a ^ k * b ^ (n - k))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,The Binomial Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,The Binomial Theorem,"The binomial coefficient binom(n, k) appears as the kth entry in the nth row of Pascal's triangle",https://en.wikipedia.org/wiki/Binomial_theorem
 the-partition-theorem,The Partition Theorem,,"theorem Euler_partition_theorem:
   ""card {p. p partitions n ∧ (∀i. p i ≤ 1)} = card {p. p partitions n ∧ (∀i. p i ≠ 0 ⟶ odd i)}""
-",https://isa-afp.org/entries/Euler_Partition.shtml,Euler_Partition,The Partition Theorem,,
+",https://isa-afp.org/entries/Euler_Partition.shtml,Euler_Partition,The Partition Theorem,number of possible partitions of a non-negative integer n,https://en.wikipedia.org/wiki/Partition_function_(number_theory)
 the-solution-of-the-general-quartic-equation,The Solution of the General Quartic Equation,,"lemma quartic:
  ""(y::real)^3 - b * y^2 + (a * c - 4 * d) * y - a^2 * d + 4 * b * d - c^2 = 0 ∧
   R^2 = a^2 / 4 - b + y ∧
@@ -246,7 +259,7 @@ the-solution-of-the-general-quartic-equation,The Solution of the General Quartic
       x = -a / 4 + R / 2 - D / 2 ∨
       x = -a / 4 - R / 2 + E / 2 ∨
       x = -a / 4 - R / 2 - E / 2""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Cubic_Quartic.html,HOL,The Solution of the General Quartic Equation,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Cubic_Quartic.html,HOL,The Solution of the General Quartic Equation,highest order polynomial equation that can be solved by radicals in the general case,https://en.wikipedia.org/wiki/Quartic_equation
 the-central-limit-theorem,The Central Limit Theorem,,"theorem (in prob_space) central_limit_theorem:
   fixes
     X :: ""nat ⇒ 'a ⇒ real"" and
@@ -266,15 +279,15 @@ the-central-limit-theorem,The Central Limit Theorem,,"theorem (in prob_space) ce
   shows
     ""weak_conv_m (λn. distr M borel (λx. S n x / sqrt (n * σ⇧2)))
         (density lborel std_normal_density)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Probability/Central_Limit_Theorem.html,HOL,The Central Limit Theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Probability/Central_Limit_Theorem.html,HOL,The Central Limit Theorem,the limit as n -> \inf of the distribution of (\bar{X}_n - \mu) * sqrt(n) is a normal distribution with mean 0 and variance \sigma^2,https://en.wikipedia.org/wiki/Central_limit_theorem
 dirichlets-theorem,Dirichlet’s Theorem,,"theorem Dirichlet:
   assumes ""n > 1"" and ""coprime h n""
   shows   ""infinite {p. prime p ∧ [p = h] (mod n)}""
-",https://isa-afp.org/entries/Dirichlet_L.html,Dirichlet_L,Dirichlet’s Theorem,,
+",https://isa-afp.org/entries/Dirichlet_L.html,Dirichlet_L,Dirichlet’s Theorem,"for any two positive coprime integers a and d, there are […] infinitely many primes that are congruent to a mod d",https://en.wikipedia.org/wiki/Dirichlet%27s_theorem_on_arithmetic_progressions
 cayley-hamilton-theorem,Cayley-Hamilton Theorem,,"theorem Cayley_Hamilton:
   fixes A :: ""'a∷comm_ring_1^'n∷finite^'n""
   shows ""evalmat (charpoly A) A = 0""
-",https://isa-afp.org/entries/Cayley_Hamilton.shtml,Cayley_Hamilton,Cayley-Hamilton Theorem,,
+",https://isa-afp.org/entries/Cayley_Hamilton.shtml,Cayley_Hamilton,Cayley-Hamilton Theorem,every square matrix over a commutative ring satisfies its own characteristic equation,https://en.wikipedia.org/wiki/Cayley%E2%80%93Hamilton_theorem
 wilsons-theorem,Wilson’s Theorem,,"lemma wilson_theorem:
   assumes ""prime p""
   shows   ""[fact (p - 1) = -1] (mod p)""
