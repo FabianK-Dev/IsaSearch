@@ -2,7 +2,7 @@ from src.solr import connect_solr
 from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs
 from src.llm import load_prompts
-from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics
+from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics, is_correct_target
 
 from vllm import LLM
 from sentence_transformers import SentenceTransformer
@@ -81,9 +81,21 @@ for i, row in tqdm(benchmark_df.iterrows()):
         benchmark_results[row["ID"]]["metadata"]["skipped"] = True
         continue
 
+    target_exists = False
+    print("Searching document identified by '" + row["Target Identifier"] + "'...")
+    for document in document_tree["documents"]:
+        if is_correct_target(document, row["Target Identifier"]):
+            target_exists = True
+            break
+
+    if not target_exists:
+        print("Warning: No target document identified by '" + row["Target Identifier"] + "' exists in the document tree, thus skipping this entry.")
+        benchmark_results[row["ID"]]["metadata"]["skipped"] = True
+        continue
+
     for query_type in query_columns:
         query = row[query_type]
-        
+
         if not pd.isna(query):
             print(row)
             print()
