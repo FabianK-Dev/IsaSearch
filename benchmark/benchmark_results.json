@@ -10,28 +10,17 @@
             },
             "Natural language query": {
                 "top_k_accuracy": 1,
-                "normalized_discounted_cumulative_gain": 0.5,
-                "reciprocal_rank": 0.3333333333333333,
-                "rank": 3
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5,
+                "rank": 2
             }
         }
     },
     "prime-number-theorem": {
-        "metadata": {},
-        "queries": {
-            "Title query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0,
-                "rank": 100
-            },
-            "Natural language query": {
-                "top_k_accuracy": 0,
-                "normalized_discounted_cumulative_gain": 0,
-                "reciprocal_rank": 0,
-                "rank": 100
-            }
-        }
+        "metadata": {
+            "skipped": true
+        },
+        "queries": {}
     },
     "g\u00f6dels-incompleteness-theorem-1": {
         "metadata": {},
@@ -102,10 +91,21 @@
         }
     },
     "the-independence-of-the-parallel-postulate": {
-        "metadata": {
-            "skipped": true
-        },
-        "queries": {}
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            }
+        }
     },
     "polyhedron-formula": {
         "metadata": {},
@@ -115,10 +115,563 @@
                 "normalized_discounted_cumulative_gain": 0.21533827903669653,
                 "reciprocal_rank": 0.041666666666666664,
                 "rank": 24
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "liouvilles-theorem-and-the-construction-of-transcendental-numbers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5,
+                "rank": 2
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.2890648263178879,
+                "reciprocal_rank": 0.1,
+                "rank": 10
+            }
+        }
+    },
+    "lagranges-four-square-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.15520856277015513,
+                "reciprocal_rank": 0.011627906976744186,
+                "rank": 86
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.24465054211822604,
+                "reciprocal_rank": 0.0625,
+                "rank": 16
+            }
+        }
+    },
+    "all-primes-1-mod-4-equal-the-sum-of-two-squares": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.2890648263178879,
+                "reciprocal_rank": 0.1,
+                "rank": 10
             }
         }
     },
     "greens-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.22424382421757544,
+                "reciprocal_rank": 0.047619047619047616,
+                "rank": 21
+            }
+        }
+    },
+    "formula-for-pythagorean-triples": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "the-undecidability-of-the-continuum-hypothesis": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            }
+        }
+    },
+    "sum-of-the-angles-of-a-triangle": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "ramseys-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            }
+        }
+    },
+    "arithmetic-mean-geometric-mean": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.21810429198553155,
+                "reciprocal_rank": 0.043478260869565216,
+                "rank": 23
+            }
+        }
+    },
+    "solutions-to-pells-equation": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5,
+                "rank": 2
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.5,
+                "reciprocal_rank": 0.3333333333333333,
+                "rank": 3
+            }
+        }
+    },
+    "minkowskis-fundamental-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.5,
+                "reciprocal_rank": 0.3333333333333333,
+                "rank": 3
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "the-partition-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "dirichlets-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.31546487678572877,
+                "reciprocal_rank": 0.125,
+                "rank": 8
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "cayley-hamilton-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5,
+                "rank": 2
+            }
+        }
+    },
+    "pi-is-transcendental": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "the-koenigsberg-bridges-problem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.156861774859441,
+                "reciprocal_rank": 0.012195121951219513,
+                "rank": 82
+            }
+        }
+    },
+    "product-of-segments-of-chords": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "the-hermite-lindemann-transcendence-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.227670248696953,
+                "reciprocal_rank": 0.05,
+                "rank": 20
+            }
+        }
+    },
+    "the-laws-of-large-numbers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "theorem-of-ceva": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            },
+            "Natural language query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.26264953503719357,
+                "reciprocal_rank": 0.07692307692307693,
+                "rank": 13
+            }
+        }
+    },
+    "isosceles-triangle-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.5,
+                "reciprocal_rank": 0.3333333333333333,
+                "rank": 3
+            }
+        }
+    },
+    "e-is-transcendental": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                "reciprocal_rank": 0.5,
+                "rank": 2
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.5,
+                "reciprocal_rank": 0.3333333333333333,
+                "rank": 3
+            }
+        }
+    },
+    "perfect-number-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "fourier-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                "reciprocal_rank": 0.16666666666666666,
+                "rank": 6
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                "reciprocal_rank": 0.16666666666666666,
+                "rank": 6
+            }
+        }
+    },
+    "sum-of-kth-powers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                "reciprocal_rank": 0.16666666666666666,
+                "rank": 6
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                "reciprocal_rank": 0.2,
+                "rank": 5
+            }
+        }
+    },
+    "the-cauchy-schwarz-inequality": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "divergence-of-the-prime-reciprocal-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            },
+            "Natural language query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "dissection-of-cubes-j.e.-littlewoods-elegant-proof": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "the-friendship-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            }
+        }
+    },
+    "lebesgue-measure-and-integration": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            }
+        }
+    },
+    "derangements-formula": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "picks-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0,
+                "reciprocal_rank": 0,
+                "rank": 100
+            }
+        }
+    },
+    "the-law-of-cosines": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 0,
+                "normalized_discounted_cumulative_gain": 0.22106472945750374,
+                "reciprocal_rank": 0.045454545454545456,
+                "rank": 22
+            }
+        }
+    },
+    "ptolemys-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "bertrands-postulate": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "top_k_accuracy": 1,
+                "normalized_discounted_cumulative_gain": 1.0,
+                "reciprocal_rank": 1.0,
+                "rank": 1
+            }
+        }
+    },
+    "descartes-rule-of-signs": {
         "metadata": {},
         "queries": {
             "Title query": {
@@ -131,20 +684,20 @@
     },
     "summary": {
         "top_k_accuracy": {
-            "sample_size": 14,
-            "average": 0.6428571428571429
+            "sample_size": 77,
+            "average": 0.7012987012987013
         },
         "normalized_discounted_cumulative_gain": {
-            "sample_size": 14,
-            "average": 0.5329628367068442
+            "sample_size": 77,
+            "average": 0.5996837777776077
         },
         "reciprocal_rank": {
-            "sample_size": 14,
-            "average": 0.48214285714285715
+            "sample_size": 77,
+            "average": 0.5405817916856389
         },
         "rank": {
-            "sample_size": 14,
-            "average": 31.785714285714285
+            "sample_size": 77,
+            "average": 23.74025974025974
         }
     }
 }

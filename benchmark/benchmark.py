@@ -84,7 +84,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
     target_exists = False
     print("Searching document identified by '" + row["Target Identifier"] + "'...")
     for document in document_tree["documents"]:
-        if is_correct_target(document, row["Target Identifier"]):
+        if is_correct_target(document, target_identifier):
             target_exists = True
             break
 

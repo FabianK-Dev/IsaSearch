@@ -1,13 +1,13 @@
 import math
 
-def is_correct_target(result, target_identifier):
+def is_correct_target(result_doc, target_identifier):
     for identifier in target_identifier:
         for identifier_key in identifier:
-            if not identifier_key in result["doc"]:
+            if not identifier_key in result_doc:
                 # print("Warning: Identifier key '" + identifier_key + "' does not exist in the document dictionary of result with ID " + result["id"] + ". Cannot verify if this is the target document.")
                 continue
 
-            if result["doc"][identifier_key] == identifier[identifier_key]:
+            if result_doc[identifier_key] == identifier[identifier_key]:
                 return True
 
     return False
@@ -19,7 +19,7 @@ def top_k_accuracy(results, target_id):
         if i >= top_k: # i starts at 0 => if i == top_k we can gurantee that the result was not within the first k results
             return 0
 
-        if is_correct_target(result, target_id):
+        if is_correct_target(result["doc"], target_id):
             return 1
     
     return 0
@@ -28,7 +28,7 @@ def top_k_accuracy(results, target_id):
 # The reelvance value is reduced logarithmically depending on the result position
 def normalized_discounted_cumulative_gain(results, target_identifier):
     for i in range(len( results )):
-        if is_correct_target(results[i], target_identifier):
+        if is_correct_target(results[i]["doc"], target_identifier):
             return 1 / math.log2(i + 2) # the first loop iteration starts at 0, not 1, thus we have to add 2 instead of 1
 
     return 0 # If the relevant target document (identified by target_id) is not in the search results
@@ -36,14 +36,14 @@ def normalized_discounted_cumulative_gain(results, target_identifier):
 # reciprocal_rank = (1 / rank) where rank_i is the rank of the first relevant document
 def reciprocal_rank(results, target_identifier): 
     for i, result in enumerate(results):
-        if is_correct_target(result, target_identifier):
+        if is_correct_target(result["doc"], target_identifier):
             return 1 / (i + 1)
 
     return 0
 
 def rank(results, target_identifier):
     for i, result in enumerate(results):
-        if is_correct_target(result, target_identifier):
+        if is_correct_target(result["doc"], target_identifier):
             return i + 1
 
     return len(results)
