@@ -4,7 +4,7 @@ def is_correct_target(result, target_identifier):
     for identifier in target_identifier:
         for identifier_key in identifier:
             if not identifier_key in result["doc"]:
-                print("Warning: Identifier key '" + identifier_key + "' does not exist in the document dictionary of result with ID " + result["id"] + ". Cannot verify if this is the target document.")
+                # print("Warning: Identifier key '" + identifier_key + "' does not exist in the document dictionary of result with ID " + result["id"] + ". Cannot verify if this is the target document.")
                 continue
 
             if result["doc"][identifier_key] == identifier[identifier_key]:
