@@ -413,11 +413,11 @@ assumes f: ""continuous_on UNIV f""
     and periodic: ""⋀x. f(x + 2*pi) = f x""
   shows ""(λn. (∑m<n. ∑k≤2*m. Fourier_coefficient f k * trigonometric_set k x) / n) \<longlonglongrightarrow> f x""
 ",https://www.isa-afp.org/entries/Fourier.html,Fourier,Fourier Series,"[…] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",https://en.wikipedia.org/wiki/Fourier_series
-sum-of-kth-powers,Sum of kth powers,,"lemma sum_of_powers:
+sum-of-kth-powers,Sum of kth powers,"[ {""entity_kname"":""Bernoulli.sum_of_powers|thm""} ]","lemma sum_of_powers:
   fixes m n :: nat
   shows ""(∑k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
 ",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[…] expresses the sum of the p-th powers of the first n positive integers […] as a polynomial in n,https://en.wikipedia.org/wiki/Faulhaber%27s_formula
-the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,,"theorem CauchySchwarzReal:
+the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,"[ {""entity_kname"":""CauchySchwarz.CauchySchwarzReal|thm""} ]","theorem CauchySchwarzReal:
   fixes x::vector
   assumes ""vlen x = vlen y""
   shows ""¦x⋅y¦ ≤ ∥x∥*∥y∥""
@@ -438,10 +438,10 @@ lemma prime_factorization_unique:
   assumes ""x ≠ 0"" ""y ≠ 0""
   shows   ""prime_factorization x = prime_factorization y ⟷ normalize x = normalize y""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Factorial_Ring.html,HOL,Fundamental Theorem of Arithmetic,"states that every integer greater than 1 can be represented uniquely as a product of prime numbers, up to the order of the factors",https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic#Proof
-divergence-of-the-prime-reciprocal-series,Divergence of the Prime Reciprocal Series,,"corollary prime_harmonic_series_diverges:
+divergence-of-the-prime-reciprocal-series,Divergence of the Prime Reciprocal Series,"[ {""entity_kname"":""Prime_Harmonic.prime_harmonic_series_diverges|thm""} ]","corollary prime_harmonic_series_diverges:
   ""¬convergent (λn. ∑p←primes_upto n. 1 / p)""
 ",https://isa-afp.org/entries/Prime_Harmonic_Series.shtml,Prime_Harmonic_Series,Divergence of the Prime Reciprocal Series,sum of the reciprocals of all prime numbers diverges,https://en.wikipedia.org/wiki/Divergence_of_the_sum_of_the_reciprocals_of_the_primes
-dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Littlewood’s “elegant” proof),,"theorem dissection_does_not_exist:
+dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Littlewood’s “elegant” proof),"[ {""entity_kname"":""Cube_Dissection.dissection_does_not_exist|thm""} ]","theorem dissection_does_not_exist:
   ""∄ C. (∀ c ∈ C. is_valid c)
         ∧ disjoint (image to_set C)
         ∧ ⋃(image to_set C) = to_set unit_cube
@@ -449,13 +449,13 @@ dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Lit
         ∧ card C ≥ 2
         ∧ finite C""
 ",https://www.isa-afp.org/entries/Cube_Dissection.html,Cube_Dissection,Dissection of Cubes (J.E. Littlewood’s “elegant” proof),,
-the-friendship-theorem,The Friendship Theorem,,"theorem (in valid_unSimpGraph) friendship_thm:
+the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""} ]","theorem (in valid_unSimpGraph) friendship_thm:
   assumes ""⋀v u. v∈V ⟹ u∈V ⟹ v≠u ⟹ ∃! n. adjacent v n ∧ adjacent u n"" and ""finite V""
   shows ""∃v. ∀n∈V. n≠v ⟶ adjacent v n""
 ",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,,
 divisibility-by-three-rule,Divisibility by Three Rule,,"theorem three_divides_nat: ""3 dvd n ⟷ 3 dvd sumdig n""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,,
-lebesgue-measure-and-integration,Lebesgue Measure and Integration,,"theorem desargues_3D:
+lebesgue-measure-and-integration,Lebesgue Measure and Integration,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P α β γ""
   shows ""rk {α, β, γ} ≤ 2""
 ",https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,
@@ -463,7 +463,7 @@ desarguess-theorem,Desargues’s Theorem,,"theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P α β γ""
   shows ""rk {α, β, γ} ≤ 2""
 ",https://www.isa-afp.org/entries/Projective_Geometry.html,Projective_Geometry,Desargues’s Theorem,,
-derangements-formula,Derangements Formula,,"theorem derangements_formula:
+derangements-formula,Derangements Formula,"[ {""entity_kname"":""Derangements.derangements_formula'|thm""} ]","theorem derangements_formula:
   assumes ""n ≠ 0"" and ""finite S"" and ""card S = n""
   shows ""card (derangements S) = round (fact n / exp 1)""
 ",https://isa-afp.org/entries/Derangements.shtml,Derangements,Derangements Formula,,
@@ -486,7 +486,7 @@ the-triangle-inequality,The Triangle Inequality,,"class ordered_ab_group_add_abs
     and abs_minus_cancel: ""¦-a¦ = ¦a¦""
     and abs_triangle_ineq: ""¦a + b¦ ≤ ¦a¦ + ¦b¦""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Groups.html,HOL,The Triangle Inequality,,
-picks-theorem,Pick’s Theorem,,"theorem pick:
+picks-theorem,Pick’s Theorem,"[ {""entity_kname"":""Pick.pick|thm""} ]","theorem pick:
 fixes p :: ""R_to_R2""
 assumes ""polygon p""
 assumes ""p = make_polygonal_path vts""
@@ -499,10 +499,10 @@ the-birthday-problem,The Birthday Problem,,"lemma birthday_paradox:
   assumes ""card S = 23"" ""card T = 365""
   shows ""2 * card {f ∈ S→⇩E S T. ¬ inj_on f S} ≥ card (S →⇩E T)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Birthday_Paradox.html,HOL,The Birthday Problem,,
-the-law-of-cosines,The Law of Cosines,,"lemma cosine_law_triangle:
+the-law-of-cosines,The Law of Cosines,"[ {""entity_kname"":""Triangle.cosine_law_triangle|thm""} ]","lemma cosine_law_triangle:
   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2 - 2 * dist a b * dist a c * cos (angle b a c)""
 ",https://isa-afp.org/entries/Triangle.shtml,Triangle,The Law of Cosines,,
-ptolemys-theorem,Ptolemy’s Theorem,,"theorem ptolemy:
+ptolemys-theorem,Ptolemy’s Theorem,"[ {""entity_kname"":""Ptolemys_Theorem.ptolemy|thm""} ]","theorem ptolemy:
   fixes A B C D center :: ""real ^ 2""
   assumes ""dist center A = radius"" and ""dist center B = radius""
   assumes ""dist center C = radius"" and ""dist center D = radius""
@@ -521,7 +521,7 @@ cramers-rule,Cramer’s Rule,,"lemma cramer:
   assumes d0: ""det A ≠ 0""
   shows ""A *v x = b ⟷ x = (χ k. det(χ i j. if j=k then b$i else A$i$j) / det A)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer’s Rule,,
-bertrands-postulate,Bertrand’s Postulate,,"theorem bertrand: ""n > 1 ⟹ ∃p∈{n<..<2*n}. prime p""
+bertrands-postulate,Bertrand’s Postulate,"[ {""entity_kname"":""Bertrand.bertrand|thm""} ]","theorem bertrand: ""n > 1 ⟹ ∃p∈{n<..<2*n}. prime p""
 ",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand’s Postulate,,
 buffon-needle-problem,Buffon Needle Problem,,"theorem buffon_short:
 assumes ""l ≤ d""
@@ -531,7 +531,7 @@ theorem buffon_long:
 assumes ""l ≥ d""
 shows   ""emeasure (buffon l d) {True} = 2 / pi * ((l / d) - sqrt ((l / d)⇧2 - 1) + arccos (d / l))""
 ",https://www.isa-afp.org/entries/Buffons_Needle.shtml,Buffons_Needle,Buffon Needle Problem,,
-descartes-rule-of-signs,Descartes Rule of Signs,,"theorem descartes_sign_rule:
+descartes-rule-of-signs,Descartes Rule of Signs,"[ {""entity_kname"":""Descartes_Sign_Rule.descartes_sign_rule|thm""} ]","theorem descartes_sign_rule:
   fixes p :: ""real poly""
   assumes ""p ≠ 0""
   shows ""∃d. even d ∧ coeff_sign_changes p = count_pos_roots p + d""
