@@ -117,7 +117,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
                     "rank": i + 1,
                     "score": score,
                     "id": doc_id,
-                    "description.": doc_description,
+                    "description": doc_description,
                     "entity_kname": doc_entity_kname,
                     "src[:200]": doc_src
                 }
