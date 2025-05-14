@@ -58,7 +58,7 @@ def calculate_mean_metrics(benchmark_results):
             continue
 
         for query_type in benchmark_results[target_id]["queries"]:
-            for metric in benchmark_results[target_id]["queries"]["metrics"][query_type]:
+            for metric in benchmark_results[target_id]["queries"][query_type]["metrics"]:
                 metric_value = benchmark_results[target_id]["queries"][query_type]["metrics"][metric]
                 if metric not in metrics:
                     metrics[metric] = { "total": 0, "sample_size": 0 }
