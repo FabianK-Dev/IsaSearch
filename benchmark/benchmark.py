@@ -123,7 +123,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
                 }
                 
                 pprint(res)
-                top_results.append(top_results)
+                top_results.append(res)
 
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "metrics": {
