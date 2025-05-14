@@ -105,6 +105,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
             results_list = search_results_to_docs(results_dict, solr)["results"]
 
             print("Top 10 results:")
+            top_results = []
             for i, result in enumerate(results_list[:10]):
                 score = result.get("score")
                 doc_id = result["doc"].get("id")
@@ -112,20 +113,29 @@ for i, row in tqdm(benchmark_df.iterrows()):
                 doc_description = result.get("llm_description")
                 doc_entity_kname = result["doc"].get("entity_kname")
 
-                pprint({
-                    "Rank": i + 1,
-                    "Score": score,
-                    "ID": doc_id,
-                    "Descr.": doc_description,
-                    "KName": doc_entity_kname,
-                    "Src": doc_src
-                })
+                res = {
+                    "rank": i + 1,
+                    "score": score,
+                    "id": doc_id,
+                    "description.": doc_description,
+                    "entity_kname": doc_entity_kname,
+                    "src[:200]": doc_src
+                }
+                
+                pprint(res)
+                top_results.append(top_results)
 
             benchmark_results[row["ID"]]["queries"][query_type] = {
-                "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
-                "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
-                "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
-                "rank": rank(results_list, target_identifier)
+                "metrics": {
+                    "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
+                    "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
+                    "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
+                    "rank": rank(results_list, target_identifier)
+                },
+                "query": query,
+                "refined_query": results_dict["refined_query"],
+                "results[:10]": top_results,
+                "duration": results_dict["duration"]
             }
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)

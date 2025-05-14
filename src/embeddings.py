@@ -61,7 +61,8 @@ def search(search_query, collection, prompts, llm):
 
     return {
         "results": results,
-        "duration": search_duration
+        "duration": search_duration,
+        "refined_query": query_text
     }
 
 def search_results_to_docs(search_results, solr):
