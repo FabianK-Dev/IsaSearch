@@ -1,3 +1,4 @@
+from vllm import LLM, SamplingParams
 import json
 import os
 import math
@@ -57,7 +58,7 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def generate_document_descriptions(config, document_tree):
+def generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
 
@@ -88,6 +89,16 @@ def generate_document_descriptions(config, document_tree):
                 print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
 
     if len(filtered_docs) >= 1:
+        for document in filtered_docs:
+            document = prompts["describe"].format(theorem_content=document["src"].split("proof")[0].strip()[:1024])
+
+        print("Loading LLM...")
+        llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=max_tokens_prompt + 512, dtype="auto")
+        sampling_params = SamplingParams(temperature=0.0, max_tokens=512)
+        
+        print(filtered_docs[:3])
+        outputs = llm.generate(filtered_docs, sampling_params)
+
         with open("./artifacts/document_descriptions.json", "w") as outfile:
             json.dump(document_descriptions, outfile, indent=4)
     else:
@@ -95,8 +106,8 @@ def generate_document_descriptions(config, document_tree):
 
     return document_descriptions
 
-def get_document_descriptions(config, document_tree):
-    document_descriptions = generate_document_descriptions(config, document_tree)
+def get_document_descriptions(config, document_tree, prompts, max_tokens_prompt):
+    document_descriptions = generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
 
     for doc_id in document_descriptions:
         try:
@@ -139,7 +150,7 @@ def build_document_tree(config, solr, tokenizer):
 
     max_tokens = 0
     for document in document_tree["documents"]:
-        token_ids = tokenizer.encode(document["src"].split("proof")[0], truncation=True, max_length=1024)
+        token_ids = tokenizer.encode(document["src"].split("proof")[0].strip()[:1024])
         num_tokens = len(token_ids)
 
         if num_tokens > max_tokens:

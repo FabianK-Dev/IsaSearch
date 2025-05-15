@@ -4,7 +4,6 @@ from src.embeddings import search, search_results_to_docs
 from src.llm import load_prompts
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics, is_correct_target
 
-from vllm import LLM
 from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer
 from tqdm import tqdm
@@ -34,11 +33,8 @@ document_tree, max_tokens = build_document_tree(config, solr, tokenizer)
 describe_prompt_tokens = tokenizer.encode(prompts["describe"])
 max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
 
-print("Loading LLM...")
-llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=max_tokens_prompt + 512, dtype="auto")
-
 print("Getting document descriptions...")
-document_tree = get_document_descriptions(config, document_tree)
+document_tree = get_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")
