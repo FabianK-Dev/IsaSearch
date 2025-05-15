@@ -1,4 +1,5 @@
 from vllm import LLM, SamplingParams
+from tqdm import tqdm
 import json
 import os
 import math
@@ -58,7 +59,7 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt):
+def generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt, save_every=1000):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
 
@@ -95,14 +96,26 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
             doc_strings.append(doc_string)
 
         print("Loading LLM...")
-        llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=max_tokens_prompt + 512, dtype="auto")
+        llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + 512, dtype="auto")
         sampling_params = SamplingParams(temperature=0.0, max_tokens=512)
         
         print(filtered_docs[:3])
-        outputs = llm.generate(doc_strings, sampling_params)
+        for i in tqdm(range(0, len(filtered_docs), save_every)):
+            print("Document descriptions iteration " + str(i) + " to " + str(i + save_every) + " of " + str(len(filtered_docs)) + " documents with batch size " + str(save_every) + "...")
+            outputs = llm.generate(doc_strings, sampling_params)
 
-        # with open("./artifacts/document_descriptions.json", "w") as outfile:
-        #     json.dump(document_descriptions, outfile, indent=4)
+            for j, output in enumerate(outputs):
+                doc_id = filtered_docs[i + j]["id"]
+                doc_src = filtered_docs[i + j]["src"]
+                document_descriptions[doc_id] = {
+                    "llm_description": output.outputs[0].text.strip(),
+                    "zlib.adler32_checksum": zlib.adler32(doc_src.encode('utf-8')),
+                    "model": config["llm_name"],
+                }
+
+            print("Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "...")
+            with open("./artifacts/document_descriptions.json", "w") as outfile:
+                json.dump(document_descriptions, outfile, indent=4)
     else:
         print("No documents need to be described by the LLM.")
 
@@ -154,6 +167,7 @@ def build_document_tree(config, solr, tokenizer):
     for document in document_tree["documents"]:
         token_ids = tokenizer.encode(document["src"].split("proof")[0].strip()[:1024])
         num_tokens = len(token_ids)
+        document["num_tokens"] = num_tokens
 
         if num_tokens > max_tokens:
             max_tokens = num_tokens

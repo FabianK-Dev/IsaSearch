@@ -7,5 +7,6 @@
     "solr_core_url": "http://localhost:8983/solr/local",
     "cache_folder": ".cache",
     "artifacts_folder": "artifacts",
-    "prompts_folder": "prompts"
+    "prompts_folder": "prompts",
+    "llm_name": "Qwen/Qwen2.5-3B"
 }

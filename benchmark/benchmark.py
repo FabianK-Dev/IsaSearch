@@ -22,7 +22,7 @@ print("Loading Solr...")
 solr = connect_solr(config)
 
 print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B")
+tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
 
 print("Loading prompts...")
 prompts = load_prompts(config)
