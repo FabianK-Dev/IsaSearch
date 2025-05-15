@@ -34,6 +34,7 @@ describe_prompt_tokens = tokenizer.encode(prompts["describe"])
 max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
 
 print("Getting document descriptions...")
+# amazon/*, microsoft/Phi-*, Qwen/*, NVIDIA/
 document_tree = get_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
 
 # Chroma setup
