@@ -448,13 +448,13 @@ dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Lit
         ∧ inj_on width C
         ∧ card C ≥ 2
         ∧ finite C""
-",https://www.isa-afp.org/entries/Cube_Dissection.html,Cube_Dissection,Dissection of Cubes (J.E. Littlewood’s “elegant” proof),,
+",https://www.isa-afp.org/entries/Cube_Dissection.html,Cube_Dissection,Dissection of Cubes (J.E. Littlewood’s “elegant” proof),Dissection of Cubes: A cube cannot be cubed.,https://leanprover-community.github.io/mathlib4_docs/Archive/Wiedijk100Theorems/CubingACube.html#Theorems100.%C2%AB82%C2%BB.cannot_cube_a_cube
 the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""} ]","theorem (in valid_unSimpGraph) friendship_thm:
   assumes ""⋀v u. v∈V ⟹ u∈V ⟹ v≠u ⟹ ∃! n. adjacent v n ∧ adjacent u n"" and ""finite V""
   shows ""∃v. ∀n∈V. n≠v ⟶ adjacent v n""
-",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,,
+",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,[…] finite graphs with the property that every two vertices have exactly one neighbor in common [...],https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem
 divisibility-by-three-rule,Divisibility by Three Rule,,"theorem three_divides_nat: ""3 dvd n ⟷ 3 dvd sumdig n""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,[…] sum of the digits must be divisible by 3 […],
 lebesgue-measure-and-integration,Lebesgue Measure and Integration,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P α β γ""
   shows ""rk {α, β, γ} ≤ 2""
