@@ -100,17 +100,17 @@ def get_document_descriptions(config, document_tree):
 
     for doc_id in document_descriptions:
         try:
-            llm_description = document_descriptions[doc_id].split("<BEGIN>")[1]
+            llm_description = document_descriptions[doc_id]["llm_description"].split("<BEGIN>")[1]
             llm_description = llm_description.split("<END>")[0]
         except Exception as err:
-            llm_description = document_descriptions[doc_id]
+            llm_description = document_descriptions[doc_id]["llm_description"]
             print(f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for document with id \"{doc_id}\", thus loading it as is.")
 
         if doc_id in document_tree["document_ids"]:
             document_id_index = document_tree["document_ids"].index(doc_id)
             document_tree["documents"][document_id_index]["llm_description"] = llm_description
         else:
-            print(f"Warning: LLM description for document with id {doc_id} does not exit in document tree and will thus be ignored.")
+            print(f"Warning: LLM description for document with id {doc_id} does not exist in document tree and will thus be ignored.")
 
     return document_tree
 
