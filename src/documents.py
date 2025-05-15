@@ -97,12 +97,12 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
 
         print("Loading LLM...")
         llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + 512, dtype="auto")
-        sampling_params = SamplingParams(temperature=0.0, max_tokens=512)
+        sampling_params = SamplingParams(temperature=0.0, max_tokens=512, stop=["<END>"])
         
         print(filtered_docs[:3])
         for i in tqdm(range(0, len(filtered_docs), save_every)):
-            print("Document descriptions iteration " + str(i) + " to " + str(i + save_every) + " of " + str(len(filtered_docs)) + " documents with batch size " + str(save_every) + "...")
-            outputs = llm.generate(doc_strings, sampling_params)
+            print("Document descriptions from index " + str(i) + " to " + str(i + save_every) + " of " + str(len(filtered_docs)) + " documents with maximum batch size " + str(save_every) + "...")
+            outputs = llm.generate(doc_strings[i:i + save_every], sampling_params)
 
             for j, output in enumerate(outputs):
                 doc_id = filtered_docs[i + j]["id"]
