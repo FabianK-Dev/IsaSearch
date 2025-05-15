@@ -40,7 +40,7 @@ def search(search_query, collection, prompts, llm):
 
     refined_query = outputs[0].outputs[0].text
     refined_query = refined_query.split("<BEGIN>")[1]
-    query_text = prompts["retrieve"].format(search_query=search_query)
+    query_text = prompts["retrieve"].format(search_query=refined_query)
 
     query_result = collection.query(
         query_texts=[query_text],
@@ -65,16 +65,13 @@ def search(search_query, collection, prompts, llm):
         "refined_query": query_text
     }
 
-def search_results_to_docs(search_results, solr):
-    result_ids = []
+def search_results_to_docs(search_results, document_tree):
     for result_id in search_results["results"]:
-        result_ids.append(result_id)
-
-    result_documents = docs_by_ids(solr, result_ids) # Get the Solr documents for each search result by ID i.e. map each search result that only consists of an ID so far to its corresponding Solr document
-
-    # Finally, update the search_results list and append data of the Solr document
-    for result in result_documents:
-        search_results["results"][result["id"]]["doc"] = result
+        index = document_tree["document_ids"].index(result_id)
+        search_results["results"][result_id] = {
+            **search_results["results"][result_id],
+            **document_tree["documents"][index]
+        }
 
     # Convert search_results["results"] to a list => this makes sorting or receiving the nth result easier
     search_results["results"] = [value for _, value in search_results["results"].items()]

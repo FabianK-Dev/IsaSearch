@@ -102,16 +102,16 @@ for i, row in tqdm(benchmark_df.iterrows()):
             print(f"Searching: \"{query}\"")
 
             results_dict = search(query, collection, prompts, llm)
-            results_list = search_results_to_docs(results_dict, solr)["results"]
+            results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             print("Top 10 results:")
             top_results = []
             for i, result in enumerate(results_list[:10]):
                 score = result.get("score")
-                doc_id = result["doc"].get("id")
-                doc_src = result["doc"].get("src")[:200] + "..."
+                doc_id = result.get("id")
+                doc_src = result.get("src")[:200] + "..."
                 doc_description = result.get("llm_description")
-                doc_entity_kname = result["doc"].get("entity_kname")
+                doc_entity_kname = result.get("entity_kname")
 
                 res = {
                     "rank": i + 1,
