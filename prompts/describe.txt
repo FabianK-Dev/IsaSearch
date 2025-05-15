@@ -14,8 +14,6 @@ Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree 
 <END>
 === End of example output ===
 
-/no_think
-
 USER:
 {theorem_content}
 
