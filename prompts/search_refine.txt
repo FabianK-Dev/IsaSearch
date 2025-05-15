@@ -28,3 +28,4 @@ USER:
 {search_query}
 
 ASSISTANT:
+/no_think

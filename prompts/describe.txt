@@ -18,3 +18,4 @@ USER:
 {theorem_content}
 
 ASSISTANT:
+/no_think
