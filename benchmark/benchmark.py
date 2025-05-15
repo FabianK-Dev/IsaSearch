@@ -18,15 +18,20 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
+print("Loading Solr...")
+solr = connect_solr(config)
+
+print("Building document tree...")
+document_tree = build_document_tree(config, solr)
+
 print("Loading prompts...")
 prompts = load_prompts(config)
 
+print("Getting document descriptions...")
+document_tree = get_document_descriptions(config, document_tree)
+
 print("Loading LLM...")
 llm = LLM(model="microsoft/Phi-3-mini-4k-instruct", max_model_len=1024, dtype="auto")
-
-solr = connect_solr(config)
-document_tree = build_document_tree(config, solr)
-document_tree = get_document_descriptions(config, document_tree)
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")

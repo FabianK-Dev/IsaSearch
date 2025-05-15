@@ -69,21 +69,39 @@ def generate_document_descriptions(config, document_tree):
 
         document_descriptions = json.loads(data)
         print(f"Finished loading {DOCUMENT_DESCRIPTIONS}")
-        return document_descriptions
     else:
-        print(f"{DOCUMENT_DESCRIPTIONS} does not already exist. Generating all document descriptions...")
+        print(f"{DOCUMENT_DESCRIPTIONS} does not already exist.")
+        document_descriptions = {}
+
+    print("Finding documents that need to be described by the LLM...")
         
     filtered_docs = []
-    for document in document_tree["documents"]:
-        checksum = zlib.adler32(document_tree["documents"][document]["src"].encode('utf-8'))
 
-        if document["id"] not in document_descriptions:
-            print("Document identified by id '" + document["id"] + "' does not already exist in document descriptions. Adding to batch...")
-            filtered_docs.append(document)
-        elif document["id"] in document_descriptions:
-            saved_checksum = document_descriptions[document["id"]].get("zlib.adler32_checksum", "")
-            if saved_checksum != checksum:
-                print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
+    for document in document_descriptions:
+        document_data = next((doc for doc in document_tree["documents"] if doc["id"] == document), None)
+        if document_data:
+            checksum = zlib.adler32(document_data["src"].encode('utf-8'))
+        else:
+            print(f"Warning: Document with id {document} not found in document_tree.")
+            continue
+        document_descriptions[document] = {
+            "llm_description": document_descriptions[document],
+            "zlib.adler32_checksum": checksum
+        }
+
+    with open("./artifacts/document_descriptions.json", "w") as outfile:
+        json.dump(document_descriptions, outfile, indent=4)
+
+    # for document in document_tree["documents"]:
+    #     checksum = zlib.adler32(document["src"].encode('utf-8'))
+
+    #     if document["id"] not in document_descriptions:
+    #         print("Document identified by id '" + document["id"] + "' does not already exist in document descriptions. Adding to batch...")
+    #         filtered_docs.append(document)
+    #     elif document["id"] in document_descriptions:
+    #         saved_checksum = document_descriptions[document["id"]].get("zlib.adler32_checksum", "")
+    #         if saved_checksum != checksum:
+    #             print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
 
     exit()
 
