@@ -3,6 +3,7 @@ import os
 import math
 import re
 import tomllib
+import zlib
 
 def get_entry_metadata(entry, config):
     metadata_folder = config["afp_folder"] + "/metadata/"
@@ -56,7 +57,7 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def get_document_descriptions(config, document_tree):
+def generate_document_descriptions(config, document_tree):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
 
@@ -68,10 +69,26 @@ def get_document_descriptions(config, document_tree):
 
         document_descriptions = json.loads(data)
         print(f"Finished loading {DOCUMENT_DESCRIPTIONS}")
+        return document_descriptions
     else:
         print(f"{DOCUMENT_DESCRIPTIONS} does not already exist. Generating all document descriptions...")
-        exit()
-        # TODO
+        
+    filtered_docs = []
+    for document in document_tree["documents"]:
+        checksum = zlib.adler32(document_tree["documents"][document]["src"].encode('utf-8'))
+
+        if document["id"] not in document_descriptions:
+            print("Document identified by id '" + document["id"] + "' does not already exist in document descriptions. Adding to batch...")
+            filtered_docs.append(document)
+        elif document["id"] in document_descriptions:
+            saved_checksum = document_descriptions[document["id"]].get("zlib.adler32_checksum", "")
+            if saved_checksum != checksum:
+                print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
+
+    exit()
+
+def get_document_descriptions(config, document_tree):
+    document_descriptions = generate_document_descriptions(config, document_tree)
 
     for doc_id in document_descriptions:
         try:
