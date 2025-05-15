@@ -42,10 +42,13 @@ print("Loading embedder...")
 embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2').to('cuda')
 print("Finished loading embedder.")
 
-# Get set of all already ecisting document IDs (saved at the source key)
+# Get set of all already existing document IDs (saved at the source key)
 existing = set()
-for item in collection.get(include=["metadatas"])["metadatas"]:
-    existing.add(item["source"])
+metadata_response = collection.get(include=["metadatas"])
+
+if "metadatas" in metadata_response and metadata_response["metadatas"] != None:
+    for item in metadata_response["metadatas"]:
+        existing.add(item["source"])
 
 for doc in tqdm(document_tree["documents"]):
     if doc["id"] in existing:
