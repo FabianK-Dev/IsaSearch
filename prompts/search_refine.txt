@@ -24,8 +24,9 @@ shows "degree (p * q) = degree p + degree q"
 <END>
 === End of example output ===
 
+/no_think
+
 USER:
 {search_query}
 
 ASSISTANT:
-/no_think
