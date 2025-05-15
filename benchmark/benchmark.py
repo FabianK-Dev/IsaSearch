@@ -37,8 +37,6 @@ print("Loading embedder...")
 embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2').to('cuda')
 print("Finished loading embedder.")
 
-instruction = "Represent the given natural language explanation concatenated with its formal math statement written in Isabelle/HOL for retrieving related statements by natural language query:"
-
 # Get set of all already ecisting document IDs (saved at the source key)
 existing = set()
 for item in collection.get(include=["metadatas"])["metadatas"]:
@@ -49,7 +47,8 @@ for doc in tqdm(document_tree["documents"]):
         continue
 
     doc_src =  doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
-    embedding = embedder.encode(instruction + "\n" + doc_src, convert_to_tensor=True).cpu().numpy()
+    embedding_str = prompts["embed"].format(doc_src=doc_src)
+    embedding = embedder.encode(embedding_str, convert_to_tensor=True).cpu().numpy()
 
     collection.add(
         documents=[doc_src],

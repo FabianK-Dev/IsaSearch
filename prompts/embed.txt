@@ -1,0 +1,2 @@
+Represent the given natural language explanation concatenated with its formal math statement written in Isabelle/HOL for retrieving related statements by natural language query:
+{doc_src}
