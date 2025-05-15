@@ -89,18 +89,20 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
                 print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
 
     if len(filtered_docs) >= 1:
+        doc_strings = []
         for document in filtered_docs:
-            document = prompts["describe"].format(theorem_content=document["src"].split("proof")[0].strip()[:1024])
+            doc_string = prompts["describe"].format(theorem_content=document["src"].split("proof")[0].strip()[:1024])
+            doc_strings.append(doc_string)
 
         print("Loading LLM...")
         llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=max_tokens_prompt + 512, dtype="auto")
         sampling_params = SamplingParams(temperature=0.0, max_tokens=512)
         
         print(filtered_docs[:3])
-        outputs = llm.generate(filtered_docs, sampling_params)
+        outputs = llm.generate(doc_strings, sampling_params)
 
-        with open("./artifacts/document_descriptions.json", "w") as outfile:
-            json.dump(document_descriptions, outfile, indent=4)
+        # with open("./artifacts/document_descriptions.json", "w") as outfile:
+        #     json.dump(document_descriptions, outfile, indent=4)
     else:
         print("No documents need to be described by the LLM.")
 
