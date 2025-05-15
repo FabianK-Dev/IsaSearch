@@ -93,7 +93,7 @@
                         "src[:200]": "lemma real_sqrt_sum_squares_triangle_ineq:\n  \"sqrt ((a + c)\u21e72 + (b + d)\u21e72) \u2264 sqrt (a\u21e72 + b\u21e72) + sqrt (c\u21e72 + d\u21e72)\"\nproof -\n  have \"(a * c + b * d) \u2264 (sqrt (a\u21e72 + b\u21e72) * sqrt (c\u21e72 + d\u21e72))\"\n    by (rule ..."
                     }
                 ],
-                "duration": 2.5698859691619873
+                "duration": 2.575995683670044
             },
             "Natural language query": {
                 "metrics": {
@@ -186,7 +186,7 @@
                         "src[:200]": "lemma real_sqrt_sum_squares_mult_squared_eq [simp]:\n  \"(sqrt ((x\u21e72 + y\u21e72) * (xa\u21e72 + ya\u21e72)))\u21e72 = (x\u21e72 + y\u21e72) * (xa\u21e72 + ya\u21e72)\"\n  by (simp add: zero_le_mult_iff)..."
                     }
                 ],
-                "duration": 2.1129579544067383
+                "duration": 2.1265604496002197
             }
         }
     },
@@ -290,7 +290,7 @@
                         "src[:200]": "lemma separation_sat_after_function_1:\n  assumes \"[a,b,c,d]\u2208list(M)\" and  \"\u03c7\u2208formula\" and \"arity(\u03c7) \u2264 6\"\n    and\n    f_fm:  \"f_fm \u2208 formula\" and\n    f_ar:  \"arity(f_fm) \u2264 6\" and\n    fsats: \"\u22c0 fx x. fx..."
                     }
                 ],
-                "duration": 1.7727265357971191
+                "duration": 1.780252456665039
             },
             "Natural language query": {
                 "metrics": {
@@ -383,7 +383,7 @@
                         "src[:200]": "lemma fEx_table:\n\"All (fComp P) \u2228 fEx P = fTrue\"\n\"Ex P \u2228 fEx P = fFalse\"\nunfolding fFalse_def fTrue_def fComp_def fEx_def by auto..."
                     }
                 ],
-                "duration": 1.4199187755584717
+                "duration": 1.4424011707305908
             }
         }
     },
@@ -481,7 +481,7 @@
                         "src[:200]": "lemma list_ex_simps [simp, code]:\n  \"list_ex P (x # xs) \u27f7 P x \u2228 list_ex P xs\"\n  \"list_ex P [] \u27f7 False\"\n  by (simp_all add: list_ex_iff)..."
                     }
                 ],
-                "duration": 2.3584253787994385
+                "duration": 2.4438297748565674
             },
             "Natural language query": {
                 "metrics": {
@@ -574,7 +574,7 @@
                         "src[:200]": "lemma sats_nForall:\n  assumes\n    \"\u03c6 \u2208 formula\"\n  shows\n    \"n\u2208nat \u27f9 ms \u2208 list(M) \u27f9\n       (M, ms \u22a8 (Forall^n(\u03c6))) \u27f7\n       (\u2200rest \u2208 list(M). length(rest) = n \u27f6 M, rest @ ms \u22a8 \u03c6)\"\nproof (induct n arbi..."
                     }
                 ],
-                "duration": 1.2346131801605225
+                "duration": 1.2984261512756348
             }
         }
     },
@@ -672,7 +672,7 @@
                         "src[:200]": "lemma Arccos_minus1: \"Arccos(-1) = pi\"\n  by (rule Arccos_unique) auto..."
                     }
                 ],
-                "duration": 1.075989007949829
+                "duration": 1.1023979187011719
             },
             "Natural language query": {
                 "metrics": {
@@ -702,6 +702,22 @@
                     },
                     {
                         "rank": 3,
+                        "score": 0.9338643550872803,
+                        "id": "ISABELLE_HOME/src/HOL/Typedef.thy|846..1301",
+                        "description": "\nLemma (Absolute Value Injectivity):\nLet \\(A\\) be a set and let \\(Abs\\) be a function that assigns an absolute value to each element in \\(A\\). If \\(x\\) and \\(y\\) are elements of \\(A\\), then the absolute value of \\(x\\) is equal to the absolute value of \\(y\\) if and only if \\(x\\) is equal to \\(y\\). In other words, \\(Abs x = Abs y\\) if and only if \\(x = y\\).\n",
+                        "entity_kname": "Typedef.type_definition.Abs_inject|thm",
+                        "src[:200]": "lemma Abs_inject:\n  assumes \"x \u2208 A\" and \"y \u2208 A\"\n  shows \"Abs x = Abs y \u27f7 x = y\"\nproof\n  assume \"Abs x = Abs y\"\n  then have \"Rep (Abs x) = Rep (Abs y)\" by (simp only:)\n  also from \u2039x \u2208 A\u203a have \"Rep (Ab..."
+                    },
+                    {
+                        "rank": 4,
+                        "score": 0.9406474828720093,
+                        "id": "ISABELLE_HOME/src/HOL/Typedef.thy|2635..2954",
+                        "description": "\nLemma (Absolute Value Image):\nLet \\(A\\) be a set. The image of \\(A\\) under the absolute value function, denoted as \\(|A|\\), is the set of all non-negative elements of \\(A\\).\n",
+                        "entity_kname": "Typedef.type_definition.Abs_image|thm",
+                        "src[:200]": "lemma Abs_image: \"Abs ` A = UNIV\"\nproof\n  show \"Abs ` A \u2286 UNIV\" by (rule subset_UNIV)\n  show \"UNIV \u2286 Abs ` A\"\n  proof\n    show \"x \u2208 Abs ` A\" for x\n    proof (rule image_eqI)\n      show \"x = Abs (Rep x..."
+                    },
+                    {
+                        "rank": 5,
                         "score": 0.9468116164207458,
                         "id": "ISABELLE_HOME/src/HOL/Transcendental.thy|258388..259373",
                         "description": "\nLemma (Existence of Polar Coordinates):\nThere exists a real number \\(r\\) and an angle \\(a\\) such that for any point \\((x, y)\\) in the Cartesian plane, the polar coordinates \\((r, a)\\) can be expressed as \\(x = r \\cdot \\cos(a)\\) and \\(y = r \\cdot \\sin(a)\\).\n",
@@ -709,7 +725,7 @@
                         "src[:200]": "lemma polar_Ex: \"\u2203r::real. \u2203a. x = r * cos a \u2227 y = r * sin a\"\nproof -\n  have polar_ex1: \"\u2203r a. x = r * cos a \u2227 y = r * sin a\" if \"0 < y\" for y\n  proof -\n    have \"x = sqrt (x\u21e72 + y\u21e72) * cos (arccos (x..."
                     },
                     {
-                        "rank": 4,
+                        "rank": 6,
                         "score": 0.9499740600585938,
                         "id": "AFP/Pell/Pell.thy|3534..3991",
                         "description": "\nCorollary (Square Root of a Natural Number and Being a Perfect Square):\nLet \\(n\\) be a natural number. Then the square root of \\(n\\) is also a natural number if and only if \\(n\\) is a perfect square. In other words, \\(\\sqrt{n} \\in \\mathbb{N} \\leftrightarrow n\\) is a perfect square.\n",
@@ -717,7 +733,7 @@
                         "src[:200]": "corollary sqrt_nat_iff_is_square:\n  \"sqrt (real n) \u2208 \u2115 \u27f7 is_square n\"\nproof\n  assume \"sqrt (real n) \u2208 \u2115\"\n  then obtain k where \"sqrt (real n) = real k\" by (auto elim!: Nats_cases)\n  hence \"sqrt (real ..."
                     },
                     {
-                        "rank": 5,
+                        "rank": 7,
                         "score": 0.9520118832588196,
                         "id": "AFP/Pell/Pell.thy|2724..3233",
                         "description": "\nCorollary (Square Root of a Natural or Irrational Number):\nGiven a real number \\(a\\) that is a perfect square, if \\(x\\) is a square root of \\(a\\), then \\(x\\) must either be an integer (\\(x \\in \\mathbb{Z}\\)) or \\(x\\) must be an irrational number (\\(x \\notin \\mathbb{Q}\\)).\n",
@@ -725,7 +741,7 @@
                         "src[:200]": "corollary sqrt_nat_or_irrat:\n  assumes \"x ^ 2 = real a\"\n  shows   \"x \u2208 \u2124 \u2228 x \u2209 \u211a\"\nproof (cases \"x \u2265 0\")\n  case True\n  with nonneg_sqrt_nat_or_irrat[OF assms this]\n    show ?thesis by (auto simp: Nats_..."
                     },
                     {
-                        "rank": 6,
+                        "rank": 8,
                         "score": 0.9580861926078796,
                         "id": "ISABELLE_HOME/src/HOL/NthRoot.thy|15565..15680",
                         "description": "\nLemma (Absolute Value and Square Root of a Real Number):\nLet \\(x\\) be a real number. Then the square root of the square of \\(x\\) is equal to the absolute value of \\(x\\), that is, \\(\\sqrt{x^2} = |x|\\).\n",
@@ -733,7 +749,7 @@
                         "src[:200]": "lemma real_sqrt_abs [simp]: \"sqrt (x\u21e72) = \u00a6x\u00a6\"\n  by (metis power2_abs abs_ge_zero real_sqrt_unique)..."
                     },
                     {
-                        "rank": 7,
+                        "rank": 9,
                         "score": 0.9604219794273376,
                         "id": "AFP/Impossible_Geometry/Impossible_Geometry.thy|55556..55760",
                         "description": "\nTheorem (Impossibility of Doubling the Cube):\nGiven a point \\(x\\) on the real number line such that \\(x^3 = 2\\), it follows that this point cannot be constructed using a finite number of steps involving only a compass and straightedge. This is a consequence of the impossibility of doubling the cube, which is a classical problem in geometry. The proof of this theorem relies on the fact that the cube root of 2 is not a constructible number, as it cannot be expressed using a finite sequence of operations involving only the extraction of square roots.\n",
@@ -741,31 +757,15 @@
                         "src[:200]": "theorem impossibility_of_doubling_the_cube:\n  \"x^3 = 2 \u27f9 (Point x 0) \u2209 constructible\"\n  by (metis abscissa.simps constructible_radical_sqrt impossibility_of_doubling_the_cube_lemma)..."
                     },
                     {
-                        "rank": 8,
+                        "rank": 10,
                         "score": 0.9607579708099365,
                         "id": "ISABELLE_HOME/src/HOL/Transcendental.thy|179739..180864",
                         "description": "\nLemma (Cosine of an Angle Equals One):\nLet \\(x\\) be a non-zero real number representing an angle in radians. Then the cosine of \\(x\\) equals one if and only if \\(x\\) is an integer multiple of \\(2\\pi\\) or \\(x\\) is an integer multiple of \\(-2\\pi\\). In other words, \\(\\cos(x) = 1\\) if and only if there exists a natural number \\(n\\) such that \\(x = n \\cdot 2\\pi\\) or \\(x = -n \\cdot 2\\pi\\).\n",
                         "entity_kname": "Transcendental.cos_one_2pi|thm",
                         "src[:200]": "lemma cos_one_2pi: \"cos x = 1 \u27f7 (\u2203n::nat. x = n * 2 * pi) \u2228 (\u2203n::nat. x = - (n * 2 * pi))\"\n  (is \"?lhs = ?rhs\")\nproof\n  assume ?lhs\n  then have \"sin x = 0\"\n    by (simp add: cos_one_sin_zero)\n  then s..."
-                    },
-                    {
-                        "rank": 9,
-                        "score": 0.9694864153862,
-                        "id": "AFP/Pell/Pell.thy|3235..3387",
-                        "description": "\nCorollary (Nonnegative Square Root of a Real Number):\nFor any nonnegative real number \\(a\\), the square root of \\(a\\) is either a natural number or an irrational number. In other words, \\(\\sqrt{a} \\in \\mathbb{N}\\) or \\(\\sqrt{a} \\notin \\mathbb{Q}\\).\n",
-                        "entity_kname": "Pell.sqrt_nat_or_irrat'|thm",
-                        "src[:200]": "corollary sqrt_nat_or_irrat':\n  \"sqrt (real a) \u2208 \u2115 \u2228 sqrt (real a) \u2209 \u211a\"\n  using nonneg_sqrt_nat_or_irrat[of \"sqrt a\" a] by auto..."
-                    },
-                    {
-                        "rank": 10,
-                        "score": 0.9701551795005798,
-                        "id": "AFP/Independence_CH/Interface.thy|17125..17596",
-                        "description": "\nLemma (Existence of a Set Containing the Natural Numbers):\nThere exists a set \\(I\\) within the collection \\(M\\) of all sets such that the set of natural numbers \\( \\mathbb{N} \\) is a subset of \\(I\\), formally written as \\( \\mathbb{N} \\subseteq I \\).\n",
-                        "entity_kname": "Interface.M_ZF1_trans.nat_subset_I|thm",
-                        "src[:200]": "lemma nat_subset_I: \"\u2203I\u2208M. nat \u2286 I\"\nproof -\n  have \"nat \u2286 I\"\n    if \"I\u2208M\" and \"0\u2208I\" and \"\u22c0x. x\u2208I \u27f9 succ(x)\u2208I\" for I\n    using that\n    by (rule_tac subsetI,induct_tac x,simp_all)\n  moreover\n  obtain I..."
                     }
                 ],
-                "duration": 7.530159950256348
+                "duration": 7.833630323410034
             }
         }
     },
@@ -863,7 +863,7 @@
                         "src[:200]": "lemma abs_power2 [simp]: \"\u00a6a\u21e72\u00a6 = a\u21e72\"\n  by (simp add: power2_eq_square)..."
                     }
                 ],
-                "duration": 1.385486125946045
+                "duration": 1.4985017776489258
             },
             "Natural language query": {
                 "metrics": {
@@ -956,7 +956,7 @@
                         "src[:200]": "lemma radical_sqrt_rule_power3:\n  \"x \u2208 radical_sqrt \u27f9 x \u2265 0 \u27f9 x^3 \u2208 radical_sqrt\"\n  by (metis power3_eq_cube radical_sqrt.intros(5))..."
                     }
                 ],
-                "duration": 1.7340104579925537
+                "duration": 1.8577702045440674
             }
         }
     },
@@ -1054,7 +1054,7 @@
                         "src[:200]": "lemma lemma_2:\n  assumes \"desargues_config A B C A' B' C' M N P R\" and \"incid A (line B' C') \u2228 incid C' (line A B)\" \n    and \"incid C (line A' B') \u2228 incid B' (line A C)\" and \"incid B (line A' C') \u2228 in..."
                     }
                 ],
-                "duration": 1.790198564529419
+                "duration": 1.8367867469787598
             },
             "Natural language query": {
                 "metrics": {
@@ -1147,7 +1147,7 @@
                         "src[:200]": "theorem hyp2_axiom2: \"\u2200 a b p q r s. a b \\<congruent>\u21e9K p q \u2227 a b \\<congruent>\u21e9K r s \u27f6 p q \\<congruent>\u21e9K r s\"\nproof standard+\n  fix a b p q r s\n  assume \"a b \\<congruent>\u21e9K p q \u2227 a b \\<congruent>\u21e9K r..."
                     }
                 ],
-                "duration": 0.9228918552398682
+                "duration": 1.0064611434936523
             }
         }
     },
@@ -1245,7 +1245,7 @@
                         "src[:200]": "lemma polygon_split_add_measure:\n  fixes p p1 p2 :: \"R_to_R2\"\n  assumes \"is_polygon_split vts i j\"\n  assumes \"vts1 = (take i vts)\" \n          \"vts2 = (take (j - i - 1) (drop (Suc i) vts)) \"\n          ..."
                     }
                 ],
-                "duration": 2.025597333908081
+                "duration": 2.1372647285461426
             },
             "Natural language query": {
                 "metrics": {
@@ -1338,7 +1338,7 @@
                         "src[:200]": "lemma convex_polygon_is_convex_hull:\n  assumes \"polygon p\"\n  assumes \"convex (path_inside p \u222a path_image p)\"\n  assumes \"p = make_polygonal_path vts\"\n  shows \"convex hull (set vts) = path_inside p \u222a pa..."
                     }
                 ],
-                "duration": 1.9325745105743408
+                "duration": 2.0291829109191895
             }
         }
     },
@@ -1436,7 +1436,7 @@
                         "src[:200]": "lemma standard_liouville_is_liouville:\n  assumes \"q > 1\" \"range p \u2286 {0..<q}\" \"frequently (\u03bbn. p n \u2260 0) sequentially\"\n  defines \"b \u2261 \u03bbn. q ^ fact (Suc n)\"\n  defines \"a \u2261 \u03bbn. (\u2211k\u2264n. p k * q ^ (fact (Suc..."
                     }
                 ],
-                "duration": 1.985456943511963
+                "duration": 2.0638375282287598
             },
             "Natural language query": {
                 "metrics": {
@@ -1529,7 +1529,7 @@
                         "src[:200]": "theorem e_transcendental_complex: \"\u00ac algebraic (exp 1 :: complex)\"\nproof\n  assume \"algebraic (exp 1 :: complex)\"\n  then obtain q :: \"int poly\"\n    where q: \"q \u2260 0\" \"coeff q 0 \u2260 0\" \"poly (of_int_poly q..."
                     }
                 ],
-                "duration": 2.012397050857544
+                "duration": 2.1243205070495605
             }
         }
     },
@@ -1627,7 +1627,7 @@
                         "src[:200]": "private lemma product_two_squares_aux: \"sum2sq_int(a, b) * sum2sq_int(c, d) = sum2sq_int(a*c - b*d, a*d + b*c)\"\n  unfolding power2_eq_square sum2sq_int_def by (simp add: algebra_simps)..."
                     }
                 ],
-                "duration": 1.861431360244751
+                "duration": 1.885559320449829
             },
             "Natural language query": {
                 "metrics": {
@@ -1720,7 +1720,7 @@
                         "src[:200]": "private lemma zprime_is_sum4sq: \"prime (nat p) \u27f9 is_sum4sq_int p\"\nproof (cases)\n  assume p2: \"p=2\"\n  hence \"p = sum4sq_int(1,1,0,0)\" by (auto simp add: sum4sq_int_def)\n  thus ?thesis by (auto simp add..."
                     }
                 ],
-                "duration": 1.9105699062347412
+                "duration": 1.9519035816192627
             }
         }
     },
@@ -1818,7 +1818,7 @@
                         "src[:200]": "private lemma Legendre_1mod4: \"prime (4*k+1::nat) \u27f9 (Legendre (-1) (4*k+1)) = 1\"\nproof -\n  let ?p = \"4*k+1\"\n  let ?L = \"Legendre (-1) ?p\"\n  assume p: \"prime ?p\"\n  from p have \"k \u2260 0\" by (intro notI) s..."
                     }
                 ],
-                "duration": 1.832364559173584
+                "duration": 1.8690013885498047
             },
             "Natural language query": {
                 "metrics": {
@@ -1911,7 +1911,7 @@
                         "src[:200]": "lemma identity_equivp: \"equivp (=)\"\n  by (auto intro: equivpI reflpI sympI transpI)..."
                     }
                 ],
-                "duration": 1.955517292022705
+                "duration": 1.957632064819336
             }
         }
     },
@@ -2009,7 +2009,7 @@
                         "src[:200]": "lemma GreenThm_typeII_twoChain:\n  shows \"two_chain_integral two_chain (partial_vector_derivative (\u03bba. (F a) \u2219 j)  i) = one_chain_line_integral F {j} (two_chain_boundary two_chain)\"\nproof (simp add: tw..."
                     }
                 ],
-                "duration": 7.624594688415527
+                "duration": 7.577581405639648
             },
             "Natural language query": {
                 "metrics": {
@@ -2102,7 +2102,7 @@
                         "src[:200]": "lemma gen_common_subdivision_imp_eq_line_integral:\n  assumes \"(common_sudiv_exists one_chain1 one_chain2)\"\n    \"boundary_chain one_chain1\"\n    \"boundary_chain one_chain2\"\n    \"\u2200(k, \u03b3)\u2208one_chain1. line..."
                     }
                 ],
-                "duration": 2.1605629920959473
+                "duration": 2.1394217014312744
             }
         }
     },
@@ -2200,7 +2200,7 @@
                         "src[:200]": "theorem hyp2_axiom3: \"\u2200 a b c. a b \\<congruent>\u21e9K c c \u27f6 a = b\"\nproof standard+\n  fix a b c\n  assume \"a b \\<congruent>\u21e9K c c\"\n  then obtain J where \"is_K2_isometry J\"\n    and \"hyp2_cltn2 a J = c\" and \"..."
                     }
                 ],
-                "duration": 1.8887138366699219
+                "duration": 1.8865540027618408
             },
             "Natural language query": {
                 "metrics": {
@@ -2293,7 +2293,7 @@
                         "src[:200]": "lemma qfN_cube_prime:\n  assumes ass: \"prime (p^2 + N*q^2::int) \u2227 N > 1\n  \u2227 (p^2 + N*q^2)^3 = a^2 + N*b^2 \u2227 coprime a b\"\n  shows \"\u00a6a\u00a6 = \u00a6p^3- 3*N*p*q^2\u00a6 \u2227 \u00a6b\u00a6 = \u00a63*p^2*q-N*q^3\u00a6\"\nproof -\n  let ?P = \"p^2..."
                     }
                 ],
-                "duration": 5.036790609359741
+                "duration": 5.040693283081055
             }
         }
     },
@@ -2391,7 +2391,7 @@
                         "src[:200]": "theorem ctm_of_not_CH:\n  assumes\n    \"M \u2248 \u03c9\" \"Transset(M)\" \"M \u22a8 ZC \u222a {\u22c5Replacement(p)\u22c5 . p \u2208 overhead_notCH}\"\n    \"\u03a6 \u2286 formula\" \"M \u22a8 { \u22c5Replacement(ground_repl_fm(\u03c6))\u22c5 . \u03c6 \u2208 \u03a6}\"\n  shows\n    \"\u2203N.\n     ..."
                     }
                 ],
-                "duration": 1.8842835426330566
+                "duration": 1.8837764263153076
             },
             "Natural language query": {
                 "metrics": {
@@ -2484,7 +2484,7 @@
                         "src[:200]": "lemma open_interval_eqpoll_reals:\n  fixes a b::real\n  shows \"{a<..<b} \u2248 (UNIV::real set) \u27f7 a<b\"\n  using bij_betw_tan bij_betw_open_intervals eqpoll_def\n  by (smt (verit, best) UNIV_I eqpoll_real_subse..."
                     }
                 ],
-                "duration": 1.5001986026763916
+                "duration": 1.505009651184082
             }
         }
     },
@@ -2582,7 +2582,7 @@
                         "src[:200]": "lemma Triangle_area_per2 : \"Triangle_area a b c = Triangle_area b a c\"\nproof -\n  have H : \"abs(sin (angle a b c)) * dist b c = abs(sin (angle b a c)) * dist a c\"\n    using sine_law_triangle\n    by (me..."
                     }
                 ],
-                "duration": 1.2300143241882324
+                "duration": 1.2163012027740479
             },
             "Natural language query": {
                 "metrics": {
@@ -2675,7 +2675,7 @@
                         "src[:200]": "lemma collinear_angle: \n  fixes a b c :: \"'a::euclidean_space\"\n  shows \"collinear {a, b, c} \u27f9 a \u2260 b \u27f9 b \u2260 c \u27f9 angle a b c \u2208 {0, pi}\"\nproof (cases \"a = c\")\n  case True\n  assume Col : \"collinear {a, b, ..."
                     }
                 ],
-                "duration": 1.4707343578338623
+                "duration": 1.4665501117706299
             }
         }
     },
@@ -2773,7 +2773,7 @@
                         "src[:200]": "lemma del_edge_undirected_degree_minus[simp]: \"finite (edges g) \u27f9 (v,e,v') \u2208 edges g \n    \u27f9 (v',e,v) \u2208 edges g \u27f9 degree v (del_unEdge v e v' g) =degree v g- (1::nat)\" \n  using del_edge_undirected_degr..."
                     }
                 ],
-                "duration": 2.331387758255005
+                "duration": 2.345613479614258
             },
             "Natural language query": {
                 "metrics": {
@@ -2866,7 +2866,7 @@
                         "src[:200]": "lemma exists_least_lemma:\n  assumes \"\u00ac P 0\" and \"\u2203n. P n\"\n  shows \"\u2203n. \u00ac P n \u2227 P (Suc n)\"\nproof -\n  from \u2039\u2203n. P n\u203a have \"P (Least P)\"\n    by (rule LeastI_ex)\n  with \u2039\u00ac P 0\u203a obtain n where \"Least P = S..."
                     }
                 ],
-                "duration": 1.7742633819580078
+                "duration": 1.7606995105743408
             }
         }
     },
@@ -2964,7 +2964,7 @@
                         "src[:200]": "lemma real_root_pow_pos: \"0 < n \u27f9 0 < x \u27f9 root n x ^ n = x\"  (* TODO: rename *)\n  using sgn_power_root[of n x] real_root_gt_zero[of n x] by simp..."
                     }
                 ],
-                "duration": 2.312695026397705
+                "duration": 2.2206614017486572
             },
             "Natural language query": {
                 "metrics": {
@@ -3057,7 +3057,7 @@
                         "src[:200]": "lemma sum_list_mono_gt [rule_format]:\n  fixes xs::\"real list\"\n  shows \"xs \u2260 [] \u2227 (\u2200x\u2208set xs. x > m)\n         \u27f6 ((\u2211:xs) > (m*(real (length xs))))\"\ntxt \u2039proof omitted\u203a\n(*<*)\nproof (induct xs)\n  case Nil..."
                     }
                 ],
-                "duration": 2.500257730484009
+                "duration": 2.420449733734131
             }
         }
     },
@@ -3155,7 +3155,7 @@
                         "src[:200]": "lemma (in pell) find_nth_solution_correct: \"find_nth_solution D n = nth_solution n\"\n  by (simp add: find_nth_solution_def nonsquare_D nth_solution_def fund_sol_code \n                pell_power_def pel..."
                     }
                 ],
-                "duration": 1.6732027530670166
+                "duration": 1.6821386814117432
             },
             "Natural language query": {
                 "metrics": {
@@ -3248,7 +3248,7 @@
                         "src[:200]": "theorem pell_solution_exists: \"\u2203(x::nat) (y::nat). y \u2260 0 \u2227 x\u21e72 = 1 + D * y\u21e72\"\nproof -\n  define S where \"S = {(t :: int, u :: nat). u > 0 \u2227 coprime u t \u2227 \u00a6t - u * sqrt D\u00a6 < 1 / u}\"\n  let ?f = \"\u03bb(t :: i..."
                     }
                 ],
-                "duration": 1.8180317878723145
+                "duration": 1.773202657699585
             }
         }
     },
@@ -3346,7 +3346,7 @@
                         "src[:200]": "theorem minkowski_compact:\n  fixes B :: \"(real ^ 'n) set\"\n  assumes \"convex B\" and \"compact B\" and symmetric: \"uminus ` B \u2286 B\"\n  assumes measure_B: \"emeasure lebesgue B \u2265 2 ^ CARD('n)\"\n  obtains x whe..."
                     }
                 ],
-                "duration": 3.687671661376953
+                "duration": 3.674147129058838
             },
             "Natural language query": {
                 "metrics": {
@@ -3439,7 +3439,7 @@
                         "src[:200]": "lemma face_of_Int_supporting_hyperplane_le:\n    \"\u27e6convex S; \u22c0x. x \u2208 S \u27f9 a \u2219 x \u2264 b\u27e7 \u27f9 (S \u2229 {x. a \u2219 x = b}) face_of S\"\n  by (simp add: convex_Int convex_hyperplane face_of_Int_supporting_hyperplane_le_s..."
                     }
                 ],
-                "duration": 1.810906171798706
+                "duration": 1.7118940353393555
             }
         }
     },
@@ -3537,7 +3537,7 @@
                         "src[:200]": "lemma in_set_enumerate_eq:\n  \"p \u2208 set (enumerate n xs) \u27f7 n \u2264 fst p \u2227 fst p < length xs + n \u2227 nth xs (fst p - n) = snd p\"\nproof -\n  { fix m\n    assume \"n \u2264 m\"\n    moreover assume \"m < length xs + n\"\n  ..."
                     }
                 ],
-                "duration": 1.8197193145751953
+                "duration": 1.7180581092834473
             },
             "Natural language query": {
                 "metrics": {
@@ -3630,7 +3630,7 @@
                         "src[:200]": "lemma powr_real_of_int':\n  assumes \"x \u2265 0\" \"x \u2260 0 \u2228 n > 0\"\n  shows   \"x powr real_of_int n = power_int x n\"\n  by (metis assms exp_ln_iff exp_power_int nless_le power_int_eq_0_iff powr_def)..."
                     }
                 ],
-                "duration": 2.547022581100464
+                "duration": 2.481114387512207
             }
         }
     },
@@ -3728,7 +3728,7 @@
                         "src[:200]": "lemma (in dcharacter) sum_dcharacter_totatives:\n  \"(\u2211x\u2208totatives n. \u03c7 x) = (if \u03c7 = principal_dchar n then of_nat (totient n) else 0)\"\nproof -\n  from n have \"(\u2211x\u2208totatives n. \u03c7 x) = (\u2211x\u2208carrier G. dc2c..."
                     }
                 ],
-                "duration": 1.7394490242004395
+                "duration": 1.6876113414764404
             },
             "Natural language query": {
                 "metrics": {
@@ -3821,7 +3821,7 @@
                         "src[:200]": "lemma coprime_mod_right_iff [simp]:\n  \"coprime a (b mod a) \u27f7 coprime a b\" if \"a \u2260 0\"\n  using that coprime_mod_left_iff [of a b] by (simp add: ac_simps)..."
                     }
                 ],
-                "duration": 1.6248581409454346
+                "duration": 1.611149549484253
             }
         }
     },
@@ -3919,7 +3919,7 @@
                         "src[:200]": "lemma  cramer_lemma_transpose:\n  fixes A:: \"'a::{field}^'n^'n\"\n    and x :: \"'a::{field}^'n\"\n  shows \"det ((\u03c7 i. if i = k then sum (\u03bbi. x$i *s row i A) (UNIV::'n set)\n                             else..."
                     }
                 ],
-                "duration": 2.112502336502075
+                "duration": 2.0496506690979004
             },
             "Natural language query": {
                 "metrics": {
@@ -4012,7 +4012,7 @@
                         "src[:200]": "lemma invertible_times_eq_zero:\n  fixes x :: \"real^'n\" and A :: \"real^'n^'n\"\n  assumes \"invertible A\" and \"A *v x = 0\"\n  shows \"x = 0\"\n  using assms invertible_def matrix_left_invertible_ker by blast..."
                     }
                 ],
-                "duration": 2.4425151348114014
+                "duration": 2.3707826137542725
             }
         }
     },
@@ -4110,7 +4110,7 @@
                         "src[:200]": "lemma cos_pi_half [simp]: \"cos (pi/2) = 0\"\n  by (simp add: pi_half cos_is_zero [THEN theI'])..."
                     }
                 ],
-                "duration": 1.3796367645263672
+                "duration": 1.3078727722167969
             },
             "Natural language query": {
                 "metrics": {
@@ -4203,7 +4203,7 @@
                         "src[:200]": "corollary exp_in_Reals [simp]: \"z \u2208 \u211d \u27f9 exp z \u2208 \u211d\"\n  by (metis Reals_cases Reals_of_real exp_of_real)..."
                     }
                 ],
-                "duration": 1.0397727489471436
+                "duration": 0.9872796535491943
             }
         }
     },
@@ -4301,7 +4301,7 @@
                         "src[:200]": "lemma rk_abc\u03b1\u03b2\u03b3 :\n  assumes \"desargues_config_2D A B C A' B' C' P \u03b1 \u03b2 \u03b3\" and \"rk {A, B, C, A', B', C', P, Q} \u2265 4\"\nand \"rk {Q, A', a} = 2\" and \"rk {Q, B', b} = 2\" and \"rk {Q, C', c} = 2\" and \"rk {P, Q,..."
                     }
                 ],
-                "duration": 1.6552329063415527
+                "duration": 1.5921902656555176
             },
             "Natural language query": {
                 "metrics": {
@@ -4394,7 +4394,7 @@
                         "src[:200]": "lemma (in valid_unMultigraph) eulerian_cons:\n  assumes\n    \"valid_unMultigraph.is_Eulerian_trail (del_unEdge v0 w v1 G) v1 ps v2\"\n    \"(v0,w,v1)\u2208 E\"\n  shows \"is_Eulerian_trail v0 ((v0,w,v1)#ps) v2\"\npr..."
                     }
                 ],
-                "duration": 1.8069508075714111
+                "duration": 1.788316249847412
             }
         }
     },
@@ -4492,7 +4492,7 @@
                         "src[:200]": "lemma congruent_triangleI_asa:\n  assumes \"angle a1 b1 c1 = angle a2 b2 c2\"\n  assumes \"dist a1 b1 = dist a2 b2\"\n  assumes \"angle b1 a1 c1 = angle b2 a2 c2\"\n  assumes \"\u00accollinear {a1, b1, c1}\"\n  shows  ..."
                     }
                 ],
-                "duration": 7.6565470695495605
+                "duration": 7.52862286567688
             },
             "Natural language query": {
                 "metrics": {
@@ -4585,7 +4585,7 @@
                         "src[:200]": "lemma isosceles_triangle_converse:\n  assumes \"angle a b c = angle b a c\" \"\u00accollinear {a,b,c}\"\n  shows   \"dist a c = dist b c\"\n  by (rule congruent_triangle_asa[OF assms(1) _ _ assms(2)])\n     (simp_al..."
                     }
                 ],
-                "duration": 2.6169064044952393
+                "duration": 2.5539605617523193
             }
         }
     },
@@ -4683,7 +4683,7 @@
                         "src[:200]": "corollary e_transcendental_real: \"\u00ac algebraic (exp 1 :: real)\"\nproof -\n  have \"\u00acalgebraic (exp 1 :: complex)\" by (rule e_transcendental_complex)\n  also have \"(exp 1 :: complex) = of_real (exp 1)\" usin..."
                     }
                 ],
-                "duration": 2.0367658138275146
+                "duration": 1.9672343730926514
             },
             "Natural language query": {
                 "metrics": {
@@ -4776,7 +4776,7 @@
                         "src[:200]": "lemma gpoly_cong:\n  assumes \"\u22c0k. k < N \u27f9 a' k = a k\" \"\u22c0k i. \u27e6k < N; i<n\u27e7 \u27f9 r' k i = r k i\"\n  shows \"gpoly n x N a r = gpoly n x N a' r'\"\n  using assms by (auto simp: gpoly_def)..."
                     }
                 ],
-                "duration": 2.555062770843506
+                "duration": 2.472447633743286
             }
         }
     },
@@ -4874,7 +4874,7 @@
                         "src[:200]": "lemma sfis_intro:\n  assumes ms: \"measure_space M\" and Ams: \"\u2200i \u2208 S. A i \u2208 measurable_sets M\" \n  and nn: \"nonnegative x\" and S: \"finite S\"\n  shows \"(\u2211i\u2208S. x i * measure M (A i)) \u2208 \n  sfis (\u03bbt. \u2211i\u2208(S::n..."
                     }
                 ],
-                "duration": 4.726121664047241
+                "duration": 4.551209926605225
             },
             "Natural language query": {
                 "metrics": {
@@ -4967,7 +4967,7 @@
                         "src[:200]": "lemma (in prob_space) indep_vars_iff_distr_eq_PiM':\n  fixes I :: \"'i set\" and X :: \"'i \u21d2 'a \u21d2 'b\"\n  assumes \"I \u2260 {}\"\n  assumes rv: \"\u22c0i. i \u2208 I \u27f9 random_variable (M' i) (X i)\"\n  shows \"indep_vars M' X I..."
                     }
                 ],
-                "duration": 3.6452486515045166
+                "duration": 3.4652059078216553
             }
         }
     },
@@ -5065,7 +5065,7 @@
                         "src[:200]": "theorem content_triangle:\n  fixes A B C :: \"real ^ 2\"\n  shows \"content (convex hull {A, B, C}) =\n           \u00a6(C $ 1 - A $ 1) * (B $ 2 - A $ 2) - (B $ 1 - A $ 1) * (C $ 2 - A $ 2)\u00a6 / 2\"\nproof -\n  defin..."
                     }
                 ],
-                "duration": 2.9749789237976074
+                "duration": 2.808647871017456
             },
             "Natural language query": {
                 "metrics": {
@@ -5158,7 +5158,7 @@
                         "src[:200]": "lemma lemma_3:\n  assumes \"is_pappus\" and \"desargues_config A B C A' B' C' M N P R\" and \n    \"triangle_circumscribes_triangle A' B' C' A B C\"\n  shows \"col M N P\"\nproof-\n  define S T where \"S = inter (l..."
                     }
                 ],
-                "duration": 2.5058720111846924
+                "duration": 2.356213092803955
             }
         }
     },
@@ -5256,7 +5256,7 @@
                         "src[:200]": "lemma isosceles_triangle_orthogonal_on_midpoint:\n  fixes A B C :: \"'a :: euclidean_space\"\n  assumes \"dist C A = dist C B\"\n  shows \"orthogonal (C - midpoint A B) (A - midpoint A B)\"\nproof (cases \"A = B..."
                     }
                 ],
-                "duration": 1.0078542232513428
+                "duration": 0.9704811573028564
             },
             "Natural language query": {
                 "metrics": {
@@ -5349,7 +5349,7 @@
                         "src[:200]": "lemma congruent_triangleI_sas:\n  assumes \"dist a1 b1 = dist a2 b2\"\n  assumes \"dist b1 c1 = dist b2 c2\"\n  assumes \"angle a1 b1 c1 = angle a2 b2 c2\"\n  shows   \"congruent_triangle a1 b1 c1 a2 b2 c2\"\nproo..."
                     }
                 ],
-                "duration": 1.9982154369354248
+                "duration": 1.9819769859313965
             }
         }
     },
@@ -5447,7 +5447,7 @@
                         "src[:200]": "lemma padic_rational_approximation_straddle_pos:\n  assumes \"\u03b5 > 0\" \"p > 1\" \"x > 0\"\n  obtains n q r \n    where \"of_nat q / p^n < x\" \"x < of_nat r / p^n\" \"\u00a6q / p^n - r / p^n \u00a6 < \u03b5\"\nproof -\n  obtain n q ..."
                     }
                 ],
-                "duration": 2.479400634765625
+                "duration": 2.4997663497924805
             },
             "Natural language query": {
                 "metrics": {
@@ -5540,7 +5540,7 @@
                         "src[:200]": "lemma pi_gt3: \"pi > 3\"\n  using pi_approx by simp..."
                     }
                 ],
-                "duration": 0.9607889652252197
+                "duration": 0.9801876544952393
             }
         }
     },
@@ -5638,7 +5638,7 @@
                         "src[:200]": "lemma prodsums_eq_sumprods:\n  fixes p :: nat and m :: nat\n  assumes \"coprime p m\"\n  shows \"\u2211((\u03bbk. p^k) ` {0..n}) * sigma m = \u2211{p^k * b |k b. k \u2264 n \u2227 b dvd m}\"\n    (is \"?lhs = ?rhs\")\nproof -\n  have \"co..."
                     }
                 ],
-                "duration": 1.9232029914855957
+                "duration": 1.9484953880310059
             },
             "Natural language query": {
                 "metrics": {
@@ -5731,7 +5731,7 @@
                         "src[:200]": "lemma power_minus1_odd: \"(- 1) ^ Suc (2*n) = -1\"\n  by simp..."
                     }
                 ],
-                "duration": 1.638101577758789
+                "duration": 1.6572778224945068
             }
         }
     },
@@ -5829,7 +5829,7 @@
                         "src[:200]": "lemma Fourier_series_l2:\n  assumes \"f square_integrable {-pi..pi}\"\n  shows \"(\u03bbn. l2norm {-pi..pi} (\u03bbx. f x - (\u2211i\u2264n. Fourier_coefficient f i * trigonometric_set i x)))\n         \u21e2 0\"\nproof (clarsimp sim..."
                     }
                 ],
-                "duration": 5.013070821762085
+                "duration": 5.046398401260376
             },
             "Natural language query": {
                 "metrics": {
@@ -5922,7 +5922,7 @@
                         "src[:200]": "lemma cos_converges: \"(\u03bbn. cos_coeff n *\u21e9R x^n) sums cos x\"\n  unfolding cos_def\n  by (metis (full_types) summable_norm_cancel summable_norm_cos summable_sums)..."
                     }
                 ],
-                "duration": 2.7618472576141357
+                "duration": 2.7887861728668213
             }
         }
     },
@@ -6020,7 +6020,7 @@
                         "src[:200]": "lemma sum_k_Bernstein [simp]: \"(\u2211k\u2264n. real k * Bernstein n k x) = of_nat n * x\"\n  apply (subst binomial_deriv1 [of n x \"1-x\", simplified, symmetric])\n  apply (simp add: sum_distrib_right)\n  apply (aut..."
                     }
                 ],
-                "duration": 2.9585137367248535
+                "duration": 2.970813035964966
             },
             "Natural language query": {
                 "metrics": {
@@ -6113,7 +6113,7 @@
                         "src[:200]": "lemma sum_of_powers_nat: \"(x - 1::nat) * (\u2211i=0..n . x^i) = x ^ Suc n - 1\"\n   (is \"?l = ?r\")\nproof (cases \"x = 0\")\n  case False\n  then have \"int ((x - 1) * sum ((^) x) {0..n}) = int (x ^ Suc n - 1)\"\n  ..."
                     }
                 ],
-                "duration": 2.308765411376953
+                "duration": 2.341447114944458
             }
         }
     },
@@ -6211,7 +6211,7 @@
                         "src[:200]": "lemma simplex_extremal_le:\n  fixes S :: \"'a::real_inner set\"\n  assumes \"finite S\"\n    and \"S \u2260 {}\"\n  shows \"\u2203u\u2208S. \u2203v\u2208S. \u2200x\u2208convex hull S. \u2200y \u2208 convex hull S. norm (x - y) \u2264 norm (u - v)\"\nproof -\n  hav..."
                     }
                 ],
-                "duration": 2.4257748126983643
+                "duration": 2.427968740463257
             },
             "Natural language query": {
                 "metrics": {
@@ -6304,7 +6304,7 @@
                         "src[:200]": "lemma onorm_inner_left:\n  assumes \"bounded_linear r\"\n  shows \"onorm (\u03bbx. r x \u2219 f) \u2264 onorm r * norm f\"\nproof (rule onorm_bound)\n  fix x\n  have \"norm (r x \u2219 f) \u2264 norm (r x) * norm f\"\n    by (simp add: C..."
                     }
                 ],
-                "duration": 2.2285091876983643
+                "duration": 2.2175557613372803
             }
         }
     },
@@ -6402,7 +6402,7 @@
                         "src[:200]": "theorem raabes_test_divergence:\nfixes f :: \"nat \u21d2 real\"\n  assumes pos: \"eventually (\u03bbn. f n > 0) sequentially\"\n  defines \"l \u2261 limsup (\u03bbn. ereal (of_nat n * (f n / f (Suc n) - 1)))\"\n  assumes l: \"l < 1..."
                     }
                 ],
-                "duration": 1.105466604232788
+                "duration": 1.0894713401794434
             },
             "Natural language query": {
                 "metrics": {
@@ -6495,7 +6495,7 @@
                         "src[:200]": "lemma\n  fixes s :: complex assumes s: \"Re s > 1\"\n  shows   Dirichlet_L_euler_product_LIMSEQ:\n            \"(\u03bbn. \u220fp\u2264n. if prime p then inverse (1 - \u03c7 p / nat_power p s) else 1)\n                \u21e2 Dirichl..."
                     }
                 ],
-                "duration": 1.2145485877990723
+                "duration": 1.2275264263153076
             }
         }
     },
@@ -6593,7 +6593,7 @@
                         "src[:200]": "lemma side_unit_cube: \n  \"side ax unit_cube = {0..<1}\"\n  by(metis add.commute add.right_neutral cube.select_convs(2) min_unit_cube_0 unit_cube_def)..."
                     }
                 ],
-                "duration": 2.0609238147735596
+                "duration": 2.0652718544006348
             }
         }
     },
@@ -6691,7 +6691,7 @@
                         "src[:200]": "lemma distinct6_def:\n\"distinct [A,B,C,D,E,F] \u2261 (A \u2260 B) \u2227 (A \u2260 C) \u2227 (A \u2260 D) \u2227 (A \u2260 E) \u2227 (A \u2260 F) \u2227\n(B \u2260 C) \u2227 (B \u2260 D) \u2227 (B \u2260 E) \u2227 (B \u2260 F) \u2227\n(C \u2260 D) \u2227 (C \u2260 E) \u2227 (C \u2260 F) \u2227\n(D \u2260 E) \u2227 (D \u2260 F) \u2227\n(E \u2260 F)\"\n  by..."
                     }
                 ],
-                "duration": 1.648782730102539
+                "duration": 1.6624648571014404
             }
         }
     },
@@ -6789,7 +6789,7 @@
                         "src[:200]": "lemma integral_le:\n  fixes f :: \"'n::euclidean_space \u21d2 real\"\n  assumes \"f integrable_on S\"\n    and \"g integrable_on S\"\n    and \"\u22c0x. x \u2208 S \u27f9 f x \u2264 g x\"\n  shows \"integral S f \u2264 integral S g\"\n  by (meson..."
                     }
                 ],
-                "duration": 2.1936817169189453
+                "duration": 2.2253522872924805
             }
         }
     },
@@ -6887,7 +6887,7 @@
                         "src[:200]": "lemma derangements_inv:\n  assumes d: \"d \u2208 derangements S\"\n  shows \"inv d \u2208 derangements S\"\nusing assms\nby (auto intro!: derangementsI elim!: derangementsE simp add: permutes_inv permutes_inv_eq)..."
                     }
                 ],
-                "duration": 1.8267381191253662
+                "duration": 1.8134093284606934
             }
         }
     },
@@ -6985,7 +6985,7 @@
                         "src[:200]": "lemma pick_triangle_lemma:\n  fixes p :: \"R_to_R2\"\n  assumes \"p = make_triangle a b c\" and \"all_integral [a, b, c]\" and \"distinct [a, b, c]\" and \"\u00ac collinear {a, b, c}\"\n          \"I = card {x. integral..."
                     }
                 ],
-                "duration": 2.109729290008545
+                "duration": 2.073805332183838
             }
         }
     },
@@ -7083,7 +7083,7 @@
                         "src[:200]": "lemma sine_law_triangle'':\n  \"b \u2260 c \u27f9 sin (angle c b a) = sin (angle b a c) * dist a c / dist b c\"\n  using sine_law_triangle[of a b c] by (simp add: divide_simps angle_commute)..."
                     }
                 ],
-                "duration": 1.9776175022125244
+                "duration": 1.9459280967712402
             }
         }
     },
@@ -7181,7 +7181,7 @@
                         "src[:200]": "lemma sine_law_triangle:\n  \"sin (angle a b c) * dist b c = sin (angle b a c) * dist a c\" (is \"?A = ?B\")\nproof (cases \"a = b\")\n  assume neq: \"a \u2260 b\"\n  show ?thesis\n  proof (rule power2_eq_imp_eq)\n    f..."
                     }
                 ],
-                "duration": 1.6655831336975098
+                "duration": 1.6328980922698975
             }
         }
     },
@@ -7279,7 +7279,7 @@
                         "src[:200]": "lemma primepow_even_imp_primepow:\n  assumes \"primepow_even n\"\n  shows   \"primepow n\"\nproof -\n  from assms obtain p k where \"1 \u2264 k\" \"prime p\" \"n = p ^ (2 * k)\"\n    unfolding primepow_even_def by blast\n..."
                     }
                 ],
-                "duration": 1.2277133464813232
+                "duration": 1.2252700328826904
             }
         }
     },
@@ -7377,7 +7377,7 @@
                         "src[:200]": "lemma polynomial_function_minus [intro]:\n  assumes f: \"polynomial_function f\"\n    shows \"polynomial_function (\u03bbx. - f x)\"\n  using polynomial_function_cmul [OF f, of \"-1\"] by simp..."
                     }
                 ],
-                "duration": 2.7722244262695312
+                "duration": 2.7670066356658936
             }
         }
     },
