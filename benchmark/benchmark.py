@@ -6,6 +6,7 @@ from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_g
 
 from vllm import LLM
 from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 
@@ -21,14 +22,20 @@ with open("config.json", "r") as file:
 print("Loading Solr...")
 solr = connect_solr(config)
 
-print("Building document tree...")
-document_tree = build_document_tree(config, solr)
+print("Loading tokenizer...")
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B")
 
 print("Loading prompts...")
 prompts = load_prompts(config)
 
+print("Building document tree...")
+document_tree, max_tokens = build_document_tree(config, solr, tokenizer)
+
+describe_prompt_tokens = tokenizer.encode(prompts["describe"])
+max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
+
 print("Loading LLM...")
-llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=1024, dtype="auto")
+llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=max_tokens_prompt + 512, dtype="auto")
 
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree)
