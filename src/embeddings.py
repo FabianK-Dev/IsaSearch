@@ -36,7 +36,7 @@ def search(search_query, collection, prompts, llm):
     docs_to_retrieve = 100
 
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
-    outputs = llm.generate([llm_prompt], SamplingParams(temperature=0, max_tokens=512, stop=["<END>"]))
+    outputs = llm.generate([llm_prompt], SamplingParams(temperature=0.3, max_tokens=512, stop=["<END>"]))
 
     refined_query = outputs[0].outputs[0].text
     refined_query = refined_query.split("<BEGIN>")[1]
