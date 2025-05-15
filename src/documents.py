@@ -97,7 +97,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
 
         print("Loading LLM...")
         llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + 512, dtype="auto")
-        sampling_params = SamplingParams(temperature=0.3, max_tokens=512, stop=["<END>"])
+        sampling_params = SamplingParams(temperature=0.7, top_p=0.8, top_k=20, min_p=0.0, max_tokens=512, stop=["<END>"])
         
         print(filtered_docs[:3])
         for i in tqdm(range(0, len(filtered_docs), save_every)):
