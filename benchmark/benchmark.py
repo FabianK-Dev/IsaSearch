@@ -27,11 +27,11 @@ document_tree = build_document_tree(config, solr)
 print("Loading prompts...")
 prompts = load_prompts(config)
 
+print("Loading LLM...")
+llm = LLM(model="Qwen/Qwen2.5-3B", max_model_len=1024, dtype="auto")
+
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree)
-
-print("Loading LLM...")
-llm = LLM(model="microsoft/Phi-3-mini-4k-instruct", max_model_len=1024, dtype="auto")
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")
