@@ -10,7 +10,7 @@ shows "degree (p * q) = degree p + degree q"
 === Start of example output ===
 <BEGIN>
 Theorem (Degree of the Product of Two Polynomials):
-Let \\(p\\) and \\(q\\) be non-zero polynomials over a field \\(K\\). Then the degree of the product \\(p \\cdot q\\) is equal to the sum of the degrees of \\(p\\) and \\(q\\), that is, \\(\\deg(p \\cdot q) = \\deg(p) + \\deg(q)\\).
+Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree of the product \(p \cdot q\) is equal to the sum of the degrees of \(p\) and \(q\), that is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 <END>
 === End of example output ===
 
