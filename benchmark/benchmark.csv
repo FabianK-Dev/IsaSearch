@@ -455,11 +455,8 @@ the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipT
 ",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,[…] finite graphs with the property that every two vertices have exactly one neighbor in common [...],https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem
 divisibility-by-three-rule,Divisibility by Three Rule,,"theorem three_divides_nat: ""3 dvd n ⟷ 3 dvd sumdig n""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,[…] sum of the digits must be divisible by 3 […],https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230
-lebesgue-measure-and-integration,Lebesgue Measure and Integration,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
-  assumes ""desargues_config_3D A B C A' B' C' P α β γ""
-  shows ""rk {α, β, γ} ≤ 2""
-",https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,
-desarguess-theorem,Desargues’s Theorem,,"theorem desargues_3D:
+lebesgue-measure-and-integration,Lebesgue Measure and Integration,,,https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,
+desarguess-theorem,Desargues’s Theorem,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P α β γ""
   shows ""rk {α, β, γ} ≤ 2""
 ",https://www.isa-afp.org/entries/Projective_Geometry.html,Projective_Geometry,Desargues’s Theorem,Two triangles are in perspective axially [iff] they are in perspective centrally.,https://en.wikipedia.org/wiki/Desargues%27s_theorem
@@ -494,14 +491,14 @@ assumes ""all_integral vts""
 assumes ""I = card {x. integral_vec x ∧ x ∈ path_inside p}""
 assumes ""B = card {x. integral_vec x ∧ x ∈ path_image p}""
 shows ""measure lebesgue (path_inside p) = I + B/2 - 1""
-",https://www.isa-afp.org/entries/Picks_Theorem.html,Picks_Theorem,Pick’s Theorem,,
+",https://www.isa-afp.org/entries/Picks_Theorem.html,Picks_Theorem,Pick’s Theorem,formula for the area of a simple polygon with integer vertex coordinates,https://en.wikipedia.org/wiki/Pick%27s_theorem
 the-birthday-problem,The Birthday Problem,,"lemma birthday_paradox:
   assumes ""card S = 23"" ""card T = 365""
   shows ""2 * card {f ∈ S→⇩E S T. ¬ inj_on f S} ≥ card (S →⇩E T)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Birthday_Paradox.html,HOL,The Birthday Problem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Birthday_Paradox.html,HOL,The Birthday Problem,same birthday […] 23 people are needed for that probability to exceed 50%,https://en.wikipedia.org/wiki/Birthday_problem
 the-law-of-cosines,The Law of Cosines,"[ {""entity_kname"":""Triangle.cosine_law_triangle|thm""} ]","lemma cosine_law_triangle:
   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2 - 2 * dist a b * dist a c * cos (angle b a c)""
-",https://isa-afp.org/entries/Triangle.shtml,Triangle,The Law of Cosines,,
+",https://isa-afp.org/entries/Triangle.shtml,Triangle,The Law of Cosines,relates the lengths of the sides of a triangle to the cosine of one of its angles,https://en.wikipedia.org/wiki/Law_of_cosines
 ptolemys-theorem,Ptolemy’s Theorem,"[ {""entity_kname"":""Ptolemys_Theorem.ptolemy|thm""} ]","theorem ptolemy:
   fixes A B C D center :: ""real ^ 2""
   assumes ""dist center A = radius"" and ""dist center B = radius""
@@ -511,18 +508,18 @@ ptolemys-theorem,Ptolemy’s Theorem,"[ {""entity_kname"":""Ptolemys_Theorem.pto
     ""radiant_of (B - center) ≤ radiant_of (C - center)""
     ""radiant_of (C - center) ≤ radiant_of (D - center)""
   shows ""dist A C * dist B D = dist A B * dist C D + dist A D * dist B C""
-",https://www.isa-afp.org/entries/Ptolemys_Theorem.shtml,Ptolemys_Theorem,Ptolemy’s Theorem,,
+",https://www.isa-afp.org/entries/Ptolemys_Theorem.shtml,Ptolemys_Theorem,Ptolemy’s Theorem,product of […] lengths of […] diagonals […] equal to […] sum of […] products of […] lengths of […] pairs of opposite sides,https://en.wikipedia.org/wiki/Ptolemy%27s_theorem
 principle-of-inclusionexclusion,Principle of Inclusion/Exclusion,,"lemma card_UNION:
   assumes ""finite A"" and ""∀k ∈ A. finite k""
   shows ""card (⋃A) = nat (∑I | I ⊆ A ∧ I ≠ {}. (- 1) ^ (card I + 1) * int (card (⋂I)))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Principle of Inclusion/Exclusion,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Principle of Inclusion/Exclusion,"[…] over-generous inclusion, followed by compensating exclusion […]",https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle
 cramers-rule,Cramer’s Rule,,"lemma cramer:
   fixes A ::""real^'n^'n""
   assumes d0: ""det A ≠ 0""
   shows ""A *v x = b ⟷ x = (χ k. det(χ i j. if j=k then b$i else A$i$j) / det A)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer’s Rule,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer’s Rule,"[…] n×n matrix A has […] nonzero determinant, […] solution for […] unknowns x_i are […] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case
 bertrands-postulate,Bertrand’s Postulate,"[ {""entity_kname"":""Bertrand.bertrand|thm""} ]","theorem bertrand: ""n > 1 ⟹ ∃p∈{n<..<2*n}. prime p""
-",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand’s Postulate,,
+",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand’s Postulate,"[…] any integer n > 3, […] exists at least one prime number p with n < p < 2n - 2",https://en.wikipedia.org/wiki/Bertrand%27s_postulate
 buffon-needle-problem,Buffon Needle Problem,,"theorem buffon_short:
 assumes ""l ≤ d""
 shows   ""emeasure (buffon l d) {True} = 2 * l / (d * pi)""
@@ -530,9 +527,9 @@ shows   ""emeasure (buffon l d) {True} = 2 * l / (d * pi)""
 theorem buffon_long:
 assumes ""l ≥ d""
 shows   ""emeasure (buffon l d) {True} = 2 / pi * ((l / d) - sqrt ((l / d)⇧2 - 1) + arccos (d / l))""
-",https://www.isa-afp.org/entries/Buffons_Needle.shtml,Buffons_Needle,Buffon Needle Problem,,
+",https://www.isa-afp.org/entries/Buffons_Needle.shtml,Buffons_Needle,Buffon Needle Problem,probability that the needle will lie across a line between two strips,https://en.wikipedia.org/wiki/Buffon%27s_needle_problem
 descartes-rule-of-signs,Descartes Rule of Signs,"[ {""entity_kname"":""Descartes_Sign_Rule.descartes_sign_rule|thm""} ]","theorem descartes_sign_rule:
   fixes p :: ""real poly""
   assumes ""p ≠ 0""
   shows ""∃d. even d ∧ coeff_sign_changes p = count_pos_roots p + d""
-",https://isa-afp.org/entries/Descartes_Sign_Rule.shtml,Descartes_Sign_Rule,Descartes Rule of Signs,,
+",https://isa-afp.org/entries/Descartes_Sign_Rule.shtml,Descartes_Sign_Rule,Descartes Rule of Signs,number of positive real roots is at most […] number of sign changes in […] sequence of […] polynomial's coefficients,https://en.wikipedia.org/wiki/Descartes%27_rule_of_signs
