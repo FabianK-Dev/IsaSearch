@@ -27,11 +27,20 @@ def top_k_accuracy(results, target_id):
 # Calculates a relevance scale of the retrieved documents
 # The reelvance value is reduced logarithmically depending on the result position
 def normalized_discounted_cumulative_gain(results, target_identifier):
-    for i in range(len( results )):
-        if is_correct_target(results[i], target_identifier):
-            return 1 / math.log2(i + 2) # the first loop iteration starts at 0, not 1, thus we have to add 2 instead of 1
+    dcg = 0
 
-    return 0 # If the relevant target document (identified by target_id) is not in the search results
+    for i, result in enumerate(results):
+        if is_correct_target(result, target_identifier):
+            dcg += 1 / math.log2(i + 2) # the first loop iteration starts at 0, not 1, thus we have to add 2 instead of 1
+
+    idcg = 0
+    for i in range(len(target_identifier)):
+        idcg += 1 / math.log2(i + 2)
+    
+    if idcg > 0:
+        return dcg / idcg
+    else:
+        return 0
 
 # reciprocal_rank = (1 / rank) where rank_i is the rank of the first relevant document
 def reciprocal_rank(results, target_identifier): 
