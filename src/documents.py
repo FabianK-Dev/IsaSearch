@@ -96,7 +96,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
     if len(filtered_docs) >= 1:
         doc_strings = []
         for document in filtered_docs:
-            doc_string = prompts["describe"].format(theorem_content=document["src"].split("proof")[0].strip()[:1024])
+            doc_string = prompts["describe"].format(theorem_content=document["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
             doc_strings.append(doc_string)
 
         print("Loading LLM...")
@@ -177,7 +177,7 @@ def build_document_tree(config, solr, tokenizer):
 
     max_tokens = 0
     for document in document_tree["documents"]:
-        token_ids = tokenizer.encode(document["src"].split("proof")[0].strip()[:1024])
+        token_ids = tokenizer.encode(document["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
         num_tokens = len(token_ids)
         document["num_tokens"] = num_tokens
 
