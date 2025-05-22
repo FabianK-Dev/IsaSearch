@@ -12,6 +12,7 @@ from pprint import pprint
 import json
 import pandas as pd
 import chromadb
+import torch
 
 print("Loading config...")
 with open("config.json", "r") as file:
@@ -33,6 +34,9 @@ document_tree, max_tokens = build_document_tree(config, solr, tokenizer)
 describe_prompt_tokens = tokenizer.encode(prompts["describe"])
 max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
 print("Max tokens for prompt: " + str(max_tokens_prompt))
+
+print("Clearing CUDA cache...")
+torch.cuda.empty_cache()
 
 print("Getting document descriptions...")
 # amazon/*, microsoft/Phi-*, Qwen/*, NVIDIA/
