@@ -91,6 +91,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
             saved_checksum = document_descriptions[document["id"]].get("zlib.adler32_checksum", "")
             if saved_checksum != checksum:
                 print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
+                filtered_docs.append(document)
 
     print("Found " + str(len(filtered_docs)) + " documents that need to be described by the LLM.")
 
@@ -112,14 +113,20 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
             for j, output in enumerate(outputs):
                 doc_id = filtered_docs[i + j]["id"]
                 doc_src = filtered_docs[i + j]["src"]
+                raw_llm_description = output.outputs[0].text.strip()
+
+                if j < 3:
+                    print(f"Raw LLM output for doc_id {doc_id}: '{raw_llm_description}'")
+
                 document_descriptions[doc_id] = {
-                    "llm_description": output.outputs[0].text.strip(),
+                    "llm_description": raw_llm_description,
                     "zlib.adler32_checksum": zlib.adler32(doc_src.encode('utf-8')),
                     "model": config["llm_name"],
+                    "prompt": doc_strings[i + j],
                 }
 
             print("Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "...")
-            with open("./artifacts/document_descriptions.json", "w") as outfile:
+            with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
                 json.dump(document_descriptions, outfile, indent=4)
 
         print("Deleting llm object and freeing GPU memory...")
@@ -127,7 +134,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
         del llm
         gc.collect()
         torch.cuda.empty_cache()
-        torch.distributed.destroy_process_group()
+        # torch.distributed.destroy_process_group()
         print("Finished deleting llm object and freeing GPU memory.")
     else:
         print("No documents need to be described by the LLM.")
