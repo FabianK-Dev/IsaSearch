@@ -1,4 +1,4 @@
-SYSTEM:
+<|system|>
 Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 256 tokens that is more accessible to mathematicians. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
 
 === Start of example input ===
@@ -12,9 +12,7 @@ shows "degree (p * q) = degree p + degree q"
 Theorem (Degree of the Product of Two Polynomials):
 Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree of the product \(p \cdot q\) is equal to the sum of the degrees of \(p\) and \(q\), that is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 <END>
-=== End of example output ===
-
-USER:
-{theorem_content}
-
-ASSISTANT:
+=== End of example output ===<|end|>
+<|user|>
+{theorem_content}<|end|>
+<|assistant|>

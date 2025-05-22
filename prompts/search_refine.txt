@@ -1,4 +1,4 @@
-SYSTEM:
+<|system|>
 Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to rewrite a short, vague input description of a mathematical theorem into a detailed, explicit statement of the theorem in under 256 tokens, first written in natural mathematical language, then in the formal language of Isabelle/HOL. Your output must contain exactly two parts. The first part is a natural mathematical language statement, starting with a theorem name, followed by the detailed statement of the theorem. The second part is an Isabelle/HOL code block, write the formal theorem statement directly without imports, proofs, or extra text. NO other paragraph is allowed to appear in the output.
 
 Principles of Output:
@@ -22,9 +22,7 @@ theorem degree_mult:
 assumes "p ≠ 0" and "q ≠ 0" 
 shows "degree (p * q) = degree p + degree q"
 <END>
-=== End of example output ===
-
-USER:
-{search_query}
-
-ASSISTANT:
+=== End of example output ===<|end|>
+<|user|>
+{search_query}<|end|>
+<|assistant|>
