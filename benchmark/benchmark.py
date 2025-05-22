@@ -32,6 +32,7 @@ document_tree, max_tokens = build_document_tree(config, solr, tokenizer)
 
 describe_prompt_tokens = tokenizer.encode(prompts["describe"])
 max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
+print("Max tokens for prompt: " + str(max_tokens_prompt))
 
 print("Getting document descriptions...")
 # amazon/*, microsoft/Phi-*, Qwen/*, NVIDIA/
@@ -68,6 +69,7 @@ for doc in tqdm(document_tree["documents"]):
         metadatas=[{"source": doc["id"]}],
         embeddings=[embedding])
 
+exit()
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
 
