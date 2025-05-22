@@ -114,7 +114,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
             print()
             print(f"Searching: \"{query}\"")
 
-            results_dict = search(query, collection, prompts, llm)
+            results_dict = search(query, collection, prompts, llm, config)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             print("Top 10 results:")
