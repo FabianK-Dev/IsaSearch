@@ -1,5 +1,9 @@
 from vllm import LLM, SamplingParams
+from vllm.distributed.parallel_state import destroy_model_parallel
 from tqdm import tqdm
+
+import gc
+import torch
 import json
 import os
 import math
@@ -98,7 +102,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
         print("Loading LLM...")
         llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + 512, dtype="auto")
         sampling_params = SamplingParams(temperature=0, max_tokens=512)
-        
+
         print(filtered_docs[:3])
         for i in tqdm(range(0, len(filtered_docs), save_every)):
             print("Document descriptions from index " + str(i) + " to " + str(i + save_every) + " of " + str(len(filtered_docs)) + " documents with maximum batch size " + str(save_every) + "...")
@@ -116,6 +120,14 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
             print("Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "...")
             with open("./artifacts/document_descriptions.json", "w") as outfile:
                 json.dump(document_descriptions, outfile, indent=4)
+
+        print("Deleting llm object and freeing GPU memory...")
+        destroy_model_parallel()
+        del llm
+        gc.collect()
+        torch.cuda.empty_cache()
+        torch.distributed.destroy_process_group()
+        print("Finished deleting llm object and freeing GPU memory.")
     else:
         print("No documents need to be described by the LLM.")
 
