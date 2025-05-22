@@ -86,12 +86,13 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
         checksum = zlib.adler32(document["src"].encode('utf-8'))
 
         if document["id"] not in document_descriptions:
-            print("Document identified by id '" + document["id"] + "' does not already exist in document descriptions. Adding to batch...")
             filtered_docs.append(document)
         elif document["id"] in document_descriptions:
             saved_checksum = document_descriptions[document["id"]].get("zlib.adler32_checksum", "")
             if saved_checksum != checksum:
                 print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
+
+    print("Found " + str(len(filtered_docs)) + " documents that need to be described by the LLM.")
 
     if len(filtered_docs) >= 1:
         doc_strings = []
