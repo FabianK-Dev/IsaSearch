@@ -75,7 +75,7 @@ for doc in tqdm(document_tree["documents"]):
 
 exit()
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
-benchmark_df = benchmark_df.reset_index()  # make sure indexes pair with number of rows
+benchmark_df = benchmark_df.reset_index()
 
 query_columns = ['Title query', 'Natural language query']
 benchmark_results = {}
