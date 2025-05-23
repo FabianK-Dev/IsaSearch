@@ -19,5 +19,8 @@
     "theorem_max_length": 1000,
     "llm_max_tokens": 256,
     "gpu_memory_utilization": 0.85,
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": -1,
     "enable_llm_output_cache": true
 }

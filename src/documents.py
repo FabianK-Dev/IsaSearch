@@ -115,7 +115,9 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
             dtype="auto",
             gpu_memory_utilization=config["gpu_memory_utilization"])
         sampling_params = SamplingParams(
-            temperature=0,
+            temperature=config["temperature"],
+            top_p=config["top_p"],
+            top_k=config["top_k"],
             max_tokens=config["llm_max_tokens"],
             stop=["<END>"])
 
