@@ -17,3 +17,4 @@ Isabelle*
 *.log
 .~lock.*.csv#
 benchmark/*.html
+*.ipynb
