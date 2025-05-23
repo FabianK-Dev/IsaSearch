@@ -1,0 +1,2 @@
+Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:
+{search_query}
