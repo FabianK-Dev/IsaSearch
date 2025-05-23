@@ -29,18 +29,14 @@ print("Loading prompts...")
 prompts = load_prompts(config)
 
 print("Building document tree...")
-document_tree, max_tokens = build_document_tree(config, solr, tokenizer)
-
-describe_prompt_tokens = tokenizer.encode(prompts["describe"])
-max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
-print("Max tokens for prompt: " + str(max_tokens_prompt))
+document_tree = build_document_tree(config, solr)
 
 # print("Clearing CUDA cache...")
 # torch.cuda.empty_cache()
 
 print("Getting document descriptions...")
 # amazon/*, microsoft/Phi-*, Qwen/*, NVIDIA/
-document_tree = get_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
+document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")

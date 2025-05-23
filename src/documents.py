@@ -52,7 +52,7 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt, save_every=1000):
+def generate_document_descriptions(config, document_tree, prompts, tokenizer, save_every=1000):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
 
@@ -86,6 +86,24 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
     print("Found " + str(len(filtered_docs)) + " documents that need to be described by the LLM.")
 
     if len(filtered_docs) >= 1:
+        print("Calculating maximum number of tokens required to describe filtered documents...")
+        max_tokens = 0
+
+        for doc_id in tqdm(filtered_docs):
+            doc = filtered_docs[doc_id]
+            token_ids = tokenizer.encode(doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
+            num_tokens = len(token_ids)
+            doc["num_tokens"] = num_tokens
+
+            if num_tokens > max_tokens:
+                max_tokens = num_tokens
+
+        print(f"Max tokens in document tree (without prompt): {max_tokens}")
+        
+        describe_prompt_tokens = tokenizer.encode(prompts["describe"])
+        max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
+        print("Max tokens for prompt and document string: " + str(max_tokens_prompt))
+
         doc_strings = []
         for doc in filtered_docs:
             doc_string = prompts["describe"].format(theorem_content=doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
@@ -131,8 +149,8 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
 
     return document_descriptions
 
-def get_document_descriptions(config, document_tree, prompts, max_tokens_prompt):
-    document_descriptions = generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
+def get_document_descriptions(config, document_tree, prompts, tokenizer):
+    document_descriptions = generate_document_descriptions(config, document_tree, prompts, tokenizer)
 
     print("Parsing LLM descriptions...")
     for doc_id in tqdm(document_descriptions):
@@ -150,7 +168,7 @@ def get_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
 
     return document_tree
 
-def build_document_tree(config, solr, tokenizer):
+def build_document_tree(config, solr):
     CACHE_FOLDER = config["cache_folder"]
     DOCUMENT_TREE_CACHE = f"{CACHE_FOLDER}/document_tree.json"
 
@@ -173,17 +191,4 @@ def build_document_tree(config, solr, tokenizer):
         with open(DOCUMENT_TREE_CACHE, 'w') as file:
             json.dump(document_tree, file)
 
-    print("Calculating maximum number of tokens required...")
-    max_tokens = 0
-
-    for doc_id in tqdm(document_tree):
-        doc = document_tree[doc_id]
-        token_ids = tokenizer.encode(doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
-        num_tokens = len(token_ids)
-        doc["num_tokens"] = num_tokens
-
-        if num_tokens > max_tokens:
-            max_tokens = num_tokens
-
-    print(f"Max tokens in document tree: {max_tokens}")
-    return document_tree, max_tokens
+    return document_tree
