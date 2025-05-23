@@ -19,6 +19,17 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
+benchmark_model = config["benchmark_llms"][0]
+benchmark_subpath = "benchmark/" + benchmark_model.replace("/", "-")
+print("Adjusting config for benchmark model '" + benchmark_model + "' and subpath '" + benchmark_subpath + "'...")
+
+config["cache_folder"] = f"{config['cache_folder']}/{benchmark_subpath}"
+config["artifact_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
+config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
+
+pprint(config)
+exit()
+
 print("Loading Solr...")
 solr = connect_solr(config)
 
@@ -39,7 +50,7 @@ document_tree = get_document_descriptions(config, document_tree, prompts, tokeni
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")
-chroma_client = chromadb.PersistentClient(path=config["chroma_db_path"])
+chroma_client = chromadb.PersistentClient(path=config["chroma_db_path"] + "/chroma_db")
 collection = chroma_client.get_or_create_collection("afp_docs")
 
 print("Loading embedder...")
