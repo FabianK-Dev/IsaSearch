@@ -35,7 +35,6 @@ document_tree = build_document_tree(config, solr)
 # torch.cuda.empty_cache()
 
 print("Getting document descriptions...")
-# amazon/*, microsoft/Phi-*, Qwen/*, NVIDIA/
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
 # Chroma setup
