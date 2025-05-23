@@ -39,7 +39,7 @@ document_tree = get_document_descriptions(config, document_tree, prompts, tokeni
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")
-chroma_client = chromadb.PersistentClient(path="chroma_storage")
+chroma_client = chromadb.PersistentClient(path=config["chroma_db_path"])
 collection = chroma_client.get_or_create_collection("afp_docs")
 
 print("Loading embedder...")
