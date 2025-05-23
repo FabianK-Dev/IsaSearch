@@ -25,7 +25,7 @@ print("Adjusting config for benchmark model '" + benchmark_model + "' and subpat
 
 config["llm_name"] = benchmark_model
 config["cache_folder"] = f"{config['cache_folder']}/{benchmark_subpath}"
-config["artifact_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
+config["artifacts_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
 config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
 config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_subpath}"
 config["gpu_memory_utilization"] = 0.8
