@@ -31,7 +31,9 @@ config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_subpath}"
 config["gpu_memory_utilization"] = 0.8
 config["temperature"] = 0.6
 config["top_p"] = 0.95
-config["top_k"] = 20
+config["min_p"] = 0
+config["top_k"] = 40
+config["repetition_penalty"] = 0
 pprint(config)
 
 print("Loading Solr...")

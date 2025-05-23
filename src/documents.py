@@ -118,6 +118,8 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
             temperature=config["temperature"],
             top_p=config["top_p"],
             top_k=config["top_k"],
+            min_p=config["min_p"],
+            repetition_penalty=config["repetition_penalty"],
             max_tokens=config["llm_max_tokens"],
             stop=["<END>"])
 
