@@ -16,5 +16,6 @@
     ],
     "theorem_max_length": 1000,
     "llm_max_tokens": 256,
-    "gpu_memory_utilization": 0.85
+    "gpu_memory_utilization": 0.85,
+    "enable_llm_output_cache": true
 }

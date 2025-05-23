@@ -12,7 +12,7 @@ from pprint import pprint
 import json
 import pandas as pd
 import chromadb
-import torch
+import os
 
 print("Loading config...")
 with open("config.json", "r") as file:
@@ -100,6 +100,19 @@ benchmark_df = benchmark_df.reset_index()
 query_columns = ['Title query', 'Natural language query']
 benchmark_results = {}
 
+llm_output_cache = None
+if config["enable_llm_output_cache"] and os.path.exists(config["cache_folder"]):
+    print("Loading LLM output cache...")
+    CACHE_FOLDER = config["cache_folder"]
+    LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
+
+    with open(LLM_OUTPUT_CACHE, "r") as file:
+        data = file.read()
+        llm_output_cache = json.loads(data)
+        print("Finished loading LLM output cache.")
+else:
+    print("LLM output caching is disabled in the config.")
+
 for i, row in tqdm(benchmark_df.iterrows()):
     target_identifier = row["Target Identifier"]
     if pd.isna(target_identifier):
@@ -138,7 +151,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
             print()
             print(f"Searching: \"{query}\"")
 
-            results_dict = search(query, collection, prompts, generation_args, pipe)
+            results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             print("Top 10 results:")
@@ -171,7 +184,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
                 },
                 "query": query,
                 "refined_query": results_dict["refined_query"],
-                "results[:10]": top_results,
+                #"results[:10]": top_results,
                 "duration": results_dict["duration"]
             }
 

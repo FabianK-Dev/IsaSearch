@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from src.solr import docs_by_ids
+from src.llm import save_llm_output_cache
 
 import torch
 import os
@@ -30,13 +31,21 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
     return encoded_embeddings
 
-def search(search_query, collection, prompts, generation_args, pipe):
+def search(search_query, collection, prompts, generation_args, pipe, config, llm_output_cache=None):
     start = time.time()
     docs_to_retrieve = 100
-
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
-    output = pipe(llm_prompt, **generation_args)
-    refined_query = output[0]['generated_text']
+    
+    if llm_output_cache is not None and llm_prompt in llm_output_cache:
+        print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
+        refined_query = llm_output_cache[llm_prompt]
+    else:
+        output = pipe(llm_prompt, **generation_args)
+        refined_query = output[0]['generated_text']
+        llm_output_cache[llm_prompt] = refined_query
+
+        if config["enable_llm_output_cache"]:
+            save_llm_output_cache(llm_output_cache, config)
 
     try:
         refined_query = refined_query.split("<BEGIN>")[1]
