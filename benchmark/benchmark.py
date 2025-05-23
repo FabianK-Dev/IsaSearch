@@ -29,11 +29,10 @@ config["artifacts_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
 config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
 config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_subpath}"
 config["gpu_memory_utilization"] = 0.8
-config["temperature"] = 0.6
-config["top_p"] = 0.95
-config["min_p"] = 0
-config["top_k"] = 40
-config["repetition_penalty"] = 0
+config["sampling_parameters"]["temperature"] = 0.6
+config["sampling_parameters"]["top_p"] = 0.95
+config["sampling_parameters"]["min_p"] = 0
+config["sampling_parameters"]["top_k"] = 40
 pprint(config)
 
 print("Loading Solr...")
