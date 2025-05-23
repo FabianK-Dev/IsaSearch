@@ -59,7 +59,8 @@ if "metadatas" in metadata_response and metadata_response["metadatas"] != None:
     for item in metadata_response["metadatas"]:
         existing.add(item["source"])
 
-for doc in tqdm(document_tree["documents"]):
+for doc_id in tqdm(document_tree):
+    doc = document_tree[doc_id]
     if doc["id"] in existing:
         continue
 
@@ -100,8 +101,8 @@ for i, row in tqdm(benchmark_df.iterrows()):
 
     target_exists = False
     print("Searching document identified by '" + row["Target Identifier"] + "'...")
-    for document in document_tree["documents"]:
-        if is_correct_target(document, target_identifier):
+    for doc_id in document_tree:
+        if is_correct_target(document_tree[doc_id], target_identifier):
             target_exists = True
             break
 

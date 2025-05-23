@@ -23,29 +23,23 @@ def get_entry_metadata(entry, config):
         print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
         return {}
 
-def extract_docs(doc, config):
-    src_str = doc["src"]
-
-    # Replace newlines through spaces
-    src_str = re.compile(r"\n").sub(" ", src_str)
-
-    # Replace two or more white spaces through single whitespace
-    src_str = re.compile(r"\s+").sub(" ", src_str).strip()
-
-    src_str = doc["theory"] + " " + src_str # Prepend the theory name
-    return doc["id"], src_str
+def relevant_doc_keys(solr_document):
+    return {
+        "id": solr_document["id"],
+        "src": solr_document["src"],
+        "entity_kname": solr_document.get("entity_kname", None)
+    }
 
 def fetch_all_docs(solr, config):
-    document_ids = []
-    documents = []
+    document_tree = {}
 
     docs_per_page = 10000
     results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=docs_per_page)
     max_docs = results.raw_response['response']['numFound']
 
     for result in results:
-        document_ids.append(result["id"])
-        documents.append(result)
+        result_filtered = relevant_doc_keys(result)
+        document_tree[result["id"]] = result_filtered
 
     pages = math.ceil(max_docs / docs_per_page)
     for i in range(1, pages):
@@ -53,13 +47,8 @@ def fetch_all_docs(solr, config):
         results = solr.search("command:theorem OR command:lemma OR command:corollary", start=i * docs_per_page, rows=docs_per_page)
 
         for result in results:
-            document_ids.append(result["id"])
-            documents.append(result)
-
-    document_tree = {
-        "document_ids": document_ids,
-        "documents": documents
-    }
+            result_filtered = relevant_doc_keys(result)
+            document_tree[result["id"]] = result_filtered
 
     return document_tree
 
@@ -82,23 +71,24 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
     print("Finding documents that need to be described by the LLM...")
         
     filtered_docs = []
-    for document in tqdm(document_tree["documents"]):
-        checksum = zlib.adler32(document["src"].encode('utf-8'))
+    for doc_id in tqdm(document_tree):
+        doc = document_tree[doc_id]
+        checksum = zlib.adler32(doc["src"].encode('utf-8'))
 
-        if document["id"] not in document_descriptions:
-            filtered_docs.append(document)
-        elif document["id"] in document_descriptions:
-            saved_checksum = document_descriptions[document["id"]].get("zlib.adler32_checksum", "")
+        if doc["id"] not in document_descriptions:
+            filtered_docs.append(doc)
+        elif doc["id"] in document_descriptions:
+            saved_checksum = document_descriptions[doc["id"]].get("zlib.adler32_checksum", "")
             if saved_checksum != checksum:
-                print("Document identified by id '" + document["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
-                filtered_docs.append(document)
+                print("Document identified by id '" + doc["id"] + "' already exists in document descriptions (" + saved_checksum + ") but doesn't match current zlib.adler32 checksum (" + checksum + "). This can happen if the theorem source code has changed. Adding to batch...")
+                filtered_docs.append(doc)
 
     print("Found " + str(len(filtered_docs)) + " documents that need to be described by the LLM.")
 
     if len(filtered_docs) >= 1:
         doc_strings = []
-        for document in filtered_docs:
-            doc_string = prompts["describe"].format(theorem_content=document["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
+        for doc in filtered_docs:
+            doc_string = prompts["describe"].format(theorem_content=doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
             doc_strings.append(doc_string)
 
         print("Loading LLM...")
@@ -153,9 +143,8 @@ def get_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
             llm_description = document_descriptions[doc_id]["llm_description"]
             print(f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for document with id \"{doc_id}\", thus loading it as is.")
 
-        if doc_id in document_tree["document_ids"]:
-            document_id_index = document_tree["document_ids"].index(doc_id)
-            document_tree["documents"][document_id_index]["llm_description"] = llm_description
+        if doc_id in document_tree:
+            document_tree[doc_id]["llm_description"] = llm_description
         else:
             print(f"Warning: LLM description for document with id {doc_id} does not exist in document tree and will thus be ignored.")
 
@@ -187,10 +176,11 @@ def build_document_tree(config, solr, tokenizer):
     print("Calculating maximum number of tokens required...")
     max_tokens = 0
 
-    for document in tqdm(document_tree["documents"]):
-        token_ids = tokenizer.encode(document["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
+    for doc_id in tqdm(document_tree):
+        doc = document_tree[doc_id]
+        token_ids = tokenizer.encode(doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
         num_tokens = len(token_ids)
-        document["num_tokens"] = num_tokens
+        doc["num_tokens"] = num_tokens
 
         if num_tokens > max_tokens:
             max_tokens = num_tokens
