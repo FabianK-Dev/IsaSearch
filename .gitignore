@@ -2,7 +2,7 @@
 .cache
 .venv
 .vscode
-chroma_storage
+chroma_storages
 artifacts
 
 # Downloaded
@@ -16,5 +16,5 @@ Isabelle*
 *.pyc
 *.log
 .~lock.*.csv#
-benchmark/*.html
 *.ipynb
+benchmark/*.html
