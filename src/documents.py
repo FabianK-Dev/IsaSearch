@@ -139,6 +139,9 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
                 }
 
             print("Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "...")
+            if not os.path.exists(ARTIFACTS_FOLDER):
+                os.makedirs(ARTIFACTS_FOLDER)
+
             with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
                 json.dump(document_descriptions, outfile, indent=4)
 

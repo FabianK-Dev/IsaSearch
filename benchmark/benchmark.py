@@ -51,6 +51,9 @@ document_tree = get_document_descriptions(config, document_tree, prompts, tokeni
 
 # Chroma setup
 print("Creating ChromaDB storage and afp_docs collection...")
+if not os.path.exists(config["chroma_db_path"]):
+    os.makedirs(config["chroma_db_path"])
+
 chroma_client = chromadb.PersistentClient(path=config["chroma_db_path"] + "/chroma_db")
 collection = chroma_client.get_or_create_collection("afp_docs")
 
