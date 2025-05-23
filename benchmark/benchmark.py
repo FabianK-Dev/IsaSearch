@@ -27,6 +27,7 @@ config["llm_name"] = benchmark_model
 config["cache_folder"] = f"{config['cache_folder']}/{benchmark_subpath}"
 config["artifact_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
 config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
+config["gpu_memory_utilization"] = 0.8
 pprint(config)
 
 print("Loading Solr...")
