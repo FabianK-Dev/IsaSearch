@@ -111,7 +111,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         print("Loading LLM...")
         llm = LLM(
             model=config["llm_name"],
-            max_model_len=max_tokens_prompt + config["max_tokens"],
+            max_model_len=max_tokens_prompt + config["sampling_parameters"]["max_tokens"],
             dtype="auto",
             gpu_memory_utilization=config["gpu_memory_utilization"])
         sampling_params = SamplingParams(
