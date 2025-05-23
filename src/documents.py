@@ -89,8 +89,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         print("Calculating maximum number of tokens required to describe filtered documents...")
         max_tokens = 0
 
-        for doc_id in tqdm(filtered_docs):
-            doc = filtered_docs[doc_id]
+        for doc in tqdm(filtered_docs):
             token_ids = tokenizer.encode(doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
             num_tokens = len(token_ids)
             doc["num_tokens"] = num_tokens
@@ -110,7 +109,12 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
             doc_strings.append(doc_string)
 
         print("Loading LLM...")
-        llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + config["llm_max_tokens"], dtype="auto", gpu_memory_utilization=config["gpu_memory_utilization"])
+        llm = LLM(
+            model=config["llm_name"],
+            max_model_len=max_tokens_prompt + config["llm_max_tokens"],
+            dtype="auto",
+            gpu_memory_utilization=config["gpu_memory_utilization"],
+            stop="<END>")
         sampling_params = SamplingParams(temperature=0, max_tokens=config["llm_max_tokens"])
 
         print(filtered_docs[:3])
@@ -156,7 +160,6 @@ def get_document_descriptions(config, document_tree, prompts, tokenizer):
     for doc_id in tqdm(document_descriptions):
         try:
             llm_description = document_descriptions[doc_id]["llm_description"].split("<BEGIN>")[1]
-            llm_description = llm_description.split("<END>")[0]
         except Exception as err:
             llm_description = document_descriptions[doc_id]["llm_description"]
             print(f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for document with id \"{doc_id}\", thus loading it as is.")
