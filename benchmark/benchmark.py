@@ -55,16 +55,18 @@ print("Finished loading embedder.")
 existing = set()
 metadata_response = collection.get(include=["metadatas"])
 
-if "metadatas" in metadata_response and metadata_response["metadatas"] != None:
+if "metadatas" in metadata_response and metadata_response["metadatas"] is not None:
     for item in metadata_response["metadatas"]:
         existing.add(item["source"])
 
-for doc_id in tqdm(document_tree):
+filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
+
+for doc_id in tqdm(filtered_tree):
     doc = document_tree[doc_id]
     if doc["id"] in existing:
         continue
 
-    doc_src =  doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
+    doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
     embedding_str = prompts["embed"].format(doc_src=doc_src)
     embedding = embedder.encode(embedding_str, convert_to_tensor=True).cpu().numpy()
 
