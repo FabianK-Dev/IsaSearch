@@ -82,7 +82,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
     print("Finding documents that need to be described by the LLM...")
         
     filtered_docs = []
-    for document in document_tree["documents"]:
+    for document in tqdm(document_tree["documents"]):
         checksum = zlib.adler32(document["src"].encode('utf-8'))
 
         if document["id"] not in document_descriptions:
@@ -144,7 +144,8 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
 def get_document_descriptions(config, document_tree, prompts, max_tokens_prompt):
     document_descriptions = generate_document_descriptions(config, document_tree, prompts, max_tokens_prompt)
 
-    for doc_id in document_descriptions:
+    print("Parsing LLM descriptions...")
+    for doc_id in tqdm(document_descriptions):
         try:
             llm_description = document_descriptions[doc_id]["llm_description"].split("<BEGIN>")[1]
             llm_description = llm_description.split("<END>")[0]
@@ -183,8 +184,10 @@ def build_document_tree(config, solr, tokenizer):
         with open(DOCUMENT_TREE_CACHE, 'w') as file:
             json.dump(document_tree, file)
 
+    print("Calculating maximum number of tokens required...")
     max_tokens = 0
-    for document in document_tree["documents"]:
+
+    for document in tqdm(document_tree["documents"]):
         token_ids = tokenizer.encode(document["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
         num_tokens = len(token_ids)
         document["num_tokens"] = num_tokens
