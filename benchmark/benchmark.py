@@ -101,15 +101,19 @@ query_columns = ['Title query', 'Natural language query']
 benchmark_results = {}
 
 llm_output_cache = None
-if config["enable_llm_output_cache"] and os.path.exists(config["cache_folder"]):
-    print("Loading LLM output cache...")
+if config["enable_llm_output_cache"]:
     CACHE_FOLDER = config["cache_folder"]
     LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
 
-    with open(LLM_OUTPUT_CACHE, "r") as file:
-        data = file.read()
-        llm_output_cache = json.loads(data)
-        print("Finished loading LLM output cache.")
+    if not os.path.exists(LLM_OUTPUT_CACHE):
+        print("Warning: LLM output cache file '" + LLM_OUTPUT_CACHE + "' does not exist, thus a new one will be created.")
+        llm_output_cache = {}
+    else:
+        print("Loading LLM output cache...")
+        with open(LLM_OUTPUT_CACHE, "r") as file:
+            data = file.read()
+            llm_output_cache = json.loads(data)
+            print("Finished loading LLM output cache.")
 else:
     print("LLM output caching is disabled in the config.")
 
