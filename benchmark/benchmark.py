@@ -5,7 +5,7 @@ from src.llm import load_prompts
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics, is_correct_target
 
 from sentence_transformers import SentenceTransformer
-from transformers import AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from tqdm import tqdm
 from pprint import pprint
 
@@ -35,8 +35,8 @@ describe_prompt_tokens = tokenizer.encode(prompts["describe"])
 max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
 print("Max tokens for prompt: " + str(max_tokens_prompt))
 
-print("Clearing CUDA cache...")
-torch.cuda.empty_cache()
+# print("Clearing CUDA cache...")
+# torch.cuda.empty_cache()
 
 print("Getting document descriptions...")
 # amazon/*, microsoft/Phi-*, Qwen/*, NVIDIA/
@@ -76,7 +76,24 @@ for doc_id in tqdm(filtered_tree):
         metadatas=[{"source": doc["id"]}],
         embeddings=[embedding])
 
-exit()
+model = AutoModelForCausalLM.from_pretrained(
+    config["llm_name"],
+    device_map="auto",
+    torch_dtype="auto")
+
+tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
+
+pipe = pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer)
+
+generation_args = {
+    "max_new_tokens": config["llm_max_tokens"],
+    "return_full_text": False,
+    "do_sample": False
+}
+
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()
 
@@ -121,7 +138,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
             print()
             print(f"Searching: \"{query}\"")
 
-            results_dict = search(query, collection, prompts, llm, config)
+            results_dict = search(query, collection, prompts, generation_args, pipe)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             print("Top 10 results:")
