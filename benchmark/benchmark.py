@@ -26,9 +26,7 @@ print("Adjusting config for benchmark model '" + benchmark_model + "' and subpat
 config["cache_folder"] = f"{config['cache_folder']}/{benchmark_subpath}"
 config["artifact_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
 config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
-
 pprint(config)
-exit()
 
 print("Loading Solr...")
 solr = connect_solr(config)
