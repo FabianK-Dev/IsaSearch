@@ -103,7 +103,7 @@ pipe = pipeline(
     tokenizer=tokenizer)
 
 generation_args = {
-    "max_new_tokens": config["llm_max_tokens"],
+    "max_new_tokens": config["max_tokens"],
     "return_full_text": False,
     "do_sample": False
 }

@@ -111,7 +111,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         print("Loading LLM...")
         llm = LLM(
             model=config["llm_name"],
-            max_model_len=max_tokens_prompt + config["llm_max_tokens"],
+            max_model_len=max_tokens_prompt + config["max_tokens"],
             dtype="auto",
             gpu_memory_utilization=config["gpu_memory_utilization"])
         sampling_params = SamplingParams(
@@ -120,8 +120,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
             top_k=config["sampling_parameters"]["top_k"],
             min_p=config["sampling_parameters"]["min_p"],
             max_tokens=config["sampling_parameters"]["max_tokens"],
-            stop=config["sampling_parameters"]["stop"]
-        )
+            stop=config["sampling_parameters"]["stop"])
 
         for i in tqdm(range(0, len(filtered_docs), save_every)):
             print("Document descriptions from index " + str(i) + " to " + str(i + save_every) + " of " + str(len(filtered_docs)) + " documents with maximum batch size " + str(save_every) + "...")
