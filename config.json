@@ -9,6 +9,12 @@
     "artifacts_folder": "artifacts",
     "prompts_folder": "prompts",
     "llm_name": "microsoft/Phi-3-mini-4k-instruct",
+    "benchmark_llms": [
+        "nvidia/Llama-3.1-8B-Instruct-FP8",
+        "Qwen/Qwen2.5-7B-Instruct",
+        "microsoft/Phi-3.5-mini-instruct"
+    ],
     "theorem_max_length": 1000,
-    "llm_max_tokens": 256
+    "llm_max_tokens": 256,
+    "gpu_memory_utilization": 0.85
 }

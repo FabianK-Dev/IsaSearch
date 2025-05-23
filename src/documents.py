@@ -92,7 +92,7 @@ def generate_document_descriptions(config, document_tree, prompts, max_tokens_pr
             doc_strings.append(doc_string)
 
         print("Loading LLM...")
-        llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + config["llm_max_tokens"], dtype="auto", gpu_memory_utilization=0.85)
+        llm = LLM(model=config["llm_name"], max_model_len=max_tokens_prompt + config["llm_max_tokens"], dtype="auto", gpu_memory_utilization=config["gpu_memory_utilization"])
         sampling_params = SamplingParams(temperature=0, max_tokens=config["llm_max_tokens"])
 
         print(filtered_docs[:3])
