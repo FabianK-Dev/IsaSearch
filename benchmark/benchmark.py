@@ -165,33 +165,33 @@ for i, row in tqdm(benchmark_df.iterrows()):
         query = row[query_type]
 
         if not pd.isna(query):
-            print(row)
-            print()
+            # print(row)
+            # print()
             print(f"Searching: \"{query}\"")
 
             results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             print("Top 10 results:")
-            top_results = []
-            for i, result in enumerate(results_list[:10]):
-                score = result.get("score")
-                doc_id = result.get("id")
-                doc_src = result.get("src")[:200] + "..."
-                doc_description = result.get("llm_description")
-                doc_entity_kname = result.get("entity_kname")
+            # top_results = []
+            # for i, result in enumerate(results_list[:10]):
+            #     score = result.get("score")
+            #     doc_id = result.get("id")
+            #     doc_src = result.get("src")[:200] + "..."
+            #     doc_description = result.get("llm_description")
+            #     doc_entity_kname = result.get("entity_kname")
 
-                res = {
-                    "rank": i + 1,
-                    "score": score,
-                    "id": doc_id,
-                    "description": doc_description,
-                    "entity_kname": doc_entity_kname,
-                    "src[:200]": doc_src
-                }
+            #     res = {
+            #         "rank": i + 1,
+            #         "score": score,
+            #         "id": doc_id,
+            #         "description": doc_description,
+            #         "entity_kname": doc_entity_kname,
+            #         "src[:200]": doc_src
+            #     }
                 
-                pprint(res)
-                top_results.append(res)
+            #     pprint(res)
+            #     top_results.append(res)
 
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "metrics": {
