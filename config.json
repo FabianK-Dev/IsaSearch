@@ -14,7 +14,8 @@
         "Qwen/Qwen2.5-3B-Instruct",
         "microsoft/Phi-3-mini-4k-instruct",
         "microsoft/Phi-3.5-mini-instruct",
-        "microsoft/Phi-4-mini-instruct"
+        "microsoft/Phi-4-mini-instruct",
+        "bartowski/nvidia_Llama-3.1-Nemotron-Nano-4B-v1.1-GGUF"
     ],
     "theorem_max_length": 1000,
     "gpu_memory_utilization": 0.85,
