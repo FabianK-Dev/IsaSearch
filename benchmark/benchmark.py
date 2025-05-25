@@ -19,21 +19,22 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-benchmark_model = config["benchmark_llms"][0] # TODO: Iterate over all benchmark models instead of a fixed one
-benchmark_subpath = benchmark_model.replace("/", "-")
-print("Adjusting config for benchmark model '" + benchmark_model + "' and subpath '" + benchmark_subpath + "'...")
+# Qwen/Qwen2.5-3B-Instruct
+# benchmark_model = config["benchmark_llms"][0] # TODO: Iterate over all benchmark models instead of a fixed one
+# benchmark_subpath = benchmark_model.replace("/", "-")
+# print("Adjusting config for benchmark model '" + benchmark_model + "' and subpath '" + benchmark_subpath + "'...")
 
-config["llm_name"] = benchmark_model
-config["cache_folder"] = f"{config['cache_folder']}/{benchmark_subpath}"
-config["artifacts_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
-config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
-config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_subpath}"
-config["gpu_memory_utilization"] = 0.8
-config["sampling_parameters"]["temperature"] = 0.6
-config["sampling_parameters"]["top_p"] = 0.95
-config["sampling_parameters"]["min_p"] = 0
-config["sampling_parameters"]["top_k"] = 40
-pprint(config)
+# config["llm_name"] = benchmark_model
+# config["cache_folder"] = f"{config['cache_folder']}/{benchmark_subpath}"
+# config["artifacts_folder"] = f"{config['artifacts_folder']}/{benchmark_subpath}"
+# config["chroma_db_path"] = f"{config['chroma_db_path']}/{benchmark_subpath}"
+# config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_subpath}"
+# config["gpu_memory_utilization"] = 0.8
+# config["sampling_parameters"]["temperature"] = 0.6
+# config["sampling_parameters"]["top_p"] = 0.95
+# config["sampling_parameters"]["min_p"] = 0
+# config["sampling_parameters"]["top_k"] = 40
+# pprint(config)
 
 print("Loading Solr...")
 solr = connect_solr(config)
