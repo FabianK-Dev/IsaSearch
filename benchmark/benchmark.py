@@ -141,7 +141,7 @@ if config["enable_llm_output_cache"]:
 else:
     print("LLM output caching is disabled in the config.")
 
-for i, row in tqdm(benchmark_df.iterrows()):
+for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     target_identifier = row["Target Identifier"]
 
     if not row["ID"] in benchmark_results:
@@ -150,16 +150,16 @@ for i, row in tqdm(benchmark_df.iterrows()):
             "queries": {}
         }
 
-    if pd.isna(target_identifier):
-        print("Warning: Target identifier JSON for row index " + str(i) + " and row ID '" + row["ID"] + "' does not exist. This benchmark entry will be skipped.")
-        benchmark_results[row["ID"]]["metadata"]["skipped"] = True
-        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "target_identifier_missing"
-        continue
-
     if row["Skip"] == "true":
         print("Warning: Entry at row index " + str(i) + " and row ID '" + row["ID"] + "' dis marked to be skipped with annotation: '" + row["Annotation"] + "'")
         benchmark_results[row["ID"]]["metadata"]["skipped"] = True
         benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "Annotation: " + row["Annotation"]
+        continue
+
+    if pd.isna(target_identifier):
+        print("Warning: Target identifier JSON for row index " + str(i) + " and row ID '" + row["ID"] + "' does not exist. This benchmark entry will be skipped.")
+        benchmark_results[row["ID"]]["metadata"]["skipped"] = True
+        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "target_identifier_missing"
         continue
 
     try:
@@ -220,7 +220,8 @@ for i, row in tqdm(benchmark_df.iterrows()):
                     "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
                     "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
                     "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
-                    "rank": rank(results_list, target_identifier)
+                    "rank": rank(results_list, target_identifier),
+                    "duration": results_dict["duration"]
                 },
                 "query": query,
                 "refined_query": results_dict["refined_query"],
