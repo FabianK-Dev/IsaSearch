@@ -133,8 +133,6 @@ else:
 
 for i, row in tqdm(benchmark_df.iterrows()):
     target_identifier = row["Target Identifier"]
-    if pd.isna(target_identifier):
-        continue
 
     if not row["ID"] in benchmark_results:
         benchmark_results[row["ID"]] = {
@@ -142,11 +140,24 @@ for i, row in tqdm(benchmark_df.iterrows()):
             "queries": {}
         }
 
+    if pd.isna(target_identifier):
+        print("Warning: Target identifier JSON for row index " + str(i) + " and row ID '" + row["ID"] + "' does not exist. This benchmark entry will be skipped.")
+        benchmark_results[row["ID"]]["metadata"]["skipped"] = True
+        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "target_identifier_missing"
+        continue
+
+    if row["Skip"] == "true":
+        print("Warning: Entry at row index " + str(i) + " and row ID '" + row["ID"] + "' dis marked to be skipped with annotation: '" + row["Annotation"] + "'")
+        benchmark_results[row["ID"]]["metadata"]["skipped"] = True
+        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "Annotation: " + row["Annotation"]
+        continue
+
     try:
         target_identifier = json.loads(row["Target Identifier"])
     except:
         print("Warning: Target identifier JSON '" + row["Target Identifier"] + "' for row index " + str(i) + " and row ID '" + row["ID"] + "' could not be parsed. This benchmark entry will be skipped.")
         benchmark_results[row["ID"]]["metadata"]["skipped"] = True
+        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "target_identifier_parse_error"
         continue
 
     target_exists = False
@@ -159,6 +170,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
     if not target_exists:
         print("Warning: No target document identified by '" + row["Target Identifier"] + "' exists in the document tree, thus skipping this entry.")
         benchmark_results[row["ID"]]["metadata"]["skipped"] = True
+        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "target_document_not_found"
         continue
 
     for query_type in query_columns:
@@ -172,7 +184,7 @@ for i, row in tqdm(benchmark_df.iterrows()):
             results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
-            print("Top 10 results:")
+            # print("Top 10 results:")
             # top_results = []
             # for i, result in enumerate(results_list[:10]):
             #     score = result.get("score")

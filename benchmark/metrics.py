@@ -62,7 +62,7 @@ def calculate_mean_metrics(benchmark_results):
     for target_id in benchmark_results:
         is_skipped = "skipped" in benchmark_results[target_id]["metadata"] and benchmark_results[target_id]["metadata"]["skipped"]
         if is_skipped:
-            print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True")
+            print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True with reason: '" + benchmark_results[target_id]["metadata"]["skipped_reason"] + "'")
             continue
 
         for query_type in benchmark_results[target_id]["queries"]:
