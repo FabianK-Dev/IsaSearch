@@ -35,14 +35,14 @@ def search(search_query, collection, prompts, generation_args, pipe, config, llm
     start = time.time()
     docs_to_retrieve = 100
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
-    
-    if llm_output_cache is not None and llm_prompt in llm_output_cache:
+
+    if llm_output_cache is not None and config["llm_name"] in llm_output_cache and llm_prompt in llm_output_cache[config["llm_name"]]:
         print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
-        refined_query = llm_output_cache[llm_prompt]
+        refined_query = llm_output_cache[config["llm_name"]][llm_prompt]
     else:
         output = pipe(llm_prompt, **generation_args)
         refined_query = output[0]['generated_text']
-        llm_output_cache[llm_prompt] = refined_query
+        llm_output_cache[config["llm_name"]][llm_prompt] = refined_query
 
         if config["enable_llm_output_cache"]:
             save_llm_output_cache(llm_output_cache, config)
