@@ -1,5 +1,5 @@
 ID,Title,Target Identifier,Theorem,Link,Session,Title query,Natural language query,Natual language query source,Skip,Annotation
-square-root-of-2-is-irrational,Square Root of 2 is Irrational,,"theorem sqrt_prime_irrational: ""prime p ? sqrt (real p) ? ?""
+square-root-of-2-is-irrational,Square Root of 2 is Irrational,"[ {""entity_kname"":""Sqrt.sqrt_prime_irrational|thm""} ]","theorem sqrt_prime_irrational: ""prime p ? sqrt (real p) ? ?""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ? ?""",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL-Examples,Square Root of 2 is Irrational,sqrt(2) is not rational,https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality,,
 fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"[ {""entity_kname"":""Fundamental_Theorem_Algebra.fundamental_theorem_of_algebra_alt|thm""} ]","lemma fundamental_theorem_of_algebra:
