@@ -36,6 +36,7 @@ def search(search_query, collection, prompts, generation_args, pipe, config, llm
     docs_to_retrieve = 100
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
 
+    # TODO: Move this to a separate function
     if llm_output_cache is not None and config["llm_name"] in llm_output_cache and llm_prompt in llm_output_cache[config["llm_name"]]:
         print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
         refined_query = llm_output_cache[config["llm_name"]][llm_prompt]
