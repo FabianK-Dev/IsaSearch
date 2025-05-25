@@ -74,21 +74,30 @@ if "metadatas" in metadata_response and metadata_response["metadatas"] is not No
         existing.add(item["source"])
 
 filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
+docs_to_embed = {
+    "documents": [],
+    "ids": [],
+    "metadatas": [],
+    "embeddings": []
+}
 
+print("Preparing documents before adding to collection...")
 for doc_id in tqdm(filtered_tree):
     doc = document_tree[doc_id]
-    if doc["id"] in existing:
-        continue
-
     doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
     embedding_str = prompts["embed"].format(doc_src=doc_src)
     embedding = embedder.encode(embedding_str, convert_to_tensor=True).cpu().numpy()
 
-    collection.add(
-        documents=[doc_src],
-        ids=[doc["id"]],
-        metadatas=[{"source": doc["id"]}],
-        embeddings=[embedding])
+    docs_to_embed["documents"].append(doc_src)
+    docs_to_embed["ids"].append(doc["id"])
+    docs_to_embed["metadatas"].append({"source": doc["id"]})
+    docs_to_embed["embeddings"].append(embedding)
+
+collection.add(
+    documents=docs_to_embed["documents"],
+    ids=docs_to_embed["ids"],
+    metadatas=docs_to_embed["metadatas"],
+    embeddings=docs_to_embed["embeddings"])
 
 model = AutoModelForCausalLM.from_pretrained(
     config["llm_name"],
