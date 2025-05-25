@@ -70,7 +70,7 @@ fundamental-theorem-of-integral-calculus,Fundamental Theorem of Integral Calculu
     and   ""?x. x ? {a..b} ? (f has_vector_derivative f' x) (at x within {a..b})""
   shows   ""(f' has_integral (f b - f a)) {a..b}""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Henstock_Kurzweil_Integration.html,HOL,Fundamental Theorem of Integral Calculus,[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other,https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus,,
-demoivres-theorem,DeMoivre�s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|thm""} }, {""entity_kname"":""Complex.DeMoivre2|thm""} ]","lemma DeMoivre: ""(cis a) ^ n = cis (real n * a)""
+demoivres-theorem,DeMoivre�s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|thm""}, {""entity_kname"":""Complex.DeMoivre2|thm""} ]","lemma DeMoivre: ""(cis a) ^ n = cis (real n * a)""
 
 lemma DeMoivre2: ""(rcis r a) ^ n = rcis (r ^ n) (real n * a)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Complex.html,HOL,DeMoivre�s Theorem,for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin ? nx,https://en.wikipedia.org/wiki/De_Moivre%27s_formula,,
@@ -135,7 +135,7 @@ sum-of-the-angles-of-a-triangle,Sum of the Angles of a Triangle,"[ {""entity_kna
   assumes ""a ? b ? b ? c ? a ? c""
   shows   ""angle c a b + angle a b c + angle b c a = pi""
 ",https://isa-afp.org/entries/Triangle.shtml,Triangle,Sum of the Angles of a Triangle,[...] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees,https://en.wikipedia.org/wiki/Triangle#Angles,,
-the-ballot-problem,The Ballot Problem,"[ {""entity_kname"":null, ""theory"": ""HOL-ex.Ballot"", ""command“: ""lemma"" } ]","lemma
+the-ballot-problem,The Ballot Problem,"[ {""entity_kname"":null, ""theory"": ""HOL-ex.Ballot"", ""command"": ""lemma""} ]","lemma
   ""valid_countings a b = (if a ? b then (if b = 0 then 1 else 0) else (a - b) / (a + b) * all_countings a b)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,candidate A receives p votes and candidate B receives q votes with p > q,https://en.wikipedia.org/wiki/Bertrand%27s_ballot_theorem,,
 ramseys-theorem,Ramsey�s Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""} ]","lemma ramsey: ""
@@ -514,7 +514,7 @@ cramers-rule,Cramer�s Rule,"[ {""entity_kname"":""Determinants.cramer|thm""} ]
   fixes A ::""real^'n^'n""
   assumes d0: ""det A ? 0""
   shows ""A *v x = b ? x = (? k. det(? i j. if j=k then b$i else A$i$j) / det A)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer�s Rule,"[...] n�n matrix A has [...] nonzero determinant, [...] solution for [...] unknowns x_i are [...] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer�s Rule,"[...] n�n matrix A has [...] nonzero determinant, [...] solution for [...] unknowns x_i are [...] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case,true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
 bertrands-postulate,Bertrand�s Postulate,"[ {""entity_kname"":""Bertrand.bertrand|thm""} ]","theorem bertrand: ""n > 1 ? ?p?{n<..<2*n}. prime p""
 ",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand�s Postulate,"[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",https://en.wikipedia.org/wiki/Bertrand%27s_postulate,,
 buffon-needle-problem,Buffon Needle Problem,,"theorem buffon_short:
