@@ -369,7 +369,7 @@ sum-of-an-arithmetic-series,Sum of an Arithmetic Series,"[ {""entity_kname"":""S
 greatest-common-divisor-algorithm,Greatest Common Divisor Algorithm,,"lemma gcd_dvd1:     ""gcd a b dvd a""
   and gcd_dvd2:     ""gcd a b dvd b""
   and gcd_greatest: ""c dvd a ? c dvd b ? c dvd gcd a b""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Greatest Common Divisor Algorithm,[...] GCD [...] is the largest positive integer that divides each of the integers,https://en.wikipedia.org/wiki/Greatest_common_divisor,true,"Has to be skipped because the original lemma does not exit anymore and a similar potential target entry’s („class semiring_gcd“) command is „class“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Greatest Common Divisor Algorithm,[...] GCD [...] is the largest positive integer that divides each of the integers,https://en.wikipedia.org/wiki/Greatest_common_divisor,true,"Has to be skipped because the original lemma does not exist anymore and a similar potential target entry’s („class semiring_gcd“) command is „class“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
 perfect-number-theorem,Perfect Number Theorem,"[ {""entity_kname"":""Perfect.perfect_number_theorem|thm""} ]","theorem perfect_number_theorem:
   assumes even: ""even m"" and perfect: ""perfect m""
   shows ""? n . m = 2^n*(2^(n+1) - 1) ? prime ((2::nat)^(n+1) - 1)""
