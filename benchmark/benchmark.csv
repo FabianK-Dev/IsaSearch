@@ -38,14 +38,14 @@ the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the An
   ""Point (cos (pi / 9)) 0 ? constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle,"The angle pi/3 radians ([...] 60�) is constructible. [...] It is impossible to construct a 20� angle. This implies that a 60� angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility,,
 the-impossibility-of-doubling-the-cube,The Impossibility of Doubling the Cube,"[ {""entity_kname"":""Impossible_Geometry.impossibility_of_doubling_the_cube|thm""} ]","theorem impossibility_of_doubling_the_cube:
   ""x^3 = 2 ? (Point x 0) ? constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Doubling the Cube,"Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",https://en.wikipedia.org/wiki/Doubling_the_cube,,
-the-area-of-a-circle,The Volume of a Sphere,"[ {""entity_kname"":""Ball_Volume.content_ball|thm""} ]","theorem content_ball:
+the-volume-of-a-sphere,The Volume of a Sphere,"[ {""entity_kname"":""Ball_Volume.content_ball|thm""} ]","theorem content_ball:
   fixes c :: ""'a :: euclidean_space""
   assumes ""r ? 0""
-  shows   ""content (ball c r) = pi powr (DIM('a) / 2) / Gamma (DIM('a) / 2 + 1) * r ^ DIM('a)""",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Ball_Volume.html,HOL,The Area of a Circle,"In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",https://en.wikipedia.org/wiki/Sphere#Enclosed_volume,,
-,The Area of a Circle,"[ {""entity_kname"":""Ball_Volume.circle_area|thm""} ]","
+  shows   ""content (ball c r) = pi powr (DIM('a) / 2) / Gamma (DIM('a) / 2 + 1) * r ^ DIM('a)""",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Ball_Volume.html,HOL,The Volume of a Sphere,"In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",https://en.wikipedia.org/wiki/Sphere#Enclosed_volume,,
+the-area-of-a-circle,The Area of a Circle,"[ {""entity_kname"":""Ball_Volume.circle_area|thm""} ]","
 corollary circle_area:
   ""r ≥ 0 ⟹ content (ball c r :: (real ^ 2) set) = r ^ 2 * pi""
-  by (simp add: content_ball unit_ball_vol_2)",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Ball_Volume.html,,,"[...] area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",https://en.wikipedia.org/wiki/Area_of_a_circle,,
+  by (simp add: content_ball unit_ball_vol_2)",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Ball_Volume.html,,The Area of a Circle,"[...] area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",https://en.wikipedia.org/wiki/Area_of_a_circle,,
 eulers-generalisation-of-fermats-little-theorem,Euler�s Generalisation of Fermat�s Little Theorem,"[ {""entity_kname"":""Residues.euler_theorem|thm""} ]","lemma euler_theorem:
   fixes a m :: nat
   assumes ""coprime a m""
