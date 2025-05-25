@@ -33,17 +33,26 @@ def encode_embeddings(config, documents_tree, bi_encoder):
 
 def search(search_query, collection, prompts, generation_args, pipe, config, llm_output_cache=None):
     start = time.time()
+    cached_duration = None
     docs_to_retrieve = 100
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
 
     # TODO: Move this to a separate function
     if llm_output_cache is not None and config["llm_name"] in llm_output_cache and llm_prompt in llm_output_cache[config["llm_name"]]:
         print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
-        refined_query = llm_output_cache[config["llm_name"]][llm_prompt]
+        refined_query = llm_output_cache[config["llm_name"]][llm_prompt]["output"]
+        cached_duration = llm_output_cache[config["llm_name"]][llm_prompt]["duration"]
     else:
         output = pipe(llm_prompt, **generation_args)
         refined_query = output[0]['generated_text']
-        llm_output_cache[config["llm_name"]][llm_prompt] = refined_query
+
+        end = time.time()
+        output_duration  = end - start
+
+        llm_output_cache[config["llm_name"]][llm_prompt] = {
+            "output": refined_query,
+            "output_duration": output_duration
+        }
 
         if config["enable_llm_output_cache"]:
             save_llm_output_cache(llm_output_cache, config)
@@ -69,8 +78,10 @@ def search(search_query, collection, prompts, generation_args, pipe, config, llm
         }
 
     end = time.time()
-    search_duration  = end - start
-    print(f"Search time: {end - start} sec")
+    search_duration = end - start
+
+    if cached_duration != None:
+        search_duration = search_duration + cached_duration
 
     return {
         "results": results,
