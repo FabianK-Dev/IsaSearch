@@ -93,11 +93,12 @@ for doc_id in tqdm(filtered_tree):
     docs_to_embed["metadatas"].append({"source": doc["id"]})
     docs_to_embed["embeddings"].append(embedding)
 
-collection.add(
-    documents=docs_to_embed["documents"],
-    ids=docs_to_embed["ids"],
-    metadatas=docs_to_embed["metadatas"],
-    embeddings=docs_to_embed["embeddings"])
+if len(docs_to_embed["documents"]) > 0:
+    collection.add(
+        documents=docs_to_embed["documents"],
+        ids=docs_to_embed["ids"],
+        metadatas=docs_to_embed["metadatas"],
+        embeddings=docs_to_embed["embeddings"])
 
 model = AutoModelForCausalLM.from_pretrained(
     config["llm_name"],
