@@ -41,7 +41,7 @@ def search(search_query, collection, prompts, generation_args, pipe, config, llm
     if llm_output_cache is not None and config["llm_name"] in llm_output_cache and llm_prompt in llm_output_cache[config["llm_name"]]:
         print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
         refined_query = llm_output_cache[config["llm_name"]][llm_prompt]["output"]
-        cached_duration = llm_output_cache[config["llm_name"]][llm_prompt]["duration"]
+        cached_duration = llm_output_cache[config["llm_name"]][llm_prompt]["output_duration"]
     else:
         output = pipe(llm_prompt, **generation_args)
         refined_query = output[0]['generated_text']
