@@ -49,6 +49,9 @@ def search(search_query, collection, prompts, generation_args, pipe, config, llm
         end = time.time()
         output_duration  = end - start
 
+        if config["llm_name"] not in llm_output_cache:
+            llm_output_cache[config["llm_name"]] = {}
+
         llm_output_cache[config["llm_name"]][llm_prompt] = {
             "output": refined_query,
             "output_duration": output_duration
