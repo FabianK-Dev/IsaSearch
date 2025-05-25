@@ -14,7 +14,7 @@ pythagorean-theorem,Pythagorean Theorem,"[ {""entity_kname"":""Triangle.Pythagor
   fixes a b c :: ""'a :: real_inner""
   assumes ""orthogonal (b - a) (c - a)""
   shows   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2""
-",,?,Pythagorean Theorem,The sum of the areas of the two squares on the legs [�] equals the area of the square on the hypotenuse [...],https://en.wikipedia.org/wiki/Pythagorean_theorem,,
+",,?,Pythagorean Theorem,The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...],https://en.wikipedia.org/wiki/Pythagorean_theorem,,
 prime-number-theorem,Prime Number Theorem,"[ {""entity_kname"":""Prime_Number_Theorem.prime_number_theorem|thm""} ]","definition primes_pi :: ""real ? real"" where
   ""primes_pi x = real (card {p::nat. prime p ? p ? x})""
 
@@ -55,7 +55,7 @@ the-infinitude-of-primes,The Infinitude of Primes,"[ {""entity_kname"":""Primes.
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Primes.html,HOL,The Infinitude of Primes,[...] There are infinitely many prime numbers,https://en.wikipedia.org/wiki/Euclid%27s_theorem,,
 the-independence-of-the-parallel-postulate,The Independence of the Parallel Postulate,"[ {""entity_kname"":""Hyperbolic_Tarski.hyp2_not_tarski|thm""} ]","theorem hyp2_not_tarski: ""� (tarski real_hyp2_C real_hyp2_B)""
   using hyp2_axiom10_false
-  by (unfold tarski_def tarski_space_def tarski_space_axioms_def) simp",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,[�] The parallel postulate is independent of other axioms of Euclidean geometry,https://en.wikipedia.org/wiki/Parallel_postulate,,
+  by (unfold tarski_def tarski_space_def tarski_space_axioms_def) simp",https://isa-afp.org/entries/Tarskis_Geometry.shtml,Tarskis_Geometry,The Independence of the Parallel Postulate,[...] The parallel postulate is independent of other axioms of Euclidean geometry,https://en.wikipedia.org/wiki/Parallel_postulate,,
 polyhedron-formula,Polyhedron Formula,"[ {""entity_kname"":""Euler_Formula.Euler_relation|thm""} ]","corollary Euler_relation:
   fixes p :: ""'n::euclidean_space set""
   assumes ""polytope p"" ""aff_dim p = 3"" ""DIM('n) = 3""
@@ -63,13 +63,13 @@ polyhedron-formula,Polyhedron Formula,"[ {""entity_kname"":""Euler_Formula.Euler
          card {e. e face_of p ? aff_dim e = 1} = 2""
 ",https://www.isa-afp.org/entries/Euler_Polyhedron_Formula.html,Euler_Polyhedron_Formula,Polyhedron Formula,Any convex polyhedron's surface has Euler characteristic X = V - E + F = 2,https://en.wikipedia.org/wiki/Euler_characteristic#Polyhedra,,
 eulers-summation-of-1-122-132-.,Euler�s Summation of 1 + (1/2)^2 + (1/3)^2 + �.,"[ {""entity_kname"":""Gamma_Function.inverse_squares_sums|thm""} ]","theorem inverse_squares_sums: ""(?n. 1 / (n + 1)?2) sums (pi?2 / 6)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Gamma_Function.html,HOL,Euler�s Summation of 1 + (1/2)^2 + (1/3)^2 + �.,[�] the precise summation of the reciprocals of the squares of the natural numbers [�] is [�] pi^2 / 6,https://en.wikipedia.org/wiki/Basel_problem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Gamma_Function.html,HOL,Euler�s Summation of 1 + (1/2)^2 + (1/3)^2 + �.,[...] the precise summation of the reciprocals of the squares of the natural numbers [...] is [...] pi^2 / 6,https://en.wikipedia.org/wiki/Basel_problem,,
 fundamental-theorem-of-integral-calculus,Fundamental Theorem of Integral Calculus,"[ {""entity_kname"":""Henstock_Kurzweil_Integration.fundamental_theorem_of_calculus|thm""} ]","theorem fundamental_theorem_of_calculus:
   fixes f :: ""real ? 'a::banach""
   assumes ""a ? b""
     and   ""?x. x ? {a..b} ? (f has_vector_derivative f' x) (at x within {a..b})""
   shows   ""(f' has_integral (f b - f a)) {a..b}""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Henstock_Kurzweil_Integration.html,HOL,Fundamental Theorem of Integral Calculus,[�] differentiating a function [�] [and] [...] integrating a function [�] can be thought of as inverses of each other,https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Henstock_Kurzweil_Integration.html,HOL,Fundamental Theorem of Integral Calculus,[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other,https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus,,
 demoivres-theorem,DeMoivre�s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|thm""} }, {""entity_kname"":""Complex.DeMoivre2|thm""} ]","lemma DeMoivre: ""(cis a) ^ n = cis (real n * a)""
 
 lemma DeMoivre2: ""(rcis r a) ^ n = rcis (r ^ n) (real n * a)""
@@ -82,7 +82,7 @@ lagranges-four-square-theorem,Lagrange�s Four-Square Theorem,"[ {""entity_knam
 all-primes-1-mod-4-equal-the-sum-of-two-squares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[ {""entity_kname"":""TwoSquares.sum_of_two_squares_prime|thm""} ]","theorem two_squares:
   assumes ""prime (p :: nat)""
   shows   ""(?a b. p = a?2 + b?2) = [p ? 3] (mod 4)
-",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[�] contains no factor p^k, where prime p ? 3 (mod 4) and k is odd",https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem,,
+",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[...] contains no factor p^k, where prime p ? 3 (mod 4) and k is odd",https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem,,
 greens-theorem,Green�s theorem,"[
   { ""entity_kname"": ""Green.green_typeI_typeII_chain.GreenThm_typeI_typeII_divisible_region|fact"" },
   { ""entity_kname"": ""Green.R2.Greens_thm_type_II|fact"" },
@@ -105,14 +105,14 @@ greens-theorem,Green�s theorem,"[
               ""common_boundary_sudivision_exists one_chain_typeI one_chain_typeII""
       shows ""integral s (%x. partial_vector_derivative (%x. (F x) ? j) i x - partial_vector_derivative (%x. (F x) ? i) j x) = one_chain_line_integral F {i, j} one_chain_typeI""
             ""integral s (%x. partial_vector_derivative (%x. (F x) ? j) i x - partial_vector_derivative (%x. (F x) ? i) j x) = one_chain_line_integral F {i, j} one_chain_typeII""
-",https://www.isa-afp.org/entries/Green.html,Green,Green�s theorem,[�] line integral around a simple closed curve C to a double integral over the plane region D [�] bounded by C,https://en.wikipedia.org/wiki/Green%27s_theorem#References,,
+",https://www.isa-afp.org/entries/Green.html,Green,Green�s theorem,[...] line integral around a simple closed curve C to a double integral over the plane region D [...] bounded by C,https://en.wikipedia.org/wiki/Green%27s_theorem#References,,
 the-non-denumerability-of-the-continuum,The Non-Denumerability of the Continuum,"[ {""entity_kname"":""Continuum_Not_Denumerable.real_non_denum|thm""} ]","theorem real_non_denum: ""?f :: nat ? real. surj f""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Continuum_Not_Denumerable.html,HOL,The Non-Denumerability of the Continuum,[�] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers [�],https://en.wikipedia.org/wiki/Cantor%27s_diagonal_argument,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Continuum_Not_Denumerable.html,HOL,The Non-Denumerability of the Continuum,[...] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers [...],https://en.wikipedia.org/wiki/Cantor%27s_diagonal_argument,,
 formula-for-pythagorean-triples,Formula for Pythagorean Triples,"[ {""entity_kname"":""Fermat4.nat_euclid_pyth_triples|thm"" } ]","theorem nat_euclid_pyth_triples:
   fixes a b c :: nat
   assumes ""coprime a b"" ""odd a"" ""a?2 + b?2 = c?2""
   shows   ""?p q. a = p?2 - q?2 ? b = 2 * p * q ? c = p?2 + q?2 ? coprime p q""
-",https://www.isa-afp.org/entries/Fermat3_4.html,Fermat3_4,Formula for Pythagorean Triples,[�] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0,https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple,,
+",https://www.isa-afp.org/entries/Fermat3_4.html,Fermat3_4,Formula for Pythagorean Triples,[...] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0,https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple,,
 the-undecidability-of-the-continuum-hypothesis,The Undecidability of the Continuum Hypothesis,"[ {""entity_kname"":""Not_CH.ctm_ZFC_imp_ctm_not_CH|thm""} ]","corollary ctm_ZFC_imp_ctm_not_CH:
   assumes
     ""M ? ?"" ""Transset(M)"" ""M ? ZFC""
@@ -134,7 +134,7 @@ leibnitzs-series-for-pi,Leibnitz�s Series for Pi,"[ {""entity_kname"":""Transc
 sum-of-the-angles-of-a-triangle,Sum of the Angles of a Triangle,"[ {""entity_kname"":""Triangle.angle_sum_triangle|thm""} ]","lemma angle_sum_triangle:
   assumes ""a ? b ? b ? c ? a ? c""
   shows   ""angle c a b + angle a b c + angle b c a = pi""
-",https://isa-afp.org/entries/Triangle.shtml,Triangle,Sum of the Angles of a Triangle,[�] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees,https://en.wikipedia.org/wiki/Triangle#Angles,,
+",https://isa-afp.org/entries/Triangle.shtml,Triangle,Sum of the Angles of a Triangle,[...] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees,https://en.wikipedia.org/wiki/Triangle#Angles,,
 the-ballot-problem,The Ballot Problem,"[ {""entity_kname"":null, ""theory"": ""HOL-ex.Ballot"", ""command“: ""lemma"" } ]","lemma
   ""valid_countings a b = (if a ? b then (if b = 0 then 1 else 0) else (a - b) / (a + b) * all_countings a b)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,candidate A receives p votes and candidate B receives q votes with p > q,https://en.wikipedia.org/wiki/Bertrand%27s_ballot_theorem,,
@@ -186,7 +186,7 @@ the-solution-of-a-cubic,The Solution of a Cubic,"[ {""entity_kname"":""Cubic_Qua
             x = s1 - p / s1 - b / (3 * a) ?
             x = s2 - p / s2 - b / (3 * a) ?
             x = s3 - p / s3 - b / (3 * a))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Cubic_Quartic.html,HOL,The Solution of a Cubic,"If all of the coefficients a, b, c, and d of the cubic equation are real numbers, then it has at least one real root [�]",https://en.wikipedia.org/wiki/Cubic_equation,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Cubic_Quartic.html,HOL,The Solution of a Cubic,"If all of the coefficients a, b, c, and d of the cubic equation are real numbers, then it has at least one real root [...]",https://en.wikipedia.org/wiki/Cubic_equation,,
 arithmetic-mean-geometric-mean,Arithmetic Mean / Geometric Mean,"[ {""entity_kname"":""CauchysMeanTheorem.CauchysMeanTheorem|thm""} ]","  theorem CauchysMeanTheorem:
   fixes z::""real list""
   assumes ""pos z""
@@ -267,7 +267,7 @@ the-central-limit-theorem,The Central Limit Theorem,"[ {""entity_kname"":""Centr
 dirichlets-theorem,Dirichlet�s Theorem,"[ {""entity_kname"":""Dirichlet_Theorem.residues_nat.Dirichlet|thm""} ]","theorem Dirichlet:
   assumes ""n > 1"" and ""coprime h n""
   shows   ""infinite {p. prime p ? [p = h] (mod n)}""
-",https://isa-afp.org/entries/Dirichlet_L.html,Dirichlet_L,Dirichlet�s Theorem,"for any two positive coprime integers a and d, there are [�] infinitely many primes that are congruent to a mod d",https://en.wikipedia.org/wiki/Dirichlet%27s_theorem_on_arithmetic_progressions,,
+",https://isa-afp.org/entries/Dirichlet_L.html,Dirichlet_L,Dirichlet�s Theorem,"for any two positive coprime integers a and d, there are [...] infinitely many primes that are congruent to a mod d",https://en.wikipedia.org/wiki/Dirichlet%27s_theorem_on_arithmetic_progressions,,
 cayley-hamilton-theorem,Cayley-Hamilton Theorem,"[ {""entity_kname"":""Cayley_Hamilton.Cayley_Hamilton|thm""} ]","theorem Cayley_Hamilton:
   fixes A :: ""'a?comm_ring_1^'n?finite^'n""
   shows ""evalmat (charpoly A) A = 0""
@@ -275,10 +275,10 @@ cayley-hamilton-theorem,Cayley-Hamilton Theorem,"[ {""entity_kname"":""Cayley_Ha
 wilsons-theorem,Wilson�s Theorem,"[ {""entity_kname"":""Residues.wilson_theorem|thm""} ]","lemma wilson_theorem:
   assumes ""prime p""
   shows   ""[fact (p - 1) = -1] (mod p)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Wilson�s Theorem,"[�] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",https://en.wikipedia.org/wiki/Wilson%27s_theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Wilson�s Theorem,"[...] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",https://en.wikipedia.org/wiki/Wilson%27s_theorem,,
 the-number-of-subsets-of-a-set,The Number of Subsets of a Set,"[ {""entity_kname"":""Power.card_Pow|thm""} ]","lemma card_Pow:
   ""finite A ? card (Pow A) = 2 ^ card A""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Power.html,HOL,The Number of Subsets of a Set,"If S is a finite set with |S| = n, then the number of all the subsets of S is [�] 2^n",https://en.wikipedia.org/wiki/Power_set#Properties,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Power.html,HOL,The Number of Subsets of a Set,"If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",https://en.wikipedia.org/wiki/Power_set#Properties,,
 pi-is-transcendental,Pi is Transcendental,"[ {""entity_kname"":""Pi_Transcendental.transcendental_pi|thm""} ]","theorem transcendental_pi: ""�algebraic pi""
 ",https://www.isa-afp.org/entries/Pi_Transcendental.html,Pi_Transcendental,Pi is Transcendental,The best-known [numbers that are not algebraic] are pi and e,https://en.wikipedia.org/wiki/Transcendental_number,,
 the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,"[ {""entity_kname"":""KoenigsbergBridge.eulerian_split|thm""} ]","lemma eulerian_split:
@@ -288,7 +288,7 @@ the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,"[ {""entity_kna
     ""valid_unMultigraph.is_Eulerian_trail  G2 v2 ps2 v2'""
   shows ""valid_unMultigraph.is_Eulerian_trail ?nodes=nodes G1 ? nodes G2,
           edges=edges G1 ? edges G2 ? {(v1',w,v2),(v2,w,v1')}? v1 (ps1@(v1',w,v2)#ps2) v2'""
-",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Koenigsberg Bridges Problem,"[�] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",https://en.wikipedia.org/wiki/Eulerian_path#Properties,,
+",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Koenigsberg Bridges Problem,"[...] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",https://en.wikipedia.org/wiki/Eulerian_path#Properties,,
 product-of-segments-of-chords,Product of Segments of Chords,"[ {""entity_kname"":""Chord_Segments.product_of_chord_segments|thm""} ]","theorem product_of_chord_segments:
   fixes S1 T1 S2 T2 X C :: ""'a :: euclidean_space""
   assumes ""between (S1, T1) X"" ""between (S2, T2) X""
@@ -311,7 +311,7 @@ corollary Hermite_Lindemann_original:
   assumes ""?i. i < n ? algebraic (? i)""
   assumes ""linearly_independent_over_int (? ` {..<n})""
   shows   ""algebraically_independent_over_rat n (?i. exp (? i))""
-",https://www.isa-afp.org/entries/Hermite_Lindemann.html,Hermite_Lindemann,The Hermite-Lindemann Transcendence Theorem,"[�] the extension field Q(e^\alpha_1, ..., e^\alpha_n) has transcendence degree n over Q",https://en.wikipedia.org/wiki/Lindemann%E2%80%93Weierstrass_theorem,,
+",https://www.isa-afp.org/entries/Hermite_Lindemann.html,Hermite_Lindemann,The Hermite-Lindemann Transcendence Theorem,"[...] the extension field Q(e^\alpha_1, ..., e^\alpha_n) has transcendence degree n over Q",https://en.wikipedia.org/wiki/Lindemann%E2%80%93Weierstrass_theorem,,
 herons-formula,Heron�s formula,"[ {""entity_kname"":""Simplex_Content.heron|thm""} ]","theorem heron:
   fixes A B C :: ""real ^ 2""
   defines ""a ? dist B C"" and ""b ? dist A C"" and ""c ? dist A B""
@@ -338,8 +338,8 @@ theorem-of-ceva,Theorem of Ceva,"[ {""entity_kname"":""Ceva.Cevas|thm""} ]","lem
   assumes TriCol : ""collinear {a,f,b} ? collinear {a,e,c} ? collinear {b,d,c}""
   assumes Triangle : ""� collinear {a,b,c}""
   shows ""dist a f * dist b d * dist c e = dist f b * dist d c * dist e a""
-",https://www.isa-afp.org/entries/Ceva.html,Ceva,Theorem of Ceva,"[�] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",https://en.wikipedia.org/wiki/Ceva%27s_theorem,,
-cantors-theorem,Cantor�s Theorem,,lemma Cantors_paradox: ?f. f ` A = Pow A,https://isabelle.in.tum.de/dist/library/HOL/HOL/Fun.html,HOL,Cantor�s Theorem,"[�] for any set A, the set of all subsets of A [�] has a strictly greater cardinality than A itself",https://en.wikipedia.org/wiki/Cantor%27s_theorem,true,Lemma does not exist anymore.
+",https://www.isa-afp.org/entries/Ceva.html,Ceva,Theorem of Ceva,"[...] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",https://en.wikipedia.org/wiki/Ceva%27s_theorem,,
+cantors-theorem,Cantor�s Theorem,,lemma Cantors_paradox: ?f. f ` A = Pow A,https://isabelle.in.tum.de/dist/library/HOL/HOL/Fun.html,HOL,Cantor�s Theorem,"[...] for any set A, the set of all subsets of A [...] has a strictly greater cardinality than A itself",https://en.wikipedia.org/wiki/Cantor%27s_theorem,true,Lemma does not exist anymore.
 lh�pitals-rule,L�H�pital�s Rule,"[ {""entity_kname"":""Deriv.lhopital|thm""} ]","lemma lhopital:
   fixes f g f' g' :: ""real ? real""
   assumes ""f ?x? 0"" and ""g ?x? 0""
@@ -369,7 +369,7 @@ sum-of-an-arithmetic-series,Sum of an Arithmetic Series,"[ {""entity_kname"":""S
 greatest-common-divisor-algorithm,Greatest Common Divisor Algorithm,,"lemma gcd_dvd1:     ""gcd a b dvd a""
   and gcd_dvd2:     ""gcd a b dvd b""
   and gcd_greatest: ""c dvd a ? c dvd b ? c dvd gcd a b""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Greatest Common Divisor Algorithm,[�] GCD [...] is the largest positive integer that divides each of the integers,https://en.wikipedia.org/wiki/Greatest_common_divisor,true,"Has to be skipped because the original lemma does not exit anymore and a similar potential target entry’s („class semiring_gcd“) command is „class“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/GCD.html,HOL,Greatest Common Divisor Algorithm,[...] GCD [...] is the largest positive integer that divides each of the integers,https://en.wikipedia.org/wiki/Greatest_common_divisor,true,"Has to be skipped because the original lemma does not exit anymore and a similar potential target entry’s („class semiring_gcd“) command is „class“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
 perfect-number-theorem,Perfect Number Theorem,"[ {""entity_kname"":""Perfect.perfect_number_theorem|thm""} ]","theorem perfect_number_theorem:
   assumes even: ""even m"" and perfect: ""perfect m""
   shows ""? n . m = 2^n*(2^(n+1) - 1) ? prime ((2::nat)^(n+1) - 1)""
@@ -377,11 +377,11 @@ perfect-number-theorem,Perfect Number Theorem,"[ {""entity_kname"":""Perfect.per
 order-of-a-subgroup,Order of a Subgroup,,"proposition (in group) lagrange_finite:
   assumes ""finite (carrier G)"" and ""subgroup H G""
   shows ""card (rcosets H) * card H = order G""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Coset.html,HOL,Order of a Subgroup,"[�] if H is a subgroup of any finite group G, then |H| is a divisor of |G| [�]",https://en.wikipedia.org/wiki/Lagrange%27s_theorem_(group_theory),true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Coset.html,HOL,Order of a Subgroup,"[...] if H is a subgroup of any finite group G, then |H| is a divisor of |G| [...]",https://en.wikipedia.org/wiki/Lagrange%27s_theorem_(group_theory),true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
 sylows-theorem,Sylow�s Theorem,"[ {""entity_kname"":""Sylow.sylow_thm|thm""} ]","theorem sylow_thm:
   assumes ""prime p"" and ""group G"" and ""order G = p ^ a * m"" and ""finite (carrier G)""
   obtains H where ""subgroup H G"" and ""card H = p ^ a""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Sylow.html,HOL,Sylow�s Theorem,"for every prime factor p of the order of a finite group G, there exists a [�] p-subgroup of G of order p^n",https://en.wikipedia.org/wiki/Sylow_theorems,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Sylow.html,HOL,Sylow�s Theorem,"for every prime factor p of the order of a finite group G, there exists a [...] p-subgroup of G of order p^n",https://en.wikipedia.org/wiki/Sylow_theorems,,
 ascending-or-descending-sequences,Ascending or Descending Sequences,"[ {""entity_kname"":""Erdoes_Szekeres.Erdoes_Szekeres|thm""} ]","lemma Erdoes_Szekeres:
   fixes f :: ""_ ? 'a::linorder""
   shows ""(?S. S ? {0..m * n} ? card S = m + 1 ? mono_on f (op ?) S) ?
@@ -409,16 +409,16 @@ fourier-series,Fourier Series,"[ {""entity_kname"":""Fourier.Fourier_Fejer_Cesar
 assumes f: ""continuous_on UNIV f""
     and periodic: ""?x. f(x + 2*pi) = f x""
   shows ""(?n. (?m<n. ?k?2*m. Fourier_coefficient f k * trigonometric_set k x) / n) \<longlonglongrightarrow> f x""
-",https://www.isa-afp.org/entries/Fourier.html,Fourier,Fourier Series,"[�] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",https://en.wikipedia.org/wiki/Fourier_series,,
+",https://www.isa-afp.org/entries/Fourier.html,Fourier,Fourier Series,"[...] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",https://en.wikipedia.org/wiki/Fourier_series,,
 sum-of-kth-powers,Sum of kth powers,"[ {""entity_kname"":""Bernoulli.sum_of_powers|thm""} ]","lemma sum_of_powers:
   fixes m n :: nat
   shows ""(?k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
-",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[�] expresses the sum of the p-th powers of the first n positive integers [�] as a polynomial in n,https://en.wikipedia.org/wiki/Faulhaber%27s_formula,,
+",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n,https://en.wikipedia.org/wiki/Faulhaber%27s_formula,,
 the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,"[ {""entity_kname"":""CauchySchwarz.CauchySchwarzReal|thm""} ]","theorem CauchySchwarzReal:
   fixes x::vector
   assumes ""vlen x = vlen y""
   shows ""�x?y� ? ?x?*?y?""
-",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,The Cauchy-Schwarz Inequality,[�] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms,https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality,,
+",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,The Cauchy-Schwarz Inequality,[...] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms,https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality,,
 the-intermediate-value-theorem,The Intermediate Value Theorem,"[ {""entity_kname"":""Limits.isCont_Lb_Ub|thm""} ]","lemma IVT':
   fixes f :: ""real ? real""
   assumes ""a ? b"" and ""y ? {f a..f b}"" and  ""continuous_on {a..b} f""
@@ -449,9 +449,9 @@ dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Lit
 the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""} ]","theorem (in valid_unSimpGraph) friendship_thm:
   assumes ""?v u. v?V ? u?V ? v?u ? ?! n. adjacent v n ? adjacent u n"" and ""finite V""
   shows ""?v. ?n?V. n?v ? adjacent v n""
-",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,[�] finite graphs with the property that every two vertices have exactly one neighbor in common [...],https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem,,
+",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...],https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem,,
 divisibility-by-three-rule,Divisibility by Three Rule,"[ {""entity_kname"":""ThreeDivides.three_divides_nat|thm""} ]","theorem three_divides_nat: ""3 dvd n ? 3 dvd sumdig n""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,[�] sum of the digits must be divisible by 3 [�],https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,[...] sum of the digits must be divisible by 3 [...],https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230,,
 lebesgue-measure-and-integration,Lebesgue Measure and Integration,,,https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,,,
 desarguess-theorem,Desargues�s Theorem,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P ? ? ?""
@@ -460,26 +460,26 @@ desarguess-theorem,Desargues�s Theorem,"[ {""entity_kname"":""Desargues_3D.hig
 derangements-formula,Derangements Formula,"[ {""entity_kname"":""Derangements.derangements_formula'|thm""} ]","theorem derangements_formula:
   assumes ""n ? 0"" and ""finite S"" and ""card S = n""
   shows ""card (derangements S) = round (fact n / exp 1)""
-",https://isa-afp.org/entries/Derangements.shtml,Derangements,Derangements Formula,[�] permutation of the elements of a set in which no element appears in its original position,https://en.wikipedia.org/wiki/Derangement,,
+",https://isa-afp.org/entries/Derangements.shtml,Derangements,Derangements Formula,[...] permutation of the elements of a set in which no element appears in its original position,https://en.wikipedia.org/wiki/Derangement,,
 the-factor-and-remainder-theorems,The Factor and Remainder Theorems,"[ {""entity_kname"":""UnivPoly.UP_cring.long_div_theorem|thm""} ]","lemma long_div_theorem:
   assumes ""g ? carrier P"" and ""f ? carrier P"" and ""g ? ??P?""
   shows ""?q r (k::nat). (q ? carrier P) ? (r ? carrier P) ?
         (lcoeff g)(^)?R?k ??P? f = g ??P? q ??P? r ?
         (r = ??P? | deg R r < deg R g)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/UnivPoly.html,HOL,The Factor and Remainder Theorems,f(x) is [�] f(r) and (x - r) [times a lower-degree polynomial],https://en.wikipedia.org/wiki/Polynomial_remainder_theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/UnivPoly.html,HOL,The Factor and Remainder Theorems,f(x) is [...] f(r) and (x - r) [times a lower-degree polynomial],https://en.wikipedia.org/wiki/Polynomial_remainder_theorem,,
 stirlings-formula,Stirling�s Formula,"[ {""entity_kname"":""Stirling_Formula.Gamma_asymp_equiv|thm""}, {""entity_kname"":""Stirling_Formula.fact_asymp_equiv|thm""} ]","theorem Gamma_asymp_equiv:
   ""Gamma ? (?x. sqrt (2*pi/x) * (x / exp 1) powr x :: real)""
 
 theorem fact_asymp_equiv:
   ""fact ? (?n. sqrt (2*pi*n) * (n / exp 1) ^ n :: real)""
-",https://www.isa-afp.org/entries/Stirling_Formula.shtml,Stirling_Formula,Stirling�s Formula,asymptotic approximation for factorials [�] accurate results even for small values of n,https://en.wikipedia.org/wiki/Stirling%27s_approximation,,
+",https://www.isa-afp.org/entries/Stirling_Formula.shtml,Stirling_Formula,Stirling�s Formula,asymptotic approximation for factorials [...] accurate results even for small values of n,https://en.wikipedia.org/wiki/Stirling%27s_approximation,,
 the-triangle-inequality,The Triangle Inequality,,"class ordered_ab_group_add_abs = ordered_ab_group_add + abs +
   assumes abs_ge_zero: ""�a� ? 0""
     and abs_ge_self: ""a ? �a�""
     and abs_leI: ""a ? b ? - a ? b ? �a� ? b""
     and abs_minus_cancel: ""�-a� = �a�""
     and abs_triangle_ineq: ""�a + b� ? �a� + �b�""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Groups.html,HOL,The Triangle Inequality,triangle [�] sum of [�] lengths of [�] two sides [�] greater than or equal [�] length of [�] remaining side,https://en.wikipedia.org/wiki/Triangle_inequality,true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Groups.html,HOL,The Triangle Inequality,triangle [...] sum of [...] lengths of [...] two sides [...] greater than or equal [...] length of [...] remaining side,https://en.wikipedia.org/wiki/Triangle_inequality,true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
 picks-theorem,Pick�s Theorem,"[ {""entity_kname"":""Pick.pick|thm""} ]","theorem pick:
 fixes p :: ""R_to_R2""
 assumes ""polygon p""
@@ -492,7 +492,7 @@ shows ""measure lebesgue (path_inside p) = I + B/2 - 1""
 the-birthday-problem,The Birthday Problem,"[ {""entity_kname"":""Birthday_Paradox.birthday_paradox|thm""} ]","lemma birthday_paradox:
   assumes ""card S = 23"" ""card T = 365""
   shows ""2 * card {f ? S??E S T. � inj_on f S} ? card (S ??E T)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Birthday_Paradox.html,HOL,The Birthday Problem,same birthday [�] 23 people are needed for that probability to exceed 50%,https://en.wikipedia.org/wiki/Birthday_problem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Birthday_Paradox.html,HOL,The Birthday Problem,same birthday [...] 23 people are needed for that probability to exceed 50%,https://en.wikipedia.org/wiki/Birthday_problem,,
 the-law-of-cosines,The Law of Cosines,"[ {""entity_kname"":""Triangle.cosine_law_triangle|thm""} ]","lemma cosine_law_triangle:
   ""dist b c ^ 2 = dist a b ^ 2 + dist a c ^ 2 - 2 * dist a b * dist a c * cos (angle b a c)""
 ",https://isa-afp.org/entries/Triangle.shtml,Triangle,The Law of Cosines,relates the lengths of the sides of a triangle to the cosine of one of its angles,https://en.wikipedia.org/wiki/Law_of_cosines,,
@@ -505,18 +505,18 @@ ptolemys-theorem,Ptolemy�s Theorem,"[ {""entity_kname"":""Ptolemys_Theorem.pto
     ""radiant_of (B - center) ? radiant_of (C - center)""
     ""radiant_of (C - center) ? radiant_of (D - center)""
   shows ""dist A C * dist B D = dist A B * dist C D + dist A D * dist B C""
-",https://www.isa-afp.org/entries/Ptolemys_Theorem.shtml,Ptolemys_Theorem,Ptolemy�s Theorem,product of [�] lengths of [�] diagonals [�] equal to [�] sum of [�] products of [�] lengths of [�] pairs of opposite sides,https://en.wikipedia.org/wiki/Ptolemy%27s_theorem,,
+",https://www.isa-afp.org/entries/Ptolemys_Theorem.shtml,Ptolemys_Theorem,Ptolemy�s Theorem,product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides,https://en.wikipedia.org/wiki/Ptolemy%27s_theorem,,
 principle-of-inclusionexclusion,Principle of Inclusion/Exclusion,"[ {""entity_kname"":""Binomial.card_UNION|thm""} ]","lemma card_UNION:
   assumes ""finite A"" and ""?k ? A. finite k""
   shows ""card (?A) = nat (?I | I ? A ? I ? {}. (- 1) ^ (card I + 1) * int (card (?I)))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Principle of Inclusion/Exclusion,"[�] over-generous inclusion, followed by compensating exclusion [�]",https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Principle of Inclusion/Exclusion,"[...] over-generous inclusion, followed by compensating exclusion [...]",https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle,,
 cramers-rule,Cramer�s Rule,"[ {""entity_kname"":""Determinants.cramer|thm""} ]","lemma cramer:
   fixes A ::""real^'n^'n""
   assumes d0: ""det A ? 0""
   shows ""A *v x = b ? x = (? k. det(? i j. if j=k then b$i else A$i$j) / det A)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer�s Rule,"[�] n�n matrix A has [�] nonzero determinant, [�] solution for [�] unknowns x_i are [�] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer�s Rule,"[...] n�n matrix A has [...] nonzero determinant, [...] solution for [...] unknowns x_i are [...] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case,,
 bertrands-postulate,Bertrand�s Postulate,"[ {""entity_kname"":""Bertrand.bertrand|thm""} ]","theorem bertrand: ""n > 1 ? ?p?{n<..<2*n}. prime p""
-",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand�s Postulate,"[�] any integer n > 3, [�] exists at least one prime number p with n < p < 2n - 2",https://en.wikipedia.org/wiki/Bertrand%27s_postulate,,
+",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand�s Postulate,"[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",https://en.wikipedia.org/wiki/Bertrand%27s_postulate,,
 buffon-needle-problem,Buffon Needle Problem,,"theorem buffon_short:
 assumes ""l ? d""
 shows   ""emeasure (buffon l d) {True} = 2 * l / (d * pi)""
@@ -529,4 +529,4 @@ descartes-rule-of-signs,Descartes Rule of Signs,"[ {""entity_kname"":""Descartes
   fixes p :: ""real poly""
   assumes ""p ? 0""
   shows ""?d. even d ? coeff_sign_changes p = count_pos_roots p + d""
-",https://isa-afp.org/entries/Descartes_Sign_Rule.shtml,Descartes_Sign_Rule,Descartes Rule of Signs,number of positive real roots is at most [�] number of sign changes in [�] sequence of [�] polynomial's coefficients,https://en.wikipedia.org/wiki/Descartes%27_rule_of_signs,,
+",https://isa-afp.org/entries/Descartes_Sign_Rule.shtml,Descartes_Sign_Rule,Descartes Rule of Signs,number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients,https://en.wikipedia.org/wiki/Descartes%27_rule_of_signs,,
