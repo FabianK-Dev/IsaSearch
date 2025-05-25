@@ -150,10 +150,10 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             "queries": {}
         }
 
-    if row["Skip"] == "true":
-        print("Warning: Entry at row index " + str(i) + " and row ID '" + row["ID"] + "' dis marked to be skipped with annotation: '" + row["Annotation"] + "'")
+    if row["Skip"] == True:
+        print("Warning: Entry at row index " + str(i) + " and row ID '" + row["ID"] + "' is marked to be skipped with annotation: '" + str(row["Annotation"]) + "'")
         benchmark_results[row["ID"]]["metadata"]["skipped"] = True
-        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "Annotation: " + row["Annotation"]
+        benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "Annotation: " + str(row["Annotation"])
         continue
 
     if pd.isna(target_identifier):
