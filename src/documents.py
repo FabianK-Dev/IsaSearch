@@ -7,9 +7,9 @@ import torch
 import json
 import os
 import math
-import re
 import tomllib
 import zlib
+import pandas as pd
 
 def get_entry_metadata(entry, config):
     metadata_folder = config["afp_folder"] + "/metadata/"
@@ -31,9 +31,9 @@ def relevant_doc_keys(solr_document):
     }
 
 # TODO: remove in future
-with open("benchmark/scrape_statistics.json", "r") as file:
-    data = file.read()
-    scrape_statistics = json.loads(data)
+benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
+benchmark_df = benchmark_df.reset_index()
+target_identifiers = " ".join(benchmark_df["Target Identifier"].astype(str).tolist())
 
 def fetch_all_docs(solr, config):
     document_tree = {}
@@ -44,7 +44,7 @@ def fetch_all_docs(solr, config):
 
     for result in results:
         # TODO: remove in future
-        if result["session"] not in scrape_statistics["unique_sessions"]: # TODO
+        if "entity_kname" not in result or result["entity_kname"] not in target_identifiers:
             continue
 
         result_filtered = relevant_doc_keys(result)
@@ -57,7 +57,7 @@ def fetch_all_docs(solr, config):
 
         for result in results:
             # TODO: remove in future
-            if result["session"] not in scrape_statistics["unique_sessions"]: # TODO
+            if "entity_kname" not in result or result["entity_kname"] not in target_identifiers:
                 continue
 
             result_filtered = relevant_doc_keys(result)
