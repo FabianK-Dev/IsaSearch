@@ -238,5 +238,5 @@ for benchmark_model in config["benchmark_llms"]:
 
     benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 
-    with open("./benchmark/benchmark_results.json", "w") as outfile:
+    with open(f"./benchmark/benchmark_results_{benchmark_subpath}.json", "w") as outfile:
         json.dump(benchmark_results, outfile, indent=4)
