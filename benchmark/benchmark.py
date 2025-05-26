@@ -34,7 +34,7 @@ for benchmark_model in config["benchmark_llms"]:
     if benchmark_model.startswith("microsoft/Phi"):
         config["prompts_folder"] = f"{config['prompts_folder']}/microsoft-Phi"
     else:
-        config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_model}"
+        config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_subpath}"
 
     if benchmark_model.startswith("Qwen/"):
         config["sampling_parameters"]["temperature"] = 0.7
