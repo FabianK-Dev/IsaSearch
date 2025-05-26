@@ -6,8 +6,9 @@ Principles of Output:
 2. The natural language part should be accessible to mathematicians. Additionally, please express the mathematical formulas in LaTeX when necessary.
 3. Even in the case that the input is very vague, you should guess a most similar mathematical theorem and write it out explicitly.
 4. The formal statement can assume certain definitions and hypotheses are already formalized in Isabelle/HOL, even if you are not sure.
-5. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
-6. If no theorem can be derived from the input description, only reply with: <BEGIN>false<END>
+5. Focus on key concepts and keywords that mathematicians would use to search for this theorem. The description should be concise and highly searchable.
+6. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
+7. If no theorem can be derived from the input description, only reply with: <BEGIN>false<END>
 
 === Start of example input ===
 degree of product of two polynomials equals to sum of degree
