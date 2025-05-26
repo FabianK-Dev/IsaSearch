@@ -9,20 +9,19 @@
     "artifacts_folder": "artifacts",
     "prompts_folder": "prompts",
     "chroma_db_path": "chroma_storages",
-    "llm_name": "microsoft/Phi-3-mini-4k-instruct",
+    "llm_name": "microsoft/Phi-3.5-mini-instruct",
     "benchmark_llms": [
-        "microsoft/Phi-4-mini-instruct",
         "microsoft/Phi-3.5-mini-instruct",
         "microsoft/Phi-3-mini-4k-instruct"
     ],
-    "theorem_max_length": 2000,
-    "gpu_memory_utilization": 0.80,
+    "theorem_max_length": 1500,
+    "gpu_memory_utilization": 0.85,
     "sampling_parameters": {
         "temperature": 0,
         "top_p": 1,
         "top_k": -1,
         "min_p": 0,
-        "max_tokens": 512,
+        "max_tokens": 300,
         "stop": ["<END>"]
     },
     "enable_llm_output_cache": true
