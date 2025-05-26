@@ -58,7 +58,10 @@ print("Creating ChromaDB storage and afp_docs collection...")
 if not os.path.exists(config["chroma_db_path"]):
     os.makedirs(config["chroma_db_path"])
 
-chroma_client = chromadb.PersistentClient(path=config["chroma_db_path"] + "/chroma_db")
+chroma_db_path = config["chroma_db_path"] + "/chroma_db"
+print("Loading ChromaDB client at path '" + chroma_db_path + "'...")
+
+chroma_client = chromadb.PersistentClient(path=chroma_db_path)
 collection = chroma_client.get_or_create_collection("afp_docs")
 
 print("Loading embedder...")
@@ -73,32 +76,30 @@ if "metadatas" in metadata_response and metadata_response["metadatas"] is not No
     for item in metadata_response["metadatas"]:
         existing.add(item["source"])
 
-filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
-docs_to_embed = {
-    "documents": [],
-    "ids": [],
-    "metadatas": [],
-    "embeddings": []
-}
-
 print("Preparing documents before adding to collection...")
-for doc_id in tqdm(filtered_tree):
-    doc = document_tree[doc_id]
-    doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
-    embedding_str = prompts["embed"].format(doc_src=doc_src)
-    embedding = embedder.encode(embedding_str, convert_to_tensor=True).cpu().numpy()
+filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
 
-    docs_to_embed["documents"].append(doc_src)
-    docs_to_embed["ids"].append(doc["id"])
-    docs_to_embed["metadatas"].append({"source": doc["id"]})
-    docs_to_embed["embeddings"].append(embedding)
+for i in range(0, len(filtered_tree), 5000):
+    doc_ids = filtered_tree[i:i + 5000]
+    print(f"Processing documents {i} to {i + len(doc_ids)}...")
 
-if len(docs_to_embed["documents"]) > 0:
+    doc_embeddings = []
+    metadatas = []
+
+    for doc_id in doc_ids:
+        doc = document_tree[doc_id]
+        doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
+        embedding_str = prompts["embed"].format(doc_src=doc_src)
+
+        doc_embeddings.append(embedding_str)
+        metadatas.append({"source": doc["id"]})
+
+    embeddings = embedder.encode(doc_embeddings, convert_to_tensor=True).cpu().numpy()
     collection.add(
-        documents=docs_to_embed["documents"],
-        ids=docs_to_embed["ids"],
-        metadatas=docs_to_embed["metadatas"],
-        embeddings=docs_to_embed["embeddings"])
+        documents=doc_embeddings,
+        ids=doc_ids,
+        metadatas=metadatas,
+        embeddings=embeddings)
 
 model = AutoModelForCausalLM.from_pretrained(
     config["llm_name"],
