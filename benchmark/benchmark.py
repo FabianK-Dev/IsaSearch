@@ -24,6 +24,11 @@ print("Loading Solr...")
 solr = connect_solr(config)
 
 for benchmark_model in config["benchmark_llms"]:
+    print("Reloading config...")
+    with open("config.json", "r") as file:
+        data = file.read()
+        config = json.loads(data)
+
     benchmark_subpath = benchmark_model.replace("/", "-")
     print("Adjusting config for benchmark model '" + benchmark_model + "' and subpath '" + benchmark_subpath + "'...")
 

@@ -11,7 +11,6 @@
     "chroma_db_path": "chroma_storages",
     "llm_name": "microsoft/Phi-3-mini-4k-instruct",
     "benchmark_llms": [
-        "Qwen/Qwen2.5-3B-Instruct",
         "microsoft/Phi-4-mini-instruct",
         "microsoft/Phi-3.5-mini-instruct",
         "microsoft/Phi-3-mini-4k-instruct"
