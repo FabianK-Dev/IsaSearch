@@ -37,7 +37,7 @@ for benchmark_model in config["benchmark_llms"]:
         config["prompts_folder"] = f"{config['prompts_folder']}/{benchmark_model}"
 
     if benchmark_model.startswith("Qwen/"):
-        config["sampling_parameters"]["temperature"] = 0.6
+        config["sampling_parameters"]["temperature"] = 0.7
         config["sampling_parameters"]["top_p"] = 0.95
         config["sampling_parameters"]["min_p"] = 0
         config["sampling_parameters"]["top_k"] = 40
