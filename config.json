@@ -12,19 +12,18 @@
     "llm_name": "microsoft/Phi-3-mini-4k-instruct",
     "benchmark_llms": [
         "Qwen/Qwen2.5-3B-Instruct",
-        "microsoft/Phi-3-mini-4k-instruct",
-        "microsoft/Phi-3.5-mini-instruct",
         "microsoft/Phi-4-mini-instruct",
-        "bartowski/nvidia_Llama-3.1-8B-UltraLong-4M-Instruct-GGUF"
+        "microsoft/Phi-3.5-mini-instruct",
+        "microsoft/Phi-3-mini-4k-instruct"
     ],
-    "theorem_max_length": 1000,
-    "gpu_memory_utilization": 0.85,
+    "theorem_max_length": 2000,
+    "gpu_memory_utilization": 0.80,
     "sampling_parameters": {
         "temperature": 0,
         "top_p": 1,
         "top_k": -1,
         "min_p": 0,
-        "max_tokens": 256,
+        "max_tokens": 512,
         "stop": ["<END>"]
     },
     "enable_llm_output_cache": true
