@@ -1,4 +1,4 @@
-Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 512 tokens that is more accessible to mathematicians. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 300 tokens that is more accessible to mathematicians. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
 
 === Start of example input ===
 theorem degree_mult:
