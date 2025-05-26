@@ -14,11 +14,15 @@ import json
 import pandas as pd
 import chromadb
 import os
+import torch
 
 print("Loading config...")
 with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
+
+# Empty CUDA cache
+torch.cuda.empty_cache()
 
 print("Loading Solr...")
 solr = connect_solr(config)
