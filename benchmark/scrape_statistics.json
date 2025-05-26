@@ -1,6 +1,7 @@
 {
     "unique_sessions": [
         "HOL-ex",
+        "HOL-Examples",
         "HOL-Computational_Algebra",
         "HOL-Library",
         "Incompleteness",
