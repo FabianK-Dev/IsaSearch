@@ -47,26 +47,36 @@ def fetch_all_docs(solr, config):
     results = solr.search("command:theorem OR command:lemma OR command:corollary", start=0, rows=docs_per_page)
     max_docs = results.raw_response['response']['numFound']
 
+    # TODO: remove in future
+    allow = 0
     for result in results:
         # TODO: remove in future
-        if result["session"] not in scrape_statistics["unique_sessions"]:
-            continue
-
-        result_filtered = relevant_doc_keys(result)
-        document_tree[result["id"]] = result_filtered
+        if "entity_kname" in result and result["entity_kname"] in target_identifiers:
+            result_filtered = relevant_doc_keys(result)
+            document_tree[result["id"]] = result_filtered
+            allow = 200
+        elif allow > 0:
+            allow -= 1
+            result_filtered = relevant_doc_keys(result)
+            document_tree[result["id"]] = result_filtered
 
     pages = math.ceil(max_docs / docs_per_page)
     for i in range(1, pages):
         print(f"Fetching page {i+1} of {pages} pages...")
         results = solr.search("command:theorem OR command:lemma OR command:corollary", start=i * docs_per_page, rows=docs_per_page)
 
+        # TODO: remove in future
+        allow = 0
         for result in results:
             # TODO: remove in future
-            if result["session"] not in scrape_statistics["unique_sessions"]:
-                continue
-
-            result_filtered = relevant_doc_keys(result)
-            document_tree[result["id"]] = result_filtered
+            if "entity_kname" in result and result["entity_kname"] in target_identifiers:
+                result_filtered = relevant_doc_keys(result)
+                document_tree[result["id"]] = result_filtered
+                allow = 200
+            elif allow > 0:
+                allow -= 1
+                result_filtered = relevant_doc_keys(result)
+                document_tree[result["id"]] = result_filtered
 
     return document_tree
 
