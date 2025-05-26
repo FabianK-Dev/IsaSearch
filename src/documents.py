@@ -35,6 +35,11 @@ benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()
 target_identifiers = " ".join(benchmark_df["Target Identifier"].astype(str).tolist())
 
+# TODO: remove in future
+with open("benchmark/scrape_statistics.json", "r") as file:
+    data = file.read()
+    scrape_statistics = json.loads(data)
+
 def fetch_all_docs(solr, config):
     document_tree = {}
 
@@ -44,7 +49,7 @@ def fetch_all_docs(solr, config):
 
     for result in results:
         # TODO: remove in future
-        if "entity_kname" not in result or result["entity_kname"] not in target_identifiers:
+        if result["session"] not in scrape_statistics["unique_sessions"]:
             continue
 
         result_filtered = relevant_doc_keys(result)
@@ -57,7 +62,7 @@ def fetch_all_docs(solr, config):
 
         for result in results:
             # TODO: remove in future
-            if "entity_kname" not in result or result["entity_kname"] not in target_identifiers:
+            if result["session"] not in scrape_statistics["unique_sessions"]:
                 continue
 
             result_filtered = relevant_doc_keys(result)
