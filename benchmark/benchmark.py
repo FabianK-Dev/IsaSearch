@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from tqdm import tqdm
 from pprint import pprint
+from chromadb.utils import embedding_functions
 
 import json
 import pandas as pd
@@ -53,20 +54,21 @@ document_tree = build_document_tree(config, solr)
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
-# Chroma setup
-print("Creating ChromaDB storage and afp_docs collection...")
+# ChromaDB embedding function
+print("Loading embedding function...")
+embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device='cuda')
+print("Finished loading embedding function.")
+
+# ChromaDB path
 if not os.path.exists(config["chroma_db_path"]):
     os.makedirs(config["chroma_db_path"])
 
+# ChromaDB client and collection
 chroma_db_path = config["chroma_db_path"] + "/chroma_db"
 print("Loading ChromaDB client at path '" + chroma_db_path + "'...")
 
 chroma_client = chromadb.PersistentClient(path=chroma_db_path)
-collection = chroma_client.get_or_create_collection("afp_docs")
-
-print("Loading embedder...")
-embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2').to('cuda')
-print("Finished loading embedder.")
+collection = chroma_client.get_or_create_collection("afp_docs", embedding_function=embedder)
 
 # Get set of all already existing document IDs (saved at the source key)
 existing = set()
@@ -94,12 +96,11 @@ for i in range(0, len(filtered_tree), 5000):
         doc_embeddings.append(embedding_str)
         metadatas.append({"source": doc["id"]})
 
-    embeddings = embedder.encode(doc_embeddings, convert_to_tensor=True).cpu().numpy()
+    #embeddings = embedder.encode(doc_embeddings, convert_to_tensor=True).cpu().numpy()
     collection.add(
         documents=doc_embeddings,
         ids=doc_ids,
-        metadatas=metadatas,
-        embeddings=embeddings)
+        metadatas=metadatas)
 
 model = AutoModelForCausalLM.from_pretrained(
     config["llm_name"],

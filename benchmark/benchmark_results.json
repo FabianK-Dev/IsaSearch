@@ -26,14 +26,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 4.265653848648071
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 4.150831937789917
                 },
                 "query": "Pythagorean Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Pythagorean Theorem):\nLet \\(a\\), \\(b\\), and \\(c\\) be the lengths of the sides of a right-angled triangle, with \\(c\\) being the length of the hypotenuse. Then the square of the length of the hypotenuse is equal to the sum of the squares of the lengths of the other two sides, that is, \\(a^2 + b^2 = c^2\\).\n\ntheorem pythagorean_theorem:\nassumes \"a > 0\" and \"b > 0\" and \"c > 0\" and \"a^2 + b^2 = c^2\"\nshows \"a^2 + b^2 = c^2\"\n\n",
-                "duration": 4.265653848648071
+                "duration": 4.150831937789917
             },
             "Natural language query": {
                 "metrics": {
@@ -41,11 +41,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.8577558994293213
+                    "duration": 3.7542216777801514
                 },
                 "query": "The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...]",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Pythagorean Theorem):\nLet \\(a\\) and \\(b\\) be the lengths of the legs of a right-angled triangle, and let \\(c\\) be the length of the hypotenuse. Then the sum of the areas of the squares on the legs is equal to the area of the square on the hypotenuse, that is, \\(a^2 + b^2 = c^2\\).\n\ntheorem pythagorean:\nassumes \"a > 0\" and \"b > 0\" and \"a + b > c\"\nshows \"square_area a + square_area b = square_area c\"\n\n",
-                "duration": 3.8577558994293213
+                "duration": 3.7542216777801514
             }
         }
     },
@@ -65,11 +65,11 @@
                     "normalized_discounted_cumulative_gain": 0.6309297535714575,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 3.0866124629974365
+                    "duration": 2.9851107597351074
                 },
                 "query": "G\ufffddel\ufffds Incompleteness Theorem 1",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (G\ufffddel's Incompleteness Theorem):\nLet \\(T\\) be a consistent, recursively enumerable theory that is capable of expressing elementary arithmetic. Then \\(T\\) cannot be both complete and consistent. In other words, there exist true statements about the natural numbers that are not provable within \\(T\\).\n\ntheorem g_incompleteness:\nassumes \"T is consistent and recursively enumerable\" and \"T can express elementary arithmetic\"\nshows \"T is not both complete and consistent\"\n\n",
-                "duration": 3.0866124629974365
+                "duration": 2.9851107597351074
             },
             "Natural language query": {
                 "metrics": {
@@ -77,11 +77,11 @@
                     "normalized_discounted_cumulative_gain": 0.6309297535714575,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 2.8399221897125244
+                    "duration": 2.739210844039917
                 },
                 "query": "Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...]",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Incompleteness of Formal Systems):\nLet \\(F\\) be a consistent formal system that is capable of expressing a certain amount of elementary arithmetic. Then \\(F\\) is incomplete, meaning there exist statements in the language of \\(F\\) that are true but not provable within \\(F\\).\n\ntheorem incompleteness:\nassumes \"F is consistent\" and \"F can express elementary arithmetic\"\nshows \"there exists a true but unprovable statement in F\"\n\n",
-                "duration": 2.8399221897125244
+                "duration": 2.739210844039917
             }
         }
     },
@@ -94,11 +94,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.8495209217071533
+                    "duration": 2.747798204421997
                 },
                 "query": "G\ufffddel\ufffds Incompleteness Theorem 2",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (G\ufffddel's Incompleteness Theorem):\nLet \\(T\\) be a consistent, effectively axiomatized theory capable of expressing elementary arithmetic. Then there exist true statements about the natural numbers that are not provable within \\(T\\).\n\ntheorem g_incompleteness:\nassumes \"T is consistent and effectively axiomatized\"\nshows \"there exists a statement \\(S\\) such that \\(S\\) is true but not provable in \\(T\\)\"\n\n",
-                "duration": 2.8495209217071533
+                "duration": 2.747798204421997
             },
             "Natural language query": {
                 "metrics": {
@@ -106,11 +106,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.733091354370117
+                    "duration": 2.632542371749878
                 },
                 "query": "[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Consistency of a Mathematical System):\nLet \\(F\\) be a consistent formal system within which a certain amount of elementary arithmetic can be carried out. Then, by G\u00f6del's second incompleteness theorem, \\(F\\) cannot prove its own consistency.\n\ntheorem consistency_of_F:\nassumes \"F is consistent\" and \"F can carry out elementary arithmetic\"\nshows \"F cannot prove its own consistency\"\n\n",
-                "duration": 2.733091354370117
+                "duration": 2.632542371749878
             }
         }
     },
@@ -130,11 +130,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.7746775150299072
+                    "duration": 2.6823699474334717
                 },
                 "query": "The Impossibility of Trisecting the Angle",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Impossibility of Trisecting the Angle):\nLet \\(A\\) be a given angle. It is impossible to construct, using only a compass and an unmarked straightedge, a line segment that bisects \\(A\\) into three equal angles.\n\ntheorem impossible_trisect:\nassumes \"A \u2260 0\"\nshows \"no construction exists such that trisecting A is possible with compass and straightedge\"\n\n",
-                "duration": 2.7746775150299072
+                "duration": 2.6823699474334717
             },
             "Natural language query": {
                 "metrics": {
@@ -142,11 +142,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.8176398277282715
+                    "duration": 3.7301626205444336
                 },
                 "query": "The angle pi/3 radians ([...] 60\ufffd) is constructible. [...] It is impossible to construct a 20\ufffd angle. This implies that a 60\ufffd angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Constructibility of Angles):\nLet \\( \\alpha \\) be a constructible angle. Then \\( \\alpha \\) is either a rational multiple of \\( \\pi \\) or a multiple of \\( \\frac{\\pi}{3} \\). It is impossible to construct an angle of \\( \\frac{2\\pi}{5} \\) radians (or 72\ufffd) using only a compass and straightedge.\n\ntheorem constructible_angle:\nassumes \"alpha is constructible\"\nshows \"alpha is rational multiple of pi or multiple of pi/3\"\nand \"it is impossible to construct an angle of 2pi/5 radians\"\n\n",
-                "duration": 3.8176398277282715
+                "duration": 3.7301626205444336
             }
         }
     },
@@ -159,11 +159,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4499237537384033
+                    "duration": 3.354661464691162
                 },
                 "query": "The Impossibility of Doubling the Cube",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Doubling the Cube is Impossible):\nLet \\(V\\) be a three-dimensional space over a field \\(K\\). The problem of doubling the cube, also known as the Delian problem, is the task of constructing a cube with twice the volume of a given cube using only a compass and straightedge. This problem is proven to be impossible.\n\ntheorem doubling_cube_impossible:\nassumes \"V is a three-dimensional space over a field K\"\nshows \"there is no construction with compass and straightedge that can double the volume of a given cube\"\n\n",
-                "duration": 3.4499237537384033
+                "duration": 3.354661464691162
             },
             "Natural language query": {
                 "metrics": {
@@ -171,11 +171,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.4138400554656982
+                    "duration": 2.3233790397644043
                 },
                 "query": "Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Constructibility of the Cube Root of Two):\nLet \\(x\\) be a real number such that \\(x^3 = 2\\). Then \\(x\\) is not a constructible number using a compass and straightedge.\n\ntheorem constructible_cube_root_of_two:\nassumes \"x^3 = 2\"\nshows \"x is not constructible\"\n\n",
-                "duration": 2.4138400554656982
+                "duration": 2.3233790397644043
             }
         }
     },
@@ -185,14 +185,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 2.313441514968872
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 2.224308729171753
                 },
                 "query": "The Volume of a Sphere",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Volume of a Sphere):\nLet \\(V\\) be the volume of a sphere with radius \\(r\\), then \\(V = \\frac{4}{3}\\pi r^3\\).\n\ntheorem volume_sphere:\nassumes \"r > 0\"\nshows \"volume (sphere r) = (4/3) * pi * r^3\"\n\n",
-                "duration": 2.313441514968872
+                "duration": 2.224308729171753
             },
             "Natural language query": {
                 "metrics": {
@@ -200,11 +200,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.7500925064086914
+                    "duration": 2.6650032997131348
                 },
                 "query": "In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Volume of a Sphere):\nLet \\(V\\) be the volume of a sphere in three-dimensional space, and let \\(r\\) be the radius of the sphere. The volume \\(V\\) is given by the formula \\(V = \\frac{4}{3}\\pi r^3\\).\n\ntheorem volume_sphere:\nassumes \"r > 0\"\nshows \"volume (sphere r) = 4/3 * pi * r^3\"\n\n",
-                "duration": 2.7500925064086914
+                "duration": 2.6650032997131348
             }
         }
     },
@@ -217,11 +217,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.9531314373016357
+                    "duration": 2.864952325820923
                 },
                 "query": "The Area of a Circle",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Area of a Circle):\nLet \\(C\\) be a circle with radius \\(r\\) in a plane. The area \\(A\\) of \\(C\\) is given by \\(A = \\pi r^2\\), where \\(\\pi\\) is the constant approximately equal to 3.14159.\n\ntheorem area_circle:\nassumes \"r > 0\"\nshows \"area C = pi * r^2\"\n\n",
-                "duration": 2.9531314373016357
+                "duration": 2.864952325820923
             },
             "Natural language query": {
                 "metrics": {
@@ -229,11 +229,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4831624031066895
+                    "duration": 3.3950815200805664
                 },
                 "query": "[...] area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Area of a Circle):\nLet \\(C\\) be the circumference of a circle and \\(r\\) be its radius. The area \\(A\\) of the circle is given by \\(A = \\frac{1}{2} \\cdot C \\cdot r\\), which simplifies to \\(A = \\frac{1}{2} \\cdot 2\\pi r^2\\).\n\ntheorem area_circle:\nassumes \"r \u2260 0\"\nshows \"area (circle) = 1/2 * circumference (circle) * radius\"\n\n\n",
-                "duration": 3.4831624031066895
+                "duration": 3.3950815200805664
             }
         }
     },
@@ -260,11 +260,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4888088703155518
+                    "duration": 3.3971056938171387
                 },
                 "query": "The Independence of the Parallel Postulate",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Independence of the Parallel Postulate):\nThe Parallel Postulate, which states that through a point not on a given line, there is exactly one line parallel to the given line, is independent of the other axioms of Euclidean geometry. This means that the Parallel Postulate cannot be derived from the other axioms and its negation does not lead to a contradiction with them.\n\ntheorem independence_parallel_postulate:\nassumes \"Euclidean geometry axioms without the Parallel Postulate\"\nshows \"Euclidean geometry axioms without the Parallel Postulate are consistent\"\n\n",
-                "duration": 3.4888088703155518
+                "duration": 3.3971056938171387
             },
             "Natural language query": {
                 "metrics": {
@@ -272,11 +272,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.276734828948975
+                    "duration": 6.18718957901001
                 },
                 "query": "[...] The parallel postulate is independent of other axioms of Euclidean geometry",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Parallel Postulate Independence):\nThe parallel postulate, which states that given a line and a point not on the line, there is exactly one line through the point that does not intersect the given line, is independent of the other axioms of Euclidean geometry. This means that the parallel postulate cannot be derived from the other axioms, and its negation does not lead to a contradiction with the other axioms.\n\ntheorem parallel_postulate_independence:\nassumes \"Euclidean_axioms\"\nshows \"not (parallel_postulate -> Euclidean_axioms)\" and \"not (negation_parallel_postulate -> Euclidean_axioms)\"\n\n",
-                "duration": 6.276734828948975
+                "duration": 6.18718957901001
             }
         }
     },
@@ -286,14 +286,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.3333333333333333,
-                    "reciprocal_rank": 0.14285714285714285,
-                    "rank": 7,
-                    "duration": 4.448856830596924
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 4.362051010131836
                 },
                 "query": "Polyhedron Formula",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Volume of a Polyhedron):\nLet \\(P\\) be a polyhedron in \\(\\mathbb{R}^3\\) with vertices \\(V = \\{v_1, v_2,..., v_n\\}\\). The volume \\(V\\) of \\(P\\) can be computed using the divergence theorem as \\(V = \\frac{1}{3} \\sum_{i=1}^{n} \\text{signedVolume}(T_i)\\), where \\(T_i\\) is a tetrahedron formed by the origin and the first \\(i\\) vertices of \\(V\\).\n\ntheorem volume_polyhedron:\nassumes \"P is a polyhedron in R^3\"\nshows \"volume P = (1/3) * sum signedVolume(T_i)\"\n\n",
-                "duration": 4.448856830596924
+                "duration": 4.362051010131836
             },
             "Natural language query": {
                 "metrics": {
@@ -301,11 +301,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.731825828552246
+                    "duration": 3.6455111503601074
                 },
                 "query": "Any convex polyhedron's surface has Euler characteristic X = V - E + F = 2",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Euler's Formula for Convex Polyhedra):\nLet \\(P\\) be a convex polyhedron in three-dimensional space. Then the Euler characteristic \\(\\chi(P)\\) of \\(P\\) satisfies the equation \\(\\chi(P) = V - E + F = 2\\), where \\(V\\) is the number of vertices, \\(E\\) is the number of edges, and \\(F\\) is the number of faces of \\(P\\).\n\ntheorem euler_characteristic:\nassumes \"P is a convex polyhedron\"\nshows \"euler_char P = euler_char (P) = 2\"\n\n",
-                "duration": 3.731825828552246
+                "duration": 3.6455111503601074
             }
         }
     },
@@ -315,14 +315,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 2.949282169342041
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 2.861927032470703
                 },
                 "query": "Euler\ufffds Summation of 1 + (1/2)^2 + (1/3)^2 + \ufffd.",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Euler's Summation of Series):\nLet \\( S \\) be the sum of the series \\( 1 + \\frac{1}{2^2} + \\frac{1}{3^2} + \\ldots \\). Then \\( S \\) converges to \\( \\frac{\\pi^2}{6} \\).\n\ntheorem euler_summation:\nassumes \"series_converges\"\nshows \"sum S = pi^2 / 6\"\n\n",
-                "duration": 2.949282169342041
+                "duration": 2.861927032470703
             },
             "Natural language query": {
                 "metrics": {
@@ -330,11 +330,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.6755099296569824
+                    "duration": 2.588618278503418
                 },
                 "query": "[...] the precise summation of the reciprocals of the squares of the natural numbers [...] is [...] pi^2 / 6",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Basel Problem):\nLet \\( \\mathbb{N} \\) denote the set of natural numbers. The precise summation of the reciprocals of the squares of the natural numbers is equal to \\( \\frac{\\pi^2}{6} \\).\n\ntheorem basel_problem:\nassumes \"n \u2208 \u2115\"\nshows \"sum (1/n^2) for n in \u2115 = pi^2 / 6\"\n\n",
-                "duration": 2.6755099296569824
+                "duration": 2.588618278503418
             }
         }
     },
@@ -347,11 +347,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.106385231018066
+                    "duration": 6.017275810241699
                 },
                 "query": "Fundamental Theorem of Integral Calculus",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Fundamental Theorem of Integral Calculus):\nLet \\(f\\) be a continuous real-valued function on a closed interval \\([a, b]\\). Then, the function \\(F\\) defined by \\(F(x) = \\int_a^x f(t) \\, dt\\) for \\(x \\in [a, b]\\) is continuous on \\([a, b]\\), differentiable on the open interval \\((a, b)\\), and \\(F'(x) = f(x)\\) for all \\(x \\in (a, b)\\).\n\ntheorem fundamental_theorem_integral:\nassumes \"f: [a, b] -> R\" and \"f continuous on [a, b]\"\nshows \"F: [a, b] -> R\" defined by \"F(x) = \u222b_a^x f(t) dt\" is continuous on [a, b]\nshows \"F: (a, b) -> R\" is differentiable on (a, b)\nshows \"F'(x) = f(x)\" for all \"x in (a, b)\"\n\n",
-                "duration": 6.106385231018066
+                "duration": 6.017275810241699
             },
             "Natural language query": {
                 "metrics": {
@@ -359,11 +359,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.571672201156616
+                    "duration": 4.483990669250488
                 },
                 "query": "[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Differentiation and Integration as Inverses):\nLet \\(f\\) be a function that is differentiable on an interval \\(I\\) and continuous on the closure of \\(I\\). If \\(F\\) is an antiderivative of \\(f\\) on \\(I\\), then the definite integral of \\(f\\) from \\(a\\) to \\(b\\) in \\(I\\) is given by \\(F(b) - F(a)\\).\n\ntheorem diff_int_inverses:\nassumes \"f: I \u2192 \u211d\" and \"f is differentiable on I\" and \"f is continuous on cl(I)\"\nand \"F: I \u2192 \u211d\" and \"F' = f on I\"\nshows \"\u222b_a^b f(x) dx = F(b) - F(a)\"\n\n",
-                "duration": 4.571672201156616
+                "duration": 4.483990669250488
             }
         }
     },
@@ -376,11 +376,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.200166463851929
+                    "duration": 4.1117494106292725
                 },
                 "query": "DeMoivre\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (DeMoivre's Theorem):\nLet \\(z\\) be a complex number in polar form \\(z = r(\\cos \\theta + i\\sin \\theta)\\), where \\(r\\) is the modulus of \\(z\\) and \\(\\theta\\) is the argument of \\(z\\). Then for any integer \\(n\\), the \\(n\\)th power of \\(z\\) is given by:\n\\[ z^n = r^n (\\cos(n\\theta) + i\\sin(n\\theta)) \\]\n\ntheorem de_moivre_theorem:\nassumes \"z \u2208 C\" and \"n \u2208 Z\"\nshows \"z^n = r^n (cos(n\u03b8) + i sin(n\u03b8))\"\n\n",
-                "duration": 4.200166463851929
+                "duration": 4.1117494106292725
             },
             "Natural language query": {
                 "metrics": {
@@ -388,11 +388,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.6876516342163086
+                    "duration": 2.6019504070281982
                 },
                 "query": "for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin ? nx",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (De Moivre's Theorem):\nFor any real number \\(x\\) and any integer \\(n\\), the expression \\((\\cos x + i \\sin x)^n\\) is equal to \\(\\cos(nx) + i \\sin(nx)\\).\n\ntheorem de_moivre:\nassumes \"x real\" and \"n integer\"\nshows \"(\\cos x + i sin x)^n = cos nx + i sin nx\"\n\n",
-                "duration": 2.6876516342163086
+                "duration": 2.6019504070281982
             }
         }
     },
@@ -405,11 +405,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.930267810821533
+                    "duration": 3.8362386226654053
                 },
                 "query": "Liouville\ufffds Theorem and the Construction of Transcendental Numbers",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Liouville's Theorem and Construction of Transcendental Numbers):\nLet \\(K\\) be the set of all algebraic numbers, and let \\(L\\) be the set of all transcendental numbers. For any non-zero algebraic number \\(\\alpha\\) and any positive integer \\(n\\), there exists a transcendental number \\(\\beta\\) such that \\(0 < |\\beta - \\alpha| < \\frac{1}{n}\\).\n\ntheorem liouville_transcendental:\nassumes \"K \u2260 L\" and \"exists alpha in K, exists n in N\"\nshows \"exists beta in L such that 0 < |beta - alpha| < 1/n\"\n\n",
-                "duration": 3.930267810821533
+                "duration": 3.8362386226654053
             },
             "Natural language query": {
                 "metrics": {
@@ -417,11 +417,11 @@
                     "normalized_discounted_cumulative_gain": 0.5,
                     "reciprocal_rank": 0.3333333333333333,
                     "rank": 3,
-                    "duration": 2.7953245639801025
+                    "duration": 2.706585645675659
                 },
                 "query": "irrational but does not have this property, so it cannot be algebraic and must be transcendental",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Transcendence of e):\nLet \\(e\\) be the base of the natural logarithm. Then \\(e\\) is a transcendental number, meaning it is not a root of any non-zero polynomial equation with rational coefficients.\n\ntheorem transcendence_of_e:\nassumes \"e \u2260 0\" and \"e \u2260 1\"\nshows \"not (exists p: Q[x] /\\ p(e) = 0)\"\n\n",
-                "duration": 2.7953245639801025
+                "duration": 2.706585645675659
             }
         }
     },
@@ -434,11 +434,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.3042731285095215
+                    "duration": 2.2150678634643555
                 },
                 "query": "Lagrange\ufffds Four-Square Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Lagrange's Four-Square Theorem):\nEvery natural number can be represented as the sum of four integer squares.\n\ntheorem lagrange_four_squares:\nassumes \"n \u2208 N\"\nshows \"\u2203 a, b, c, d \u2208 Z : n = a^2 + b^2 + c^2 + d^2\"\n\n",
-                "duration": 2.3042731285095215
+                "duration": 2.2150678634643555
             },
             "Natural language query": {
                 "metrics": {
@@ -446,11 +446,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.2119529247283936
+                    "duration": 2.124298572540283
                 },
                 "query": "every nonnegative integer can be represented as a sum of four non-negative integer squares",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Four-Square Theorem):\nEvery nonnegative integer can be represented as the sum of four integer squares.\n\ntheorem four_square_theorem:\nassumes \"n \u2265 0\"\nshows \"\u2203a, b, c, d \u2208 Z such that n = a^2 + b^2 + c^2 + d^2\"\n\n",
-                "duration": 2.2119529247283936
+                "duration": 2.124298572540283
             }
         }
     },
@@ -463,11 +463,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.324645519256592
+                    "duration": 3.236607551574707
                 },
                 "query": "All Primes (1 mod 4) Equal the Sum of Two Squares",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (All Primes (1 mod 4) Equal the Sum of Two Squares):\nLet \\(p\\) be a prime number such that \\(p \\equiv 1 \\mod 4\\). Then there exist integers \\(a\\) and \\(b\\) such that \\(p = a^2 + b^2\\).\n\ntheorem all_primes_1_mod_4_equal_sum_of_squares:\nassumes \"prime p\" and \"p mod 4 = 1\"\nshows \"exists a, b :: nat such that p = a^2 + b^2\"\n\n",
-                "duration": 3.324645519256592
+                "duration": 3.236607551574707
             },
             "Natural language query": {
                 "metrics": {
@@ -475,11 +475,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.677020311355591
+                    "duration": 3.5896828174591064
                 },
                 "query": "[...] contains no factor p^k, where prime p ? 3 (mod 4) and k is odd",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Fermat's Last Theorem for Primes Modulo 4):\nLet \\(p\\) be a prime number such that \\(p \\equiv 3 \\mod 4\\), and let \\(k\\) be an odd integer. Then the equation \\(x^k + y^k = p^k\\) has no non-zero integer solutions for \\(x\\) and \\(y\\).\n\ntheorem fermat_last_mod_4:\nassumes \"p is a prime\" and \"p mod 4 = 3\" and \"k is odd\"\nshows \"no non-zero integer solutions for x and y in x^k + y^k = p^k\"\n\n",
-                "duration": 3.677020311355591
+                "duration": 3.5896828174591064
             }
         }
     },
@@ -492,11 +492,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 5.982823848724365
+                    "duration": 5.896669864654541
                 },
                 "query": "Green\ufffds theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Green's Theorem):\nLet \\(D\\) be a simply connected region in the plane with a positively oriented, piecewise-smooth boundary curve \\(C\\). If \\(P(x, y)\\) and \\(Q(x, y)\\) have continuous partial derivatives on an open region that contains \\(D\\), then Green's theorem states that the line integral around \\(C\\) of \\(Pdx + Qdy\\) is equal to the double integral over \\(D\\) of \\(\\left(\\frac{\\partial Q}{\\partial x} - \\frac{\\partial P}{\\partial y}\\right)dxdy\\), that is,\n\n\\[\n\\oint_C (P\\,dx + Q\\,dy) = \\iint_D \\left(\\frac{\\partial Q}{\\partial x} - \\frac{\\partial P}{\\partial y}\\right) dA.\n\\]\n\ntheorem green_theorem:\nassumes \"D is simply connected\" and \"C is positively oriented, piecewise-smooth\"\nshows \"integral_C (P dx + Q dy) = double_integral_D (partial_x Q - partial_y P) dA\"\n<\n",
-                "duration": 5.982823848724365
+                "duration": 5.896669864654541
             },
             "Natural language query": {
                 "metrics": {
@@ -504,11 +504,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 5.99023175239563
+                    "duration": 5.903369426727295
                 },
                 "query": "[...] line integral around a simple closed curve C to a double integral over the plane region D [...] bounded by C",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Green's Theorem):\nLet \\(D\\) be a region in the plane bounded by a simple, closed, piecewise-smooth curve \\(C\\) oriented counterclockwise. If \\(P(x, y)\\) and \\(Q(x, y)\\) have continuous partial derivatives on an open region that contains \\(D\\), then the line integral of \\(P\\) and \\(Q\\) around \\(C\\) is equal to the double integral over the region \\(D\\) of the partial derivative of \\(Q\\) with respect to \\(x\\) minus the partial derivative of \\(P\\) with respect to \\(y\\), that is,\n\n\\[\n\\oint_C (P \\, dx + Q \\, dy) = \\iint_D \\left( \\frac{\\partial Q}{\\partial x} - \\frac{\\partial P}{\\partial y} \\right) \\, dA.\n\\]\n\ntheorem green_theorem:\nassumes \"D is a region in the plane\"\nassumes \"C is a simple, closed, piecewise-smooth curve\"\nassumes \"C is oriented counterclockwise\"\nassumes \"P and Q have continuous partial derivatives on an open region containing D\n",
-                "duration": 5.99023175239563
+                "duration": 5.903369426727295
             }
         }
     },
@@ -518,26 +518,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 2.617286205291748
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.5131936073303223
                 },
                 "query": "The Non-Denumerability of the Continuum",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Non-Denumerability of the Continuum):\nLet \\(C\\) denote the set of real numbers. The set \\(C\\) is non-denumerable, meaning it cannot be put into a one-to-one correspondence with the set of natural numbers \\(N\\).\n\ntheorem non_denumerability_of_continuum:\nassumes \"C \u2260 N\"\nshows \"there is no bijection between C and N\"\n\n",
-                "duration": 2.617286205291748
+                "duration": 2.5131936073303223
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.31546487678572877,
-                    "reciprocal_rank": 0.125,
-                    "rank": 8,
-                    "duration": 2.43379545211792
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 2.3405263423919678
                 },
                 "query": "[...] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers [...]",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Non-Countable Infinite Sets):\nLet \\(S\\) be a set that cannot be put into a one-to-one correspondence with the set of natural numbers \\(N\\). Then \\(S\\) is an example of a non-countable infinite set.\n\ntheorem non_countable_infinite_set:\nassumes \"S \u2260 N\"\nshows \"S is non-countable\"\n\n",
-                "duration": 2.43379545211792
+                "duration": 2.3405263423919678
             }
         }
     },
@@ -550,11 +550,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.1860249042510986
+                    "duration": 3.0941765308380127
                 },
                 "query": "Formula for Pythagorean Triples",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Pythagorean Triples):\nLet \\(a\\), \\(b\\), and \\(c\\) be positive integers such that \\(a^2 + b^2 = c^2\\). Then \\((a, b, c)\\) is a Pythagorean triple.\n\ntheorem pythagorean_triples:\nassumes \"a > 0\" and \"b > 0\"\nshows \"a^2 + b^2 = c^2\"\nwhere \"c = sqrt(a^2 + b^2)\"\n\n",
-                "duration": 3.1860249042510986
+                "duration": 3.0941765308380127
             },
             "Natural language query": {
                 "metrics": {
@@ -562,11 +562,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.2339537143707275
+                    "duration": 4.143225908279419
                 },
                 "query": "[...] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Generation of Pythagorean Triples):\nLet \\(m\\) and \\(n\\) be two distinct positive integers such that \\(m > n > 0\\). Then the integers \\(a = m^2 - n^2\\), \\(b = 2mn\\), and \\(c = m^2 + n^2\\) form a Pythagorean triple, i.e., \\(a^2 + b^2 = c^2\\).\n\ntheorem pythagorean_triple:\nassumes \"m > n > 0\"\nshows \"a^2 + b^2 = c^2\"\nwhere \"a = m^2 - n^2\", \"b = 2mn\", and \"c = m^2 + n^2\"\n\n",
-                "duration": 4.2339537143707275
+                "duration": 4.143225908279419
             }
         }
     },
@@ -579,23 +579,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.394108295440674
+                    "duration": 3.305598497390747
                 },
                 "query": "The Undecidability of the Continuum Hypothesis",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Undecidability of the Continuum Hypothesis):\nThe Continuum Hypothesis (CH), which posits that there is no set whose cardinality is strictly between that of the integers and the real numbers, is undecidable within the framework of Zermelo-Fraenkel set theory with the Axiom of Choice (ZFC). This means that within ZFC, the Continuum Hypothesis can neither be proven nor disproven.\n\ntheorem undecidability_CH:\nassumes \"ZFC\"\nshows \"CH is not provable in ZFC\"\n\n",
-                "duration": 3.394108295440674
+                "duration": 3.305598497390747
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.5,
-                    "reciprocal_rank": 0.3333333333333333,
-                    "rank": 3,
-                    "duration": 3.620652198791504
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 3.535177230834961
                 },
                 "query": "There is no set whose cardinality is strictly between that of the integers and the real numbers",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Cardinality of Sets):\nLet \\( \\mathbb{Z} \\) denote the set of integers and \\( \\mathbb{R} \\) denote the set of real numbers. There is no set \\( S \\) such that \\( \\mathbb{Z} \\subset S \\subset \\mathbb{R} \\) and the cardinality of \\( S \\) is strictly between that of \\( \\mathbb{Z} \\) and \\( \\mathbb{R} \\).\n\ntheorem no_set_between_cardinalities:\nassumes \"Z \u2260 S\" and \"S \u2260 R\"\nshows \"cardinality Z < cardinality S < cardinality R\"\n\n",
-                "duration": 3.620652198791504
+                "duration": 3.535177230834961
             }
         }
     },
@@ -608,11 +608,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4410035610198975
+                    "duration": 3.350788116455078
                 },
                 "query": "Schroeder-Bernstein Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Schroeder-Bernstein Theorem):\nLet \\(A\\) and \\(B\\) be two sets. If there exist injective (one-to-one) functions \\(f: A \\rightarrow B\\) and \\(g: B \\rightarrow A\\), then there exists a bijective (one-to-one and onto) function \\(h: A \\rightarrow B\\).\n\ntheorem schroeder_bernstein:\nassumes \"A, B are sets\" and \"exists f: A -> B injective\" and \"exists g: B -> A injective\"\nshows \"exists h: A -> B bijective\"\n\n",
-                "duration": 3.4410035610198975
+                "duration": 3.350788116455078
             },
             "Natural language query": {
                 "metrics": {
@@ -620,11 +620,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.4291229248046875
+                    "duration": 4.341637849807739
                 },
                 "query": "there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A ? B",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Bijection from A to B via Injective Functions):\nLet \\(A\\) and \\(B\\) be sets, and let \\(f: A \\rightarrow B\\) and \\(g: B \\rightarrow A\\) be injective functions. Then there exists a bijective function \\(h: A \\rightarrow B\\) such that \\(h = g \\circ f\\).\n\ntheorem bijection_from_A_to_B:\nassumes \"f: A -> B\" and \"g: B -> A\"\nshows \"exists h: A -> B such that h = g \u2218 f\"\nwhere h is defined by \\(h(a) = g(f(a))\\) for all \\(a \\in A\\), and it is proven that \\(h\\) is both injective and surjective, hence bijective.\n\n",
-                "duration": 4.4291229248046875
+                "duration": 4.341637849807739
             }
         }
     },
@@ -637,11 +637,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.442207098007202
+                    "duration": 3.354567527770996
                 },
                 "query": "Leibnitz\ufffds Series for Pi",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Leibniz's Series for Pi):\nLet \\( \\pi \\) be the constant representing the ratio of a circle's circumference to its diameter. Then, the series \\( \\sum_{n=0}^{\\infty} \\frac{(-1)^n}{2n+1} \\) converges to \\( \\frac{\\pi}{4} \\).\n\ntheorem leibniz_pi:\nassumes \"n is a non-negative integer\"\nshows \"sum (from n=0 to infinity) of (-1)^n / (2n+1) = pi / 4\"\n\n",
-                "duration": 3.442207098007202
+                "duration": 3.354567527770996
             },
             "Natural language query": {
                 "metrics": {
@@ -649,11 +649,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.7477359771728516
+                    "duration": 3.659085988998413
                 },
                 "query": "pi [...] as an alternating series",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Alternating Series Test):\nLet \\((a_n)\\) be a sequence of real numbers such that \\(a_n \\geq 0\\) for all \\(n\\) and \\(a_n\\) is decreasing to zero. Then the alternating series \\(\\sum_{n=1}^{\\infty} (-1)^{n+1} a_n\\) converges.\n\ntheorem alternating_series_test:\nassumes \"a_n >= 0\" and \"a_n is decreasing\" and \"lim (n -> \u221e) a_n = 0\"\nshows \"converges\"\n\n",
-                "duration": 3.7477359771728516
+                "duration": 3.659085988998413
             }
         }
     },
@@ -666,11 +666,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.0308361053466797
+                    "duration": 2.9414327144622803
                 },
                 "query": "Sum of the Angles of a Triangle",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of Angles in a Triangle):\nLet \\(ABC\\) be a triangle in a Euclidean plane. The sum of the internal angles \\(\\angle A\\), \\(\\angle B\\), and \\(\\angle C\\) is equal to \\(180^\\circ\\).\n\ntheorem sum_of_angles_triangle:\nassumes \"ABC is a triangle in a Euclidean plane\"\nshows \"angle A + angle B + angle C = 180\"\n\n",
-                "duration": 3.0308361053466797
+                "duration": 2.9414327144622803
             },
             "Natural language query": {
                 "metrics": {
@@ -678,11 +678,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4771347045898438
+                    "duration": 3.386312961578369
                 },
                 "query": "[...] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of Interior Angles of a Triangle):\nLet \\( \\triangle ABC \\) be a triangle in Euclidean space. The sum of the measures of the interior angles of \\( \\triangle ABC \\) is always 180 degrees, that is, \\( \\angle A + \\angle B + \\angle C = 180^\\circ \\).\n\ntheorem sum_of_angles_triangle:\nassumes \"ABC is a triangle in Euclidean space\"\nshows \"angle A + angle B + angle C = 180\"\n\n",
-                "duration": 3.4771347045898438
+                "duration": 3.386312961578369
             }
         }
     },
@@ -702,23 +702,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.6484334468841553
+                    "duration": 3.556445837020874
                 },
                 "query": "Ramsey\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Ramsey's Theorem):\nLet \\( R(m, n) \\) denote the smallest number such that any graph with \\( R(m, n) \\) vertices contains a monochromatic \\( K_m \\) (complete graph on \\( m \\) vertices) or a monochromatic \\( K_n \\) (complete graph on \\( n \\) vertices) when its edges are colored with two colors. Then \\( R(m, n) \\) exists for all positive integers \\( m \\) and \\( n \\).\n\ntheorem ramsey:\nassumes \"m, n \u2208 N\"\nshows \"R(m, n) exists\"\n\n",
-                "duration": 3.6484334468841553
+                "duration": 3.556445837020874
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 4.0992209911346436
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 4.012623071670532
                 },
                 "query": "how big must some structure be to guarantee that a particular property holds?",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Minimum Structure Size for Property Guarantee):\nLet \\(P\\) be a property that we wish to guarantee holds for a structure \\(S\\). The minimum size \\(n\\) of \\(S\\) such that \\(P\\) holds for all subsets of \\(S\\) of size \\(n\\) is given by the smallest integer \\(n\\) for which there exists a subset \\(T\\) of \\(S\\) with \\(|T| = n\\) and \\(P\\) holds for all subsets of \\(T\\).\n\nlemma min_structure_size:\nassumes \"P is a property of subsets of S\"\nshows \"There exists an integer n such that for all subsets T of S with |T| = n, P holds for all subsets of T\"\n\n",
-                "duration": 4.0992209911346436
+                "duration": 4.012623071670532
             }
         }
     },
@@ -728,26 +728,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.803457736968994
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 3.6977035999298096
                 },
                 "query": "Divergence of the Harmonic Series",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Divergence of the Harmonic Series):\nLet \\(H_n\\) denote the \\(n\\)-th harmonic number, defined as \\(H_n = \\sum_{k=1}^n \\frac{1}{k}\\). Then the harmonic series \\(H_n\\) diverges as \\(n\\) approaches infinity, that is, \\(\\lim_{n \\to \\infty} H_n = \\infty\\).\n\ntheorem harmonic_series_divergence:\nassumes \"n \u2208 \u2115\"\nshows \"lim (n -> \u221e) (sum (k = 1 to n) (1/k)) = \u221e\"\n\n",
-                "duration": 3.803457736968994
+                "duration": 3.6977035999298096
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 3.052913188934326
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.959731101989746
                 },
                 "query": "the infinite series formed by summing all positive unit fractions",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of Positive Unit Fractions):\nLet \\( S \\) be the infinite series formed by summing all positive unit fractions, that is, \\( S = \\sum_{n=1}^{\\infty} \\frac{1}{n} \\). The sum \\( S \\) is known as the harmonic series and is divergent, meaning it does not converge to a finite limit.\n\ntheorem harmonic_series:\nassumes \"n \u2208 \u2115\"\nshows \"\u03a3 (1/n) diverges\"\n\n",
-                "duration": 3.052913188934326
+                "duration": 2.959731101989746
             }
         }
     },
@@ -760,11 +760,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.194636106491089
+                    "duration": 6.105341672897339
                 },
                 "query": "Taylor\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Taylor's Theorem):\nLet \\(f: \\mathbb{R} \\to \\mathbb{R}\\) be a function that is \\(n+1\\) times differentiable at a point \\(a \\in \\mathbb{R}\\). Then for every \\(x\\) in the interval \\((a, a+h)\\), there exists a number \\(c\\) between \\(a\\) and \\(x\\) such that\n\\[f(x) = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2 + \\cdots + \\frac{f^{(n)}(a)}{n!}(x-a)^n + \\frac{f^{(n+1)}(c)}{(n+1)!}(x-a)^{n+1}.\\]\n\ntheorem taylor_theorem:\nassumes \"f: R -> R\" and \"n + 1\" times differentiable at \"a\"\nshows \"f(x) = f(a) + f'(a)(x-a) +... + f^(n)(a)/n!(x-a)^n + f^(n+1)(c)/\n",
-                "duration": 6.194636106491089
+                "duration": 6.105341672897339
             },
             "Natural language query": {
                 "metrics": {
@@ -772,11 +772,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.337615489959717
+                    "duration": 6.250887870788574
                 },
                 "query": "infinite sum of terms that are expressed in terms of the function's derivatives at a single point",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Taylor Series Expansion):\nLet \\(f\\) be a function that is infinitely differentiable at a point \\(a\\). Then the function \\(f\\) can be expressed as an infinite sum of terms, each term being a derivative of \\(f\\) at \\(a\\) divided by the factorial of the order of the derivative, multiplied by the difference between \\(x\\) and \\(a\\). Mathematically, this is represented as:\n\n\\[ f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x - a)^n \\]\n\nwhere \\(f^{(n)}(a)\\) denotes the \\(n\\)-th derivative of \\(f\\) evaluated at \\(a\\), and \\(n!\\) is the factorial of \\(n\\).\n\ntheorem taylor_series:\nassumes \"f is infinitely differentiable at a\"\nshows \"f(x) = sum (f^(n)(a) / n! * (x - a)^n, n in N)\"\n\n",
-                "duration": 6.337615489959717
+                "duration": 6.250887870788574
             }
         }
     },
@@ -789,23 +789,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.6045169830322266
+                    "duration": 3.5157604217529297
                 },
                 "query": "Brouwer Fixed Point Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Brouwer Fixed Point Theorem):\nLet \\(D\\) be a non-empty, compact, and convex subset of a Euclidean space \\( \\mathbb{R}^n \\). If \\(f: D \\rightarrow D\\) is a continuous function, then there exists a point \\(x \\in D\\) such that \\(f(x) = x\\).\n\ntheorem brouwer_fixed_point:\nassumes \"D \u2260 \u2205\" and \"D is compact\" and \"D is convex\" and \"f: D \u2192 D\"\nshows \"exists x \u2208 D such that f(x) = x\"\n\n",
-                "duration": 3.6045169830322266
+                "duration": 3.5157604217529297
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
-                    "reciprocal_rank": 0.2,
-                    "rank": 5,
-                    "duration": 3.6931312084198
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 3.60610294342041
                 },
                 "query": "for any continuous function f [...] there is a point x_0 such that f(x_0) = x_0",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Intermediate Value Theorem):\nLet \\(f\\) be a continuous function on the closed interval \\([a, b]\\), and let \\(c\\) be a number between \\(f(a)\\) and \\(f(b)\\). Then there exists a point \\(x_0\\) in the interval \\([a, b]\\) such that \\(f(x_0) = c\\).\n\ntheorem ivt:\nassumes \"f is continuous on [a, b]\" and \"c is between f(a) and f(b)\"\nshows \"there exists x_0 in [a, b] such that f(x_0) = c\"\n\n",
-                "duration": 3.6931312084198
+                "duration": 3.60610294342041
             }
         }
     },
@@ -822,26 +822,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 4.726041793823242
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 4.638563394546509
                 },
                 "query": "Arithmetic Mean / Geometric Mean",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Arithmetic Mean - Geometric Mean Inequality):\nFor any non-negative real numbers \\(a_1, a_2, \\ldots, a_n\\), the arithmetic mean is greater than or equal to the geometric mean. That is, \\(\\frac{a_1 + a_2 + \\ldots + a_n}{n} \\geq \\sqrt[n]{a_1 \\cdot a_2 \\cdot \\ldots \\cdot a_n}\\), with equality if and only if all the \\(a_i\\) are equal.\n\ntheorem am_gm_inequality:\nassumes \"a1, a2,..., an \u2265 0\"\nshows \"a1 + a2 +... + an >= n * sqrt(a1 * a2 *... * an)\"\nwhere \"sqrt\" denotes the square root function\n\n",
-                "duration": 4.726041793823242
+                "duration": 4.638563394546509
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 4.922043085098267
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 4.8341286182403564
                 },
                 "query": "the arithmetic mean of a list of non-negative real numbers is greater than or equal to the geometric mean of the same list",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Arithmetic Mean-Geometric Mean Inequality):\nLet \\(x_1, x_2, \\ldots, x_n\\) be a list of non-negative real numbers. Then the arithmetic mean of these numbers is greater than or equal to their geometric mean, that is,\n\n\\[\\frac{x_1 + x_2 + \\ldots + x_n}{n} \\geq \\sqrt[n]{x_1 \\cdot x_2 \\cdot \\ldots \\cdot x_n}\\]\n\nwith equality if and only if all the numbers in the list are equal.\n\ntheorem am_gm_inequality:\nassumes \"n > 0\" and \"x_1, x_2, \\ldots, x_n >= 0\"\nshows \"sum (x_i) / n >= product (x_i)^(1/n)\"\n\n",
-                "duration": 4.922043085098267
+                "duration": 4.8341286182403564
             }
         }
     },
@@ -851,26 +851,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.061373710632324
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.974802255630493
                 },
                 "query": "Solutions to Pell\ufffds Equation",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Pell's Equation):\nLet \\(n\\) be a positive non-square integer. Then the equation \\(x^2 - ny^2 = 1\\) has infinitely many integer solutions \\((x, y)\\).\n\ntheorem pells_equation:\nassumes \"n > 0\" and \"n is not a perfect square\"\nshows \"there exists a solution (x, y) in Z such that x^2 - ny^2 = 1\"\nand \"there are infinitely many such solutions\"\n\n",
-                "duration": 3.061373710632324
+                "duration": 2.974802255630493
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.0569262504577637
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.9688994884490967
                 },
                 "query": "as long as n is not a perfect square, [x^2 \ufffd ny^2 = 1] has infinitely many distinct integer solutions",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Baker's Theorem on Diophantine Equations):\nLet \\(n\\) be an integer such that \\(n\\) is not a perfect square. Then the equation \\(x^2 - ny^2 = 1\\) has infinitely many distinct integer solutions \\((x, y)\\).\n\ntheorem baker_diophantine:\nassumes \"n \u2260 0\" and \"n \u2260 perfect_square\"\nshows \"infinitely_many_solutions (x^2 - ny^2 = 1)\"\n\n",
-                "duration": 3.0569262504577637
+                "duration": 2.9688994884490967
             }
         }
     },
@@ -883,11 +883,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.0494630336761475
+                    "duration": 3.9603028297424316
                 },
                 "query": "Minkowski\ufffds Fundamental Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Minkowski's Fundamental Theorem for Convex Sets):\nLet \\(K\\) be a compact convex set in \\(\\mathbb{R}^n\\) with non-empty interior, and let \\(S\\) be a symmetric convex set centered at the origin with non-empty interior. If \\(S\\) is contained in \\(K\\), then the volume of \\(S\\) is greater than or equal to the volume of the intersection of \\(S\\) with the boundary of \\(K\\).\n\ntheorem minkowski_fundamental:\nassumes \"K is compact and convex with non-empty interior\" and \"S is symmetric convex with non-empty interior and contained in K\"\nshows \"volume S \u2265 volume (S \u2229 \u2202K)\"\n\n",
-                "duration": 4.0494630336761475
+                "duration": 3.9603028297424316
             },
             "Natural language query": {
                 "metrics": {
@@ -895,11 +895,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.0373036861419678
+                    "duration": 2.9499261379241943
                 },
                 "query": "every convex set in R^n which is symmetric to the origin and has volume greater than 2^n contains a non-zero integer point",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Minkowski's Convex Body Theorem):\nLet \\(C\\) be a convex set in \\(\\mathbb{R}^n\\) that is symmetric with respect to the origin and has a volume greater than \\(2^n\\). Then \\(C\\) contains at least one non-zero integer point.\n\ntheorem minkowski_convex_body:\nassumes \"C is convex\" and \"C is symmetric with respect to the origin\" and \"volume of C > 2^n\"\nshows \"C contains a non-zero integer point\"\n\n",
-                "duration": 3.0373036861419678
+                "duration": 2.9499261379241943
             }
         }
     },
@@ -926,23 +926,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.40152645111084
+                    "duration": 4.3143229484558105
                 },
                 "query": "The Binomial Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Binomial Theorem):\nLet \\(n\\) be a non-negative integer and \\(x, y\\) be elements of a commutative ring with unity. Then the expansion of \\((x + y)^n\\) is given by:\n\\[\n(x + y)^n = \\sum_{k=0}^{n} \\binom{n}{k} x^{n-k} y^k\n\\]\nwhere \\(\\binom{n}{k}\\) denotes the binomial coefficient.\n\ntheorem binomial_theorem:\nassumes \"n >= 0\" and \"ring R with unity\"\nshows \"(x + y)^n = sum (k=0 to n) (binomial_coefficient n k) x^(n-k) y^k\"\n\n",
-                "duration": 4.40152645111084
+                "duration": 4.3143229484558105
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 4.628847360610962
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 4.540701150894165
                 },
                 "query": "The binomial coefficient binom(n, k) appears as the kth entry in the nth row of Pascal's triangle",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Binomial Coefficient):\nLet \\(n\\) and \\(k\\) be non-negative integers with \\(k \\leq n\\). The binomial coefficient \\(\\binom{n}{k}\\), which represents the number of ways to choose \\(k\\) elements from a set of \\(n\\) elements without regard to order, is given by the formula:\n\n\\[\n\\binom{n}{k} = \\frac{n!}{k!(n-k)!}\n\\]\n\nwhere \\(n!\\) denotes the factorial of \\(n\\), which is the product of all positive integers up to \\(n\\).\n\ntheorem binomial_coefficient:\nassumes \"n >= 0\" and \"k >= 0\" and \"k <= n\"\nshows \"binom(n, k) = n! / (k! * (n-k)!)\"\n\n",
-                "duration": 4.628847360610962
+                "duration": 4.540701150894165
             }
         }
     },
@@ -955,11 +955,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.1616268157958984
+                    "duration": 2.0742757320404053
                 },
                 "query": "The Partition Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Partition Theorem):\nLet \\(n\\) be a positive integer. Then the number of partitions of \\(n\\) into distinct parts is equal to the number of partitions of \\(n\\) into odd parts.\n\ntheorem partition_theorem:\nassumes \"n > 0\"\nshows \"partition_distinct(n) = partition_odd(n)\"\n\n",
-                "duration": 2.1616268157958984
+                "duration": 2.0742757320404053
             },
             "Natural language query": {
                 "metrics": {
@@ -967,11 +967,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.9823341369628906
+                    "duration": 1.8948826789855957
                 },
                 "query": "number of possible partitions of a non-negative integer n",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Partition Function):\nLet \\(n\\) be a non-negative integer. The number of possible partitions of \\(n\\) is given by the partition function \\(p(n)\\).\n\ntheorem partition_function:\nassumes \"n \u2265 0\"\nshows \"partition_count n = p(n)\"\n\n",
-                "duration": 1.9823341369628906
+                "duration": 1.8948826789855957
             }
         }
     },
@@ -998,11 +998,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.426503896713257
+                    "duration": 3.338015079498291
                 },
                 "query": "Dirichlet\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Dirichlet's Theorem on Arithmetic Progressions):\nLet \\(a\\) and \\(d\\) be coprime integers, and let \\(S\\) be the set of all primes \\(p\\) such that \\(p \\equiv a \\mod d\\). Then there are infinitely many primes in \\(S\\).\n\ntheorem dirichlet_theorem:\nassumes \"a, d \u2208 Z\" and \"gcd(a, d) = 1\"\nshows \"\u2203p1, p2,... (p1, p2,... \u2208 S \u2227 |p1 - p2| > 1)\"\n\n",
-                "duration": 3.426503896713257
+                "duration": 3.338015079498291
             },
             "Natural language query": {
                 "metrics": {
@@ -1010,11 +1010,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.705800771713257
+                    "duration": 2.6194798946380615
                 },
                 "query": "for any two positive coprime integers a and d, there are [...] infinitely many primes that are congruent to a mod d",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Dirichlet's Theorem on Arithmetic Progressions):\nLet \\(a\\) and \\(d\\) be positive coprime integers. Then there are infinitely many primes of the form \\(a + kd\\), where \\(k\\) is a non-negative integer.\n\ntheorem dirichlet_arithmetic_progression:\nassumes \"gcd(a, d) = 1\"\nshows \"infinitely many primes of the form a + kd\"\n\n",
-                "duration": 2.705800771713257
+                "duration": 2.6194798946380615
             }
         }
     },
@@ -1027,11 +1027,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.1547045707702637
+                    "duration": 3.0657620429992676
                 },
                 "query": "Cayley-Hamilton Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Cayley-Hamilton Theorem):\nLet \\(A\\) be an \\(n \\times n\\) matrix over a commutative ring \\(R\\). Then the characteristic polynomial \\(p_A(\\lambda)\\) of \\(A\\) satisfies \\(p_A(A) = 0\\), where \\(0\\) is the zero matrix of the same size as \\(A\\).\n\ntheorem cayley_hamilton:\nassumes \"A :'matrix'\" and \"R : 'commutative ring'\"\nshows \"eval p_A (A) = zero_matrix\"\n\n",
-                "duration": 3.1547045707702637
+                "duration": 3.0657620429992676
             },
             "Natural language query": {
                 "metrics": {
@@ -1039,11 +1039,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.1535990238189697
+                    "duration": 3.0662786960601807
                 },
                 "query": "every square matrix over a commutative ring satisfies its own characteristic equation",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Cayley-Hamilton Theorem for Matrices):\nLet \\(A\\) be a square matrix over a commutative ring \\(R\\). Then \\(A\\) satisfies its own characteristic equation, which means that if \\(\\chi_A(t) = \\det(tI - A)\\) is the characteristic polynomial of \\(A\\), then \\(\\chi_A(A) = 0\\).\n\ntheorem cayley_hamilton:\nassumes \"A is a square matrix over a commutative ring R\"\nshows \"det(A * I - A) = 0\"\n\n",
-                "duration": 3.1535990238189697
+                "duration": 3.0662786960601807
             }
         }
     },
@@ -1060,26 +1060,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 2.3586103916168213
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 2.2654898166656494
                 },
                 "query": "The Number of Subsets of a Set",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Number of Subsets of a Set):\nLet \\(S\\) be a finite set with \\(n\\) elements. Then the number of subsets of \\(S\\), including the empty set and \\(S\\) itself, is \\(2^n\\).\n\ntheorem num_subsets:\nassumes \"S is a finite set with n elements\"\nshows \"number of subsets of S is 2^n\"\n\n",
-                "duration": 2.3586103916168213
+                "duration": 2.2654898166656494
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 2.507138729095459
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 2.4190080165863037
                 },
                 "query": "If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Number of Subsets of a Finite Set):\nLet \\(S\\) be a finite set with \\(|S| = n\\). Then the number of all subsets of \\(S\\), including the empty set and \\(S\\) itself, is \\(2^n\\).\n\ntheorem subsets_count:\nassumes \"S is a finite set with |S| = n\"\nshows \"number of subsets of S = 2^n\"\n\n",
-                "duration": 2.507138729095459
+                "duration": 2.4190080165863037
             }
         }
     },
@@ -1092,11 +1092,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.3048765659332275
+                    "duration": 3.2174603939056396
                 },
                 "query": "Pi is Transcendental",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Transcendence of Pi):\nLet \\( \\pi \\) be the constant representing the ratio of a circle's circumference to its diameter in the real numbers \\( \\mathbb{R} \\). Then \\( \\pi \\) is a transcendental number, which means it is not a root of any non-zero polynomial equation with rational coefficients.\n\ntheorem transcendental_pi:\nassumes \"pi \u2260 0\" and \"pi \u2208 \u211d\"\nshows \"not (exists p(x) \u2208 \u211a[x] with p(pi) = 0)\"\n\n",
-                "duration": 3.3048765659332275
+                "duration": 3.2174603939056396
             },
             "Natural language query": {
                 "metrics": {
@@ -1104,11 +1104,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.8934075832366943
+                    "duration": 2.8024020195007324
                 },
                 "query": "The best-known [numbers that are not algebraic] are pi and e",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Transcendence of Pi and E):\nLet \\( \\pi \\) and \\( e \\) be transcendental numbers over the field of rational numbers \\( \\mathbb{Q} \\). This means that \\( \\pi \\) and \\( e \\) are not roots of any non-zero polynomial equation with rational coefficients.\n\ntheorem transcendence_pi_e:\nassumes \"pi is transcendental\" and \"e is transcendental\"\nshows \"pi and e are not algebraic numbers\"\n\n",
-                "duration": 2.8934075832366943
+                "duration": 2.8024020195007324
             }
         }
     },
@@ -1118,26 +1118,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 0,
-                    "normalized_discounted_cumulative_gain": 0.19823986317056053,
-                    "reciprocal_rank": 0.03125,
-                    "rank": 32,
-                    "duration": 4.7180681228637695
+                    "normalized_discounted_cumulative_gain": 0.2559580248098155,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 4.6292948722839355
                 },
                 "query": "The Koenigsberg Bridges Problem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Koenigsberg Bridges Problem):\nIn the city of Koenigsberg, there were seven bridges connecting four landmasses. The problem asks whether it is possible to devise a walk through the city that would cross each bridge exactly once.\n\ntheorem koenigsberg_walk:\nassumes \"landmasses = 4\" and \"bridges = 7\"\nshows \"it is possible to devise such a walk\"\n\n",
-                "duration": 4.7180681228637695
+                "duration": 4.6292948722839355
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.595304489135742
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 3.507939577102661
                 },
                 "query": "[...] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Handshaking Lemma for Undirected Graphs):\nLet \\(G\\) be an undirected graph. Then the sum of the degrees of all vertices in \\(G\\) is twice the number of edges, and exactly zero or two vertices have an odd degree. Furthermore, all vertices with nonzero degree are part of a single connected component.\n\ntheorem handshaking_lemma:\nassumes \"G is an undirected graph\"\nshows \"sum of degrees of all vertices in G = 2 * number of edges\" and \"either 0 or 2 vertices have odd degree\" and \"all vertices with nonzero degree belong to a single connected component\"\n\n",
-                "duration": 3.595304489135742
+                "duration": 3.507939577102661
             }
         }
     },
@@ -1150,11 +1150,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.397836923599243
+                    "duration": 3.309309959411621
                 },
                 "query": "Product of Segments of Chords",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Product of Segments of Chords):\nLet \\(AB\\) and \\(CD\\) be two chords in a circle that intersect at point \\(E\\). Then the product of the lengths of segments \\(AE\\) and \\(EB\\) is equal to the product of the lengths of segments \\(CE\\) and \\(ED\\), that is, \\(AE \\cdot EB = CE \\cdot ED\\).\n\ntheorem product_of_segments_of_chords:\nassumes \"AB and CD are chords in a circle\" and \"AB intersects CD at E\"\nshows \"AE \\cdot EB = CE \\cdot ED\"\n\n",
-                "duration": 3.397836923599243
+                "duration": 3.309309959411621
             },
             "Natural language query": {
                 "metrics": {
@@ -1162,11 +1162,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.3881478309631348
+                    "duration": 3.2998452186584473
                 },
                 "query": "products of the lengths of the line segments on each chord are equal",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Power of a Point):\nLet \\(P\\) be a point outside a circle, and let \\(AB\\) and \\(CD\\) be two chords of the circle that intersect at \\(P\\). Then the product of the lengths of the segments of one chord is equal to the product of the lengths of the segments of the other chord, that is, \\(PA \\cdot PB = PC \\cdot PD\\).\n\ntheorem power_of_point:\nassumes \"P is outside a circle\" and \"AB and CD are chords intersecting at P\"\nshows \"PA * PB = PC * PD\"\n\n",
-                "duration": 3.3881478309631348
+                "duration": 3.2998452186584473
             }
         }
     },
@@ -1179,23 +1179,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.920785427093506
+                    "duration": 2.833052396774292
                 },
                 "query": "The Hermite-Lindemann Transcendence Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Hermite-Lindemann Transcendence Theorem):\nLet \\( \\alpha \\) be a non-zero algebraic number, and let \\( e^\\alpha \\) be the exponential function evaluated at \\( \\alpha \\). Then \\( e^\\alpha \\) is transcendental, meaning it is not a root of any non-zero polynomial equation with rational coefficients.\n\ntheorem hermite_lindemann:\nassumes \"alpha is a non-zero algebraic number\"\nshows \"e^alpha is transcendental\"\n\n",
-                "duration": 2.920785427093506
+                "duration": 2.833052396774292
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.5,
-                    "reciprocal_rank": 0.3333333333333333,
-                    "rank": 3,
-                    "duration": 3.897120714187622
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 3.810718536376953
                 },
                 "query": "[...] the extension field Q(e^\\alpha_1, ..., e^\\alpha_n) has transcendence degree n over Q",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Transcendence Degree of an Extension Field):\nLet \\(E\\) be an extension field of the field \\(F\\) generated by a set of elements \\(\\{e_1, e_2,..., e_n\\}\\) where each \\(e_i\\) is transcendental over \\(F\\). Then the transcendence degree of \\(E\\) over \\(F\\) is equal to \\(n\\), that is, \\(\\text{trdeg}(E/F) = n\\).\n\ntheorem transcendence_degree:\nassumes \"E is an extension field of F generated by a set of transcendental elements over F\"\nshows \"trdeg(E/F) = n\"\n\n",
-                "duration": 3.897120714187622
+                "duration": 3.810718536376953
             }
         }
     },
@@ -1208,11 +1208,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.591727018356323
+                    "duration": 4.50290846824646
                 },
                 "query": "Heron\ufffds formula",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Heron's Formula for the Area of a Triangle):\nLet \\(a\\), \\(b\\), and \\(c\\) be the lengths of the sides of a triangle with semiperimeter \\(s = \\frac{a + b + c}{2}\\). Then the area \\(A\\) of the triangle is given by \\(A = \\sqrt{s(s - a)(s - b)(s - c)}\\).\n\ntheorem heron_area:\nassumes \"a, b, c > 0\" and \"a + b > c\" and \"a + c > b\" and \"b + c > a\"\nshows \"area (triangle a b c) = sqrt (s * (s - a) * (s - b) * (s - c))\"\nwhere \"s = (a + b + c) / 2\"\n\n",
-                "duration": 4.591727018356323
+                "duration": 4.50290846824646
             },
             "Natural language query": {
                 "metrics": {
@@ -1220,11 +1220,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.461082935333252
+                    "duration": 4.3736302852630615
                 },
                 "query": "the area of a triangle in terms of the three side lengths a, b, c",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Area of a Triangle from Side Lengths):\nLet \\(a\\), \\(b\\), and \\(c\\) be the lengths of the sides of a triangle. The area \\(A\\) of the triangle can be expressed using Heron's formula as \\(A = \\sqrt{s(s-a)(s-b)(s-c)}\\), where \\(s\\) is the semi-perimeter of the triangle, \\(s = \\frac{a + b + c}{2}\\).\n\ntheorem area_triangle:\nassumes \"a \u2260 0\", \"b \u2260 0\", \"c \u2260 0\"\nshows \"area = sqrt(s * (s - a) * (s - b) * (s - c))\"\nwhere \"s = (a + b + c) / 2\"\n\n",
-                "duration": 4.461082935333252
+                "duration": 4.3736302852630615
             }
         }
     },
@@ -1234,14 +1234,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 4.878652572631836
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 4.789442539215088
                 },
                 "query": "Formula for the Number of Combinations",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Number of Combinations):\nLet \\(n\\) be a non-negative integer and \\(r\\) be a non-negative integer such that \\(0 \\leq r \\leq n\\). The number of combinations of \\(n\\) items taken \\(r\\) at a time, denoted as \\(C(n, r)\\) or \\(\\binom{n}{r}\\), is given by the formula:\n\n\\[ C(n, r) = \\binom{n}{r} = \\frac{n!}{r!(n-r)!} \\]\n\nwhere \\(n!\\) denotes the factorial of \\(n\\), which is the product of all positive integers up to \\(n\\).\n\ntheorem number_combinations:\nassumes \"n >= 0\" and \"r >= 0\" and \"r <= n\"\nshows \"C(n, r) = n! / (r! * (n-r)!)\"\n\n",
-                "duration": 4.878652572631836
+                "duration": 4.789442539215088
             },
             "Natural language query": {
                 "metrics": {
@@ -1249,11 +1249,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.0267019271850586
+                    "duration": 2.9355368614196777
                 },
                 "query": "a k-combination of a set S is a subset of k distinct elements of S",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (K-Combination of a Set):\nLet \\(S\\) be a finite set and \\(k\\) be a non-negative integer. A \\(k\\)-combination of \\(S\\) is a subset of \\(S\\) containing exactly \\(k\\) distinct elements.\n\ntheorem k_combination:\nassumes \"S is a finite set\" and \"k is a non-negative integer\"\nshows \"there exists a subset C of S such that |C| = k and C is a k-combination of S\"\n\n",
-                "duration": 3.0267019271850586
+                "duration": 2.9355368614196777
             }
         }
     },
@@ -1266,11 +1266,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.5241918563842773
+                    "duration": 3.4369633197784424
                 },
                 "query": "The Laws of Large Numbers",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Law of Large Numbers):\nLet \\(X_1, X_2, \\ldots, X_n\\) be a sequence of independent and identically distributed random variables with finite expected value \\(\\mu\\). Then, as \\(n\\) approaches infinity, the sample mean \\(\\overline{X}_n = \\frac{1}{n}\\sum_{i=1}^{n}X_i\\) converges in probability to the expected value \\(\\mu\\).\n\ntheorem law_of_large_numbers:\nassumes \"independence\" and \"identically distributed\" and \"finite expected value\"\nshows \"convergence in probability to expected value\"\n\n",
-                "duration": 3.5241918563842773
+                "duration": 3.4369633197784424
             },
             "Natural language query": {
                 "metrics": {
@@ -1278,11 +1278,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.9618818759918213
+                    "duration": 3.8732101917266846
                 },
                 "query": "average of the results obtained from a large number of independent random samples converges to the true value",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Convergence of Sample Averages):\nLet \\(X_1, X_2, \\ldots, X_n\\) be a sequence of independent and identically distributed (i.i.d.) random variables with a finite expected value \\(\\mu\\). According to the Law of Large Numbers, the sample average \\(\\bar{X}_n = \\frac{1}{n}\\sum_{i=1}^{n}X_i\\) converges in probability to the true mean \\(\\mu\\) as \\(n\\) approaches infinity.\n\ntheorem convergence_law_of_large_numbers:\nassumes \"X_i are i.i.d. with finite expected value\"\nshows \"convergence in probability of sample average to true mean\"\n\n",
-                "duration": 3.9618818759918213
+                "duration": 3.8732101917266846
             }
         }
     },
@@ -1299,26 +1299,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.9663262367248535
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 3.8735928535461426
                 },
                 "query": "Theorem of Ceva",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Ceva's Theorem):\nLet \\(ABC\\) be a triangle, and let \\(D\\), \\(E\\), and \\(F\\) be points on the sides \\(BC\\), \\(CA\\), and \\(AB\\), respectively, such that \\(AD\\), \\(BE\\), and \\(CF\\) are concurrent. Then, the following relation holds:\n\\[\\frac{BD}{DC} \\cdot \\frac{CE}{EA} \\cdot \\frac{AF}{FB} = 1\\]\n\ntheorem ceva:\nassumes \"ABC is a triangle\" and \"D, E, F are points on the sides of ABC\"\nshows \"BD/DC * CE/EA * AF/FB = 1\"\n\n",
-                "duration": 3.9663262367248535
+                "duration": 3.8735928535461426
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 3.5129106044769287
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 3.424875497817993
                 },
                 "query": "[...] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Simson's Line Theorem):\nLet triangle ABC be a given triangle, and let O be a point on the circumcircle of triangle ABC. Let AO, BO, and CO be lines drawn from O to the vertices A, B, and C, respectively, meeting the opposite sides at points D, E, and F. Then the points D, E, and F are collinear, and the line DEF is called the Simson line of point O with respect to triangle ABC.\n\ntheorem simson_line:\nassumes \"triangle ABC\" and \"O on circumcircle ABC\"\nshows \"D, E, F collinear\"\n\n",
-                "duration": 3.5129106044769287
+                "duration": 3.424875497817993
             }
         }
     },
@@ -1338,11 +1338,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.129157066345215
+                    "duration": 6.041604042053223
                 },
                 "query": "L\ufffdH\ufffdpital\ufffds Rule",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (L'H\u00f4pital's Rule for Indeterminate Forms):\nLet \\(f\\) and \\(g\\) be differentiable functions on an open interval \\(I\\) except possibly at a point \\(c\\) in \\(I\\), and let \\(c\\) be a limit point of \\(I\\). If \\(\\lim_{x \\to c} f(x) = \\lim_{x \\to c} g(x) = 0\\) or \\(\\pm\\infty\\), and the limit \\(\\lim_{x \\to c} \\frac{f'(x)}{g'(x)}\\) exists or is \\(\\pm\\infty\\), then \\(\\lim_{x \\to c} \\frac{f(x)}{g(x)} = \\lim_{x \\to c} \\frac{f'(x)}{g'(x)}\\).\n\ntheorem lhopital_rule:\nassumes \"f and g are differentiable on I except possibly at c\"\nand \"limit of f and g as x approaches c is 0 or \u00b1\u221e\"\nand \"limit of f'/g' as x approaches c exists or is \u00b1\u221e\"\nshows \"limit of f/\n",
-                "duration": 6.129157066345215
+                "duration": 6.041604042053223
             },
             "Natural language query": {
                 "metrics": {
@@ -1350,11 +1350,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.126011610031128
+                    "duration": 6.029754400253296
                 },
                 "query": "evaluating limits of indeterminate forms using derivatives",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Evaluating Indeterminate Limits Using Derivatives):\nLet \\(f(x)\\) and \\(g(x)\\) be functions that approach 0 as \\(x\\) approaches \\(a\\), and let \\(g'(x)\\) not equal 0 near \\(a\\). Then the limit of \\(f(x)/g(x)\\) as \\(x\\) approaches \\(a\\) can be evaluated using L'H\u00f4pital's Rule, which states that the limit is equal to the limit of the derivatives of \\(f(x)\\) and \\(g(x)\\) as \\(x\\) approaches \\(a\\), that is, \\(\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)}\\), provided the limit on the right-hand side exists.\n\ntheorem lhopital_limit:\nassumes \"f(x) \u2260 0\" and \"g(x) \u2260 0\" and \"g'(x) \u2260 0\" near \"a\"\nshows \"limit (f(x)/g(x)) as x -> a = limit\n",
-                "duration": 6.126011610031128
+                "duration": 6.029754400253296
             }
         }
     },
@@ -1367,11 +1367,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.415518045425415
+                    "duration": 2.3275437355041504
                 },
                 "query": "Isosceles Triangle Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Isosceles Triangle Theorem):\nLet triangle ABC be an isosceles triangle with AB = AC. Then the angles at B and C are equal, that is, \u2220B = \u2220C.\n\ntheorem isosceles_triangle:\nassumes \"triangle ABC\" and \"AB = AC\"\nshows \"\u2220B = \u2220C\"\n\n",
-                "duration": 2.415518045425415
+                "duration": 2.3275437355041504
             },
             "Natural language query": {
                 "metrics": {
@@ -1379,11 +1379,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.2479379177093506
+                    "duration": 2.1612184047698975
                 },
                 "query": "triangle that has two sides of equal length and two angles of equal measure",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Isosceles Triangle Properties):\nLet triangle \\(ABC\\) be an isosceles triangle with sides \\(AB = AC\\). Then the angles opposite to the equal sides are also equal, that is, \\(\\angle B = \\angle C\\).\n\ntheorem isosceles_triangle:\nassumes \"AB = AC\"\nshows \"angle B = angle C\"\n\n",
-                "duration": 2.2479379177093506
+                "duration": 2.1612184047698975
             }
         }
     },
@@ -1396,23 +1396,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.671067237854004
+                    "duration": 3.5840039253234863
                 },
                 "query": "Sum of a Geometric Series",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of a Geometric Series):\nLet \\(a\\) be the first term and \\(r\\) be the common ratio of a geometric series, where \\(r \\neq 1\\). The sum \\(S\\) of the first \\(n\\) terms of the series is given by \\(S = a \\frac{1 - r^n}{1 - r}\\), provided \\(n\\) is finite and \\(r\\) is a real number.\n\ntheorem sum_geometric:\nassumes \"a \u2260 0\" and \"r \u2260 1\" and \"n \u2208 \u2115\"\nshows \"S = a * (1 - r^n) / (1 - r)\"\n\n",
-                "duration": 3.671067237854004
+                "duration": 3.5840039253234863
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.46845052016107697,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 4.566077947616577
+                    "normalized_discounted_cumulative_gain": 0.4415801103577823,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 4.479346752166748
                 },
                 "query": "When summing infinitely many terms, the [series in question] can either be convergent or divergent",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Convergence of Infinite Series):\nLet \\(\\sum_{n=1}^{\\infty} a_n\\) be a series of real numbers. The series is said to be convergent if the sequence of partial sums \\(S_N = \\sum_{n=1}^{N} a_n\\) approaches a finite limit as \\(N\\) approaches infinity. Conversely, the series is divergent if the sequence of partial sums does not approach a finite limit.\n\ntheorem series_convergence:\nassumes \"a_n \u2208 \u211d\" for all \"n \u2208 \u2115\"\nshows \"converges\" if \"lim (N\u2192\u221e) S_N = L for some L \u2208 \u211d\"\nshows \"diverges\" if \"lim (N\u2192\u221e) S_N does not exist or is \u00b1\u221e\"\n\n",
-                "duration": 4.566077947616577
+                "duration": 4.479346752166748
             }
         }
     },
@@ -1425,11 +1425,11 @@
                     "normalized_discounted_cumulative_gain": 0.6309297535714575,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 3.1570730209350586
+                    "duration": 3.0641415119171143
                 },
                 "query": "e is Transcendental",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Transcendence of e):\nLet \\(e\\) be the base of the natural logarithm. Then \\(e\\) is a transcendental number, which means it is not a root of any non-zero polynomial equation with integer coefficients.\n\ntheorem transcendence_of_e:\nassumes \"e \u2260 0\"\nshows \"not (exists (P :: 'a list) :: 'a => P \u2260 [] /\\ P.map (\u03bb x => x * x - e) = 0)\"\n\n",
-                "duration": 3.1570730209350586
+                "duration": 3.0641415119171143
             },
             "Natural language query": {
                 "metrics": {
@@ -1437,11 +1437,11 @@
                     "normalized_discounted_cumulative_gain": 0.6309297535714575,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 3.06502366065979
+                    "duration": 2.974496841430664
                 },
                 "query": "The best-known [numbers that are not algebraic] are [e and] pi",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Transcendence of e and \u03c0):\nLet \\(e\\) and \\(\\pi\\) be transcendental numbers over the field of rational numbers \\(Q\\). Then \\(e\\) and \\(\\pi\\) are not algebraic numbers, meaning they are not roots of any non-zero polynomial equation with rational coefficients.\n\ntheorem transcendence_e_and_pi:\nassumes \"e \u2260 0\" and \"pi \u2260 0\"\nshows \"not algebraic(e)\" and \"not algebraic(pi)\"\n\n",
-                "duration": 3.06502366065979
+                "duration": 2.974496841430664
             }
         }
     },
@@ -1454,11 +1454,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.5605316162109375
+                    "duration": 3.472433090209961
                 },
                 "query": "Sum of an Arithmetic Series",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of an Arithmetic Series):\nLet \\(a_1\\) be the first term and \\(d\\) the common difference of an arithmetic series. If \\(n\\) is the number of terms, then the sum \\(S_n\\) of the first \\(n\\) terms is given by \\(S_n = \\frac{n}{2}(2a_1 + (n-1)d)\\).\n\ntheorem sum_arithmetic:\nassumes \"a1 \u2260 0\" and \"d \u2260 0\"\nshows \"Sn = n/2 * (2a1 + (n-1)d)\"\n\n",
-                "duration": 3.5605316162109375
+                "duration": 3.472433090209961
             },
             "Natural language query": {
                 "metrics": {
@@ -1466,11 +1466,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4460809230804443
+                    "duration": 3.357208251953125
                 },
                 "query": "taking the number n of terms being added [...], multiplying by the sum of the first and last number in the progression [...], and dividing by 2",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of an Arithmetic Progression):\nLet \\(S\\) be the sum of the first \\(n\\) terms of an arithmetic progression with the first term \\(a_1\\) and the last term \\(a_n\\). The sum \\(S\\) can be calculated using the formula \\(S = \\frac{n}{2}(a_1 + a_n)\\).\n\ntheorem sum_ap:\nassumes \"n > 0\" and \"a1 \u2260 0\" and \"an \u2260 0\"\nshows \"sum (ap) = n/2 * (a1 + an)\"\n\n",
-                "duration": 3.4460809230804443
+                "duration": 3.357208251953125
             }
         }
     },
@@ -1490,11 +1490,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.7974257469177246
+                    "duration": 2.706458568572998
                 },
                 "query": "Perfect Number Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Euler's Totient Theorem for Perfect Numbers):\nLet \\(n\\) be a positive integer. Then \\(n\\) is a perfect number if and only if \\(n\\) is equal to twice the sum of its proper divisors, excluding \\(n\\) itself.\n\ntheorem perfect_number:\nassumes \"n > 0\"\nshows \"n is perfect\" iff \"n = 2 * sum(divisors(n) - n)\"\n\n",
-                "duration": 2.7974257469177246
+                "duration": 2.706458568572998
             },
             "Natural language query": {
                 "metrics": {
@@ -1502,11 +1502,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.5162975788116455
+                    "duration": 3.4295108318328857
                 },
                 "query": "an even number is perfect iff it has the form 2^(p?1) * (2^p - 1), where 2^p ? 1 is a prime number",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Perfect Number Characterization):\nLet \\(n\\) be an even integer. Then \\(n\\) is perfect if and only if it can be expressed in the form \\(n = 2^{p-1}(2^p - 1)\\), where \\(2^p - 1\\) is a prime number, known as a Mersenne prime.\n\ntheorem perfect_number:\nassumes \"n is even\"\nshows \"n is perfect <-> exists p. (2^p - 1 is prime) /\\ (n = 2^(p-1) * (2^p - 1))\"\n\n",
-                "duration": 3.5162975788116455
+                "duration": 3.4295108318328857
             }
         }
     },
@@ -1540,11 +1540,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.400923490524292
+                    "duration": 3.3138911724090576
                 },
                 "query": "The Principle of Mathematical Induction",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Principle of Mathematical Induction):\nLet \\(P(n)\\) be a property that is defined for all natural numbers \\(n\\). If \\(P(1)\\) is true, and for every natural number \\(k\\), \\(P(k)\\) implies \\(P(k+1)\\), then \\(P(n)\\) is true for all natural numbers \\(n\\).\n\ntheorem principle_of_mathematical_induction:\nassumes \"P(1)\" and \"\u2200k. P(k) \u21d2 P(k+1)\"\nshows \"\u2200n. P(n)\"\n\n",
-                "duration": 3.400923490524292
+                "duration": 3.3138911724090576
             },
             "Natural language query": {
                 "metrics": {
@@ -1552,11 +1552,11 @@
                     "normalized_discounted_cumulative_gain": 0.2890648263178879,
                     "reciprocal_rank": 0.1,
                     "rank": 10,
-                    "duration": 6.127830266952515
+                    "duration": 6.0360612869262695
                 },
                 "query": "first proving a simple case, then showing if we assume the claim is true for a given case, then the next case is also true",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Degree of the Product of Two Polynomials):\nLet \\(p\\) and \\(q\\) be non-zero polynomials over a field \\(K\\). Then the degree of the product \\(p \\cdot q\\) is equal to the sum of the degrees of \\(p\\) and \\(q\\), that is, \\(\\deg(p \\cdot q) = \\deg(p) + \\deg(q)\\).\n\ntheorem degree_mult: \nassumes \"p \u2260 0\" and \"q \u2260 0\" \nshows \"degree (p * q) = degree p + degree q\"\n\n",
-                "duration": 6.127830266952515
+                "duration": 6.0360612869262695
             }
         }
     },
@@ -1569,23 +1569,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.7666096687316895
+                    "duration": 4.6728196144104
                 },
                 "query": "The Mean Value Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Mean Value Theorem):\nLet \\(f\\) be a continuous function on the closed interval \\([a, b]\\) and differentiable on the open interval \\((a, b)\\). Then there exists at least one point \\(c\\) in \\((a, b)\\) such that the instantaneous rate of change of the function at \\(c\\) is equal to the average rate of change of the function over the interval \\([a, b]\\), that is, \\(f'(c) = \\frac{f(b) - f(a)}{b - a}\\).\n\ntheorem mean_value_theorem:\nassumes \"f is continuous on [a, b] and differentiable on (a, b)\"\nshows \"exists c in (a, b) such that f'(c) = (f(b) - f(a)) / (b - a)\"\n\n",
-                "duration": 4.7666096687316895
+                "duration": 4.6728196144104
             },
             "Natural language query": {
                 "metrics": {
-                    "top_k_accuracy": 0,
-                    "normalized_discounted_cumulative_gain": 0.33672884983294765,
-                    "reciprocal_rank": 0.09090909090909091,
-                    "rank": 11,
-                    "duration": 3.495993137359619
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5802792108518124,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 3.408393383026123
                 },
                 "query": "for a given planar arc between two endpoints, at least one point at which the tangent to the arc is parallel to the secant through its endpoints",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Parallel Tangent to Secant in a Planar Arc):\nLet \\(A\\) and \\(B\\) be two distinct points in the plane, and let \\(C\\) be a point on the arc \\(AB\\) such that the tangent to the arc at \\(C\\) is parallel to the line segment \\(AB\\). Then \\(C\\) is the point of tangency of the arc \\(AB\\).\n\ntheorem parallel_tangent_secant:\nassumes \"A \u2260 B\" and \"C \u2208 arc(A, B)\"\nshows \"tangent_at C is parallel to line segment AB\"\n\n",
-                "duration": 3.495993137359619
+                "duration": 3.408393383026123
             }
         }
     },
@@ -1598,11 +1598,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.167635679244995
+                    "duration": 6.080719232559204
                 },
                 "query": "Fourier Series",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Fourier Series Representation of a Periodic Function):\nLet \\(f\\) be a \\(2\\pi\\)-periodic function that is piecewise continuous and piecewise differentiable on the interval \\([-\u03c0, \u03c0]\\). Then \\(f\\) can be represented as a Fourier series:\n\n\\[ f(x) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty} \\left( a_n \\cos(nx) + b_n \\sin(nx) \\right) \\]\n\nwhere the Fourier coefficients \\(a_n\\) and \\(b_n\\) are given by:\n\n\\[ a_n = \\frac{1}{\\pi} \\int_{-\\pi}^{\\pi} f(x) \\cos(nx) \\, dx, \\quad n \\geq 0 \\]\n\n\\[ b_n = \\frac{1}{\\pi} \\int_{-\\pi}^{\\pi} f(x) \\sin(nx) \\, dx, \\quad n \\geq 1 \\]\n\n\n",
-                "duration": 6.167635679244995
+                "duration": 6.080719232559204
             },
             "Natural language query": {
                 "metrics": {
@@ -1610,11 +1610,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.160179138183594
+                    "duration": 6.071629285812378
                 },
                 "query": "[...] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Smooth Functions and Fourier Series):\nLet \\(f\\) be a smooth function on the interval \\([-L, L]\\), where \\(L > 0\\). Then \\(f\\) can be represented as a Fourier series given by:\n\\[ f(x) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty} \\left( a_n \\cos\\left(\\frac{n\\pi x}{L}\\right) + b_n \\sin\\left(\\frac{n\\pi x}{L}\\right) \\right) \\]\nwhere the Fourier coefficients \\(a_n\\) and \\(b_n\\) are defined as:\n\\[ a_n = \\frac{1}{L} \\int_{-L}^{L} f(x) \\cos\\left(\\frac{n\\pi x}{L}\\right) dx, \\quad n \\geq 0 \\]\n\\[ b_n = \\frac{1}{L} \\int_{-L}^{L} f(x) \\sin\\left(\\frac{n\\pi x}{L}\\right) dx, \\quad n \\geq 1 \\]\n\n",
-                "duration": 6.160179138183594
+                "duration": 6.071629285812378
             }
         }
     },
@@ -1624,14 +1624,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 4.940370798110962
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 4.853124380111694
                 },
                 "query": "Sum of kth powers",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of kth Powers):\nLet \\(a_1, a_2, \\ldots, a_n\\) be non-negative real numbers. Then the sum of their kth powers is less than or equal to \\(n\\) times the kth power of their arithmetic mean, that is,\n\n\\[\\left(\\sum_{i=1}^{n} a_i\\right)^k \\leq n \\left(\\frac{1}{n}\\sum_{i=1}^{n} a_i^k\\right)^k\\]\n\nfor all \\(k \\geq 1\\).\n\ntheorem sum_of_kth_powers:\nassumes \"a_1, a_2,..., a_n \u2265 0\" and \"n > 0\"\nshows \"sum (a_i^k) \u2264 n * (mean (a_i^k))^k\"\n\n",
-                "duration": 4.940370798110962
+                "duration": 4.853124380111694
             },
             "Natural language query": {
                 "metrics": {
@@ -1639,11 +1639,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.059269666671753
+                    "duration": 3.9713985919952393
                 },
                 "query": "[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Sum of the p-th Powers of the First n Positive Integers):\nLet \\(p\\) be a positive integer. Then the sum of the \\(p\\)-th powers of the first \\(n\\) positive integers can be expressed as a polynomial in \\(n\\) of degree \\(p+1\\).\n\ntheorem sum_of_powers:\nassumes \"p > 0\"\nshows \"sum (k^p for k in [1..n]) = (1/p+1) * n^(p+1) + (1/p+1) * (p+1) * n^p +... + (1/p+1) * p * n + (1/p+1)\"\n\n",
-                "duration": 4.059269666671753
+                "duration": 3.9713985919952393
             }
         }
     },
@@ -1656,11 +1656,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.300548315048218
+                    "duration": 4.212913751602173
                 },
                 "query": "The Cauchy-Schwarz Inequality",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Cauchy-Schwarz Inequality):\nLet \\(V\\) be an inner product space over a field \\(F\\), and let \\(x, y\\) be elements of \\(V\\). The Cauchy-Schwarz Inequality states that the absolute value of the inner product of \\(x\\) and \\(y\\) is less than or equal to the product of the norms of \\(x\\) and \\(y\\), that is, \\(|\\langle x, y \\rangle| \\leq \\|x\\| \\cdot \\|y\\|\\).\n\ntheorem cauchy_schwarz:\nassumes \"V is an inner product space over F\" and \"x, y \u2208 V\"\nshows \"abs(inner_product x y) \u2264 norm x * norm y\"\n\n",
-                "duration": 4.300548315048218
+                "duration": 4.212913751602173
             },
             "Natural language query": {
                 "metrics": {
@@ -1668,11 +1668,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.995051145553589
+                    "duration": 3.903613567352295
                 },
                 "query": "[...] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Cauchy-Schwarz Inequality):\nLet \\(V\\) be an inner product space over a field \\(F\\), and let \\(x, y \\in V\\) be non-zero vectors. Then the absolute value of the inner product of \\(x\\) and \\(y\\) is less than or equal to the product of the norms of \\(x\\) and \\(y\\), that is, \\(|\\langle x, y \\rangle| \\leq \\|x\\| \\cdot \\|y\\|\\).\n\ntheorem cauchy_schwarz:\nassumes \"x \u2260 0\" and \"y \u2260 0\"\nshows \"abs (inner_product x y) <= norm x * norm y\"\n\n",
-                "duration": 3.995051145553589
+                "duration": 3.903613567352295
             }
         }
     },
@@ -1682,26 +1682,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.436720609664917
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 3.3451333045959473
                 },
                 "query": "The Intermediate Value Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Intermediate Value Theorem):\nLet \\(f\\) be a continuous function on the closed interval \\([a, b]\\), and let \\(N\\) be any number between \\(f(a)\\) and \\(f(b)\\). Then there exists a number \\(c\\) in the interval \\((a, b)\\) such that \\(f(c) = N\\).\n\ntheorem IVT:\nassumes \"f is continuous on [a, b]\" and \"N is between f(a) and f(b)\"\nshows \"there exists c in (a, b) such that f(c) = N\"\n\n",
-                "duration": 3.436720609664917
+                "duration": 3.3451333045959473
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 3.4239501953125
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 3.3364765644073486
                 },
                 "query": "if f is a continuous function whose domain contains the interval [a, b], then it takes on any given value between f(a) and f(b)",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Intermediate Value Theorem):\nLet \\(f\\) be a continuous function on the closed interval \\([a, b]\\). If \\(y\\) is any number between \\(f(a)\\) and \\(f(b)\\), then there exists a number \\(c\\) in the interval \\([a, b]\\) such that \\(f(c) = y\\).\n\ntheorem ivt:\nassumes \"f is continuous on [a, b]\" and \"y is between f(a) and f(b)\"\nshows \"there exists c in [a, b] such that f(c) = y\"\n\n",
-                "duration": 3.4239501953125
+                "duration": 3.3364765644073486
             }
         }
     },
@@ -1721,11 +1721,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.746673107147217
+                    "duration": 2.6600289344787598
                 },
                 "query": "Divergence of the Prime Reciprocal Series",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Divergence of the Prime Reciprocal Series):\nLet \\(\\sum_{p \\text{ prime}} \\frac{1}{p}\\) denote the series of the reciprocals of the prime numbers. This series diverges, meaning that its sum is infinite.\n\ntheorem prime_reciprocal_series_divergence:\nassumes \"p is a prime number\"\nshows \"sum (1/p) over all primes p diverges\"\n\n",
-                "duration": 2.746673107147217
+                "duration": 2.6600289344787598
             },
             "Natural language query": {
                 "metrics": {
@@ -1733,11 +1733,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.260869026184082
+                    "duration": 3.172337055206299
                 },
                 "query": "sum of the reciprocals of all prime numbers diverges",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Divergence of the Sum of Reciprocals of Primes):\nLet \\(P\\) be the set of all prime numbers. The series formed by the sum of the reciprocals of the elements in \\(P\\) diverges, that is, \\(\\sum_{p \\in P} \\frac{1}{p} = \\infty\\).\n\ntheorem sum_of_reciprocals_of_primes:\nassumes \"P is the set of all prime numbers\"\nshows \"sum (1/p for p in P) = infinity\"\n\n",
-                "duration": 3.260869026184082
+                "duration": 3.172337055206299
             }
         }
     },
@@ -1747,14 +1747,14 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
-                    "reciprocal_rank": 0.2,
-                    "rank": 5,
-                    "duration": 3.8597395420074463
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 3.7724766731262207
                 },
                 "query": "Dissection of Cubes (J.E. Littlewood\ufffds \ufffdelegant\ufffd proof)",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Littlewood's Dissection of Cubes):\nLet \\(n\\) be a positive integer. Then the sum of the cubes of the first \\(n\\) positive integers can be expressed as the square of the sum of the first \\(n\\) positive integers, that is,\n\n\\[\n\\sum_{k=1}^{n} k^3 = \\left(\\sum_{k=1}^{n} k\\right)^2.\n\\]\n\ntheorem littlewood_cubes:\nassumes \"n > 0\"\nshows \"sum (k^3 for k in 1..n) = (sum (k for k in 1..n))^2\"\n\n",
-                "duration": 3.8597395420074463
+                "duration": 3.7724766731262207
             },
             "Natural language query": {
                 "metrics": {
@@ -1762,11 +1762,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.5076701641082764
+                    "duration": 2.420166015625
                 },
                 "query": "Dissection of Cubes: A cube cannot be cubed.",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Cubing a Cube):\nLet \\(C\\) be a geometric cube. Then \\(C\\) cannot be cubed, meaning that there is no cube \\(C'\\) such that \\(C'\\) is the result of cubing \\(C\\).\n\ntheorem cubing_cube:\nassumes \"C is a cube\"\nshows \"there does not exist a cube C' such that C' is the cube of C\"\n\n",
-                "duration": 2.5076701641082764
+                "duration": 2.420166015625
             }
         }
     },
@@ -1779,11 +1779,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.532365560531616
+                    "duration": 3.444990396499634
                 },
                 "query": "The Friendship Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Friendship Theorem):\nLet \\(G\\) be a finite group and \\(H\\) be a subgroup of \\(G\\). If every element of \\(G\\) commutes with every element of \\(H\\) (i.e., \\(gh = hg\\) for all \\(g \\in G\\) and \\(h \\in H\\)), then \\(H\\) is a normal subgroup of \\(G\\).\n\ntheorem friendship_theorem:\nassumes \"G is a finite group\" and \"H is a subgroup of G\"\nand \"for all g in G and h in H, gh = hg\"\nshows \"H is a normal subgroup of G\"\n\n",
-                "duration": 3.532365560531616
+                "duration": 3.444990396499634
             },
             "Natural language query": {
                 "metrics": {
@@ -1791,11 +1791,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4339747428894043
+                    "duration": 3.343167304992676
                 },
                 "query": "[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...]",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Unique Common Neighbor in Finite Graphs):\nLet \\(G\\) be a finite undirected graph. If every pair of distinct vertices in \\(G\\) has exactly one common neighbor, then \\(G\\) is a regular graph of degree \\(k\\), where \\(k\\) is the common degree of all vertices.\n\ntheorem unique_common_neighbor:\nassumes \"G is a finite undirected graph\"\nshows \"for all vertices \\(u, v \\in G\\), the number of common neighbors is exactly 1\"\nand \"G is a regular graph of degree \\(k\\)\"\n\n",
-                "duration": 3.4339747428894043
+                "duration": 3.343167304992676
             }
         }
     },
@@ -1819,26 +1819,26 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 3.4934940338134766
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 3.3853564262390137
                 },
                 "query": "Desargues\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Desargues' Theorem):\nLet \\(A, B, C, D\\) be four points in a plane such that the lines \\(AB, BC, CD, DA\\) are concurrent at a point \\(O\\). Then the points of intersection of the pairs of corresponding sides of the triangles \\(ABC\\) and \\(CDA\\) are collinear.\n\ntheorem desargues:\nassumes \"A, B, C, D are distinct points in a plane\"\nand \"lines AB, BC, CD, DA are concurrent at point O\"\nshows \"points of intersection of corresponding sides of triangles ABC and CDA are collinear\"\n\n",
-                "duration": 3.4934940338134766
+                "duration": 3.3853564262390137
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 0,
-                    "normalized_discounted_cumulative_gain": 0.27894294565112987,
-                    "reciprocal_rank": 0.09090909090909091,
-                    "rank": 11,
-                    "duration": 3.068777322769165
+                    "normalized_discounted_cumulative_gain": 0.227670248696953,
+                    "reciprocal_rank": 0.05,
+                    "rank": 20,
+                    "duration": 2.9735002517700195
                 },
                 "query": "Two triangles are in perspective axially [iff] they are in perspective centrally.",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Axial and Central Perspective of Triangles):\nLet \\(T_1\\) and \\(T_2\\) be two triangles in the Euclidean plane. Then \\(T_1\\) and \\(T_2\\) are in axial perspective if and only if they are in central perspective.\n\ntheorem axial_central_perspective:\nassumes \"T1 \u2260 0\" and \"T2 \u2260 0\"\nshows \"axial_perspective T1 T2 \u2194 central_perspective T1 T2\"\n\n",
-                "duration": 3.068777322769165
+                "duration": 2.9735002517700195
             }
         }
     },
@@ -1851,11 +1851,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.7613613605499268
+                    "duration": 2.6691904067993164
                 },
                 "query": "Derangements Formula",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Derangement Formula):\nLet \\(n\\) be a non-negative integer. The number of derangements (permutations with no fixed points) of \\(n\\) distinct objects is given by the nearest integer to \\(n! / e\\), where \\(e\\) is the base of the natural logarithm.\n\ntheorem derangement_formula:\nassumes \"n \u2208 N\"\nshows \"derangements(n) = round(n!/e)\"\n\n",
-                "duration": 2.7613613605499268
+                "duration": 2.6691904067993164
             },
             "Natural language query": {
                 "metrics": {
@@ -1863,11 +1863,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.8880534172058105
+                    "duration": 2.7971973419189453
                 },
                 "query": "[...] permutation of the elements of a set in which no element appears in its original position",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (No-Fixed-Point Permutation):\nLet \\(S\\) be a finite set with \\(n\\) elements. A permutation \\(\\sigma\\) of \\(S\\) is called a no-fixed-point permutation if for every element \\(x \\in S\\), \\(\\sigma(x) \\neq x\\).\n\ntheorem no_fixed_point_permutation:\nassumes \"S is a finite set with n elements\"\nshows \"forall x in S, sigma(x)!= x\"\n\n",
-                "duration": 2.8880534172058105
+                "duration": 2.7971973419189453
             }
         }
     },
@@ -1887,11 +1887,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.5735929012298584
+                    "duration": 3.482017755508423
                 },
                 "query": "Stirling\ufffds Formula",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Stirling's Formula for the Gamma Function):\nLet \\(n\\) be a positive integer. Stirling's formula provides an approximation for the factorial of \\(n\\), denoted as \\(n!\\), which is given by:\n\n\\[ n! \\approx \\sqrt{2 \\pi n} \\left(\\frac{n}{e}\\right)^n \\]\n\nThis approximation becomes more accurate as \\(n\\) increases.\n\ntheorem stirling_formula:\nassumes \"n > 0\"\nshows \"n! ~ sqrt(2*pi*n) * (n/e)^n\"\n\n",
-                "duration": 3.5735929012298584
+                "duration": 3.482017755508423
             },
             "Natural language query": {
                 "metrics": {
@@ -1899,11 +1899,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.859788179397583
+                    "duration": 3.7713706493377686
                 },
                 "query": "asymptotic approximation for factorials [...] accurate results even for small values of n",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Stirling's Approximation for Factorials):\nLet \\(n\\) be a non-negative integer. Stirling's approximation provides an asymptotic formula for the factorial of \\(n\\), which is given by \\(n! \\approx \\sqrt{2 \\pi n} \\left(\\frac{n}{e}\\right)^n\\), where \\(e\\) is the base of the natural logarithm. This approximation becomes increasingly accurate as \\(n\\) grows larger.\n\ntheorem stirling_approx:\nassumes \"n \u2208 \u2115\"\nshows \"n! \u2248 sqrt(2 * pi * n) * (n / e)^n\"\n\n",
-                "duration": 3.859788179397583
+                "duration": 3.7713706493377686
             }
         }
     },
@@ -1923,23 +1923,23 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 4.002096176147461
+                    "duration": 3.902897596359253
                 },
                 "query": "Pick\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Pick's Theorem):\nLet \\(A\\) be a simple polygon with vertices on a lattice grid. If \\(A\\) is a non-self-intersecting polygon (i.e., a simple polygon), then the area \\(A\\) of \\(A\\) can be calculated by the formula \\(A = i + \\frac{b}{2} - 1\\), where \\(i\\) is the number of lattice points on the interior of \\(A\\) and \\(b\\) is the number of lattice points on the boundary of \\(A\\).\n\ntheorem picks_theorem:\nassumes \"A is a simple polygon with vertices on a lattice grid\"\nshows \"area A = i + b/2 - 1\"\n\n",
-                "duration": 4.002096176147461
+                "duration": 3.902897596359253
             },
             "Natural language query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 6.103546142578125
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 6.015220403671265
                 },
                 "query": "formula for the area of a simple polygon with integer vertex coordinates",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Area of a Simple Polygon with Integer Vertex Coordinates):\nLet \\(P\\) be a simple polygon with vertices \\(V = \\{v_1, v_2,..., v_n\\}\\) where each \\(v_i = (x_i, y_i)\\) are integer coordinates in the Cartesian plane. The area \\(A\\) of \\(P\\) can be computed using the shoelace formula:\n\n\\[ A = \\frac{1}{2} \\left| \\sum_{i=1}^{n} (x_i y_{i+1} - x_{i+1} y_i) \\right| \\]\n\nwhere \\(x_{n+1} = x_1\\) and \\(y_{n+1} = y_1\\) to close the polygon.\n\ntheorem area_simple_polygon:\nassumes \"P is a simple polygon\" and \"V = {v_1, v_2,..., v_n}\"\nand \"each v_i = (x_i, y_i)\"\nshows \"area P = 1/2 * |sum(x_i * y_{i+\n",
-                "duration": 6.103546142578125
+                "duration": 6.015220403671265
             }
         }
     },
@@ -1959,11 +1959,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.1320462226867676
+                    "duration": 3.0424582958221436
                 },
                 "query": "The Law of Cosines",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Law of Cosines):\nLet \\( \\triangle ABC \\) be a triangle with sides \\( a, b, \\) and \\( c \\) opposite angles \\( A, B, \\) and \\( C \\) respectively. Then, the Law of Cosines states that \\( c^2 = a^2 + b^2 - 2ab \\cos(C) \\).\n\ntheorem law_of_cosines:\nassumes \"triangle ABC exists\"\nshows \"c^2 = a^2 + b^2 - 2ab cos(C)\"\n\n",
-                "duration": 3.1320462226867676
+                "duration": 3.0424582958221436
             },
             "Natural language query": {
                 "metrics": {
@@ -1971,11 +1971,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.4952235221862793
+                    "duration": 3.352958917617798
                 },
                 "query": "relates the lengths of the sides of a triangle to the cosine of one of its angles",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Law of Cosines):\nLet \\( \\triangle ABC \\) be a triangle with sides \\( a, b, \\) and \\( c \\) opposite to angles \\( A, B, \\) and \\( C \\) respectively. If \\( \\cos(C) \\) is known, then the lengths of the sides can be related as follows: \\( c^2 = a^2 + b^2 - 2ab\\cos(C) \\).\n\ntheorem law_cosines:\nassumes \"triangle ABC exists\"\nshows \"c^2 = a^2 + b^2 - 2ab*cos(C)\"\n\n",
-                "duration": 3.4952235221862793
+                "duration": 3.352958917617798
             }
         }
     },
@@ -1988,11 +1988,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.3241069316864014
+                    "duration": 3.226635456085205
                 },
                 "query": "Ptolemy\ufffds Theorem",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Ptolemy's Theorem):\nLet \\(ABCD\\) be a cyclic quadrilateral (a quadrilateral inscribed in a circle). Then the sum of the products of the lengths of opposite sides is equal to the product of the lengths of the diagonals, that is, \\(AB \\cdot CD + BC \\cdot AD = AC \\cdot BD\\).\n\ntheorem ptolemy_theorem:\nassumes \"ABCD is a cyclic quadrilateral\"\nshows \"AB * CD + BC * AD = AC * BD\"\n\n",
-                "duration": 3.3241069316864014
+                "duration": 3.226635456085205
             },
             "Natural language query": {
                 "metrics": {
@@ -2000,11 +2000,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.2183470726013184
+                    "duration": 3.1216788291931152
                 },
                 "query": "product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Diagonal Product Theorem):\nLet \\(ABC\\) be a cyclic quadrilateral (a quadrilateral inscribed in a circle). Then the product of the lengths of the diagonals \\(AC\\) and \\(BD\\) is equal to the sum of the products of the lengths of the pairs of opposite sides \\(AB \\cdot CD\\) and \\(BC \\cdot AD\\).\n\ntheorem diagonal_product:\nassumes \"ABC is a cyclic quadrilateral\"\nshows \"AC * BD = AB * CD + BC * AD\"\n\n",
-                "duration": 3.2183470726013184
+                "duration": 3.1216788291931152
             }
         }
     },
@@ -2017,11 +2017,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.220485687255859
+                    "duration": 6.116749286651611
                 },
                 "query": "Principle of Inclusion/Exclusion",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Principle of Inclusion/Exclusion):\nLet \\(A_1, A_2, \\ldots, A_n\\) be finite sets. The Principle of Inclusion/Exclusion states that the cardinality of the union of these sets is given by:\n\n\\[\n|A_1 \\cup A_2 \\cup \\ldots \\cup A_n| = \\sum_{i=1}^{n} |A_i| - \\sum_{1 \\leq i < j \\leq n} |A_i \\cap A_j| + \\sum_{1 \\leq i < j < k \\leq n} |A_i \\cap A_j \\cap A_k| - \\ldots + (-1)^{n+1} |A_1 \\cap A_2 \\cap \\ldots \\cap A_n|.\n\\]\n\ntheorem principle_inclusion_exclusion:\nassumes \"A1, A2,..., An are finite sets\"\nshows \"|A1 \u222a A2 \u222a... \u222a An| = \u03a3|Ai| - \u03a3|Ai \u2229 Aj| + \n",
-                "duration": 6.220485687255859
+                "duration": 6.116749286651611
             },
             "Natural language query": {
                 "metrics": {
@@ -2029,11 +2029,11 @@
                     "normalized_discounted_cumulative_gain": 0.16260831227163416,
                     "reciprocal_rank": 0.014285714285714285,
                     "rank": 70,
-                    "duration": 6.243738174438477
+                    "duration": 6.137915849685669
                 },
                 "query": "[...] over-generous inclusion, followed by compensating exclusion [...]",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Degree of the Product of Two Polynomials):\nLet \\(p\\) and \\(q\\) be non-zero polynomials over a field \\(K\\). Then the degree of the product \\(p \\cdot q\\) is equal to the sum of the degrees of \\(p\\) and \\(q\\), that is, \\(\\deg(p \\cdot q) = \\deg(p) + \\deg(q)\\).\n\ntheorem degree_mult: \nassumes \"p \u2260 0\" and \"q \u2260 0\" \nshows \"degree (p * q) = degree p + degree q\"\n\n",
-                "duration": 6.243738174438477
+                "duration": 6.137915849685669
             }
         }
     },
@@ -2053,11 +2053,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.3157598972320557
+                    "duration": 2.211806535720825
                 },
                 "query": "Bertrand\ufffds Postulate",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Bertrand's Postulate):\nFor every integer \\(n > 1\\), there exists at least one prime number \\(p\\) such that \\(n < p < 2n\\).\n\ntheorem bertrand_postulate:\nassumes \"n > 1\"\nshows \"exists p :: nat such that n < p and p < 2n\"\n\n",
-                "duration": 2.3157598972320557
+                "duration": 2.211806535720825
             },
             "Natural language query": {
                 "metrics": {
@@ -2065,11 +2065,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.4749701023101807
+                    "duration": 2.36983060836792
                 },
                 "query": "[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Bertrand's Postulate):\nFor any integer \\(n > 3\\), there exists at least one prime number \\(p\\) such that \\(n < p < 2n - 2\\).\n\ntheorem bertrand_postulate:\nassumes \"n > 3\"\nshows \"exists p :: nat such that n < p and p < 2 * n - 2\"\n\n",
-                "duration": 2.4749701023101807
+                "duration": 2.36983060836792
             }
         }
     },
@@ -2089,11 +2089,11 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 6.073235750198364
+                    "duration": 5.960891008377075
                 },
                 "query": "Descartes Rule of Signs",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Descartes' Rule of Signs):\nLet \\(f(x)\\) be a polynomial with real coefficients. The number of positive real roots of \\(f(x)\\) is either equal to the number of variations in sign of the coefficients of \\(f(x)\\) or is less than it by an even number. Similarly, the number of negative real roots of \\(f(x)\\) is either equal to the number of variations in sign of the coefficients of \\(f(x)\\) after replacing \\(x\\) with \\(-x\\) or is less than it by an even number.\n\ntheorem descartes_rule_of_signs:\nassumes \"f(x) \u2208 R[x]\"\nshows \"positive_roots(f) \u2264 variations_in_sign(f) \u2227 (positive_roots(f) = variations_in_sign(f) \u2228 positive_roots(f) = variations_in_sign(f) - 2n)\"\nand \"negative_roots(f) \u2264 variations_in_sign(f_neg) \u2227 (negative_roots(f) = variations_in_sign(\n",
-                "duration": 6.073235750198364
+                "duration": 5.960891008377075
             },
             "Natural language query": {
                 "metrics": {
@@ -2101,34 +2101,34 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 3.7721352577209473
+                    "duration": 3.669426441192627
                 },
                 "query": "number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients",
                 "refined_query": "Retrieve math theorems stated in natural language that are mathematically equivalent to the given one:\n\nTheorem (Descartes' Rule of Signs):\nLet \\(p(x)\\) be a polynomial with real coefficients. The number of positive real roots of \\(p(x)\\) is at most the number of sign changes in the sequence of its coefficients, and the number of negative real roots is at most the number of sign changes in the sequence of coefficients of \\(p(-x)\\).\n\ntheorem descartes_rule_of_signs:\nassumes \"p \u2260 0\"\nshows \"positive_roots \u2264 sign_changes(coefficients(p))\" and \"negative_roots \u2264 sign_changes(coefficients(p(-x)))\"\n\n",
-                "duration": 3.7721352577209473
+                "duration": 3.669426441192627
             }
         }
     },
     "summary": {
         "top_k_accuracy": {
             "sample_size": 132,
-            "average": 0.9696969696969697
+            "average": 0.9772727272727273
         },
         "normalized_discounted_cumulative_gain": {
             "sample_size": 132,
-            "average": 0.878878854005979
+            "average": 0.8827106289173127
         },
         "reciprocal_rank": {
             "sample_size": 132,
-            "average": 0.84087281090122
+            "average": 0.8457251082251082
         },
         "rank": {
             "sample_size": 132,
-            "average": 2.4166666666666665
+            "average": 2.212121212121212
         },
         "duration": {
             "sample_size": 132,
-            "average": 3.7283173257654365
+            "average": 3.637007792790731
         }
     }
 }
