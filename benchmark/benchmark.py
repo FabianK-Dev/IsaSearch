@@ -21,9 +21,6 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-# Empty CUDA cache
-torch.cuda.empty_cache()
-
 print("Loading Solr...")
 solr = connect_solr(config)
 
