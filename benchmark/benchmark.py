@@ -66,8 +66,9 @@ if "metadatas" in metadata_response and metadata_response["metadatas"] is not No
     for item in metadata_response["metadatas"]:
         existing.add(item["source"])
 
-print("Preparing documents before adding to collection...")
+print("Preparing documents before adding to ChromaDB collection...")
 filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
+print(f"{len(filtered_tree)} documents are still missing in ChromaDB collection.")
 
 for i in range(0, len(filtered_tree), 5000):
     doc_ids = filtered_tree[i:i + 5000]
