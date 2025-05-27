@@ -224,5 +224,5 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 
-with open(f"./benchmark/benchmark_results_{config["llm_name"].replace("/", "-")}.json", "w") as outfile:
+with open("./benchmark/benchmark_results_" + config["llm_name"].replace("/", "-") + ".json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
