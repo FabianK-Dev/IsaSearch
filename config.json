@@ -7,9 +7,9 @@
     "solr_core_url": "http://localhost:8983/solr/local",
     "cache_folder": ".cache",
     "artifacts_folder": "artifacts",
-    "prompts_folder": "prompts",
+    "prompts_folder": "prompts/microsoft-Phi",
     "chroma_db_path": "chroma_storages",
-    "llm_name": "microsoft/Phi-3.5-mini-instruct",
+    "llm_name": "microsoft/Phi-3-mini-4k-instruct",
     "benchmark_llms": [
         "microsoft/Phi-3.5-mini-instruct",
         "microsoft/Phi-3-mini-4k-instruct"
