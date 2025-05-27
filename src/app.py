@@ -128,6 +128,7 @@ else:
 while True:
     print()
     print("Please enter a search query or terminate the application using Ctrl + C:")
+    print("Examples: 'pythagoras', 'prime number theorem but in vector space', 'fundamental formula for generating Pythagorean triples', ...")
     query = input("Query: ")
 
     results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
@@ -137,18 +138,17 @@ while True:
     for i, result in enumerate(results_list[:5]):
         score = result.get("score")
         doc_id = result.get("id").split("/")[-1]
-        src_text = "\n    ".join(result.get("src", "").splitlines()) # Indent with 4 spaces
 
-        doc_src = "\n".join(src_text.splitlines()[:10])
-        if len(src_text.splitlines()) > 10:
-            doc_src += "\n... (theorem source code truncated to 10 lines)"
+        if len(src_text()) > 500:
+            doc_src = doc_src[:500] + "...\n(theorem source code truncated to 500 characters)"
 
-        doc_description = "\n        ".join(result.get("llm_description").splitlines()) # Indent with 8 spaces
+        src_text = "    " + "\n    ".join(result.get("src", "").splitlines()) # Indent with 4 spaces
+        doc_description = "    " + "\n    ".join(result.get("llm_description").splitlines()) # Indent with 8 spaces
         doc_entity_kname = result.get("entity_kname")
 
         print(f"RESULT {i+1}: | SCORE (lower is better): {str(round(score, 3))} | ID: {doc_id}")
         print(src_text)
         print()
-        print("    LLM SUMMARY:")
-        print("\"" + doc_description + "\"")
+        print("    LLM SUMMARY: " + doc_description)
         print()
+        print("=" * 40)
