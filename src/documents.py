@@ -140,7 +140,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         llm = LLM(
             model=config["llm_name"],
             max_model_len=max_tokens_prompt + config["sampling_parameters"]["max_tokens"],
-            dtype="auto",
+            dtype="cuda",
             gpu_memory_utilization=config["gpu_memory_utilization"])
         sampling_params = SamplingParams(
             temperature=config["sampling_parameters"]["temperature"],

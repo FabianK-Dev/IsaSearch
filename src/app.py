@@ -92,7 +92,7 @@ for i in range(0, len(filtered_tree), 5000):
 
 model = AutoModelForCausalLM.from_pretrained(
     config["llm_name"],
-    device_map="auto",
+    device_map="cuda",
     torch_dtype="auto")
 
 tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
