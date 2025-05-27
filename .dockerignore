@@ -1,0 +1,20 @@
+# Folders
+.cache
+.venv
+.vscode
+chroma_storages*
+artifacts
+
+# Downloaded
+afp-*
+Isabelle*
+
+# Files
+.directory
+*.zip
+*.pyc
+*.log
+.~lock.*.csv#
+*.ipynb
+.no_backup_tag
+benchmark/*.html
