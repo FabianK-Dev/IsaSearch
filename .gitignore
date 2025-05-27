@@ -12,7 +12,6 @@ Isabelle*
 # Files
 .directory
 *.zip
-*.tar.gz
 *.pyc
 *.log
 .~lock.*.csv#
