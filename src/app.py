@@ -139,16 +139,16 @@ while True:
         score = result.get("score")
         doc_id = result.get("id").split("/")[-1]
 
+        src_text = result.get("src", "")
+        doc_description = result.get("llm_description")
+        doc_entity_kname = result.get("entity_kname")
+
         if len(src_text()) > 500:
             doc_src = doc_src[:500] + "...\n(theorem source code truncated to 500 characters)"
-
-        src_text = "    " + "\n    ".join(result.get("src", "").splitlines()) # Indent with 4 spaces
-        doc_description = "    " + "\n    ".join(result.get("llm_description").splitlines()) # Indent with 8 spaces
-        doc_entity_kname = result.get("entity_kname")
 
         print(f"RESULT {i+1}: | SCORE (lower is better): {str(round(score, 3))} | ID: {doc_id}")
         print(src_text)
         print()
-        print("    LLM SUMMARY: " + doc_description)
+        print("LLM SUMMARY: " + doc_description)
         print()
         print("=" * 40)
