@@ -2,6 +2,8 @@ FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
     wget openjdk-17-jre-headless \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -16,6 +18,9 @@ ENV SOLR_HOME=/opt/solr
 ENV PATH="$SOLR_HOME/bin:$PATH"
 
 COPY . /app/
-RUN tar -xf assets/artifacts.tar.gz assets/cache.tar.gz assets/chroma_storages.tar.gz assets/find_facts.tar.gz 
+RUN tar -xf assets/artifacts.tar.gz && \
+    tar -xf assets/cache.tar.gz && \
+    tar -xf assets/chroma_storages.tar.gz && \
+    tar -xf assets/find_facts.tar.gz
 
-CMD ["solr", "start", "--force", "-p", "8983", "-s", "/opt/solr/server/solr/local"]
+CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && pip install -r requirements.txt && python -m benchmark.benchmark
