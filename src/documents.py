@@ -201,8 +201,6 @@ def get_document_descriptions(config, document_tree, prompts, tokenizer):
 
         if doc_id in document_tree:
             document_tree[doc_id]["llm_description"] = llm_description
-        else:
-            print(f"Warning: LLM description for document with id {doc_id} does not exist in document tree and will thus be ignored.")
 
     return document_tree
 
