@@ -30,15 +30,15 @@ def relevant_doc_keys(solr_document):
         "entity_kname": solr_document.get("entity_kname", None)
     }
 
-# TODO: remove in future
-benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
-benchmark_df = benchmark_df.reset_index()
-target_identifiers = " ".join(benchmark_df["Target Identifier"].astype(str).tolist())
+# # TODO: remove in future
+# benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
+# benchmark_df = benchmark_df.reset_index()
+# target_identifiers = " ".join(benchmark_df["Target Identifier"].astype(str).tolist())
 
-# TODO: remove in future
-with open("benchmark/scrape_statistics.json", "r") as file:
-    data = file.read()
-    scrape_statistics = json.loads(data)
+# # TODO: remove in future
+# with open("benchmark/scrape_statistics.json", "r") as file:
+#     data = file.read()
+#     scrape_statistics = json.loads(data)
 
 def fetch_all_docs(solr, config):
     document_tree = {}
@@ -48,17 +48,17 @@ def fetch_all_docs(solr, config):
     max_docs = results.raw_response['response']['numFound']
 
     # TODO: remove in future
-    allow = 0
+    # allow = 0
     for result in results:
-        # TODO: remove in future
-        if "entity_kname" in result and result["entity_kname"] in target_identifiers:
-            result_filtered = relevant_doc_keys(result)
-            document_tree[result["id"]] = result_filtered
-            allow = 200
-        elif allow > 0:
-            allow -= 1
-            result_filtered = relevant_doc_keys(result)
-            document_tree[result["id"]] = result_filtered
+    #     # TODO: remove in future
+    #     if "entity_kname" in result and result["entity_kname"] in target_identifiers:
+    #         result_filtered = relevant_doc_keys(result)
+    #         document_tree[result["id"]] = result_filtered
+    #         allow = 200
+    #     elif allow > 0:
+    #         allow -= 1
+        result_filtered = relevant_doc_keys(result)
+        document_tree[result["id"]] = result_filtered
 
     pages = math.ceil(max_docs / docs_per_page)
     for i in range(1, pages):
@@ -66,17 +66,17 @@ def fetch_all_docs(solr, config):
         results = solr.search("command:theorem OR command:lemma OR command:corollary", start=i * docs_per_page, rows=docs_per_page)
 
         # TODO: remove in future
-        allow = 0
+        # allow = 0
         for result in results:
-            # TODO: remove in future
-            if "entity_kname" in result and result["entity_kname"] in target_identifiers:
-                result_filtered = relevant_doc_keys(result)
-                document_tree[result["id"]] = result_filtered
-                allow = 200
-            elif allow > 0:
-                allow -= 1
-                result_filtered = relevant_doc_keys(result)
-                document_tree[result["id"]] = result_filtered
+        #     # TODO: remove in future
+        #     if "entity_kname" in result and result["entity_kname"] in target_identifiers:
+        #         result_filtered = relevant_doc_keys(result)
+        #         document_tree[result["id"]] = result_filtered
+        #         allow = 200
+        #     elif allow > 0:
+        #         allow -= 1
+            result_filtered = relevant_doc_keys(result)
+            document_tree[result["id"]] = result_filtered
 
     return document_tree
 
