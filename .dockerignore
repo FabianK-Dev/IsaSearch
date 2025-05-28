@@ -18,3 +18,4 @@ Isabelle*
 *.ipynb
 .no_backup_tag
 benchmark/*.html
+Dockerfile

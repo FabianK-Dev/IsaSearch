@@ -26,4 +26,4 @@ RUN tar -xf assets/artifacts.tar.gz && \
     tar -xf assets/chroma_storages.tar.gz && \
     tar -xf assets/find_facts.tar.gz
 
-CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python -m benchmark.benchmark
+CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m benchmark.benchmark

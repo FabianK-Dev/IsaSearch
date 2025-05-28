@@ -92,7 +92,7 @@ for i in range(0, len(filtered_tree), 5000):
 
 model = AutoModelForCausalLM.from_pretrained(
     config["llm_name"],
-    device_map="cuda",
+    device_map="auto",
     torch_dtype="auto")
 
 tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
@@ -128,7 +128,7 @@ else:
 while True:
     print()
     print("Please enter a search query or terminate the application using Ctrl + C:")
-    print("Examples: 'pythagoras', 'prime number theorem but in vector space', 'fundamental formula for generating Pythagorean triples', ...")
+    print("Examples: 'pythagoras', 'pythagorean theorem but in vector space', 'fundamental formula for generating Pythagorean triples', ...")
     query = input("Query: ")
 
     results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
@@ -143,12 +143,12 @@ while True:
         doc_description = result.get("llm_description")
         doc_entity_kname = result.get("entity_kname")
 
-        if len(src_text()) > 500:
-            doc_src = doc_src[:500] + "...\n(theorem source code truncated to 500 characters)"
+        if len(src_text) > 500:
+            src_text = src_text[:500] + "...\n(theorem source code truncated to 500 characters)"
 
         print(f"RESULT {i+1}: | SCORE (lower is better): {str(round(score, 3))} | ID: {doc_id}")
         print(src_text)
         print()
         print("LLM SUMMARY: " + doc_description)
         print()
-        print("=" * 40)
+        print("-" * 40)
