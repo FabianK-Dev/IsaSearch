@@ -30,6 +30,9 @@ RUN tar -xf assets/artifacts.tar.gz && \
     tar -xf assets/chroma_storages.tar.gz && \
     tar -xf assets/find_facts.tar.gz
 
-COPY . /app/
+COPY benchmark /app/benchmark
+COPY prompts /app/prompts
+COPY src /app/src
+COPY config.json /app/config.json
 
-CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m benchmark.benchmark
+#CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && sleep 10 && python3 -m benchmark.benchmark
