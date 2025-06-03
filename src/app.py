@@ -125,15 +125,34 @@ if config["enable_llm_output_cache"]:
 else:
     print("LLM output caching is disabled in the config.")
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 try:
     while True:
         print()
-        print("Please enter a search query or terminate the application using Ctrl + C:")
-        print("Examples: 'pythagoras', 'pythagorean theorem but in vector space', 'fundamental formula for generating Pythagorean triples', ...")
+        print(color.BOLD + color.RED + "Please enter a search query or terminate the application using Ctrl + C:")
+        print("Examples: 'pythagoras', 'pythagorean theorem but in vector space', 'fundamental formula for generating Pythagorean triples', ..." + color.END)
         query = input("Query: ")
 
         results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
         results_list = search_results_to_docs(results_dict, document_tree)["results"]
+
+        print()
+        print(color.YELLOW + "REFINED QUERY USING LLM:")
+        print(results_dict["refined_query"] + color.END)
+
+        with open("user_queries.txt", "a") as myfile:
+            myfile.write(query + "\n")
 
         top_results = []
         for i, result in enumerate(results_list[:10]):
@@ -147,11 +166,20 @@ try:
             if len(src_text) > 500:
                 src_text = src_text[:500] + "...\n(theorem source code truncated to 500 characters)"
 
-            print(f"RESULT {i+1}: | SCORE (lower is better): {str(round(score, 3))} | ID: {doc_id}")
-            print(src_text)
+            print(color.BLUE + f"RESULT {i+1}: | SCORE (lower is better): {str(round(score, 3))} | ID: {doc_id}" + color.END)
+            print(color.CYAN + src_text + color.END)
             print()
-            print("LLM SUMMARY: " + doc_description)
+            print(color.YELLOW + "LLM SUMMARY: " + doc_description + color.END)
             print()
             print("-" * 40)
 except KeyboardInterrupt:
     print("\nApplication terminated by user.")
+    print()
+    print(color.BOLD + color.GREEN + "Thank you for testing the application!")
+    print("Your search queries have been saved to user_queries.txt. Of course, they will not be uploaded or shared with anyone, however if you would like to help us improve this AI search, feel free to send the user_queries.txt file to F.Kadlez@campus.lmu.de. The user queries will be treated anonymously only and will be used in a benchmark to evaluate and improve the search performance.")
+
+    print("user_queries.txt:")
+    if os.path.exists("user_queries.txt"):
+        with open("user_queries.txt", "r") as file:
+            data = file.read()
+            print(data)
