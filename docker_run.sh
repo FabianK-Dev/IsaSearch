@@ -1,1 +1,1 @@
-docker run --gpus all -it afp-ai-search
+docker run --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
