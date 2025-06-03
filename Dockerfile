@@ -19,11 +19,11 @@ ENV PATH="$SOLR_HOME/bin:$PATH"
 
 COPY . /app/
 
-RUN pip3 install --no-cache-dir -r requirements.txt
-
 RUN tar -xf assets/artifacts.tar.gz && \
     tar -xf assets/cache.tar.gz && \
     tar -xf assets/chroma_storages.tar.gz && \
     tar -xf assets/find_facts.tar.gz
+
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m benchmark.benchmark
