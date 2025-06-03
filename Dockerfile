@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 RUN apt-get update && apt-get install -y \
     wget openjdk-17-jre-headless \
@@ -17,13 +17,19 @@ RUN mkdir -p /opt/solr/server/solr/local
 ENV SOLR_HOME=/opt/solr
 ENV PATH="$SOLR_HOME/bin:$PATH"
 
-COPY . /app/
+# Copy python requirements before copying the rest to allow Docker to cache the layer
+COPY requirements.txt /app/
+
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+
+# Copy assets to the app directory
+COPY ./assets /app/assets/
 
 RUN tar -xf assets/artifacts.tar.gz && \
     tar -xf assets/cache.tar.gz && \
     tar -xf assets/chroma_storages.tar.gz && \
     tar -xf assets/find_facts.tar.gz
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+COPY . /app/
 
 CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m benchmark.benchmark
