@@ -38,4 +38,4 @@ COPY prompts /app/prompts
 COPY src /app/src
 COPY config.json /app/config.json
 
-#CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m benchmark.benchmark
+CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m src.app
