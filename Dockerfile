@@ -30,7 +30,7 @@ RUN tar -xf assets/artifacts.tar.gz && \
     tar -xf assets/find_facts.tar.gz
 
 RUN mv find_facts/solr/* /opt/solr/server/solr/ && \
-    rm -rf find_facts/solr && \
+    rm -rf find_facts/ && \
     rm -rf assets
 
 COPY benchmark /app/benchmark
