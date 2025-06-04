@@ -18,6 +18,13 @@
 - Mean Reciprocal Rank
 - Normalized Discounted Cumulative Gain?
 
+### Comparisons
+- one model: microsoft/Phi-3.5-mini-instruct (1)
+- with / without metadata + title (2)
+- with / without LLM query refinement (2)
+- comparison: bi-encoder + cross-encoder (1)
+- total: 1*2*2 + 1 = 5 runs
+
 ## Deployment
 - [ ] FastAPI
 - [ ] UI with HTML (choose framework later)
