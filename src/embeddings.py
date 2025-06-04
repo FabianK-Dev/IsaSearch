@@ -6,30 +6,7 @@ import torch
 import os
 import time
 
-def encode_embeddings(config, documents_tree, bi_encoder):
-    CACHE_FOLDER = config["cache_folder"]
-    EMBEDDINGS_CACHE = f"{CACHE_FOLDER}/embeddings_cache.pt"
 
-    # Retrieve and Rerank pipeline
-    if not torch.cuda.is_available():
-        print("No GPU found, so the CPU will be used instead which may increase encoding and search duration.")
-
-    if os.path.exists(EMBEDDINGS_CACHE):
-        encoded_embeddings = torch.load(EMBEDDINGS_CACHE)
-        print("Finished loading cached embeddings.")
-    else:
-        encoded_embeddings = bi_encoder.encode(
-            documents_tree["documents"],
-            convert_to_tensor=True,
-            show_progress_bar=True)
-
-        # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
-        if not os.path.exists(CACHE_FOLDER):
-            os.makedirs(CACHE_FOLDER)
-
-        torch.save(encoded_embeddings, EMBEDDINGS_CACHE)
-
-    return encoded_embeddings
 
 def search(search_query, collection, prompts, generation_args, pipe, config, llm_output_cache=None):
     start = time.time()
