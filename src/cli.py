@@ -70,7 +70,7 @@ try:
         print("Examples: 'pythagoras', 'pythagorean theorem but in vector space', 'fundamental formula for generating Pythagorean triples', ..." + color.END)
         query = input("Query: ")
 
-        results_dict = search(query, collection, prompts, generation_args, pipe, config, llm_output_cache=llm_output_cache)
+        results_dict = search(query, collection, prompts, llm_args, llm_pipe, config, llm_output_cache=llm_output_cache)
         results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
         print()
