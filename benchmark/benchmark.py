@@ -21,6 +21,11 @@ with open("config.json", "r") as file:
 print("Loading Solr...")
 solr = connect_solr(config)
 
+if config["add_metadata"]:
+    config["artifacts_folder"] = config["artifacts_folder"] + "-with-metadata"
+    config["prompts_folder"] = config["prompts_folder"] + "-with-metadata"
+    config["chroma_db_path"] = config["chroma_db_path"] + "-with-metadata"
+
 print("Using config for benchmark:")
 pprint(config)
 
@@ -148,5 +153,10 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 
-with open("./benchmark/benchmark_results_" + config["llm_name"].replace("/", "-") + ".json", "w") as outfile:
+if config["add_metadata"]:
+    benchmark_results_name = config["llm_name"].replace("/", "-") + "_with_metadata"
+else:
+    benchmark_results_name = config["llm_name"].replace("/", "-")
+
+with open("./benchmark/benchmark_results_" + benchmark_results_name + ".json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
