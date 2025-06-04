@@ -143,23 +143,6 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         nltk.download('punkt')
         nltk.download('stopwords')
 
-        print("Calculating maximum number of tokens required to describe filtered documents...")
-        max_tokens = 0
-
-        for doc in tqdm(filtered_docs):
-            token_ids = tokenizer.encode(doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
-            num_tokens = len(token_ids)
-            doc["num_tokens"] = num_tokens
-
-            if num_tokens > max_tokens:
-                max_tokens = num_tokens
-
-        describe_prompt_tokens = tokenizer.encode(prompts["describe"])
-        max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
-
-        print("Max tokens in document tree (without prompt): " + str(max_tokens))
-        print("Max tokens for prompt and document string: " + str(max_tokens_prompt))
-
         doc_strings = []
         for doc in filtered_docs:
             # Remove the proof part of the theorem source code, truncate to max length and strip trailing whitespaces
@@ -168,6 +151,9 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
             if config["add_metadata"]:
                 title = prepare_metadata(doc["metadata"].get("title", ""))
                 abstract = prepare_metadata(doc["metadata"].get("abstract", ""))
+
+                if len(title + abstract) > config["metadata_max_length"]:
+                    abstract = abstract[:config["metadata_max_length"] - len(title)] + "..."
 
                 if title == "":
                     title = "-- no title --"
@@ -184,10 +170,22 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
 
             doc_strings.append(doc_string)
 
+        print("Calculating maximum number of tokens required to describe filtered documents...")
+        max_tokens = 0
+
+        for doc in tqdm(doc_strings):
+            token_ids = tokenizer.encode(doc)
+            num_tokens = len(token_ids)
+
+            if num_tokens > max_tokens:
+                max_tokens = num_tokens
+
+        print("Max tokens for prompt and document string: " + str(max_tokens))
+
         print("Loading LLM...")
         llm = LLM(
             model=config["llm_name"],
-            max_model_len=max_tokens_prompt + config["sampling_parameters"]["max_tokens"],
+            max_model_len=max_tokens + config["sampling_parameters"]["max_tokens"],
             dtype="auto",
             gpu_memory_utilization=config["gpu_memory_utilization"])
         sampling_params = SamplingParams(
