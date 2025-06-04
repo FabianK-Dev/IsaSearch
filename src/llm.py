@@ -2,6 +2,7 @@ from pathlib import Path
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import glob
 import json
+import os
 
 def load_prompts(config):
     prompts_folder = config["prompts_folder"]
@@ -45,3 +46,23 @@ def get_llm(config):
     }
 
     return pipe, generation_args
+
+def get_llm_output_cache(config):
+    llm_output_cache = None
+    if config["enable_llm_output_cache"]:
+        CACHE_FOLDER = config["cache_folder"]
+        LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
+
+        if not os.path.exists(LLM_OUTPUT_CACHE):
+            print("Warning: LLM output cache file '" + LLM_OUTPUT_CACHE + "' does not exist, thus a new one will be created.")
+            llm_output_cache = {}
+        else:
+            print("Loading LLM output cache...")
+            with open(LLM_OUTPUT_CACHE, "r") as file:
+                data = file.read()
+                llm_output_cache = json.loads(data)
+                print("Finished loading LLM output cache.")
+    else:
+        print("LLM output caching is disabled in the config.")
+
+    return llm_output_cache

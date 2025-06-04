@@ -1,7 +1,7 @@
 from src.solr import connect_solr
 from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
-from src.llm import load_prompts, get_llm
+from src.llm import load_prompts, get_llm, get_llm_output_cache
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics, is_correct_target
 
 from transformers import AutoTokenizer
@@ -49,28 +49,15 @@ collection = get_chromadb_collection(config, prompts, embedder, document_tree)
 print("Loading LLM pipeline and gerneration arguments...")
 llm_pipe, llm_args = get_llm(config)
 
+print("Check if loading LLM output cache is enabled via config...")
+llm_output_cache = get_llm_output_cache(config)
+
+print("Loading benchmark CSV...")
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()
 
 query_columns = ['Title query', 'Natural language query']
 benchmark_results = {}
-
-llm_output_cache = None
-if config["enable_llm_output_cache"]:
-    CACHE_FOLDER = config["cache_folder"]
-    LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
-
-    if not os.path.exists(LLM_OUTPUT_CACHE):
-        print("Warning: LLM output cache file '" + LLM_OUTPUT_CACHE + "' does not exist, thus a new one will be created.")
-        llm_output_cache = {}
-    else:
-        print("Loading LLM output cache...")
-        with open(LLM_OUTPUT_CACHE, "r") as file:
-            data = file.read()
-            llm_output_cache = json.loads(data)
-            print("Finished loading LLM output cache.")
-else:
-    print("LLM output caching is disabled in the config.")
 
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     target_identifier = row["Target Identifier"]
