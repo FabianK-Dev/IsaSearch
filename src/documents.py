@@ -102,7 +102,7 @@ def prepare_metadata(metadata):
     tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
     plain_text = (" ").join(tokens_without_stopwords)
 
-    return metadata
+    return plain_text
 
 def generate_document_descriptions(config, document_tree, prompts, tokenizer, save_every=1000):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
@@ -153,7 +153,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
                 abstract = prepare_metadata(doc["metadata"].get("abstract", ""))
 
                 if len(title + abstract) > config["metadata_max_length"]:
-                    abstract = abstract[:config["metadata_max_length"] - len(title)] + "..."
+                    abstract = abstract[:config["metadata_max_length"] - len(title) - 3] + "..."
 
                 if title == "":
                     title = "-- no title --"
