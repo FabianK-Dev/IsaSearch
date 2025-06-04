@@ -33,11 +33,8 @@ prompts = load_prompts(config)
 print("Building document tree...")
 document_tree = build_document_tree(config, solr)
 
-if torch.cuda.is_available():
-    print("Clearing CUDA cache...")
-    torch.cuda.empty_cache()
-else:
-    print("CUDA is not available, skipping cache clear.")
+print("Clearing CUDA cache...")
+torch.cuda.empty_cache()
 
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
