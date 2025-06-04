@@ -1,6 +1,8 @@
 from vllm import LLM, SamplingParams
 from vllm.distributed.parallel_state import destroy_model_parallel
 from tqdm import tqdm
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 import gc
 import torch
@@ -9,7 +11,8 @@ import os
 import math
 import tomllib
 import zlib
-import pandas as pd
+import re
+import nltk
 
 def get_entry_metadata(entry, config):
     metadata_folder = config["afp_folder"] + "/metadata/"
@@ -81,6 +84,26 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
+def prepare_metadata(metadata):
+    # Replace newlines through spaces
+    plain_text = re.compile(r"\n").sub(" ", metadata)
+
+    # Replace two or more white spaces through single whitespace
+    plain_text = re.compile(r"\s+").sub(" ", plain_text).strip()
+
+    # Only allow letters or spaces in text
+    plain_text = re.compile('[^a-zA-Z ]').sub("", plain_text) 
+
+    # Remove words with three characters or less
+    plain_text = re.compile(r'\b\w{1,3}\b').sub("", plain_text)
+
+    # Remove stop words like e.g. "the", "a", "and", etc.
+    plain_text_tokens = word_tokenize(plain_text)
+    tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
+    plain_text = (" ").join(tokens_without_stopwords)
+
+    return metadata
+
 def generate_document_descriptions(config, document_tree, prompts, tokenizer, save_every=1000):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
@@ -115,6 +138,11 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
     print("Found " + str(len(filtered_docs)) + " documents that need to be described by the LLM.")
 
     if len(filtered_docs) >= 1:
+        # Only update NLTK resources if any documents need to be described to avoid unnecessary downloads
+        print("Downloading/Updating NLTK resources (punkt and stopwords)...")
+        nltk.download('punkt')
+        nltk.download('stopwords')
+
         print("Calculating maximum number of tokens required to describe filtered documents...")
         max_tokens = 0
 
@@ -126,15 +154,34 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
             if num_tokens > max_tokens:
                 max_tokens = num_tokens
 
-        print(f"Max tokens in document tree (without prompt): {max_tokens}")
-        
         describe_prompt_tokens = tokenizer.encode(prompts["describe"])
         max_tokens_prompt = max_tokens + len(describe_prompt_tokens)
+
+        print("Max tokens in document tree (without prompt): " + str(max_tokens))
         print("Max tokens for prompt and document string: " + str(max_tokens_prompt))
 
         doc_strings = []
         for doc in filtered_docs:
-            doc_string = prompts["describe"].format(theorem_content=doc["src"].split("proof")[0].strip()[:config["theorem_max_length"]])
+            # Remove the proof part of the theorem source code, truncate to max length and strip trailing whitespaces
+            theorem_content=doc["src"].split("proof")[0][:config["theorem_max_length"]].strip()
+
+            if config["add_metadata"]:
+                title = prepare_metadata(doc["metadata"].get("title", ""))
+                abstract = prepare_metadata(doc["metadata"].get("abstract", ""))
+
+                if title == "":
+                    title = "-- no title --"
+                if abstract == "":
+                    abstract = "-- no abstract --"
+
+                doc_string = prompts["describe"].format(
+                    theorem_content=theorem_content,
+                    title=title,
+                    abstract=abstract)
+            else:
+                doc_string = prompts["describe"].format(
+                    theorem_content=theorem_content)
+
             doc_strings.append(doc_string)
 
         print("Loading LLM...")
