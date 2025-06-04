@@ -27,7 +27,8 @@ def relevant_doc_keys(solr_document):
     return {
         "id": solr_document["id"],
         "src": solr_document["src"],
-        "entity_kname": solr_document.get("entity_kname", None)
+        "entity_kname": solr_document.get("entity_kname", None),
+        "metadata": get_entry_metadata(solr_document["session"])
     }
 
 # # TODO: remove in future
@@ -97,7 +98,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         document_descriptions = {}
 
     print("Finding documents that need to be described by the LLM...")
-        
+
     filtered_docs = []
     for doc_id in tqdm(document_tree):
         doc = document_tree[doc_id]
