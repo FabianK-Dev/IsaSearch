@@ -1,11 +1,10 @@
 from src.solr import connect_solr
 from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
-from src.llm import load_prompts
+from src.llm import load_prompts, get_llm
 from benchmark.metrics import top_k_accuracy, normalized_discounted_cumulative_gain, reciprocal_rank, rank, calculate_mean_metrics, is_correct_target
 
-from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from chromadb.utils import embedding_functions
@@ -47,23 +46,8 @@ embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, embedder, document_tree)
 
-model = AutoModelForCausalLM.from_pretrained(
-    config["llm_name"],
-    device_map="auto",
-    torch_dtype="auto")
-
-tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
-
-pipe = pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer)
-
-generation_args = {
-    "max_new_tokens": config["sampling_parameters"]["max_tokens"],
-    "return_full_text": False,
-    "do_sample": False
-}
+print("Loading LLM pipeline and gerneration arguments...")
+llm_pipe, llm_args = get_llm(config)
 
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()

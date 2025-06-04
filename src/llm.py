@@ -1,4 +1,5 @@
 from pathlib import Path
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import glob
 import json
 
@@ -23,3 +24,24 @@ def save_llm_output_cache(llm_output_cache, config):
 
     with open(LLM_OUTPUT_CACHE, "w") as file:
         json.dump(llm_output_cache, file, indent=4)
+
+def get_llm(config):
+    model = AutoModelForCausalLM.from_pretrained(
+        config["llm_name"],
+        device_map="auto",
+        torch_dtype="auto")
+
+    tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
+
+    pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer)
+
+    generation_args = {
+        "max_new_tokens": config["sampling_parameters"]["max_tokens"],
+        "return_full_text": False,
+        "do_sample": False
+    }
+
+    return pipe, generation_args
