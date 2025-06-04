@@ -11,7 +11,6 @@ from chromadb.utils import embedding_functions
 
 import json
 import pandas as pd
-import os
 import torch
 
 print("Loading config...")
