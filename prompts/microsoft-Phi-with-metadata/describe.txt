@@ -5,6 +5,9 @@ Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to trans
 theorem degree_mult:
 assumes "p ≠ 0" and "q ≠ 0"
 shows "degree (p * q) = degree p + degree q"
+
+Title:
+Abstract:
 === End of example input ===
 
 === Start of example output ===
@@ -14,5 +17,8 @@ Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree 
 <END>
 === End of example output ===<|end|>
 <|user|>
-{theorem_content}<|end|>
+{theorem_content}
+
+Title: {title}
+Abstract: {abstract}<|end|>
 <|assistant|>
