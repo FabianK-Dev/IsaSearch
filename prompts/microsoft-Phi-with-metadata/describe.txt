@@ -1,13 +1,13 @@
 <|system|>
-Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 256 tokens that is more accessible to mathematicians. Please utilize the provided theorem's session metadata (title and abstract) to better understand the formal theorem. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 256 tokens that is more accessible to mathematicians. Please utilize the provided theorem's session metadata (title and abstract, stopwords removed) to better understand the formal theorem. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
 
 === Start of example input ===
 theorem degree_mult:
 assumes "p ≠ 0" and "q ≠ 0"
 shows "degree (p * q) = degree p + degree q"
 
-Title:
-Abstract:
+Title: Lemmas for calculating the degree of univariate polynomials
+Abstract: This file defines Polynomial R, the type of univariate polynomials over the semiring R, builds a semiring structure it, and gives basic definitions that are expanded in other files in this directory.
 === End of example input ===
 
 === Start of example output ===
