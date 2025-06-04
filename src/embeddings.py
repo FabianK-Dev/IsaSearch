@@ -2,11 +2,55 @@ from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from src.solr import docs_by_ids
 from src.llm import save_llm_output_cache
 
-import torch
 import os
 import time
+import chromadb
 
+def get_chromadb_collection(config, prompts, embedder, document_tree):
+    # ChromaDB path
+    if not os.path.exists(config["chroma_db_path"]):
+        os.makedirs(config["chroma_db_path"])
 
+    # ChromaDB client and collection
+    chroma_db_path = config["chroma_db_path"] + "/chroma_db"
+    print("Loading ChromaDB client at path '" + chroma_db_path + "'...")
+
+    chroma_client = chromadb.PersistentClient(path=chroma_db_path)
+    collection = chroma_client.get_or_create_collection("afp_docs", embedding_function=embedder)
+
+    # Get set of all already existing document IDs (saved at the source key)
+    existing = set()
+    metadata_response = collection.get(include=["metadatas"])
+
+    if "metadatas" in metadata_response and metadata_response["metadatas"] is not None:
+        for item in metadata_response["metadatas"]:
+            existing.add(item["source"])
+
+    print("Preparing documents before adding to ChromaDB collection...")
+    filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
+    print(f"{len(filtered_tree)} documents are still missing in ChromaDB collection.")
+
+    for i in range(0, len(filtered_tree), 5000):
+        doc_ids = filtered_tree[i:i + 5000]
+        print(f"Processing documents {i} to {i + len(doc_ids)}...")
+
+        doc_embeddings = []
+        metadatas = []
+
+        for doc_id in doc_ids:
+            doc = document_tree[doc_id]
+            doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
+            embedding_str = prompts["embed"].format(doc_src=doc_src)
+
+            doc_embeddings.append(embedding_str)
+            metadatas.append({"source": doc["id"]})
+
+        collection.add(
+            documents=doc_embeddings,
+            ids=doc_ids,
+            metadatas=metadatas)
+
+    return collection
 
 def search(search_query, collection, prompts, generation_args, pipe, config, llm_output_cache=None):
     start = time.time()
