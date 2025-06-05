@@ -82,7 +82,7 @@ def fetch_all_docs(solr, config):
         #         allow = 200
         #     elif allow > 0:
         #         allow -= 1
-            result_filtered = relevant_doc_keys(result)
+            result_filtered = relevant_doc_keys(result, config)
             document_tree[result["id"]] = result_filtered
 
     return document_tree
