@@ -22,8 +22,8 @@ def get_entry_metadata(entry, config):
         with open(entry_toml, "rb") as f:
             toml = tomllib.load(f)
             return {
-                "title": toml.get("title"),
-                "abstract": toml.get("abstract")
+                "title": toml.get("title", ""),
+                "abstract": toml.get("abstract", "")
             }
     else:
         print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
