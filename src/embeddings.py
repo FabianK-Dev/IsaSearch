@@ -59,10 +59,10 @@ def search(search_query, collection, prompts, model, config, llm_output_cache=No
     llm_prompt = prompts["search_refine"].format(search_query=search_query)
 
     # TODO: Move this to a separate function
-    if llm_output_cache is not None and config["vllm_name"] in llm_output_cache and llm_prompt in llm_output_cache[config["vllm_name"]]:
+    if llm_output_cache is not None and config["llm_name"] in llm_output_cache and llm_prompt in llm_output_cache[config["llm_name"]]:
         print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
-        refined_query = llm_output_cache[config["vllm_name"]][llm_prompt]["output"]
-        cached_duration = llm_output_cache[config["vllm_name"]][llm_prompt]["output_duration"]
+        refined_query = llm_output_cache[config["llm_name"]][llm_prompt]["output"]
+        cached_duration = llm_output_cache[config["llm_name"]][llm_prompt]["output_duration"]
     else:
         llm_output_cache = llm_output_cache if llm_output_cache is not None else {}
         with model.chat_session():
@@ -77,10 +77,10 @@ def search(search_query, collection, prompts, model, config, llm_output_cache=No
         end = time.time()
         output_duration  = end - start
 
-        if config["vllm_name"] not in llm_output_cache:
-            llm_output_cache[config["vllm_name"]] = {}
+        if config["llm_name"] not in llm_output_cache:
+            llm_output_cache[config["llm_name"]] = {}
 
-        llm_output_cache[config["vllm_name"]][llm_prompt] = {
+        llm_output_cache[config["llm_name"]][llm_prompt] = {
             "output": refined_query,
             "output_duration": output_duration
         }
