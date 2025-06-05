@@ -52,7 +52,7 @@ def get_chromadb_collection(config, prompts, embedder, document_tree):
 
     return collection
 
-def search(search_query, collection, prompts, generation_args, pipe, config, llm_output_cache=None):
+def search(search_query, collection, prompts, model, config, llm_output_cache=None):
     start = time.time()
     cached_duration = None
     docs_to_retrieve = 100
@@ -64,8 +64,15 @@ def search(search_query, collection, prompts, generation_args, pipe, config, llm
         refined_query = llm_output_cache[config["llm_name"]][llm_prompt]["output"]
         cached_duration = llm_output_cache[config["llm_name"]][llm_prompt]["output_duration"]
     else:
-        output = pipe(llm_prompt, **generation_args)
-        refined_query = output[0]['generated_text']
+        llm_output_cache = llm_output_cache if llm_output_cache is not None else {}
+        with model.chat_session():
+            refined_query = model.generate(
+                llm_prompt,
+                max_tokens=config["sampling_parameters"]["max_tokens"],
+                temp=config["sampling_parameters"]["temperature"],
+                top_p=config["sampling_parameters"]["top_p"],
+                top_k=config["sampling_parameters"]["top_k"],
+                min_p=config["sampling_parameters"]["min_p"])
 
         end = time.time()
         output_duration  = end - start

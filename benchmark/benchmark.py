@@ -51,7 +51,7 @@ print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, embedder, document_tree)
 
 print("Loading LLM pipeline and gerneration arguments...")
-llm_pipe, llm_args = get_llm(config)
+model = get_llm(config, prompts, tokenizer)
 
 print("Check if loading LLM output cache is enabled via config...")
 llm_output_cache = get_llm_output_cache(config)
@@ -113,7 +113,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             # print()
             print(f"Searching: \"{query}\"")
 
-            results_dict = search(query, collection, prompts, llm_args, llm_pipe, config, llm_output_cache=llm_output_cache)
+            results_dict = search(query, collection, prompts, model, config, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             # print("Top 10 results:")

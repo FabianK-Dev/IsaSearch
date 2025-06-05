@@ -1,5 +1,5 @@
 from pathlib import Path
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from gpt4all import GPT4All
 import glob
 import json
 import os
@@ -26,26 +26,13 @@ def save_llm_output_cache(llm_output_cache, config):
     with open(LLM_OUTPUT_CACHE, "w") as file:
         json.dump(llm_output_cache, file, indent=4)
 
-def get_llm(config):
-    model = AutoModelForCausalLM.from_pretrained(
-        config["llm_name"],
-        device_map="auto",
-        torch_dtype="auto")
+def get_llm(config, prompts, tokenizer):
+    print("Calculating max number of tokens required for search refinement prompt...")
+    token_ids = tokenizer.encode(prompts["search_refine"])
+    num_tokens = len(token_ids)
 
-    tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
-
-    pipe = pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer)
-
-    generation_args = {
-        "max_new_tokens": config["sampling_parameters"]["max_tokens"],
-        "return_full_text": False,
-        "do_sample": False
-    }
-
-    return pipe, generation_args
+    model = GPT4All("Meta-Llama-3-8B-Instruct.Q4_0.gguf", device="cuda", n_ctx=num_tokens + config["sampling_parameters"]["max_tokens"])
+    return model
 
 def get_llm_output_cache(config):
     llm_output_cache = None
