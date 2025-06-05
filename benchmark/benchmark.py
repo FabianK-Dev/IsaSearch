@@ -118,7 +118,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             print(results_list[0])
 
             top_results = []
-            for i, result in enumerate(results_list[:100]):
+            for i, result in enumerate(results_list[:10]):
                 score = result.get("score")
                 doc_id = result.get("id")
                 doc_src = result.get("src")
