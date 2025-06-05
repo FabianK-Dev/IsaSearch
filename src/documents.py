@@ -14,17 +14,22 @@ import zlib
 import re
 import nltk
 
+cached_metadata = {}
 def get_entry_metadata(entry, config):
     metadata_folder = config["afp_folder"] + "/metadata/"
     entry_toml = metadata_folder + "entries/" + entry + ".toml"
 
     if os.path.isfile(entry_toml):
+        if entry in cached_metadata:
+            return cached_metadata[entry]
+
         with open(entry_toml, "rb") as f:
             toml = tomllib.load(f)
-            return {
+            cached_metadata[entry] = {
                 "title": toml.get("title", ""),
                 "abstract": toml.get("abstract", "")
             }
+            return cached_metadata[entry]
     else:
         print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
         return {}
@@ -34,7 +39,7 @@ def relevant_doc_keys(solr_document, config):
         "id": solr_document["id"],
         "src": solr_document["src"],
         "entity_kname": solr_document.get("entity_kname", None),
-        "metadata": get_entry_metadata(solr_document["session"], config)
+        "metadata": get_entry_metadata(solr_document["session"], config) if config["add_metadata"] else {}
     }
 
 # # TODO: remove in future
