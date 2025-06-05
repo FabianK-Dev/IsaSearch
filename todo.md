@@ -23,6 +23,7 @@
 - with / without metadata + title (2)
 - with / without LLM query refinement (2)
 - comparison: bi-encoder + cross-encoder (1)
+- maybe: original query + refined query ? (2)
 - total: 1*2*2 + 1 = 5 runs
 
 ## Deployment
