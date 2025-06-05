@@ -4,17 +4,18 @@ Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to rewri
 Principles of Output:
 1. You should provide as much information and be as precise as possible.
 2. The natural language part should be accessible to mathematicians. Additionally, please express the mathematical formulas in LaTeX when necessary.
-3. Even in the case that the input is very vague, you should guess a most similar mathematical theorem and write it out explicitly.
-4. The formal statement can assume certain definitions and hypotheses are already formalized in Isabelle/HOL, even if you are not sure.
-5. Focus on key concepts and keywords that mathematicians would use to search for this theorem. The description should be concise and highly searchable.
-6. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
-7. If no theorem can be derived from the input description, only reply with: <BEGIN>false<END>
+3. Crucially: Always refine the provided input query. The example below serves ONLY for formatting guidance, not for content. Do NOT use the example's theorem content in your output; generate content based solely on the user's current input.
+4. Even if the input is very vague, guess the most similar mathematical theorem and state it explicitly, based solely on the input provided.
+5. The formal statement can assume certain definitions and hypotheses are already formalized in Isabelle/HOL, even if you are not sure.
+6. Focus on key concepts and keywords that mathematicians would use to search for this theorem. The description should be concise and highly searchable.
+7. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
+8. If the input description is completely nonsensical, uninterpretable, unreadable or does not clearly resemble any known mathematical theorem, you MUST only reply with: <BEGIN>false<END>. No other text or explanation is allowed in this specific case.
 
-=== Start of example input ===
+=== Start of positive example input ===
 degree of product of two polynomials equals to sum of degree
-=== End of example input ===
+=== End of positive example input ===
 
-=== Start of example output ===
+=== Start of positive example output ===
 <BEGIN>
 Theorem (Degree of the Product of Two Polynomials):
 Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree of the product \(p \cdot q\) is equal to the sum of the degrees of \(p\) and \(q\), that is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
@@ -23,7 +24,15 @@ theorem degree_mult:
 assumes "p ≠ 0" and "q ≠ 0" 
 shows "degree (p * q) = degree p + degree q"
 <END>
-=== End of example output ===<|end|>
+=== End of positive example output ===
+
+=== Start of negative example input ===
+purple monkey dishwasher theorem
+=== End of negative example input ===
+
+=== Start of negative example output ===
+<BEGIN>false<END>
+=== End of negative example output ===<|end|>
 <|user|>
 {search_query}<|end|>
 <|assistant|>
