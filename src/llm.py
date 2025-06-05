@@ -31,7 +31,7 @@ def get_llm(config, prompts, tokenizer):
     token_ids = tokenizer.encode(prompts["search_refine"])
     num_tokens = len(token_ids)
 
-    model = GPT4All("Phi-3-mini-4k-instruct.Q4_0.gguf", device="cuda", n_ctx=num_tokens + config["sampling_parameters"]["max_tokens"])
+    model = GPT4All(config["llm_name"], device="cuda", n_ctx=num_tokens + config["sampling_parameters"]["max_tokens"])
     return model
 
 def get_llm_output_cache(config):

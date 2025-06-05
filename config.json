@@ -10,6 +10,7 @@
     "prompts_folder": "prompts/microsoft-Phi",
     "chroma_db_path": "chroma_storages/microsoft/Phi-3.5-mini-instruct",
     "vllm_name": "microsoft/Phi-3.5-mini-instruct",
+    "llm_name": "Phi-3-mini-4k-instruct.Q4_0.gguf",
     "theorem_max_length": 1000,
     "metadata_max_length": 300,
     "gpu_memory_utilization": 0.85,
@@ -22,5 +23,5 @@
         "stop": ["<END>"]
     },
     "add_metadata": false,
-    "enable_llm_output_cache": false
+    "enable_llm_output_cache": true
 }
