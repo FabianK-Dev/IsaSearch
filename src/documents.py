@@ -39,7 +39,7 @@ def relevant_doc_keys(solr_document, config):
         "id": solr_document["id"],
         "src": solr_document["src"],
         "entity_kname": solr_document.get("entity_kname", None),
-        "metadata": get_entry_metadata(solr_document["session"], config) if config["add_metadata"] else {}
+        "metadata": get_entry_metadata(solr_document["session"], config) # Always load metadata to ensure cached document_tree.json always contains it, regardless of config["add_metadata"]
     }
 
 # # TODO: remove in future
