@@ -1,12 +1,12 @@
 ID,Title,Target Identifier,Theorem,Link,Session,Title query,Natural language query,Natual language query source,Skip,Annotation
-square-root-of-2-is-irrational,Square Root of 2 is Irrational,"[ {""entity_kname"":""Sqrt.sqrt_prime_irrational|thm""} ]","theorem sqrt_prime_irrational: ""prime p ? sqrt (real p) ? ?""
+square-root-of-2-is-irrational,Square Root of 2 is Irrational,"[ {""entity_kname"":""Sqrt.sqrt_prime_irrational|thm""}, {""entity_kname"": ""Sqrt.sqrt_2_not_rat|thm""}, {""entity_kname"": ""Quadratic_Irrationals.quadratic_irrational_sqrt|thm""}, {""entity_kname"": ""Quadratic_Irrationals.irrat_sqrt_nonsquare|thm""}, {""entity_kname"": ""Pell.irrat_sqrt_nonsquare|thm""}, {""entity_kname"": ""Sqrt_Script.prime_sqrt_irrational|thm""} ]","theorem sqrt_prime_irrational: ""prime p ? sqrt (real p) ? ?""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ? ?""",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL-Examples,Square Root of 2 is Irrational,sqrt(2) is not rational,https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality,,
 fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"[ {""entity_kname"":""Fundamental_Theorem_Algebra.fundamental_theorem_of_algebra_alt|thm""} ]","lemma fundamental_theorem_of_algebra:
   assumes nc: ""� constant (poly p)""
   shows ""?z::complex. poly p z = 0""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements,,
-denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"[ {""entity_kname"":""Countable.rat_denum|thm""} ]","theorem rat_denum: ""?f :: nat ? rat. surj f""
+denumerability-of-the-rational-numbers,Denumerability of the Rational Numbers,"[ {""entity_kname"":""Countable.rat_denum|thm""}, {""entity_kname"": ""Countable_Set.countable_int|thm""}, {""entity_kname"": ""General_Cardinals.uncountable_Real_set|thm""}, {""entity_kname"": ""Countable_Set.to_nat_on_infinite|thm""}, {""entity_kname"": ""Countable_Set.countable_infiniteE'|thm""}, {""entity_kname"": ""Countable_Set.countable_rat|thm""}, {""entity_kname"": ""Countable_Set.countable_enum_cases|thm""}, {""entity_kname"": ""Countable_Set.countableE_infinite|thm""} ]","theorem rat_denum: ""?f :: nat ? rat. surj f""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Library/Countable.html,HOL,Denumerability of the Rational Numbers,"
 
 Z (the set of all integers) and Q (the set of all rational numbers) are countable",https://en.wikipedia.org/wiki/Countable_set#cite_note-25,,
@@ -27,10 +27,10 @@ g�dels-incompleteness-theorem-1,G�del�s Incompleteness Theorem 1,"[ {""ent
       ""� {} ? Neg ?""
       ""eval_fm e ?""
       ""ground_fm ?""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,G�del�s Incompleteness Theorem 1,Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...],https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem,,
-g�dels-incompleteness-theorem-2,G�del�s Incompleteness Theorem 2,"[ {""entity_kname"":""Goedel_II.Goedel_II|thm""}, {""entity_kname"":""Jeroslow_Simplified.Jeroslow_Godel_Second.jeroslow_godel_second|thm""} ]","theorem Goedel_II:
+g�dels-incompleteness-theorem-2,G�del�s Incompleteness Theorem 2,"[ {""entity_kname"":""Goedel_II.Goedel_II|thm""}, {""entity_kname"":""Jeroslow_Simplified.Jeroslow_Godel_Second.jeroslow_godel_second|thm""}, {""entity_kname"": ""Deduction.Deduct_with_False.consistent_def3|thm""}, {""entity_kname"": ""Instance.Goedel_I|thm""}, {""entity_kname"": ""Epistemic_Logic.inconsistent_imply|thm""}, {""entity_kname"": ""Abstract_First_Goedel.Goedel_Form.goedel_first_theEasyHalf|thm""}, {""entity_kname"": ""Derivability_Conditions.CleanRepr_Proofs.consistent_not_prv_not_prv_PPf|thm""}, {""entity_kname"": ""Abstract_First_Goedel.Goedel_Form_Classical_HBL1_rev_prv.goedel_first_theHardHalf|thm""}, {""entity_kname"": ""FOL_Fitting.deriv_consistency|thm""} ]","theorem Goedel_II:
   assumes ""� {} ? Fls""
     shows ""� {} ? Neg (PfP ?Fls?)""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,G�del�s Incompleteness Theorem 2,"[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem,,
-law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"[ {""entity_kname"":""Quadratic_Reciprocity.Quadratic_Reciprocity|thm""} ]","theorem Quadratic_Reciprocity:
+law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"[ {""entity_kname"":""Quadratic_Reciprocity.Quadratic_Reciprocity|thm""}, {""entity_kname"": ""More_Residues.QuadRes'HasIntRoot|thm""}, {""entity_kname"": ""QuadRes.QuadRes_iff|thm""}, {""entity_kname"": ""More_Residues.QuadResHasIntRoot|thm""}, {""entity_kname"": ""More_Residues.QuadResHasTwoIntRoots|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_cong|thm""}, {""entity_kname"": ""QuadRes.QuadRes_set_prime|thm""}, {""entity_kname"": ""Euler_Criterion.l12|thm""}, {""entity_kname"": ""More_Residues.QuadResImplQuadRes'2|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_mult|thm""}, {""entity_kname"": ""QuadRes.card_QuadRes_set_prime|thm""} ]","theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ? q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q ? 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,,,
@@ -62,7 +62,7 @@ polyhedron-formula,Polyhedron Formula,"[ {""entity_kname"":""Euler_Formula.Euler
   shows ""(card {v. v face_of p ? aff_dim v = 0} + card {f. f face_of p ? aff_dim f = 2}) -
          card {e. e face_of p ? aff_dim e = 1} = 2""
 ",https://www.isa-afp.org/entries/Euler_Polyhedron_Formula.html,Euler_Polyhedron_Formula,Polyhedron Formula,Any convex polyhedron's surface has Euler characteristic X = V - E + F = 2,https://en.wikipedia.org/wiki/Euler_characteristic#Polyhedra,,
-eulers-summation-of-1-122-132-.,Euler�s Summation of 1 + (1/2)^2 + (1/3)^2 + �.,"[ {""entity_kname"":""Gamma_Function.inverse_squares_sums|thm""} ]","theorem inverse_squares_sums: ""(?n. 1 / (n + 1)?2) sums (pi?2 / 6)""
+eulers-summation-of-1-122-132-.,Euler�s Summation of 1 + (1/2)^2 + (1/3)^2 + �.,"[ {""entity_kname"":""Gamma_Function.inverse_squares_sums|thm""}, {""entity_kname"": ""Zeta_Function.zeta_2|thm""}, {""entity_kname"": ""Dirichlet_Series_Analysis.inverse_squares_sums'|thm""}, {""entity_kname"": ""Zeta_Function.zeta_6|thm""}, {""entity_kname"": ""Bernoulli_Zeta.nat_squares_sums|thm""}, {""entity_kname"": ""Bernoulli_Zeta.nat_power6_sums|thm""}, {""entity_kname"": ""Euler_MacLaurin_Landau.sum_inverse_squares_expansion_bigo_simple|thm""}, {""entity_kname"": ""Zeta_Function.zeta_4|thm""}, {""entity_kname"": ""Bernoulli_Zeta.nat_power8_sums|thm""}, {""entity_kname"": ""Zeta_Function.sums_zeta_nat|thm""}, {""entity_kname"": ""Zeta_Function.euler_product_zeta|thm""} ]","theorem inverse_squares_sums: ""(?n. 1 / (n + 1)?2) sums (pi?2 / 6)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Gamma_Function.html,HOL,Euler�s Summation of 1 + (1/2)^2 + (1/3)^2 + �.,[...] the precise summation of the reciprocals of the squares of the natural numbers [...] is [...] pi^2 / 6,https://en.wikipedia.org/wiki/Basel_problem,,
 fundamental-theorem-of-integral-calculus,Fundamental Theorem of Integral Calculus,"[ {""entity_kname"":""Henstock_Kurzweil_Integration.fundamental_theorem_of_calculus|thm""} ]","theorem fundamental_theorem_of_calculus:
   fixes f :: ""real ? 'a::banach""
@@ -74,7 +74,7 @@ demoivres-theorem,DeMoivre�s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|t
 
 lemma DeMoivre2: ""(rcis r a) ^ n = rcis (r ^ n) (real n * a)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Complex.html,HOL,DeMoivre�s Theorem,for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin ? nx,https://en.wikipedia.org/wiki/De_Moivre%27s_formula,,
-liouvilles-theorem-and-the-construction-of-transcendental-numbers,Liouville�s Theorem and the Construction of Transcendental Numbers,"[ {""entity_kname"":""Liouville_Numbers.transcendental_liouville_constant|thm""} ]","corollary transcendental_liouville_constant:
+liouvilles-theorem-and-the-construction-of-transcendental-numbers,Liouville�s Theorem and the Construction of Transcendental Numbers,"[ {""entity_kname"":""Liouville_Numbers.transcendental_liouville_constant|thm""}, {""entity_kname"": ""Pi_Transcendental.transcendental_pi|thm""}, {""entity_kname"": ""Hermite_Lindemann.pi_transcendental|thm""}, {""entity_kname"": ""Pi_Transcendental.transcendental_i_pi|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arctan|thm""}, {""entity_kname"": ""Pi_Irrational.pi_irrational|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arccos|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arcsin|thm""}, {""entity_kname"": ""Contrib.trancl_subseteq|thm""}, {""entity_kname"": ""Liouville_Numbers.liouville.transcendental|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_tan|thm""} ]","corollary transcendental_liouville_constant:
   ""�algebraic (standard_liouville (?_. 1) 10)""
 ",https://isa-afp.org/entries/Liouville_Numbers.shtml,Liouville_Numbers,Liouville�s Theorem and the Construction of Transcendental Numbers,"irrational but does not have this property, so it cannot be algebraic and must be transcendental",https://en.wikipedia.org/wiki/Liouville_number#Liouville_numbers_and_transcendence,,
 lagranges-four-square-theorem,Lagrange�s Four-Square Theorem,"[ {""entity_kname"":""FourSquares.is_sum4sq_int_nat_eq|thm""} ]","theorem four_squares: ""?a b c d::nat. n = a?2 + b?2 + c?2 + d?2""
@@ -138,7 +138,7 @@ sum-of-the-angles-of-a-triangle,Sum of the Angles of a Triangle,"[ {""entity_kna
 the-ballot-problem,The Ballot Problem,"[ {""entity_kname"":null, ""theory"": ""HOL-ex.Ballot"", ""command"": ""lemma""} ]","lemma
   ""valid_countings a b = (if a ? b then (if b = 0 then 1 else 0) else (a - b) / (a + b) * all_countings a b)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,candidate A receives p votes and candidate B receives q votes with p > q,https://en.wikipedia.org/wiki/Bertrand%27s_ballot_theorem,,
-ramseys-theorem,Ramsey�s Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""} ]","lemma ramsey: ""
+ramseys-theorem,Ramsey�s Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""}, {""entity_kname"": ""Infinite_Set.MOST_nat|thm""} ]","lemma ramsey: ""
   ?(s::nat) (r::nat) (YY::'a set) (f::'a set => nat).
   infinite YY
   ? (?X. X <= YY ? finite X ? card X = r ? f X < s)
@@ -148,10 +148,10 @@ ramseys-theorem,Ramsey�s Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""} ]
   ? t' < s
   ? (?X. X <= Y' ? finite X ? card X = r ? f X = t'))""
 ",https://isa-afp.org/entries/Ramsey-Infinite.shtml,Ramsey-Infinite,Ramsey�s Theorem,how big must some structure be to guarantee that a particular property holds?,https://en.wikipedia.org/wiki/Ramsey_theory,,
-divergence-of-the-harmonic-series,Divergence of the Harmonic Series,"[ {""entity_kname"":""Summation_Tests.not_summable_harmonic|thm""} ]","theorem not_summable_harmonic:
+divergence-of-the-harmonic-series,Divergence of the Harmonic Series,"[ {""entity_kname"":""Summation_Tests.not_summable_harmonic|thm""}, {""entity_kname"": ""Summation_Tests.inverse_power_summable|thm""}, {""entity_kname"": ""Summation_Tests.ratio_test_convergence|thm""}, {""entity_kname"": ""Series.summable_sums|thm""}, {""entity_kname"": ""HarmonicSeries.DivergenceOfHarmonicSeries|thm""} ]","theorem not_summable_harmonic:
   shows ""�summable (?n. 1 / real (n + 1))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Summation_Tests.html,HOL,Divergence of the Harmonic Series,the infinite series formed by summing all positive unit fractions,https://en.wikipedia.org/wiki/Harmonic_series_(mathematics),,
-taylors-theorem,Taylor�s Theorem,"[ {""entity_kname"":""MacLaurin.Taylor|thm""} ]","theorem taylor:
+taylors-theorem,Taylor�s Theorem,"[ {""entity_kname"":""MacLaurin.Taylor|thm""}, {""entity_kname"": ""Derivative.differentiable_series|fact""}, {""entity_kname"": ""Derivative.differentiable_series'|thm""}, {""entity_kname"": ""Transcendental.termdiffs_sums_strong|thm""}, {""entity_kname"": ""Transcendental.termdiff_converges_all|thm""} ]","theorem taylor:
   fixes a :: real and n :: nat and f :: ""real ? real""
   assumes ""n > 0"" and ""diff 0 = f""
     and   ""?m t. m < n ? t ? {a..b} ? (diff m has_real_derivative diff (m + 1) t) (at t)""
@@ -204,7 +204,7 @@ solutions-to-pells-equation,Infinitely many solutions to Pell�s Equation,"[ {"
   assumes ""?k. D = k?2""
   shows   ""infinite {(x :: int, y :: int). x?2 - D * y?2 = 1}""
 ",https://www.isa-afp.org/entries/Pell.html,Pell,Solutions to Pell�s Equation,"as long as n is not a perfect square, [x^2 � ny^2 = 1] has infinitely many distinct integer solutions",https://en.wikipedia.org/wiki/Pell's_equation,,
-minkowskis-fundamental-theorem,Minkowski�s Fundamental Theorem,"[ {""entity_kname"":""Minkowskis_Theorem.minkowski|thm""} ]","theorem minkowski:
+minkowskis-fundamental-theorem,Minkowski�s Fundamental Theorem,"[ {""entity_kname"":""Minkowskis_Theorem.minkowski|thm""}, {""entity_kname"": ""Minkowskis_Theorem.minkowski|thm""}, {""entity_kname"": ""Minkowskis_Theorem.minkowski_compact|thm""} ]","theorem minkowski:
   fixes B :: ""(real ^ 'n) set""
   assumes ""convex B"" and symmetric: ""uminus ` B ? B""
   assumes meas_B [measurable]: ""B ? sets lebesgue""
@@ -217,7 +217,7 @@ puiseuxs-theorem,Puiseux�s Theorem,,"definition is_fpxs :: ""(rat ? 'a :: zero
 typedef (overloaded) 'a fpxs = ""{f::rat ? 'a :: zero. is_fpxs f}""
    morphisms fpxs_nth Abs_fpxs
 ",https://www.isa-afp.org/entries/Formal_Puiseux_Series.html,Formal_Puiseux_Series,Puiseux�s Theorem,generalization of power series that allow for negative and fractional exponents of the indeterminate,https://en.wikipedia.org/wiki/Puiseux_series,true,"Has to be skipped because target command is „definition“ or „typedef“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“."
-sum-of-the-reciprocals-of-the-triangular-numbers,Sum of the Reciprocals of the Triangular Numbers,"[ {""entity_kname"":""Triangular_Numbers.inverse_triangle_num_sums|thm""} ]","definition triangle_num :: ""nat ? nat"" where
+sum-of-the-reciprocals-of-the-triangular-numbers,Sum of the Reciprocals of the Triangular Numbers,"[ {""entity_kname"":""Triangular_Numbers.inverse_triangle_num_sums|thm""}, {""entity_kname"": ""Triangular_Numbers.triangle_num_altdef|thm""}, {""entity_kname"": ""Triangular_Numbers.triangle_num_numeral|thm""}, {""entity_kname"": ""Triangular_Numbers.triangle_num_Suc|thm""}, {""entity_kname"": ""Triangular_Numbers.real_triangle_num|thm""} ]","definition triangle_num :: ""nat ? nat"" where
   ""triangle_num n = (n * (n + 1)) div 2""
 
 theorem inverse_triangle_num_sums:
@@ -318,7 +318,7 @@ herons-formula,Heron�s formula,"[ {""entity_kname"":""Simplex_Content.heron|th
   defines ""s ? (a + b + c) / 2""
   shows   ""content (convex hull {A, B, C}) = sqrt (s * (s - a) * (s - b) * (s - c))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Simplex_Content.html,HOL,Heron�s formula,"the area of a triangle in terms of the three side lengths a, b, c",https://en.wikipedia.org/wiki/Heron%27s_formula,,
-formula-for-the-number-of-combinations,Formula for the Number of Combinations,"[ {""entity_kname"":""Binomial.n_subsets|thm""} ]","theorem n_subsets:
+formula-for-the-number-of-combinations,Formula for the Number of Combinations,"[ {""entity_kname"":""Binomial.n_subsets|thm""}, {""entity_kname"": ""Clique_Large_Monotone_Circuits.first_assumptions.card_POS|thm""} ]","theorem n_subsets:
   ""finite A ? card {B. B ? A ? card B = k} = (card A choose k)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Formula for the Number of Combinations,a k-combination of a set S is a subset of k distinct elements of S,https://en.wikipedia.org/wiki/Combination,,
 the-laws-of-large-numbers,The Laws of Large Numbers,"[ {""entity_kname"":""Laws_of_Large_Numbers.prob_space.strong_law_of_large_numbers_iid|thm""} ]"," theorem (in prob_space) strong_law_of_large_numbers_iid:
@@ -354,13 +354,13 @@ isosceles-triangle-theorem,Isosceles Triangle Theorem,"[ {""entity_kname"":""Tri
   assumes ""dist a c = dist b c""
   shows   ""angle b a c = angle a b c""
 ",https://isa-afp.org/entries/Triangle.shtml,Triangle,Isosceles Triangle Theorem,triangle that has two sides of equal length and two angles of equal measure,https://en.wikipedia.org/wiki/Isosceles_triangle,,
-sum-of-a-geometric-series,Sum of a Geometric Series,"[ {""entity_kname"":""Series.geometric_sums|thm""}, {""entity_kname"":""Series.suminf_geometric|thm""} ]","lemma geometric_sums:
+sum-of-a-geometric-series,Sum of a Geometric Series,"[ {""entity_kname"":""Series.geometric_sums|thm""}, {""entity_kname"":""Series.suminf_geometric|thm""}, {""entity_kname"": ""Series.summable_sums|thm""}, {""entity_kname"": ""Series.summable_imp_convergent|thm""}, {""entity_kname"": ""Extended_Reals_Sums_Compl.ereal_sums_Pinfty|thm""}, {""entity_kname"": ""Series.summable_iff_convergent'|thm""}, {""entity_kname"": ""Summation_Tests.kummers_test_divergence|thm""}, {""entity_kname"": ""Summation_Tests.not_summable_outside_conv_radius|thm""}, {""entity_kname"": ""Series.summable_iff_convergent|thm""}, {""entity_kname"": ""Summation_Tests.ratio_test_convergence|thm""} ]","lemma geometric_sums:
   ""norm c < 1 ? (?n. c^n) sums (1 / (1 - c))""
 
 lemma suminf_geometric:
   ""norm c < 1 ? (?n. c ^ n) = 1 / (1 - c)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Series.html,HOL,Sum of a Geometric Series,"When summing infinitely many terms, the [series in question] can either be convergent or divergent",https://en.wikipedia.org/wiki/Geometric_series#Definition_and_examples,,
-e-is-transcendental,e is Transcendental,"[ {""entity_kname"":""E_Transcendental.e_transcendental_real|thm""} ]","corollary e_transcendental_real: ""� algebraic (exp 1 :: real)""
+e-is-transcendental,e is Transcendental,"[ {""entity_kname"":""E_Transcendental.e_transcendental_real|thm""}, {""entity_kname"": ""Pi_Transcendental.transcendental_pi|thm""}, {""entity_kname"": ""Pi_Transcendental.transcendental_i_pi|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Ln|thm""}, {""entity_kname"": ""Liouville_Numbers.liouville.transcendental|thm""}, {""entity_kname"": ""Hermite_Lindemann.pi_transcendental|thm""}, {""entity_kname"": ""Liouville_Numbers.transcendental_standard_liouville|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arctan|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_complex_logarithm|thm""}, {""entity_kname"": ""E_Transcendental.e_transcendental_complex|thm""} ]","corollary e_transcendental_real: ""� algebraic (exp 1 :: real)""
 ",https://www.isa-afp.org/entries/E_Transcendental.shtml,E_Transcendental,e is Transcendental,The best-known [numbers that are not algebraic] are [e and] pi,https://en.wikipedia.org/wiki/Transcendental_number,,
 sum-of-an-arithmetic-series,Sum of an Arithmetic Series,"[ {""entity_kname"":""Set_Interval.comm_semiring_1.double_arith_series|thm""} ]","lemma double_arith_series:
   fixes a d :: ""'a :: comm_semiring_1""
@@ -405,12 +405,12 @@ lemma MVT2:
       and ""?x?{a..b}. (f has_real_derivative f' x) (at x)""
   shows ""?z::real. z ? {a<..<b} ? f b - f a = (b - a) * f' z""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Deriv.html,HOL,The Mean Value Theorem,"for a given planar arc between two endpoints, at least one point at which the tangent to the arc is parallel to the secant through its endpoints",https://en.wikipedia.org/wiki/Mean_value_theorem,,
-fourier-series,Fourier Series,"[ {""entity_kname"":""Fourier.Fourier_Fejer_Cesaro_summable_simple|thm""} ]","corollary Fourier_Fejer_Cesaro_summable_simple:
+fourier-series,Fourier Series,"[ {""entity_kname"":""Fourier.Fourier_Fejer_Cesaro_summable_simple|thm""}, {""entity_kname"": ""Fourier.differentiable_Fourier_convergence_periodic|thm""}, {""entity_kname"": ""Fourier.Fourier_sum_limit_Dirichlet_kernel_part|thm""}, {""entity_kname"": ""Fourier.simple_Fourier_convergence_periodic|thm""}, {""entity_kname"": ""Fourier.Fourier_sum_offset_Dirichlet_kernel_half|thm""}, {""entity_kname"": ""Fourier.Fourier_sum_offset_Dirichlet_kernel|thm""}, {""entity_kname"": ""Fourier.Fourier_sum_limit_Dirichlet_kernel|thm""}, {""entity_kname"": ""Fourier.Fourier_sum_offset_unpaired|thm""}, {""entity_kname"": ""Fourier.Fourier_sum_limit_Dirichlet_kernel_half|thm""}, {""entity_kname"": ""Prime_Number_Theorem_Library.fds_converges_remainder|thm""}, {""entity_kname"": ""Fourier.Fourier_Fejér_Cesaro_summable|thm""} ]","corollary Fourier_Fejer_Cesaro_summable_simple:
 assumes f: ""continuous_on UNIV f""
     and periodic: ""?x. f(x + 2*pi) = f x""
   shows ""(?n. (?m<n. ?k?2*m. Fourier_coefficient f k * trigonometric_set k x) / n) \<longlonglongrightarrow> f x""
 ",https://www.isa-afp.org/entries/Fourier.html,Fourier,Fourier Series,"[...] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",https://en.wikipedia.org/wiki/Fourier_series,,
-sum-of-kth-powers,Sum of kth powers,"[ {""entity_kname"":""Bernoulli.sum_of_powers|thm""} ]","lemma sum_of_powers:
+sum-of-kth-powers,Sum of kth powers,"[ {""entity_kname"":""Bernoulli.sum_of_powers|thm""}, {""entity_kname"": ""Dedekind_Sums.sum_of_powers'_int_from_1|thm""}, {""entity_kname"": ""Dedekind_Sums.sum_of_powers'_int|thm""}, {""entity_kname"": ""Dedekind_Sums.sum_of_powers'|thm""}, {""entity_kname"": ""Bernoulli.sum_of_powers|thm""} ]","lemma sum_of_powers:
   fixes m n :: nat
   shows ""(?k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
 ",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n,https://en.wikipedia.org/wiki/Faulhaber%27s_formula,,
@@ -424,7 +424,7 @@ the-intermediate-value-theorem,The Intermediate Value Theorem,"[ {""entity_kname
   assumes ""a ? b"" and ""y ? {f a..f b}"" and  ""continuous_on {a..b} f""
   obtains x where ""x ? {a..b}"" and ""f x = y""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Topological_Spaces.html,HOL,The Intermediate Value Theorem,"if f is a continuous function whose domain contains the interval [a, b], then it takes on any given value between f(a) and f(b)",https://en.wikipedia.org/wiki/Intermediate_value_theorem,,
-fundamental-theorem-of-arithmetic,Fundamental Theorem of Arithmetic,"[ {""entity_kname"":""Factorial_Ring.factorial_semiring.in_prime_factors_iff|thm""}, {""entity_kname"":""Factorial_Ring.factorial_semiring_multiplicative.prod_mset_prime_factorization|thm""}, {""entity_kname"":""Factorial_Ring.factorial_semiring.prime_factorization_unique|thm""} ]","lemma in_prime_factors_iff:
+fundamental-theorem-of-arithmetic,Fundamental Theorem of Arithmetic,"[ {""entity_kname"":""Factorial_Ring.factorial_semiring.in_prime_factors_iff|thm""}, {""entity_kname"":""Factorial_Ring.factorial_semiring_multiplicative.prod_mset_prime_factorization|thm""}, {""entity_kname"":""Factorial_Ring.factorial_semiring.prime_factorization_unique|thm""}, {""entity_kname"": ""Primes_Ex.factorization_unique|thm""}, {""entity_kname"": ""Primes.prod_mset_prime_factorization_int|thm""}, {""entity_kname"": ""Primes.prime_factorization_exists_nat|thm""}, {""entity_kname"": ""Prime_Factorization.prime_factorization_nat_main|thm""}, {""entity_kname"": ""Euler_Criterion.l8|thm""}, {""entity_kname"": ""Primes.prime_factorization_unique_int|thm""}, {""entity_kname"": ""Primes.prime_factorization_int|thm""}, {""entity_kname"": ""Dirichlet_Efficient_Code.distinct_prime_factorization_nat'|thm""}, {""entity_kname"": ""Factorial_Ring.factorial_semiring.prime_factorization_unique'|thm""}, {""entity_kname"": ""Pratt_Certificate.prime_factors_list_prime|thm""} ]","lemma in_prime_factors_iff:
   ""p ? set_mset (prime_factors x) ? x ? 0 ? p dvd x ? prime p""
 
 lemma prod_mset_prime_factorization:
@@ -438,7 +438,7 @@ lemma prime_factorization_unique:
 divergence-of-the-prime-reciprocal-series,Divergence of the Prime Reciprocal Series,"[ {""entity_kname"":""Prime_Harmonic.prime_harmonic_series_diverges|thm""} ]","corollary prime_harmonic_series_diverges:
   ""�convergent (?n. ?p?primes_upto n. 1 / p)""
 ",https://isa-afp.org/entries/Prime_Harmonic_Series.shtml,Prime_Harmonic_Series,Divergence of the Prime Reciprocal Series,sum of the reciprocals of all prime numbers diverges,https://en.wikipedia.org/wiki/Divergence_of_the_sum_of_the_reciprocals_of_the_primes,,
-dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Littlewood�s �elegant� proof),"[ {""entity_kname"":""Cube_Dissection.dissection_does_not_exist|thm""} ]","theorem dissection_does_not_exist:
+dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Littlewood�s �elegant� proof),"[ {""entity_kname"":""Cube_Dissection.dissection_does_not_exist|thm""}, {""entity_kname"": ""Cube_Dissection.subset_unit_cube_if_dissection|thm""}, {""entity_kname"": ""Cube_Dissection.bot_unit_cube_cover_by_bot|thm""} ]","theorem dissection_does_not_exist:
   ""? C. (? c ? C. is_valid c)
         ? disjoint (image to_set C)
         ? ?(image to_set C) = to_set unit_cube
@@ -480,7 +480,7 @@ the-triangle-inequality,The Triangle Inequality,,"class ordered_ab_group_add_abs
     and abs_minus_cancel: ""�-a� = �a�""
     and abs_triangle_ineq: ""�a + b� ? �a� + �b�""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Groups.html,HOL,The Triangle Inequality,triangle [...] sum of [...] lengths of [...] two sides [...] greater than or equal [...] length of [...] remaining side,https://en.wikipedia.org/wiki/Triangle_inequality,true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
-picks-theorem,Pick�s Theorem,"[ {""entity_kname"":""Pick.pick|thm""} ]","theorem pick:
+picks-theorem,Pick�s Theorem,"[ {""entity_kname"":""Pick.pick|thm""}, {""entity_kname"": ""Pick.pick_unrotated|thm""}, {""entity_kname"": ""Pick.pick_triangle_lemma|thm""}, {""entity_kname"": ""Simplex_Content.content_triangle|thm""} ]","theorem pick:
 fixes p :: ""R_to_R2""
 assumes ""polygon p""
 assumes ""p = make_polygonal_path vts""
