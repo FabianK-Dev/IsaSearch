@@ -131,7 +131,6 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                     "id": doc_id,
                     "description": doc_description,
                     "entity_kname": doc_entity_kname,
-                    "target_identifier": target_identifier,
                     "src": doc_src
                 }
 
@@ -148,7 +147,8 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 "query": query,
                 "refined_query": results_dict["refined_query"],
                 "results[:10]": top_results,
-                "duration": results_dict["duration"]
+                "duration": results_dict["duration"],
+                "target_identifier": target_identifier[0]
             }
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
