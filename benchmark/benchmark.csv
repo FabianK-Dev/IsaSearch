@@ -70,7 +70,7 @@ fundamental-theorem-of-integral-calculus,Fundamental Theorem of Integral Calculu
     and   ""?x. x ? {a..b} ? (f has_vector_derivative f' x) (at x within {a..b})""
   shows   ""(f' has_integral (f b - f a)) {a..b}""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Henstock_Kurzweil_Integration.html,HOL,Fundamental Theorem of Integral Calculus,[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other,https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus,,
-demoivres-theorem,DeMoivre�s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|thm""}, {""entity_kname"":""Complex.DeMoivre2|thm""} ]","lemma DeMoivre: ""(cis a) ^ n = cis (real n * a)""
+demoivres-theorem,DeMoivre�s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|thm""}, {""entity_kname"":""Complex.DeMoivre2|thm""}, {""entity_kname"": ""Complex_Transcendental.DeMoivre|thm""}, {""entity_kname"": ""FFT.root_unity|thm""}, {""entity_kname"": ""Complex.cos_n_Re_cis_pow_n|thm""}, {""entity_kname"": ""Complex_Transcendental.Euler|thm""}, {""entity_kname"": ""Complex.sin_n_Im_cis_pow_n|thm""} ]","lemma DeMoivre: ""(cis a) ^ n = cis (real n * a)""
 
 lemma DeMoivre2: ""(rcis r a) ^ n = rcis (r ^ n) (real n * a)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Complex.html,HOL,DeMoivre�s Theorem,for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin ? nx,https://en.wikipedia.org/wiki/De_Moivre%27s_formula,,
