@@ -9,7 +9,7 @@
     "artifacts_folder": "artifacts/microsoft/Phi-3.5-mini-instruct",
     "prompts_folder": "prompts/microsoft-Phi",
     "chroma_db_path": "chroma_storages/microsoft/Phi-3.5-mini-instruct",
-    "llm_name": "microsoft/Phi-3.5-mini-instruct",
+    "vllm_name": "microsoft/Phi-3.5-mini-instruct",
     "theorem_max_length": 1000,
     "metadata_max_length": 300,
     "gpu_memory_utilization": 0.85,

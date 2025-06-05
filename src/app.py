@@ -25,7 +25,7 @@ print("Using config for benchmark:")
 pprint(config)
 
 print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
+tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
 
 print("Loading prompts...")
 prompts = load_prompts(config)

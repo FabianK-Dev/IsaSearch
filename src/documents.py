@@ -194,7 +194,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
 
         print("Loading LLM...")
         llm = LLM(
-            model=config["llm_name"],
+            model=config["vllm_name"],
             max_model_len=max_tokens + config["sampling_parameters"]["max_tokens"],
             dtype="auto",
             gpu_memory_utilization=config["gpu_memory_utilization"])
@@ -221,7 +221,7 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
                 document_descriptions[doc_id] = {
                     "llm_description": raw_llm_description,
                     "zlib.adler32_checksum": zlib.adler32(doc_src.encode('utf-8')),
-                    "model": config["llm_name"],
+                    "model": config["vllm_name"],
                     "prompt": doc_strings[i + j],
                 }
 

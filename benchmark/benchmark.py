@@ -30,7 +30,7 @@ print("Using config for benchmark:")
 pprint(config)
 
 print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(config["llm_name"])
+tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
 
 print("Loading prompts...")
 prompts = load_prompts(config)
@@ -154,9 +154,9 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 
 if config["add_metadata"]:
-    benchmark_llm_name = config["llm_name"].replace("/", "-") + "_with_metadata"
+    benchmark_llm_name = config["vllm_name"].replace("/", "-") + "_with_metadata"
 else:
-    benchmark_llm_name = config["llm_name"].replace("/", "-")
+    benchmark_llm_name = config["vllm_name"].replace("/", "-")
 
 with open("./benchmark/benchmark_results_" + benchmark_llm_name + ".json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
