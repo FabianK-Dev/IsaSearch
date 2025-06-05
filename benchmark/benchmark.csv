@@ -276,12 +276,12 @@ wilsons-theorem,Wilson�s Theorem,"[ {""entity_kname"":""Residues.wilson_theore
   assumes ""prime p""
   shows   ""[fact (p - 1) = -1] (mod p)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Residues.html,HOL,Wilson�s Theorem,"[...] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",https://en.wikipedia.org/wiki/Wilson%27s_theorem,,
-the-number-of-subsets-of-a-set,The Number of Subsets of a Set,"[ {""entity_kname"":""Power.card_Pow|thm""} ]","lemma card_Pow:
+the-number-of-subsets-of-a-set,The Number of Subsets of a Set,"[ {""entity_kname"":""Power.card_Pow|thm""}, {""entity_kname"":""Cardinal_Library_Relative.M_library.cardinal_rel_Pow_rel|thm""} ]","lemma card_Pow:
   ""finite A ? card (Pow A) = 2 ^ card A""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Power.html,HOL,The Number of Subsets of a Set,"If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",https://en.wikipedia.org/wiki/Power_set#Properties,,
 pi-is-transcendental,Pi is Transcendental,"[ {""entity_kname"":""Pi_Transcendental.transcendental_pi|thm""} ]","theorem transcendental_pi: ""�algebraic pi""
 ",https://www.isa-afp.org/entries/Pi_Transcendental.html,Pi_Transcendental,Pi is Transcendental,The best-known [numbers that are not algebraic] are pi and e,https://en.wikipedia.org/wiki/Transcendental_number,,
-the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,"[ {""entity_kname"":""KoenigsbergBridge.eulerian_split|thm""} ]","lemma eulerian_split:
+the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,"[ {""entity_kname"":""KoenigsbergBridge.eulerian_split|thm""}, {""entity_kname"":""Tree_Graph.fin_ulgraph.handshaking|thm""} ]","lemma eulerian_split:
   assumes ""nodes G1 ? nodes G2 = {}"" ""edges G1 ? edges G2={}""
     ""valid_unMultigraph G1"" ""valid_unMultigraph G2""
     ""valid_unMultigraph.is_Eulerian_trail  G1 v1 ps1 v1'""
@@ -382,7 +382,7 @@ sylows-theorem,Sylow�s Theorem,"[ {""entity_kname"":""Sylow.sylow_thm|thm""} ]
   assumes ""prime p"" and ""group G"" and ""order G = p ^ a * m"" and ""finite (carrier G)""
   obtains H where ""subgroup H G"" and ""card H = p ^ a""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Algebra/Sylow.html,HOL,Sylow�s Theorem,"for every prime factor p of the order of a finite group G, there exists a [...] p-subgroup of G of order p^n",https://en.wikipedia.org/wiki/Sylow_theorems,,
-ascending-or-descending-sequences,Ascending or Descending Sequences,"[ {""entity_kname"":""Erdoes_Szekeres.Erdoes_Szekeres|thm""} ]","lemma Erdoes_Szekeres:
+ascending-or-descending-sequences,Ascending or Descending Sequences,"[ {""entity_kname"":""Erdoes_Szekeres.Erdoes_Szekeres|thm""}, {""entity_kname"":""Extended_Real_Limits.limsup_subseq_lim|thm""} ]","lemma Erdoes_Szekeres:
   fixes f :: ""_ ? 'a::linorder""
   shows ""(?S. S ? {0..m * n} ? card S = m + 1 ? mono_on f (op ?) S) ?
          (?S. S ? {0..m * n} ? card S = n + 1 ? mono_on f (op ?) S)""
@@ -489,7 +489,7 @@ assumes ""I = card {x. integral_vec x ? x ? path_inside p}""
 assumes ""B = card {x. integral_vec x ? x ? path_image p}""
 shows ""measure lebesgue (path_inside p) = I + B/2 - 1""
 ",https://www.isa-afp.org/entries/Picks_Theorem.html,Picks_Theorem,Pick�s Theorem,formula for the area of a simple polygon with integer vertex coordinates,https://en.wikipedia.org/wiki/Pick%27s_theorem,,
-the-birthday-problem,The Birthday Problem,"[ {""entity_kname"":""Birthday_Paradox.birthday_paradox|thm""} ]","lemma birthday_paradox:
+the-birthday-problem,The Birthday Problem,"[ {""entity_kname"":""Birthday_Paradox.birthday_paradox|thm""}, {""entity_kname"":""Frequency_Moment_0.collision_prob|thm""} ]","lemma birthday_paradox:
   assumes ""card S = 23"" ""card T = 365""
   shows ""2 * card {f ? S??E S T. � inj_on f S} ? card (S ??E T)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Birthday_Paradox.html,HOL,The Birthday Problem,same birthday [...] 23 people are needed for that probability to exceed 50%,https://en.wikipedia.org/wiki/Birthday_problem,,

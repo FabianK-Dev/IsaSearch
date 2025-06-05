@@ -9,7 +9,6 @@ Principles of Output:
 5. The formal statement can assume certain definitions and hypotheses are already formalized in Isabelle/HOL, even if you are not sure.
 6. Focus on key concepts and keywords that mathematicians would use to search for this theorem. The description should be concise and highly searchable.
 7. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
-8. If the input description is completely nonsensical, uninterpretable, unreadable or does not clearly resemble any known mathematical theorem, you MUST only reply with: <BEGIN>false<END>. No other text or explanation is allowed in this specific case.
 
 === Start of positive example input ===
 degree of product of two polynomials equals to sum of degree
@@ -24,15 +23,7 @@ theorem degree_mult:
 assumes "p ≠ 0" and "q ≠ 0" 
 shows "degree (p * q) = degree p + degree q"
 <END>
-=== End of positive example output ===
-
-=== Start of negative example input ===
-purple monkey dishwasher theorem
-=== End of negative example input ===
-
-=== Start of negative example output ===
-<BEGIN>false<END>
-=== End of negative example output ===<|end|>
+=== End of positive example output ===<|end|>
 <|user|>
 {search_query}<|end|>
 <|assistant|>
