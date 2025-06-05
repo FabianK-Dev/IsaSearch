@@ -115,27 +115,26 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
             results_dict = search(query, collection, prompts, model, config, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
+            print(results_list[0])
 
-            # print("Top 10 results:")
-            # top_results = []
-            # for i, result in enumerate(results_list[:10]):
-            #     score = result.get("score")
-            #     doc_id = result.get("id")
-            #     doc_src = result.get("src")[:200] + "..."
-            #     doc_description = result.get("llm_description")
-            #     doc_entity_kname = result.get("entity_kname")
+            top_results = []
+            for i, result in enumerate(results_list[:10]):
+                score = result.get("score")
+                doc_id = result.get("id")
+                doc_src = result.get("src")[:200] + "..."
+                doc_description = result.get("llm_description")
+                doc_entity_kname = result.get("entity_kname")
 
-            #     res = {
-            #         "rank": i + 1,
-            #         "score": score,
-            #         "id": doc_id,
-            #         "description": doc_description,
-            #         "entity_kname": doc_entity_kname,
-            #         "src[:200]": doc_src
-            #     }
-                
-            #     pprint(res)
-            #     top_results.append(res)
+                res = {
+                    "rank": i + 1,
+                    "score": score,
+                    "id": doc_id,
+                    "description": doc_description,
+                    "entity_kname": doc_entity_kname,
+                    "src[:200]": doc_src
+                }
+
+                top_results.append(res)
 
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "metrics": {
@@ -147,7 +146,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 },
                 "query": query,
                 "refined_query": results_dict["refined_query"],
-                #"results[:10]": top_results,
+                "results[:10]": top_results,
                 "duration": results_dict["duration"]
             }
 
