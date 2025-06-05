@@ -21,17 +21,20 @@ def get_entry_metadata(entry, config):
     if os.path.isfile(entry_toml):
         with open(entry_toml, "rb") as f:
             toml = tomllib.load(f)
-            return toml
+            return {
+                "title": toml.get("title"),
+                "abstract": toml.get("abstract")
+            }
     else:
         print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
         return {}
 
-def relevant_doc_keys(solr_document):
+def relevant_doc_keys(solr_document, config):
     return {
         "id": solr_document["id"],
         "src": solr_document["src"],
         "entity_kname": solr_document.get("entity_kname", None),
-        "metadata": get_entry_metadata(solr_document["session"])
+        "metadata": get_entry_metadata(solr_document["session"], config)
     }
 
 # # TODO: remove in future
@@ -61,7 +64,7 @@ def fetch_all_docs(solr, config):
     #         allow = 200
     #     elif allow > 0:
     #         allow -= 1
-        result_filtered = relevant_doc_keys(result)
+        result_filtered = relevant_doc_keys(result, config)
         document_tree[result["id"]] = result_filtered
 
     pages = math.ceil(max_docs / docs_per_page)
