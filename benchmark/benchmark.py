@@ -131,7 +131,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                     "id": doc_id,
                     "description": doc_description,
                     "entity_kname": doc_entity_kname,
-                    "src": doc_src
+                    "src": doc_src.split("proof")[0][:1000] + "..."
                 }
 
                 top_results.append(res)
