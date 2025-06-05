@@ -63,7 +63,9 @@ def rank(results, target_identifier):
     return len(results)
 
 def calculate_mean_metrics(benchmark_results):
-    metrics = {}
+    metrics = {
+        "all_queries": {}
+    }
 
     for target_id in benchmark_results:
         is_skipped = "skipped" in benchmark_results[target_id]["metadata"] and benchmark_results[target_id]["metadata"]["skipped"]
@@ -72,17 +74,28 @@ def calculate_mean_metrics(benchmark_results):
             continue
 
         for query_type in benchmark_results[target_id]["queries"]:
+            if query_type not in metrics:
+                metrics[query_type] = {}
+
             for metric in benchmark_results[target_id]["queries"][query_type]["metrics"]:
                 metric_value = benchmark_results[target_id]["queries"][query_type]["metrics"][metric]
-                if metric not in metrics:
-                    metrics[metric] = { "total": 0, "sample_size": 0 }
-                
-                metrics[metric]["total"] += metric_value
-                metrics[metric]["sample_size"] += 1
+
+                if metric not in metrics[query_type]:
+                    metrics[query_type][metric] = { "total": 0, "sample_size": 0 }
+
+                metrics[query_type][metric]["total"] += metric_value
+                metrics[query_type][metric]["sample_size"] += 1
+
+                if metric not in metrics["all_queries"]:
+                    metrics["all_queries"][metric] = { "total": 0, "sample_size": 0 }
+
+                metrics["all_queries"][metric]["total"] += metric_value
+                metrics["all_queries"][metric]["sample_size"] += 1
 
     # Calculate the average
-    for metric in metrics:
-        metrics[metric]["average"] = metrics[metric]["total"] / metrics[metric]["sample_size"]
-        del metrics[metric]["total"]
+    for query_type in metrics:
+        for metric in metrics[query_type]:
+            metrics[query_type][metric]["average"] = metrics[query_type][metric]["total"] / metrics[query_type][metric]["sample_size"]
+            del metrics[query_type][metric]["total"]
 
     return metrics
