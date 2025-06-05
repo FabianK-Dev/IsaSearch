@@ -2,12 +2,18 @@ import math
 
 def is_correct_target(result_doc, target_identifier):
     for identifier in target_identifier:
+        correct_identifiers = 0
         for identifier_key in identifier:
             if not identifier_key in result_doc:
                 continue
 
-            if result_doc[identifier_key] == identifier[identifier_key]:
-                return True
+            if result_doc[identifier_key] != identifier[identifier_key]:
+                correct_identifiers = float('-inf')
+
+            correct_identifiers += 1
+
+        if correct_identifiers == len(identifier):
+            return True
 
     return False
 
