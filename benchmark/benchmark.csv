@@ -452,7 +452,7 @@ the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipT
 ",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...],https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem,,
 divisibility-by-three-rule,Divisibility by Three Rule,"[ {""entity_kname"":""ThreeDivides.three_divides_nat|thm""} ]","theorem three_divides_nat: ""3 dvd n ? 3 dvd sumdig n""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,[...] sum of the digits must be divisible by 3 [...],https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230,,
-lebesgue-measure-and-integration,Lebesgue Measure and Integration,,,https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,,,
+lebesgue-measure-and-integration,Lebesgue Measure and Integration,,,https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,,true,"It is not clear which specific theorem, lemma or corollary adresses this entry."
 desarguess-theorem,Desargues�s Theorem,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P ? ? ?""
   shows ""rk {?, ?, ?} ? 2""
