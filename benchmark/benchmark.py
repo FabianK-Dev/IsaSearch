@@ -109,13 +109,10 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         query = row[query_type]
 
         if not pd.isna(query):
-            # print(row)
-            # print()
             print(f"Searching: \"{query}\"")
 
             results_dict = search(query, collection, prompts, model, config, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
-            print(results_list[0])
 
             top_results = []
             for i, result in enumerate(results_list[:10]):
