@@ -12,6 +12,7 @@ from chromadb.utils import embedding_functions
 import json
 import pandas as pd
 import torch
+import os
 
 print("Loading config...")
 with open("config.json", "r") as file:
@@ -155,5 +156,8 @@ if config["add_metadata"]:
 else:
     benchmark_llm_name = config["vllm_name"].replace("/", "-") + "_" + config["llm_name"].replace("/", "-")
 
-with open("./benchmark/benchmark_results_" + benchmark_llm_name + ".json", "w") as outfile:
+if not os.path.exists("./benchmark/results/"):
+    os.makedirs("./benchmark/results/")
+
+with open("./benchmark/results/" + benchmark_llm_name + ".json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)
