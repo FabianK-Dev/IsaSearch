@@ -87,24 +87,21 @@ def fetch_all_docs(solr, config):
 
     return document_tree
 
-def prepare_metadata(metadata):
+def prepare_metadata(metadata, stop_words_set):
     # Replace newlines through spaces
-    plain_text = re.compile(r"\n").sub(" ", metadata)
+    plain_text = metadata.lower().replace('\n', ' ')
+
+    # Replace 1-3 letter words and non-alphabetic characters with a single whitespace
+    plain_text = re.sub(r'\b[a-z]{1,3}\b|[^a-z ]', ' ', plain_text)
 
     # Replace two or more white spaces through single whitespace
-    plain_text = re.compile(r"\s+").sub(" ", plain_text).strip()
-
-    # Only allow letters or spaces in text
-    plain_text = re.compile('[^a-zA-Z ]').sub("", plain_text) 
-
-    # Remove words with three characters or less
-    plain_text = re.compile(r'\b\w{1,3}\b').sub("", plain_text)
+    plain_text = re.sub(r'\s+', ' ', plain_text).strip()
 
     # Remove stop words like e.g. "the", "a", "and", etc.
-    plain_text_tokens = word_tokenize(plain_text)
-    tokens_without_stopwords = [word for word in plain_text_tokens if not word in stopwords.words()]
-    plain_text = (" ").join(tokens_without_stopwords)
+    plain_text_tokens = plain_text.split()
+    tokens_without_stopwords = [word for word in plain_text_tokens if word not in stop_words_set]
 
+    plain_text = " ".join(tokens_without_stopwords)
     return plain_text
 
 def generate_document_descriptions(config, document_tree, prompts, tokenizer, save_every=1000):
@@ -141,19 +138,20 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
     print("Found " + str(len(filtered_docs)) + " documents that need to be described by the LLM.")
 
     if len(filtered_docs) >= 1:
-        # Only update NLTK resources if any documents need to be described to avoid unnecessary downloads
+        # Only update NLTK resources if any documents need to be described and if adding metadata is enabled, to avoid unnecessary downloads
         print("Downloading/Updating NLTK resources (punkt and stopwords)...")
         nltk.download('punkt')
         nltk.download('stopwords')
+        stop_words_set = set(stopwords.words('english'))
 
         doc_strings = []
-        for doc in filtered_docs:
+        for doc in tqdm(filtered_docs):
             # Remove the proof part of the theorem source code, truncate to max length and strip trailing whitespaces
             theorem_content=doc["src"].split("proof")[0][:config["theorem_max_length"]].strip()
 
             if config["add_metadata"]:
-                title = prepare_metadata(doc["metadata"].get("title", ""))
-                abstract = prepare_metadata(doc["metadata"].get("abstract", ""))
+                title = prepare_metadata(doc["metadata"].get("title", ""), stop_words_set)
+                abstract = prepare_metadata(doc["metadata"].get("abstract", ""), stop_words_set)
 
                 if len(title + abstract) > config["metadata_max_length"]:
                     abstract = abstract[:config["metadata_max_length"] - len(title) - 3] + "..."
