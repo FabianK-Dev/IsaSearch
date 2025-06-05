@@ -19,10 +19,10 @@ def get_entry_metadata(entry, config):
     metadata_folder = config["afp_folder"] + "/metadata/"
     entry_toml = metadata_folder + "entries/" + entry + ".toml"
 
-    if os.path.isfile(entry_toml):
-        if entry in cached_metadata:
-            return cached_metadata[entry]
+    if entry in cached_metadata:
+        return cached_metadata[entry]
 
+    if os.path.isfile(entry_toml):
         with open(entry_toml, "rb") as f:
             toml = tomllib.load(f)
             cached_metadata[entry] = {
@@ -32,7 +32,11 @@ def get_entry_metadata(entry, config):
             return cached_metadata[entry]
     else:
         print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
-        return {}
+        cached_metadata[entry] = {
+            "title": "",
+            "abstract": ""
+        }
+        return cached_metadata[entry]
 
 def relevant_doc_keys(solr_document, config):
     return {
