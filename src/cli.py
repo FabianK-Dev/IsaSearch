@@ -82,7 +82,7 @@ try:
 
         top_results = []
         for i, result in enumerate(results_list[:10]):
-            score = result.get("score")
+            distance = result.get("distance")
             doc_id = result.get("id").split("/")[-1]
 
             src_text = result.get("src", "")
@@ -92,7 +92,7 @@ try:
             if len(src_text) > 500:
                 src_text = src_text[:500] + "...\n(theorem source code truncated to 500 characters)"
 
-            print(color.BLUE + f"RESULT {i+1}: | SCORE (lower is better): {str(round(score, 3))} | ID: {doc_id}" + color.END)
+            print(color.BLUE + f"RESULT {i+1}: | SCORE (lower is better): {str(round(distance, 3))} | ID: {doc_id}" + color.END)
             print(color.CYAN + src_text + color.END)
             print()
             print(color.YELLOW + "LLM SUMMARY: " + doc_description + color.END)

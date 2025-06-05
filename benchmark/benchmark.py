@@ -117,7 +117,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
             top_results = []
             for i, result in enumerate(results_list[:10]):
-                score = result.get("score")
+                distance = result.get("distance")
                 doc_id = result.get("id")
                 doc_src = result.get("src")
                 doc_description = result.get("llm_description")
@@ -125,7 +125,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
                 res = {
                     "rank": i + 1,
-                    "score": score,
+                    "distance": distance,
                     "id": doc_id,
                     "description": doc_description,
                     "entity_kname": doc_entity_kname,

@@ -104,7 +104,7 @@ def search(search_query, collection, prompts, model, config, llm_output_cache=No
     for metadata, distance in zip(query_result["metadatas"][0], query_result["distances"][0]):
         result_id = metadata["source"]
         results[result_id] = {
-            "score": distance,
+            "distance": distance,
             "id": result_id
         }
 
