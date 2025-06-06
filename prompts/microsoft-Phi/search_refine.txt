@@ -1,38 +1,27 @@
-<|system|>
-Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to rewrite a short, vague input description of a mathematical theorem into a detailed, explicit statement of the theorem in under 256 tokens, first written in natural mathematical language, then in the formal language of Isabelle/HOL. Your output must contain exactly two parts. The first part is a natural mathematical language statement, starting with a theorem name, followed by the detailed statement of the theorem. The second part is an Isabelle/HOL code block, write the formal theorem statement directly without imports, proofs, or extra text. NO other paragraph is allowed to appear in the output.
+I have a task for you. In this task, you will be given a short description that user typed in a search engine. It is about some mathematical definition or theorem. You should figure out what this short description points to, and describe it in the same format as the following examples. This paraphrase is intended to provide more information about the same thing, making the search engine performs better if it uses this new description instead, so please be as rich as possible, and don't use mathematics symbols like ">/</=". Instead, translate them into  "more than/less than/equal". Do not use any mathematical symbols, especially LaTeX.
 
-Principles of Output:
-1. You should provide as much information and be as precise as possible.
-2. The natural language part should be accessible to mathematicians. Additionally, please express the mathematical formulas in LaTeX when necessary.
-3. Crucially: Always refine the provided input query. The example below serves ONLY for formatting guidance, not for content. Do NOT use the example's theorem content in your output; generate content based solely on the user's current input.
-4. Even if the input is very vague, guess the most similar mathematical theorem and state it explicitly, based solely on the input provided.
-5. The formal statement can assume certain definitions and hypotheses are already formalized in Isabelle/HOL, even if you are not sure.
-6. Focus on key concepts and keywords that mathematicians would use to search for this theorem. The description should be concise and highly searchable.
-7. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
-8. If the input description is completely nonsensical, uninterpretable, unreadable or does not clearly resemble any known mathematical theorem, you MUST only reply with: <BEGIN>false<END>. No other text or explanation is allowed in this specific case.
+You should give your result in following format: Paraphrase: <BEGIN>Theorem (<a proper new name>):
+<your result><END>
 
-=== Start of positive example input ===
-degree of product of two polynomials equals to sum of degree
-=== End of positive example input ===
+Examples:
 
-=== Start of positive example output ===
-<BEGIN>
-Theorem (Degree of the Product of Two Polynomials):
-Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree of the product \(p \cdot q\) is equal to the sum of the degrees of \(p\) and \(q\), that is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
+Input: "the property that a choose element satisfies"
+Paraphrase: <BEGIN>Theorem (Classical Choose Specification):
+For any type α and a property p on α, if there exists an element x such that p(x) is true, then the chosen element from the set of elements satisfying p is also true for p.
 
-theorem degree_mult: 
-assumes "p ≠ 0" and "q ≠ 0" 
-shows "degree (p * q) = degree p + degree q"
+theorem some_spec:
+  assumes "EX x. p x"
+  shows "p (SOME x. p x)"
 <END>
-=== End of positive example output ===
 
-=== Start of negative example input ===
-purple monkey dishwasher theorem
-=== End of negative example input ===
+Input: "if a binary property holds for $(0, n)$, and for any $m \\ge 0$, it holds for $(n%m, m)$ implies it holds for $(n, m)$, then this property holds for all $(m, n)$"
+Paraphrase: <BEGIN>Theorem (Strong Induction on Natural Numbers):
+For any natural number a, if a property holds for 0 and for any natural number n assuming it holds for n, then the property holds for a.
 
-=== Start of negative example output ===
-<BEGIN>false<END>
-=== End of negative example output ===<|end|>
-<|user|>
-{search_query}<|end|>
-<|assistant|>
+theorem nat_induct:
+  assumes "P 0" and "ALL n. P n --> P (Suc n)"
+  shows "P a"
+<END>
+
+Input: "{search_query}"
+Paraphrase:
