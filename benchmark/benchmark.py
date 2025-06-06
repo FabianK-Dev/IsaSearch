@@ -115,7 +115,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         if not pd.isna(query):
             print(f"Searching: \"{query}\"")
 
-            results_dict = search(query, collection, prompts, model, config, llm_output_cache=llm_output_cache)
+            results_dict = search(query, collection, prompts, model, config, refine_query=True, llm_output_cache=llm_output_cache)
             results_list = search_results_to_docs(results_dict, document_tree)["results"]
 
             top_results = []
