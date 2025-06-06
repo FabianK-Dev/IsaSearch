@@ -20,11 +20,9 @@
 
 ### Comparisons
 - one model: microsoft/Phi-3.5-mini-instruct (1)
-- [x] with / without metadata + title (*2)
-- [x] with / without LLM query refinement (*2)
-- [x] hybrid: original query + refined query ? (+1)
-- [x] ~~comparison: bi-encoder + cross-encoder (1)~~
-- total: 1*2*2 + 1 = 5 runs
+- [x] with / without metadata (*2)
+- [x] with / without LLM query refinement / hybrid (original query + refined query) (*3)
+- total: 1*2*3 = 5 runs
 
 ## Deployment
 - [ ] FastAPI
