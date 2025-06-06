@@ -93,6 +93,9 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = "target_identifier_parse_error"
         continue
 
+    # Remove duplicates from target_identifier (list of dicts)
+    target_identifier = [ dict(t) for t in {tuple(d.items()) for d in target_identifier} ]
+
     target_exists = False
     print("Searching document identified by '" + row["Target Identifier"] + "'...")
     for doc_id in document_tree:
