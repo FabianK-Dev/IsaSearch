@@ -23,5 +23,5 @@
         "stop": ["<END>"]
     },
     "add_metadata": false,
-    "enable_llm_output_cache": false
+    "enable_llm_output_cache": true
 }
