@@ -38,8 +38,4 @@ COPY prompts /app/prompts
 COPY src /app/src
 COPY config.json /app/config.json
 
-# Pre-download the model so that it is available when the container starts
-ARG vllm_name=microsoft/Phi-3.5-mini-instruct
-RUN python3 -c "from transformers import AutoModelForCausalLM; AutoModelForCausalLM.from_pretrained('$vllm_name')"
-
 CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python3 -m src.app
