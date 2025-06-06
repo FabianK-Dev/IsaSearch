@@ -2,7 +2,7 @@ ID,Title,Target Identifier,Theorem,Link,Session,Title query,Natural language que
 square-root-of-2-is-irrational,Square Root of 2 is Irrational,"[ {""entity_kname"":""Sqrt.sqrt_prime_irrational|thm""}, {""entity_kname"": ""Sqrt.sqrt_2_not_rat|thm""}, {""entity_kname"": ""Quadratic_Irrationals.quadratic_irrational_sqrt|thm""}, {""entity_kname"": ""Quadratic_Irrationals.irrat_sqrt_nonsquare|thm""}, {""entity_kname"": ""Pell.irrat_sqrt_nonsquare|thm""}, {""entity_kname"": ""Sqrt_Script.prime_sqrt_irrational|thm""} ]","theorem sqrt_prime_irrational: ""prime p ? sqrt (real p) ? ?""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ? ?""",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html,HOL-Examples,Square Root of 2 is Irrational,sqrt(2) is not rational,https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality,,
-fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"[ {""entity_kname"":""Fundamental_Theorem_Algebra.fundamental_theorem_of_algebra_alt|thm""} ]","lemma fundamental_theorem_of_algebra:
+fundamental-theorem-of-algebra,Fundamental Theorem of Algebra,"[ {""entity_kname"":""Fundamental_Theorem_Algebra.fundamental_theorem_of_algebra_alt|thm""}, {""entity_kname"": ""Vector_Derivative_On.fundamental_theorem_of_calculus'|thm""}, {""entity_kname"": ""Interval_Integral.interval_integral_FTC_integrable|thm""}, {""entity_kname"": ""Master_Theorem.fundamental_theorem_of_calculus_real|thm""}, {""entity_kname"": ""Interval_Integral_HK.fundamental_theorem_of_calculus_ivl_integral|thm""} ]","lemma fundamental_theorem_of_algebra:
   assumes nc: ""� constant (poly p)""
   shows ""?z::complex. poly p z = 0""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-Computational_Algebra/Fundamental_Theorem_Algebra.html,HOL,Fundamental Theorem of Algebra,Every univariate polynomial of positive degree with complex coefficients has at least one complex root,https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements,,
@@ -113,7 +113,7 @@ formula-for-pythagorean-triples,Formula for Pythagorean Triples,"[ {""entity_kna
   assumes ""coprime a b"" ""odd a"" ""a?2 + b?2 = c?2""
   shows   ""?p q. a = p?2 - q?2 ? b = 2 * p * q ? c = p?2 + q?2 ? coprime p q""
 ",https://www.isa-afp.org/entries/Fermat3_4.html,Fermat3_4,Formula for Pythagorean Triples,[...] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0,https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple,,
-the-undecidability-of-the-continuum-hypothesis,The Undecidability of the Continuum Hypothesis,"[ {""entity_kname"":""Not_CH.ctm_ZFC_imp_ctm_not_CH|thm""}, {""entity_kname"": ""Countable_Set_Type.countable_card_le_natLeq|thm""}, {""entity_kname"": ""Countable_Set_Type.countable_cases_card_of|thm""} ]","corollary ctm_ZFC_imp_ctm_not_CH:
+the-undecidability-of-the-continuum-hypothesis,The Undecidability of the Continuum Hypothesis,"[ {""entity_kname"":""Not_CH.ctm_ZFC_imp_ctm_not_CH|thm""}, {""entity_kname"": ""Countable_Set_Type.countable_card_le_natLeq|thm""}, {""entity_kname"": ""Countable_Set_Type.countable_cases_card_of|thm""}, {""entity_kname"": ""General_Cardinals.C_continuum_ge|thm""}, {""entity_kname"": ""General_Cardinals.uncountable_Real_set|thm""}, {""entity_kname"": ""Set.Cantors_theorem|thm""} ]","corollary ctm_ZFC_imp_ctm_not_CH:
   assumes
     ""M ? ?"" ""Transset(M)"" ""M ? ZFC""
   shows
@@ -138,7 +138,7 @@ sum-of-the-angles-of-a-triangle,Sum of the Angles of a Triangle,"[ {""entity_kna
 the-ballot-problem,The Ballot Problem,"[ {""entity_kname"":null, ""theory"": ""HOL-ex.Ballot"", ""command"": ""lemma""} ]","lemma
   ""valid_countings a b = (if a ? b then (if b = 0 then 1 else 0) else (a - b) / (a + b) * all_countings a b)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,candidate A receives p votes and candidate B receives q votes with p > q,https://en.wikipedia.org/wiki/Bertrand%27s_ballot_theorem,,
-ramseys-theorem,Ramsey�s Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""}, {""entity_kname"": ""Infinite_Set.MOST_nat|thm""} ]","lemma ramsey: ""
+ramseys-theorem,Ramsey�s Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""}, {""entity_kname"": ""Infinite_Set.MOST_nat|thm""}, {""entity_kname"": ""Pocklington.nat_exists_least_iff|thm""}, {""entity_kname"": ""Algebra1.lbs_ex_Zleast|thm""}, {""entity_kname"": ""Pocklington.nat_exists_least_iff'|thm""} ]","lemma ramsey: ""
   ?(s::nat) (r::nat) (YY::'a set) (f::'a set => nat).
   infinite YY
   ? (?X. X <= YY ? finite X ? card X = r ? f X < s)
@@ -159,7 +159,7 @@ taylors-theorem,Taylor�s Theorem,"[ {""entity_kname"":""MacLaurin.Taylor|thm""
   shows ""?t. t ? open_segment x c ?
              f x = (?m<n. (diff m c / fact m) * (x - c) ^ m) + (diff n t / fact n) * (x - c) ^ n""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/MacLaurin.html,HOL,Taylor�s Theorem,infinite sum of terms that are expressed in terms of the function's derivatives at a single point,https://en.wikipedia.org/wiki/Taylor_series,,
-brouwer-fixed-point-theorem,Brouwer Fixed Point Theorem,"[ {""entity_kname"":""Brouwer_Fixpoint.brouwer|thm""} ]","lemma brouwer:
+brouwer-fixed-point-theorem,Brouwer Fixed Point Theorem,"[ {""entity_kname"":""Brouwer_Fixpoint.brouwer|thm""}, {""entity_kname"": ""Abstract_Topology_2.homeomorphic_fixpoint_property|thm""} ]","lemma brouwer:
   fixes f :: ""'a::euclidean_space ? 'a""
   assumes ""compact S"" and ""convex S"" and ""S ? {}""
     and ""continuous_on S f""
@@ -281,7 +281,7 @@ the-number-of-subsets-of-a-set,The Number of Subsets of a Set,"[ {""entity_kname
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Power.html,HOL,The Number of Subsets of a Set,"If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",https://en.wikipedia.org/wiki/Power_set#Properties,,
 pi-is-transcendental,Pi is Transcendental,"[ {""entity_kname"":""Pi_Transcendental.transcendental_pi|thm""} ]","theorem transcendental_pi: ""�algebraic pi""
 ",https://www.isa-afp.org/entries/Pi_Transcendental.html,Pi_Transcendental,Pi is Transcendental,The best-known [numbers that are not algebraic] are pi and e,https://en.wikipedia.org/wiki/Transcendental_number,,
-the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,"[ {""entity_kname"":""KoenigsbergBridge.eulerian_split|thm""}, {""entity_kname"":""Tree_Graph.fin_ulgraph.handshaking|thm""}, {""entity_kname"": ""MoreGraph.odd_nodes_no_edge|thm""}, {""entity_kname"": ""Tree_Graph.fin_ulgraph.handshaking|thm""}, {""entity_kname"": ""Tree_Graph.connected_ulgraph.connected_components|thm""} ]","lemma eulerian_split:
+the-koenigsberg-bridges-problem,The Koenigsberg Bridges Problem,"[ {""entity_kname"":""KoenigsbergBridge.eulerian_split|thm""}, {""entity_kname"":""Tree_Graph.fin_ulgraph.handshaking|thm""}, {""entity_kname"": ""MoreGraph.odd_nodes_no_edge|thm""}, {""entity_kname"": ""Tree_Graph.fin_ulgraph.handshaking|thm""}, {""entity_kname"": ""Tree_Graph.connected_ulgraph.connected_components|thm""}, {""entity_kname"": ""Tree_Graph.connected_ulgraph.connected_components|thm""}, {""entity_kname"": ""MoreGraph.del_UnEdge_odd_odd|thm""}, {""entity_kname"": ""Tree_Graph.ulgraph.vert_connected_connected_component|thm""} ]","lemma eulerian_split:
   assumes ""nodes G1 ? nodes G2 = {}"" ""edges G1 ? edges G2={}""
     ""valid_unMultigraph G1"" ""valid_unMultigraph G2""
     ""valid_unMultigraph.is_Eulerian_trail  G1 v1 ps1 v1'""
@@ -387,7 +387,7 @@ ascending-or-descending-sequences,Ascending or Descending Sequences,"[ {""entity
   shows ""(?S. S ? {0..m * n} ? card S = m + 1 ? mono_on f (op ?) S) ?
          (?S. S ? {0..m * n} ? card S = n + 1 ? mono_on f (op ?) S)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Erdoes_Szekeres.html,HOL,Ascending or Descending Sequences,"given r, s, [...] contains a monotonically increasing subsequence of length r or a monotonically decreasing subsequence of length s",https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Szekeres_theorem,,
-the-principle-of-mathematical-induction,The Principle of Mathematical Induction,"[ {""entity_kname"":""Nat.nat_induct0|thm""} ]","theorem nat_induct:
+the-principle-of-mathematical-induction,The Principle of Mathematical Induction,"[ {""entity_kname"":""Nat.nat_induct0|thm""}, {""entity_kname"": ""SetInterval2.nat_induct'|thm""}, {""entity_kname"": ""Int.int_ge_induct|thm""}, {""entity_kname"": ""Int.int_induct|thm""}, {""entity_kname"": ""HOL.induct_trueI|thm""}, {""entity_kname"": ""StandardBorel.nat_complete_induction|thm""} ]","theorem nat_induct:
   assumes ""P 0"" and ""?n. P n ? P (Suc n)""
   shows   ""P n""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Nat.html,HOL,The Principle of Mathematical Induction,"first proving a simple case, then showing if we assume the claim is true for a given case, then the next case is also true",https://en.wikipedia.org/wiki/Mathematical_induction,,
@@ -414,7 +414,7 @@ sum-of-kth-powers,Sum of kth powers,"[ {""entity_kname"":""Bernoulli.sum_of_powe
   fixes m n :: nat
   shows ""(?k=0..n. k ^ m) = (bernpoly (m + 1) (n + 1) - bernpoly (m + 1) 0) / (m + 1)""
 ",https://www.isa-afp.org/entries/Bernoulli.html,Bernoulli,Sum of kth powers,[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n,https://en.wikipedia.org/wiki/Faulhaber%27s_formula,,
-the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,"[ {""entity_kname"":""CauchySchwarz.CauchySchwarzReal|thm""} ]","theorem CauchySchwarzReal:
+the-cauchy-schwarz-inequality,The Cauchy-Schwarz Inequality,"[ {""entity_kname"":""CauchySchwarz.CauchySchwarzReal|thm""}, {""entity_kname"": ""Hyperdual.inner_mult_le_mult_inner|thm""}, {""entity_kname"": ""Positive_Operators.generalized_Cauchy_Schwarz|thm""}, {""entity_kname"": ""Inner_Product.real_inner.Cauchy_Schwarz_ineq2|thm""}, {""entity_kname"": ""MoreComplex.abs_inner_lt_1|thm""}, {""entity_kname"": ""Inner_Product.real_inner.norm_cauchy_schwarz|thm""}, {""entity_kname"": ""Complex_Euclidean_Space0.CBasis_le_norm|thm""}, {""entity_kname"": ""Cones.Cauchy_Schwarz_strict_ineq2|thm""}, {""entity_kname"": ""CauchySchwarz.CauchySchwarz.lemCauchySchwarz4|thm""}, {""entity_kname"": ""Euclidean_Space.Basis_le_norm|thm""}, {""entity_kname"": ""CauchySchwarz.CauchySchwarz.lemCauchySchwarz|thm""} ]","theorem CauchySchwarzReal:
   fixes x::vector
   assumes ""vlen x = vlen y""
   shows ""�x?y� ? ?x?*?y?""
@@ -446,14 +446,14 @@ dissection-of-cubes-j.e.-littlewoods-elegant-proof,Dissection of Cubes (J.E. Lit
         ? card C ? 2
         ? finite C""
 ",https://www.isa-afp.org/entries/Cube_Dissection.html,Cube_Dissection,Dissection of Cubes (J.E. Littlewood�s �elegant� proof),Dissection of Cubes: A cube cannot be cubed.,https://leanprover-community.github.io/mathlib4_docs/Archive/Wiedijk100Theorems/CubingACube.html#Theorems100.%C2%AB82%C2%BB.cannot_cube_a_cube,,
-the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""}, {""entity_kname"": ""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""} ]","theorem (in valid_unSimpGraph) friendship_thm:
+the-friendship-theorem,The Friendship Theorem,"[ {""entity_kname"":""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""}, {""entity_kname"": ""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""}, {""entity_kname"": ""FriendshipTheory.valid_unSimpGraph.friendship_thm|thm""} ]","theorem (in valid_unSimpGraph) friendship_thm:
   assumes ""?v u. v?V ? u?V ? v?u ? ?! n. adjacent v n ? adjacent u n"" and ""finite V""
   shows ""?v. ?n?V. n?v ? adjacent v n""
 ",https://isa-afp.org/entries/Koenigsberg_Friendship.shtml,Koenigsberg_Friendship,The Friendship Theorem,[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...],https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem,,
 divisibility-by-three-rule,Divisibility by Three Rule,"[ {""entity_kname"":""ThreeDivides.three_divides_nat|thm""} ]","theorem three_divides_nat: ""3 dvd n ? 3 dvd sumdig n""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/ThreeDivides.html,HOL,Divisibility by Three Rule,[...] sum of the digits must be divisible by 3 [...],https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230,,
 lebesgue-measure-and-integration,Lebesgue Measure and Integration,,,https://isa-afp.org/entries/Integration.shtml,Integration,Lebesgue Measure and Integration,,,true,"It is not clear which specific theorem, lemma or corollary adresses this entry."
-desarguess-theorem,Desargues�s Theorem,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""} ]","theorem desargues_3D:
+desarguess-theorem,Desargues�s Theorem,"[ {""entity_kname"":""Desargues_3D.higher_projective_space_rank.desargues_3D|thm""}, {""entity_kname"": ""Pappus_Desargues.projective_plane.hessenberg_thereom|thm""}, {""entity_kname"": ""Desargues_Property.projective_plane.perspective_from_point_desargues_config|thm""} ]","theorem desargues_3D:
   assumes ""desargues_config_3D A B C A' B' C' P ? ? ?""
   shows ""rk {?, ?, ?} ? 2""
 ",https://www.isa-afp.org/entries/Projective_Geometry.html,Projective_Geometry,Desargues�s Theorem,Two triangles are in perspective axially [iff] they are in perspective centrally.,https://en.wikipedia.org/wiki/Desargues%27s_theorem,,
@@ -461,7 +461,7 @@ derangements-formula,Derangements Formula,"[ {""entity_kname"":""Derangements.de
   assumes ""n ? 0"" and ""finite S"" and ""card S = n""
   shows ""card (derangements S) = round (fact n / exp 1)""
 ",https://isa-afp.org/entries/Derangements.shtml,Derangements,Derangements Formula,[...] permutation of the elements of a set in which no element appears in its original position,https://en.wikipedia.org/wiki/Derangement,,
-the-factor-and-remainder-theorems,The Factor and Remainder Theorems,"[ {""entity_kname"":""UnivPoly.UP_cring.long_div_theorem|thm""} ]","lemma long_div_theorem:
+the-factor-and-remainder-theorems,The Factor and Remainder Theorems,"[ {""entity_kname"":""UnivPoly.UP_cring.long_div_theorem|thm""}, {""entity_kname"": ""Padic_Field_Powers.padic_fields.Taylor_deg_1_expansion''|thm""}, {""entity_kname"": ""Cring_Poly.INTEG.taylor_sum|thm""}, {""entity_kname"": ""Cring_Poly.INTEG.taylor_deg_1|thm""}, {""entity_kname"": ""Cring_Poly.INTEG.taylor_term_sum|thm""} ]","lemma long_div_theorem:
   assumes ""g ? carrier P"" and ""f ? carrier P"" and ""g ? ??P?""
   shows ""?q r (k::nat). (q ? carrier P) ? (r ? carrier P) ?
         (lcoeff g)(^)?R?k ??P? f = g ??P? q ??P? r ?
@@ -506,7 +506,7 @@ ptolemys-theorem,Ptolemy�s Theorem,"[ {""entity_kname"":""Ptolemys_Theorem.pto
     ""radiant_of (C - center) ? radiant_of (D - center)""
   shows ""dist A C * dist B D = dist A B * dist C D + dist A D * dist B C""
 ",https://www.isa-afp.org/entries/Ptolemys_Theorem.shtml,Ptolemys_Theorem,Ptolemy�s Theorem,product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides,https://en.wikipedia.org/wiki/Ptolemy%27s_theorem,,
-principle-of-inclusionexclusion,Principle of Inclusion/Exclusion,"[ {""entity_kname"":""Binomial.card_UNION|thm""} ]","lemma card_UNION:
+principle-of-inclusionexclusion,Principle of Inclusion/Exclusion,"[ {""entity_kname"":""Binomial.card_UNION|thm""}, {""entity_kname"": ""IL_IntervalOperators.iT_Plus_neg_inext|thm""} ]","lemma card_UNION:
   assumes ""finite A"" and ""?k ? A. finite k""
   shows ""card (?A) = nat (?I | I ? A ? I ? {}. (- 1) ^ (card I + 1) * int (card (?I)))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Binomial.html,HOL,Principle of Inclusion/Exclusion,"[...] over-generous inclusion, followed by compensating exclusion [...]",https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle,,
