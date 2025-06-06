@@ -248,15 +248,20 @@ def get_document_descriptions(config, document_tree, prompts, tokenizer):
     document_descriptions = generate_document_descriptions(config, document_tree, prompts, tokenizer)
 
     print("Parsing LLM descriptions...")
+    parsing_failed = 0
+
     for doc_id in tqdm(document_descriptions):
         try:
             llm_description = document_descriptions[doc_id]["llm_description"].split("<BEGIN>")[1]
         except Exception as err:
+            parsing_failed += 1
             llm_description = document_descriptions[doc_id]["llm_description"]
-            print(f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for document with id \"{doc_id}\", thus loading it as is.")
 
         if doc_id in document_tree:
             document_tree[doc_id]["llm_description"] = llm_description
+
+    if parsing_failed > 0:
+        print(f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for {parsing_failed} documents, thus loading them as-is.")
 
     return document_tree
 
