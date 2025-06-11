@@ -78,18 +78,23 @@
             const refineQuery = !document.getElementById("disableRefineCheck").checked;
             const resultList = document.getElementById("searchResults");
 
-            // if (!input)
-            //     return;
+            if (!input)
+                return;
 
             console.log("Searching: input =", input, "disableRefine =", refineQuery, "resultList =", resultList);
 
             fetch("/search/" + input + "?refine_query=" + refineQuery)
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    resultList.innerText = "An error occured:\n" + error
-                });
+            .then(response => {
+                if (!response.ok) {
+                    response.text().then(val => {
+                        resultList.innerText = "An error occured:\n" + val;
+                    });
+                } else {
+                    response.json().then(val => {
+                        console.log(val);
+                    });
+                }
+            });
         }
     </script>
 </body>
