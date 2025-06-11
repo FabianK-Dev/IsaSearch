@@ -7,7 +7,7 @@ from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from chromadb.utils import embedding_functions
-from fastapi import FastAPI
+from flask import Flask, request
 
 import json
 import torch
@@ -51,11 +51,11 @@ print("Check if loading LLM output cache is enabled via config...")
 llm_output_cache = get_llm_output_cache(config)
 
 print("Starting FastAPI application...")
-app = FastAPI()
+app = Flask(__name__)
 
-@app.get("/search/{query}")
-def read_item(query: str, refine_query: bool = True):
+@app.get("/search/<query>")
+def search_endpoint(query):
+    refine_query = request.args.get("refine_query", "true").lower() == "true"
     results_dict = search(query, collection, prompts, model, config, refine_query, llm_output_cache=llm_output_cache)
     results_list = search_results_to_docs(results_dict, document_tree)
-
     return results_list
