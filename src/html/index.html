@@ -20,7 +20,7 @@
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                
+
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
@@ -36,6 +36,23 @@
                 </div>
             </div>
         </nav>
+
+        <div class="my-3"></div>
+
+        <form>
+            <div class="mb-3">
+                <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem to search for</label>
+                <textarea class="form-control" id="searchInput" rows="3" placeholder="Examples:
+- a^2 + b^2 = c^2
+- bijections have inverses
+- for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin nx"></textarea>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Disable query refinement.</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
