@@ -7,7 +7,7 @@ from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from chromadb.utils import embedding_functions
-from flask import Flask, request
+from flask import Flask, request, send_file
 
 import json
 import torch
@@ -53,6 +53,10 @@ llm_output_cache = get_llm_output_cache(config)
 print("Preparing Flask app...")
 app = Flask(__name__)
 
+@app.route("/")
+def web():
+    return send_file("html/index.html")
+
 @app.get("/search/<query>")
 def search_endpoint(query):
     refine_query = request.args.get("refine_query", "true").lower() == "true"
@@ -61,6 +65,6 @@ def search_endpoint(query):
     return results_list
 
 if __name__ == "__main__":
-    print(f"Serving Flask API on port {config['api_port']}...")
+    print(f"Serving Flask API on port {config['api_port']}... Open: http://localhost:{config['api_port']}/")
     from waitress import serve
     serve(app, host="0.0.0.0", port=config["api_port"])
