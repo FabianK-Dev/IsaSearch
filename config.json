@@ -23,5 +23,6 @@
         "stop": ["<END>"]
     },
     "add_metadata": false,
-    "enable_llm_output_cache": true
+    "enable_llm_output_cache": true,
+    "api_port": 5000
 }
