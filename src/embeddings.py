@@ -52,7 +52,7 @@ def get_chromadb_collection(config, prompts, embedder, document_tree):
 
     return collection
 
-def search(search_query, collection, prompts, model, config, refine_query=True, llm_output_cache=None):
+def search(search_query, collection, prompts, model, config, document_tree, refine_query=True, llm_output_cache=None):
     start = time.time()
     cached_duration = None
     docs_to_retrieve = 100
@@ -112,7 +112,7 @@ def search(search_query, collection, prompts, model, config, refine_query=True, 
         results[result_id] = {
             "distance": distance,
             "id": result_id,
-            "llm_description": results[result_id]["llm_description"]
+            "llm_description": document_tree[result_id]["llm_description"]
         }
 
     end = time.time()

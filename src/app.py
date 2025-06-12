@@ -64,7 +64,7 @@ def static_files(filename):
 @app.get("/search/<query>")
 def search_endpoint(query):
     refine_query = request.args.get("refine_query", "true").lower() == "true"
-    results_dict = search(query, collection, prompts, model, config, refine_query, llm_output_cache=llm_output_cache)
+    results_dict = search(query, collection, prompts, model, config, document_tree, refine_query, llm_output_cache=llm_output_cache)
     results_list = search_results_to_docs(results_dict, solr)
     return results_list
 
