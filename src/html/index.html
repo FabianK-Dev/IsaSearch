@@ -54,7 +54,7 @@
                 <input type="checkbox" class="form-check-input" id="disableRefineCheck">
                 <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but also decreases search accuracy.">Disable query refinement</a></label>
             </div>
-            <button type="submit" class="btn btn-primary" onclick="search();">Search</button>
+            <button class="btn btn-primary" onclick="search();">Search</button>
         </form>
 
         <div class="my-3"></div>
@@ -86,12 +86,18 @@
             fetch("/search/" + input + "?refine_query=" + refineQuery)
             .then(response => {
                 if (!response.ok) {
-                    response.text().then(val => {
-                        resultList.innerText = "An error occured:\n" + val;
+                    response.text().then(res => {
+                        resultList.innerText = "An error occured:\n" + res;
                     });
                 } else {
-                    response.json().then(val => {
-                        console.log(val);
+                    response.json().then(res => {
+                        for (const el of res.results) {
+                            let html = atob(el.html);
+                            let div = document.createElement('div');
+                            div.innerHTML = html.trim();
+
+                            resultList.append(div);
+                        }
                     });
                 }
             });
