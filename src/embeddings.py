@@ -125,12 +125,15 @@ def search(search_query, collection, prompts, model, config, refine_query=True, 
         "refined_query": query_text
     }
 
-# TODO: Fetch documents from Solr instead of document_tree
-def search_results_to_docs(search_results, document_tree):
-    for result_id in search_results["results"]:
-        search_results["results"][result_id] = {
-            **search_results["results"][result_id],
-            **document_tree[result_id]
+def search_results_to_docs(search_results, solr):
+    ids = [_id for _id in search_results["results"]]
+
+    for doc in docs_by_ids(solr, ids):
+        doc_id = doc["id"]
+        # Merge search_results with Solr documents
+        search_results["results"][doc_id] = {
+            **search_results["results"][doc_id],
+            **doc
         }
 
     # Convert search_results["results"] to a list => this makes sorting or receiving the nth result easier
