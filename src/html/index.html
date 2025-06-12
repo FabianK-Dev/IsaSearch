@@ -97,8 +97,6 @@ bijections have inverses, ..."></textarea>
             if (!input)
                 return;
 
-            console.log("Searching: input =", input, "disableRefine =", refineQuery, "resultList =", resultList);
-
             fetch("/search/" + input + "?refine_query=" + refineQuery)
             .then(response => {
                 if (!response.ok) {
@@ -109,12 +107,16 @@ bijections have inverses, ..."></textarea>
                     resultList.innerHTML = "";
                     response.json().then(res => {
                         for (const el of res.results) {
-                            console.log(el);
                             let node = template.cloneNode(true);
 
                             node.style.display = "block";
                             node.querySelector("#theoremTitle").innerText = el.theory;
                             node.querySelector("#theoremMetadata").innerText = "Distance: ~" + Math.round(el.distance * 10000) / 10000 + " | Start line: " + el.start_line
+
+                            if (el.remote_url !== "#") {
+                                node.querySelector("#theoremMetadata").innerHTML = '<a href="' + el.remote_url + '" target="_blank" rel="noopener">Open file</a> | ' + node.querySelector("#theoremMetadata").innerHTML;
+                            }
+
                             node.querySelector("#theoremCode").innerText = el.src;
                             node.querySelector("#theoremLLMSummary").innerText = el.llm_description.trim();
                             resultList.append(node);
