@@ -35,7 +35,7 @@ print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
 print("Loading ChromaDB embedding function...")
-embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device='cuda')
+embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device='auto')
 
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, embedder, document_tree)

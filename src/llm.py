@@ -3,6 +3,7 @@ from gpt4all import GPT4All
 import glob
 import json
 import os
+import torch
 
 def load_prompts(config):
     prompts_folder = config["prompts_folder"]
@@ -31,7 +32,7 @@ def get_llm(config, prompts, tokenizer):
     token_ids = tokenizer.encode(prompts["search_refine"])
     num_tokens = len(token_ids)
 
-    model = GPT4All(config["llm_name"], device="cuda", n_ctx=num_tokens + config["sampling_parameters"]["max_tokens"])
+    model = GPT4All(config["llm_name"], device="cuda" if torch.cuda.is_available() else "cpu", n_ctx=num_tokens + config["sampling_parameters"]["max_tokens"])
     return model
 
 def get_llm_output_cache(config):
