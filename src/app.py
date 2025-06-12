@@ -7,7 +7,7 @@ from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from chromadb.utils import embedding_functions
-from flask import Flask, request, send_file, send_from_directory
+from flask import Flask, request, send_from_directory
 
 import json
 import torch
@@ -55,7 +55,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def web():
-    return send_file("html/index.html")
+    return send_from_directory("html", "index.html")
 
 @app.route("/<path:filename>")
 def static_files(filename):
