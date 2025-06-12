@@ -56,6 +56,7 @@ def search(search_query, collection, prompts, model, config, refine_query=True, 
     start = time.time()
     cached_duration = None
     docs_to_retrieve = 100
+    refined_query = None
 
     if refine_query:
         llm_prompt = prompts["search_refine"].format(search_query=search_query)
@@ -110,7 +111,8 @@ def search(search_query, collection, prompts, model, config, refine_query=True, 
         result_id = metadata["source"]
         results[result_id] = {
             "distance": distance,
-            "id": result_id
+            "id": result_id,
+            "llm_description": results[result_id]["llm_description"]
         }
 
     end = time.time()
@@ -122,7 +124,7 @@ def search(search_query, collection, prompts, model, config, refine_query=True, 
     return {
         "results": results,
         "duration": search_duration,
-        "refined_query": query_text
+        "refined_query": refined_query
     }
 
 def search_results_to_docs(search_results, solr):
