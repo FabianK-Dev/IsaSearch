@@ -73,6 +73,13 @@
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
+        // This is the recommended way of decoding a binary string, instead of only using atob()
+        function decodeUnicode(str) {
+            return decodeURIComponent(atob(str).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+        }
+
         function search() {
             const input = document.getElementById("searchInput").value;
             const refineQuery = !document.getElementById("disableRefineCheck").checked;
@@ -92,7 +99,8 @@
                 } else {
                     response.json().then(res => {
                         for (const el of res.results) {
-                            let html = atob(el.html);
+                            let html = decodeUnicode(el.html);
+                            console.log(html);
                             let div = document.createElement('div');
                             div.innerHTML = html.trim();
 
