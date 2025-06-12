@@ -138,6 +138,10 @@ def search_results_to_docs(search_results, solr):
             **doc
         }
 
+        # Remove HTML and XML from API response to lower response size and network usage
+        del search_results["results"][doc_id]["html"];
+        del search_results["results"][doc_id]["xml"];
+
     # Convert search_results["results"] to a list => this makes sorting or receiving the nth result easier
     search_results["results"] = [value for _, value in search_results["results"].items()]
     return search_results
