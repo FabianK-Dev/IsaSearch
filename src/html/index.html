@@ -48,36 +48,24 @@
         <form>
             <div class="mb-3">
                 <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem to search for</label>
-                <textarea class="form-control" id="searchInput" rows="4" placeholder="Examples:
-- a^2 + b^2 = c^2
-- bijections have inverses
-- for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin nx"></textarea>
+                <textarea class="form-control" id="searchInput" rows="2" placeholder="Examples: a^2 + b^2 = c^2,
+bijections have inverses, ..."></textarea>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="disableRefineCheck">
                 <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but also decreases search accuracy.">Disable query refinement</a></label>
             </div>
-            <button type="submit" class="btn btn-primary" onclick="search();">Search</button>
+            <button type="button" class="btn btn-primary" onclick="search();">Search</button>
         </form>
 
         <div class="my-3"></div>
 
         <div class="card" style="display: none;" id="theoremTemplate">
             <div class="card-body">
-                <h4 id="theoremTitle"></h4>
+                <h5 id="theoremTitle"></h5>
                 <p class="lh-1" style="font-family: 'Courier New', Courier, monospace; font-size: 14px;" id="theoremCode"></p>
-
-                <a data-bs-toggle="collapse" href="#llmSummaryCollapse" role="button" aria-expanded="false" aria-controls="llmSummaryCollapse">
-                    <h6>
-                        LLM Summary
-                    </h6>
-                </a>
-                <div class="collapse" id="llmSummaryCollapse">
-                    <p style="font-size: 14px;" id="theoremDescription"></p>
-                    <div class="alert alert-warning" role="alert" style="font-size: 14px;">
-                        <b>Warning:</b> A simple warning alert—check it out!
-                    </div>
-                </div>
+                <span class="badge text-bg-primary">LLM Summary</span>
+                <p id="theoremLLMSummary"></p>
             </div>
         </div>
 
@@ -106,6 +94,7 @@
             const input = document.getElementById("searchInput").value;
             const refineQuery = !document.getElementById("disableRefineCheck").checked;
             const resultList = document.getElementById("searchResults");
+            const template = document.getElementById("theoremTemplate");
 
             if (!input)
                 return;
@@ -119,14 +108,17 @@
                         resultList.innerText = "An error occured:\n" + res;
                     });
                 } else {
+                    resultList.innerHTML = "";
                     response.json().then(res => {
                         for (const el of res.results) {
+                            console.log(el);
                             let html = decodeUnicode(el.html);
-                            console.log(html);
-                            let div = document.createElement('div');
-                            div.innerHTML = html.trim();
+                            let node = template.cloneNode(true);
 
-                            resultList.append(div);
+                            node.style.display = "block";
+                            node.querySelector("#theoremTitle").innerText = el.entity_kname;
+                            node.querySelector("#theoremCode").innerText = el.src;
+                            resultList.append(node);
                         }
                     });
                 }
