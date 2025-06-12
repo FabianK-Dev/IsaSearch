@@ -32,6 +32,7 @@ RUN mv find_facts/solr/* /opt/solr/server/solr/ && \
     rm -rf find_facts/ && \
     rm -rf assets
 
+COPY artifacts /app/artifacts
 COPY benchmark /app/benchmark
 COPY prompts /app/prompts
 COPY src /app/src
