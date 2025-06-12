@@ -63,12 +63,13 @@ bijections have inverses, ..."></textarea>
         <div class="card" style="display: none;" id="theoremTemplate">
             <div class="card-body">
                 <h6 id="theoremTitle"></h6>
-                <div class="alert alert-light lh-1" role="alert" style="font-family: 'Courier New', Courier, monospace; font-size: 16px;" id="theoremCode">
+                <p style="font-size: 12px" id="theoremMetadata"></p>
 
-                </div>
+                <div class="alert alert-light lh-1" role="alert" style="font-family: 'Courier New', Courier, monospace; font-size: 16px;" id="theoremCode"></div>
+
                 <h6><span class="badge text-bg-primary" id="">LLM Summary</span></h6>
                 <p id="theoremLLMSummary" style="font-size: 16px;"></p>
-                
+
                 <div id="theoremSources"></div>
             </div>
         </div>
@@ -113,6 +114,7 @@ bijections have inverses, ..."></textarea>
 
                             node.style.display = "block";
                             node.querySelector("#theoremTitle").innerText = el.theory;
+                            node.querySelector("#theoremMetadata").innerText = "Distance: ~" + Math.round(el.distance * 10000) / 10000 + " | Start line: " + el.start_line
                             node.querySelector("#theoremCode").innerText = el.src;
                             node.querySelector("#theoremLLMSummary").innerText = el.llm_description.trim();
                             resultList.append(node);
