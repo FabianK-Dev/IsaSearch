@@ -10,6 +10,7 @@ from chromadb.utils import embedding_functions
 from flask import Flask, request, send_from_directory
 
 import json
+import torch
 
 print("Loading config...")
 with open("config.json", "r") as file:
@@ -35,12 +36,11 @@ print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
 print("Loading ChromaDB embedding function...")
-embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device='auto')
-
+embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device="cuda" if torch.cuda.is_available() else "cpu")
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, embedder, document_tree)
 
-print("Loading LLM pipeline and gerneration arguments...")
+print("Loading LLM pipeline and generation arguments...")
 model = get_llm(config, prompts, tokenizer)
 
 print("Check if loading LLM output cache is enabled via config...")
