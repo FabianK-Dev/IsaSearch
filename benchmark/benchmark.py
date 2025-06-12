@@ -11,7 +11,6 @@ from chromadb.utils import embedding_functions
 
 import json
 import pandas as pd
-import torch
 import os
 
 print("Loading config...")
@@ -38,9 +37,6 @@ prompts = load_prompts(config)
 
 print("Building document tree...")
 document_tree = build_document_tree(config, solr)
-
-print("Clearing CUDA cache...")
-torch.cuda.empty_cache()
 
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
