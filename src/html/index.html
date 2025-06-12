@@ -53,7 +53,7 @@ bijections have inverses, ..."></textarea>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="disableRefineCheck">
-                <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but also decreases search accuracy.">Disable query refinement</a></label>
+                <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but may decrease search accuracy.">Disable query refinement</a></label>
             </div>
             <button type="button" class="btn btn-primary" onclick="search();">Search</button>
         </form>
@@ -62,10 +62,14 @@ bijections have inverses, ..."></textarea>
 
         <div class="card" style="display: none;" id="theoremTemplate">
             <div class="card-body">
-                <h5 id="theoremTitle"></h5>
-                <p class="lh-1" style="font-family: 'Courier New', Courier, monospace; font-size: 14px;" id="theoremCode"></p>
-                <span class="badge text-bg-primary">LLM Summary</span>
-                <p id="theoremLLMSummary"></p>
+                <h6 id="theoremTitle"></h6>
+                <div class="alert alert-light lh-1" role="alert" style="font-family: 'Courier New', Courier, monospace; font-size: 16px;" id="theoremCode">
+
+                </div>
+                <h6><span class="badge text-bg-primary" id="">LLM Summary</span></h6>
+                <p id="theoremLLMSummary" style="font-size: 16px;"></p>
+                
+                <div id="theoremSources"></div>
             </div>
         </div>
 
@@ -82,13 +86,6 @@ bijections have inverses, ..."></textarea>
         // Initialize tooltips
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-        // This is the recommended way of decoding a binary string, instead of only using atob()
-        function decodeUnicode(str) {
-            return decodeURIComponent(atob(str).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-        }
 
         function search() {
             const input = document.getElementById("searchInput").value;
@@ -112,12 +109,12 @@ bijections have inverses, ..."></textarea>
                     response.json().then(res => {
                         for (const el of res.results) {
                             console.log(el);
-                            let html = decodeUnicode(el.html);
                             let node = template.cloneNode(true);
 
                             node.style.display = "block";
-                            node.querySelector("#theoremTitle").innerText = el.entity_kname;
+                            node.querySelector("#theoremTitle").innerText = el.theory;
                             node.querySelector("#theoremCode").innerText = el.src;
+                            node.querySelector("#theoremLLMSummary").innerText = el.llm_description.trim();
                             resultList.append(node);
                         }
                     });
