@@ -108,11 +108,6 @@ bijections have inverses, bubblesort, ..."></textarea>
             const llmRefinedQueryParent = document.getElementById("LLMRefinedQueryParent");
             const aiWarning = document.getElementById("aiWarning");
 
-            if (firstSearch) {
-                firstSearch = false;
-                aiWarning.style.display = "block";
-            }
-
             if (!input)
                 return;
 
@@ -125,6 +120,11 @@ bijections have inverses, bubblesort, ..."></textarea>
                 } else {
                     resultList.innerHTML = "";
                     response.json().then(res => {
+                        if (firstSearch) {
+                            firstSearch = false;
+                            aiWarning.style.display = "block";
+                        }
+
                         if (res.refined_query) {
                             llmRefinedQueryParent.style.display = "block";
                             llmRefinedQuery.innerText = res.refined_query;
