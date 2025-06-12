@@ -116,7 +116,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             print(f"Searching: \"{query}\"")
 
             results_dict = search(query, collection, prompts, model, config, refine_query=True, llm_output_cache=llm_output_cache)
-            results_list = search_results_to_docs(results_dict, document_tree)["results"]
+            results_list = search_results_to_docs(results_dict, solr)["results"]
 
             top_results = []
             for i, result in enumerate(results_list[:10]):
