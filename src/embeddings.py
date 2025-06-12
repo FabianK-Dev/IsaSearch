@@ -127,7 +127,7 @@ def search(search_query, collection, prompts, model, config, document_tree, refi
         "refined_query": refined_query
     }
 
-def search_results_to_docs(search_results, solr):
+def search_results_to_docs(search_results, solr, config):
     ids = [_id for _id in search_results["results"]]
 
     for doc in docs_by_ids(solr, ids):
@@ -137,6 +137,13 @@ def search_results_to_docs(search_results, solr):
             **search_results["results"][doc_id],
             **doc
         }
+
+        # Add direct link to file in remote repository
+        sub_path = search_results["results"][doc_id]["file"].split("/thys/")
+        if len(sub_path) > 1:
+            search_results["results"][doc_id]["remote_url"] = config["afp_remote_thys_folder_url"] + sub_path
+        else:
+            search_results["results"][doc_id]["remote_url"] = "#"
 
         # Remove HTML and XML from API response to lower response size and network usage
         del search_results["results"][doc_id]["html"];
