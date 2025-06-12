@@ -5,7 +5,6 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 import gc
-import torch
 import json
 import os
 import math
@@ -236,8 +235,6 @@ def generate_document_descriptions(config, document_tree, prompts, tokenizer, sa
         destroy_model_parallel()
         del llm
         gc.collect()
-        torch.cuda.empty_cache()
-        # torch.distributed.destroy_process_group()
         print("Finished deleting llm object and freeing GPU memory.")
     else:
         print("No documents need to be described by the LLM.")
