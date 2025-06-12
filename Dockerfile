@@ -24,8 +24,7 @@ ENV PATH="$SOLR_HOME/bin:$PATH"
 # Copy assets to the app directory
 COPY ./assets /app/assets/
 
-RUN tar -xf assets/artifacts.tar.gz && \
-    tar -xf assets/cache.tar.gz && \
+RUN tar -xf assets/afp-2025-branch-default.tar.gz && \
     tar -xf assets/chroma_storages.tar.gz && \
     tar -xf assets/find_facts.tar.gz
 
