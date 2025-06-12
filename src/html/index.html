@@ -49,7 +49,7 @@
             <div class="mb-3">
                 <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem to search for</label>
                 <textarea class="form-control" id="searchInput" rows="2" placeholder="Examples: a^2 + b^2 = c^2,
-bijections have inverses, ..."></textarea>
+bijections have inverses, bubblesort, ..."></textarea>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="disableRefineCheck">
@@ -59,6 +59,16 @@ bijections have inverses, ..."></textarea>
         </form>
 
         <div class="my-3"></div>
+
+        <div class="alert alert-info" role="alert" id="LLMRefinedQueryParent" style="display: none;">
+            <h6><span class="badge text-bg-primary" id="">LLM-refined query</span></h6>
+            <div id="LLMRefinedQuery"></div>
+        </div>
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" id="aiWarning" style="display: none;">
+            <strong>⚠️ Warning:</strong> Refined queries and summaries are AI-generated and may be inaccurate. Please use as guidance only.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
         <div class="card" style="display: none;" id="theoremTemplate">
             <div class="card-body">
@@ -87,12 +97,21 @@ bijections have inverses, ..."></textarea>
         // Initialize tooltips
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        let firstSearch = true;
 
         function search() {
             const input = document.getElementById("searchInput").value;
             const refineQuery = !document.getElementById("disableRefineCheck").checked;
             const resultList = document.getElementById("searchResults");
             const template = document.getElementById("theoremTemplate");
+            const llmRefinedQuery = document.getElementById("LLMRefinedQuery");
+            const llmRefinedQueryParent = document.getElementById("LLMRefinedQueryParent");
+            const aiWarning = document.getElementById("aiWarning");
+
+            if (firstSearch) {
+                firstSearch = false;
+                aiWarning.style.display = "block";
+            }
 
             if (!input)
                 return;
@@ -106,6 +125,13 @@ bijections have inverses, ..."></textarea>
                 } else {
                     resultList.innerHTML = "";
                     response.json().then(res => {
+                        if (res.refined_query) {
+                            llmRefinedQueryParent.style.display = "block";
+                            llmRefinedQuery.innerText = res.refined_query;
+                        } else {
+                            llmRefinedQueryParent.style.display = "none";
+                        }
+
                         for (const el of res.results) {
                             let node = template.cloneNode(true);
 
