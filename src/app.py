@@ -35,13 +35,16 @@ document_tree = build_document_tree(config, solr)
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
+# Clean up tokenizer to memory
+del tokenizer
+
 print("Loading ChromaDB embedding function...")
 embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device="cuda" if torch.cuda.is_available() else "cpu")
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, embedder, document_tree)
 
 print("Loading LLM pipeline and generation arguments...")
-model = get_llm(config, prompts, tokenizer)
+model = get_llm(config)
 
 print("Check if loading LLM output cache is enabled via config...")
 llm_output_cache = get_llm_output_cache(config)
@@ -67,4 +70,4 @@ def search_endpoint(query):
 if __name__ == "__main__":
     print(f"Serving Flask API on port {config['api_port']}... Open: http://localhost:{config['api_port']}/")
     from waitress import serve
-    serve(app, host="0.0.0.0", port=config["api_port"])
+    serve(app, host="0.0.0.0", port=config["api_port"], threads=1)
