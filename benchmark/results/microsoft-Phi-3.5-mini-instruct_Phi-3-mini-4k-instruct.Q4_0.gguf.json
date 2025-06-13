@@ -145,8 +145,8 @@
                     "rank": 2,
                     "duration": 1.3
                 },
-                "query": "G\u00f6del\u2019s Incompleteness Theorem 1",
-                "refined_query": "Theorem (The Fundamental Limitation of Axiomatic Systems): Given any consistent and recursively enumerable set of axioms that is capable of expressing basic arithmetic, there will always exist a true mathematical statement within the system's language that cannot be proven using only those given axioms.\n"
+                "query": "G\u00f6del's Incompleteness Theorem 1",
+                "refined_query": "Theorem (The Fundamental Limitation of Axiomatic Systems): Given any consistent and recursively enumerable set of axioms that is capable of expressing basic arithmetic, there will always exist a statement within the system's language which cannot be proven or disproven using only those given axioms.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -167,13 +167,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.46252675146877575,
+                    "normalized_discounted_cumulative_gain": 0.43377084742177796,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 1.2
+                    "duration": 2.7
                 },
-                "query": "G\u00f6del\u2019s Incompleteness Theorem 2",
-                "refined_query": "Theorem (Infinite Unprovability in Formal Systems):\nFor any consistent and recursively enumerable formal system that can express basic arithmetic, there exists a statement within the system which is true but cannot be proven using only the axioms of that same system.\n"
+                "query": "G\u00f6del's Incompleteness Theorem 2",
+                "refined_query": "Theorem (Infinite Limits of G\u00f6del's Proof):\nFor any formal system that is consistent and capable enough to express arithmetic, there exists a statement within the system which cannot be proven or disproven using only the rules and axioms defined in that same system. This theorem highlights the inherent limitations present when attempting to fully capture mathematical truth through self-contained logical frameworks."
             },
             "Natural language query": {
                 "metrics": {
@@ -329,13 +329,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 1.2
+                    "normalized_discounted_cumulative_gain": 0.3333333333333333,
+                    "reciprocal_rank": 0.14285714285714285,
+                    "rank": 7,
+                    "duration": 1.3
                 },
-                "query": "Euler\u2019s Generalisation of Fermat\u2019s Little Theorem",
-                "refined_query": "Theorem (Euler's Enhanced Factorial Congruence):\nThis theorem extends the original Fermat's Little Theorem by incorporating Euler's totient function, providing a more general congruency relation for integers and their factors.\n"
+                "query": "Euler's Generalisation of Fermat's Little Theorem",
+                "refined_query": "Theorem (Generalized Fermat-Like Property): This theorem extends the concept introduced by Pierre de Fermat, stating that for any integer a and prime number p where gcd(a,p) = 1, it holds true that \\(a^p \\equiv a\\mod{p}\\).\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -437,13 +437,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.4121323632561354,
-                    "reciprocal_rank": 0.125,
-                    "rank": 8,
-                    "duration": 1.2
+                    "normalized_discounted_cumulative_gain": 0.4882182116780375,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.8
                 },
-                "query": "Euler\u2019s Summation of 1 + (1/2)^2 + (1/3)^2 + ...",
-                "refined_query": "Theorem (Euler's Infinite Series Representation): The sum of the infinite series, where each term is given by a^2 raised to the power 1 divided by its position in the sequence starting from one and increasing sequentially for all natural numbers.\n"
+                "query": "Euler's Summation of 1 + (1/2)^2 + (1/3)^2 + ...",
+                "refined_query": "Theorem (Euler's Basis Series): The infinite series formed by summing the squares of fractions with denominators as consecutive natural numbers, starting from 1 and increasing indefinitely.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -491,13 +491,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6921824969982208,
+                    "normalized_discounted_cumulative_gain": 0.6950772913482687,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
                     "duration": 1.5
                 },
-                "query": "DeMoivre\u2019s Theorem",
-                "refined_query": "Theorem (Fourier Series Representation of Complex Numbers):\nThis theorem provides an expression for the nth power of a complex number in polar form, where r is raised to the power of n and cosine and sine functions are used with appropriate angles. It establishes that any complex number can be represented as a sum involving its magnitude (r), angle (\u03b8), and trigonometric components based on these values for powers greater than zero.\n"
+                "query": "DeMoivre's Theorem",
+                "refined_query": "Theorem (Fourier Series Representation of Complex Numbers):\nThis theorem provides an expression for the nth power of a complex number in polar form, where r is raised to the power of n and cosine and sine functions are used with appropriate angles. It establishes that any complex number can be represented as a sum involving its magnitude (r), angle (\u03b8), and trigonometric components based on powers of these values.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -518,13 +518,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.5847756549277633,
+                    "normalized_discounted_cumulative_gain": 0.5611449364813244,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
                     "duration": 1.4
                 },
-                "query": "Liouville\u2019s Theorem and the Construction of Transcendental Numbers",
-                "refined_query": "Theorem (Liouville's Conjecture on Diophantine Approximations): This theorem establishes a criterion for determining whether certain numbers are transcendental based on their ability to be approximated by rationals, and it led to the development of methods that construct specific examples of such irrational or non-algebraic (transcendent) numbers.\n"
+                "query": "Liouville's Theorem and the Construction of Transcendental Numbers",
+                "refined_query": "Theorem (Existence and Characterization of Liouville-type Integers):\nThis theorem establishes a method to construct numbers that are not algebraic, using an iterative process based on the properties defined by Liouville's Theorem. These constructed numbers exhibit specific behavior when approximated by rational fractions with large denominators but small numerators relative to their size. "
             },
             "Natural language query": {
                 "metrics": {
@@ -545,13 +545,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
-                    "reciprocal_rank": 0.25,
-                    "rank": 4,
-                    "duration": 1.2
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.3
                 },
-                "query": "Lagrange\u2019s Four-Square Theorem",
-                "refined_query": "Theorem (Four Squares Summation): A positive integer can be expressed as the sum of four square numbers if and only if it is not divisible by 4 or has a remainder when divided by 4 that equals either 1 or 2.\n"
+                "query": "Lagrange's Four-Square Theorem",
+                "refined_query": "Theorem (Four Squares Summation): A natural number can be expressed as the sum of four integer squares if and only if it is not a perfect square itself. This theorem provides an alternative representation for numbers that are already known to have this property, expanding our understanding of how integers can be decomposed into sums involving squared values.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -599,13 +599,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6468229952454461,
+                    "normalized_discounted_cumulative_gain": 0.6619880222671881,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 1.4
+                    "duration": 1.1
                 },
-                "query": "Green\u2019s theorem",
-                "refined_query": "Theorem (The Green's Theorem):\nThis mathematical principle establishes the relationship between double integrals over a plane region and line integrals along its boundary. Specifically, it states that for any smooth vector field on a simply connected planar domain D with positive orientation, the circulation of the field around the perimeter is equal to the flux across the area enclosed by the curve.\n"
+                "query": "Green's theorem",
+                "refined_query": "Theorem (Integral Calculus Relationship):\nThis mathematical principle establishes the relationship between double integrals over a plane region and line integral around its boundary, providing an equivalence that connects these two types of integration. It is named after mathematician George Green."
             },
             "Natural language query": {
                 "metrics": {
@@ -734,13 +734,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 1.0,
-                    "reciprocal_rank": 1.0,
-                    "rank": 1,
-                    "duration": 1.6
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 1.2
                 },
-                "query": "Leibnitz\u2019s Series for Pi",
-                "refined_query": "Theorem (Leibniz's Formula for Calculating Pi):\nThis theorem provides an infinite series representation of the mathematical constant pi, where each term in the sequence is derived from a specific pattern involving alternating signs and fractions with successive odd numbers as denominators. The formula allows calculating increasingly accurate approximations to pi by summing these terms. "
+                "query": "Leibnitz's Series for Pi",
+                "refined_query": "Theorem (Euler-Maclaurin Summation Formula):\nThis theorem provides an expression to approximate the sum of infinite series, specifically used in calculating values such as pi. It connects discrete sums with continuous functions through a formula that includes Bernoulli numbers and integrals over intervals around each term's index value. "
             },
             "Natural language query": {
                 "metrics": {
@@ -795,13 +795,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 0,
-                    "normalized_discounted_cumulative_gain": 0.09460634670666435,
-                    "reciprocal_rank": 0.09090909090909091,
-                    "rank": 11,
+                    "normalized_discounted_cumulative_gain": 0.054793185501041654,
+                    "reciprocal_rank": 0.013888888888888888,
+                    "rank": 72,
                     "duration": 1.3
                 },
-                "query": "Ramsey\u2019s Theorem",
-                "refined_query": "Theorem (Generalized Ramsey's Principle):\nGiven any positive integers r and k, there exists at least one non-empty subset of natural numbers with exactly r elements such that no matter how we partition this set into two disjoint subsets based on a specific coloring scheme for the partitions, either all members in both sets will have equal sums or they won't.\n"
+                "query": "Ramsey's Theorem",
+                "refined_query": "Theorem (Generalized Ramsey Property): Given any positive integer k, there exists at least one coloring of the edges between all possible pairs in a complete graph with n vertices such that no matter how you partition these vertices into two non-empty sets based on their colors, either set will contain exactly k elements forming an independent subgraph.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -849,13 +849,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.505631563479448,
+                    "normalized_discounted_cumulative_gain": 0.39265677145724803,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.2
+                    "duration": 1.6
                 },
-                "query": "Taylor\u2019s Theorem",
-                "refined_query": "Theorem (Taylor's Expansion):\nFor any smooth function f(x) and point x=a, Taylor's theorem states that the value of a function can be approximated by its polynomial expansion around this specific point. The approximation becomes more accurate as we include higher-order terms in the series representation.\""
+                "query": "Taylor's Theorem",
+                "refined_query": "Theorem (Generalized Taylor Expansion):\nThis theorem provides an approximation of functions using polynomials, where the coefficients are determined by derivatives at a specific point. It states that for any smooth function f(x) and real number c not equal to zero or infinity, there exists a polynomial P_n(x-c), with degree n less than or equal to some positive integer k, such that as x approaches c, the difference between f(x) and its Taylor series approximation becomes negligible.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -956,14 +956,14 @@
         "queries": {
             "Title query": {
                 "metrics": {
-                    "top_k_accuracy": 0,
-                    "normalized_discounted_cumulative_gain": 0.2559580248098155,
-                    "reciprocal_rank": 0.07142857142857142,
-                    "rank": 14,
-                    "duration": 1.3
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 1.4
                 },
-                "query": "Solutions to Pell\u2019s Equation",
-                "refined_query": "Theorem (Generalized Form of the Pell's Conjecture):\nThe theorem addresses finding integer solutions for equations in which a given number, when squared and added or subtracted from another specific value involving that same initial number, results in an equation with two variables. This conjecture extends to all non-square natural numbers as potential starting points for the solution process.\n"
+                "query": "Solutions to Pell's Equation",
+                "refined_query": "Theorem (Generalized Form of the Pell-Furry Relations):\nThe theorem describes an infinite set of integer solutions for a specific quadratic Diophantine equation, where each solution pair represents two consecutive terms in a sequence that grows exponentially. This relationship is crucial to understanding and solving problems related to this type of mathematical problem involving irrational numbers raised to powers. "
             },
             "Natural language query": {
                 "metrics": {
@@ -987,9 +987,9 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 2.5
+                    "duration": 2.1
                 },
-                "query": "Minkowski\u2019s Fundamental Theorem",
+                "query": "Minkowski's Fundamental Theorem",
                 "refined_query": "Theorem (Geometric Inequality of Minkowski):\nThis theorem establishes that for any non-empty set S in Euclidean space, the volume of a convex body is less than or equal to the product of its diameter and the determinant of an invertible linear map from R^n to itself. The equality holds if and only if the convex body is axis-aligned with respect to this linear transformation."
             },
             "Natural language query": {
@@ -1158,8 +1158,8 @@
                     "rank": 3,
                     "duration": 1.3
                 },
-                "query": "Dirichlet\u2019s Theorem",
-                "refined_query": "Theorem (Prime Number Distribution):\nThis theorem states that for any positive integer, there are infinitely many prime numbers. The distribution of these primes follows a specific pattern where the difference between consecutive prime numbers tends to increase as we move towards larger values in an unpredictable manner but still maintains certain statistical properties related to their occurrence and spacing within natural number sequences."
+                "query": "Dirichlet's Theorem",
+                "refined_query": "Theorem (Prime Number Distribution):\nThis theorem states that for any positive integer greater than one, there are infinitely many prime numbers. The distribution of these primes follows a specific pattern where the difference between consecutive prime numbers tends to increase as we move towards larger values in an unpredictable manner but still maintains certain statistical properties related to their occurrence and spacing within natural number sequences."
             },
             "Natural language query": {
                 "metrics": {
@@ -1207,13 +1207,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.5,
-                    "reciprocal_rank": 0.3333333333333333,
-                    "rank": 3,
-                    "duration": 1.3
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.1
                 },
-                "query": "Wilson\u2019s Theorem",
-                "refined_query": "Theorem (Generalized Wilson's Conjecture):\nFor any prime number p, the factorial of one less than this prime minus 1 is equal to one more than two times its square root. This theorem provides a condition for determining whether an odd integer greater than 2 can be classified as a probable prime or not. "
+                "query": "Wilson's Theorem",
+                "refined_query": "Theorem (The Wilson Criterion for Prime Numbers):\nFor any natural number greater than one, if the factorial of its predecessor plus one is divisible by that number minus one, then it must be a prime.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -1372,10 +1372,10 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.9
+                    "duration": 1.3
                 },
-                "query": "Heron\u2019s formula",
-                "refined_query": "Theorem (The Area of Triangles): Given the lengths of all three sides of any triangle, there exists an expression to calculate its area using only those side lengths. This relationship is named after Hero of Alexandria and can be used for both equilateral and non-equilateral triangles."
+                "query": "Heron's formula",
+                "refined_query": "Theorem (Area of Triangle Using Side Lengths):\nGiven the lengths of all three sides of any triangle, there exists an expression that calculates its area. This mathematical relationship is named after Hero of Alexandria and provides a formula to determine the area without requiring knowledge about angles or altitude within the triangle itself."
             },
             "Natural language query": {
                 "metrics": {
@@ -1455,8 +1455,8 @@
                     "rank": 3,
                     "duration": 1.3
                 },
-                "query": "Bezout\u2019s Theorem",
-                "refined_query": "Theorem (Generalized Bezout's Identity):\nFor any two non-zero integers, there exist unique coefficients such that the product of these coefficients and their corresponding linear combinations equals the greatest common divisor between them. The existence is guaranteed for all pairs of coprime numbers where one number divides another with no remainder greater than zero. "
+                "query": "Bezout's Theorem",
+                "refined_query": "Theorem (Generalized Bezout Identity):\nFor any two integers, there exist unique non-negative integer solutions for the greatest common divisor of those numbers that satisfy a specific linear combination relationship. This theorem provides an expression wherein one number can be expressed as a multiple of another by their shared factors plus or minus some remainder term(s)."
             },
             "Natural language query": {
                 "metrics": {
@@ -1511,13 +1511,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
-                    "reciprocal_rank": 0.2,
-                    "rank": 5,
-                    "duration": 1.4
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 2.2
                 },
-                "query": "L\u2019H\u00f4pital\u2019s Rule",
-                "refined_query": "Theorem (Differentiation of Indeterminate Form Limits): When evaluating the limit of two functions as they approach an indeterminate form, if both have a derivative that is continuous at said point and their derivatives are equal to each other indefinitely near this point, then the original function's limits can be found by taking the ratio of these respective derivatives.\n"
+                "query": "L'H\u00f4pital's Rule",
+                "refined_query": "Theorem (Continuous Limit Ratio):\nGiven two functions that are differentiable at the same point, if their ratio tends to an indeterminate form as a variable approaches zero or infinity, then this theorem states that under certain conditions, the limit of the ratio is equal to the limit of the quotient of their derivatives. This principle helps in evaluating limits involving fractions where direct substitution leads to undefined expressions like 0/0 or \u221e/\u221e."
             },
             "Natural language query": {
                 "metrics": {
@@ -1643,7 +1643,7 @@
     "greatest-common-divisor-algorithm": {
         "metadata": {
             "skipped": true,
-            "skipped_reason": "Annotation: Has to be skipped because the original lemma does not exist anymore and a similar potential target entry\u2019s (\u201eclass semiring_gcd\u201c) command is \u201eclass\u201c. The AI search only searches for documents with command \u201etheorem\u201c, \u201elemma\u201c or \u201ecorollary\u201c"
+            "skipped_reason": "Annotation: Has to be skipped because the original lemma does not exist anymore and a similar potential target entry's (\u201eclass semiring_gcd\u201c) command is \u201eclass\u201c. The AI search only searches for documents with command \u201etheorem\u201c, \u201elemma\u201c or \u201ecorollary\u201c"
         },
         "queries": {}
     },
@@ -1690,10 +1690,10 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.2
+                    "duration": 1.5
                 },
-                "query": "Sylow\u2019s Theorem",
-                "refined_query": "Theorem (Generalized Sylow's Theorems):\nFor any finite group G and prime number p, if there exists at least one subgroup of order equal to the highest power of p that divides the size of G, then such subgroups exist within G. Furthermore, these subgroups are conjugate to each other in G."
+                "query": "Sylow's Theorem",
+                "refined_query": "Theorem (Generalized Sylow Subgroup Existence):\nFor any finite group G and prime number p, if the order of subgroup H is divisible by p to a certain power but not higher powers, then there exists at least one such subgroup within G that has this specific property. This theorem guarantees the existence and uniqueness (up to conjugation) of these subgroups in relation to their respective orders based on prime factors.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -1798,7 +1798,7 @@
                     "normalized_discounted_cumulative_gain": 0.6736525857061149,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 1.5
+                    "duration": 1.6
                 },
                 "query": "Fourier Series",
                 "refined_query": "Theorem (The Fundamental Theorem of Harmonic Analysis): The Fourier series is an expression that represents any periodic function as the sum of simple oscillating functions, specifically sines and cosines. This theorem provides a way to decompose complex waveforms into their constituent frequencies with equal or varying amplitudes."
@@ -1957,13 +1957,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.5437227374453396,
+                    "normalized_discounted_cumulative_gain": 0.46927872602275644,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.2
+                    "duration": 2.1
                 },
-                "query": "Dissection of Cubes (J.E. Littlewood\u2019s \u201celegant\u201d proof)",
-                "refined_query": "Theorem (Littlewood's Cube Dissection):\nThis theorem refers to an elegant mathematical argument that demonstrates the possibility of dissecting a cube into smaller cubes, each with integer side lengths. The total volume of these dissected pieces equals one unit cube."
+                "query": "Dissection of Cubes (J.E. Littlewood's \u201celegant\u201d proof)",
+                "refined_query": "Theorem (Littlewood's Dissection Theorem): A dissection puzzle that involves cutting a cube into smaller cubic pieces, which can then be rearranged to form another integer-size cube. This elegant mathematical proof demonstrates the possibility of such transformations using only whole number dimensions and volumes."
             },
             "Natural language query": {
                 "metrics": {
@@ -2045,13 +2045,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 0,
-                    "normalized_discounted_cumulative_gain": 0.0,
-                    "reciprocal_rank": 0,
-                    "rank": 100,
-                    "duration": 1.4
+                    "normalized_discounted_cumulative_gain": 0.3338625627861488,
+                    "reciprocal_rank": 0.0625,
+                    "rank": 16,
+                    "duration": 2.8
                 },
-                "query": "Desargues\u2019s Theorem",
-                "refined_query": "Theorem (Desargues's Fundamental Conjecture):\nThis theorem, named after the French mathematician G\u00e9rard Desargues, establishes a relationship between two triangles in perspective. If one pair of corresponding sides and angles are parallel to each other for both triangles, then their intersections will also be congruent. This principle is fundamental in projective geometry as it provides insight into the properties of points at infinity."
+                "query": "Desargues's Theorem",
+                "refined_query": "Theorem (Desargues's Fundamental Conjecture):\nThis theorem, named after the French mathematician G\u00e9rard Desargues, establishes a relationship between two triangles in perspective. If one pair of corresponding sides are parallel and their included angles equal, then another pair of corresponding vertices will also be aligned as perpendx-axis intersection points. This principle is fundamental to projective geometry and has implications for the study of conic sections."
             },
             "Natural language query": {
                 "metrics": {
@@ -2126,13 +2126,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.18457569677956817,
-                    "reciprocal_rank": 0.1111111111111111,
-                    "rank": 9,
-                    "duration": 2.4
+                    "normalized_discounted_cumulative_gain": 0.3165435293778422,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 2.7
                 },
-                "query": "Stirling\u2019s Formula",
-                "refined_query": "Theorem (Approximation of Factorial Function):\nA mathematical formula that provides an approximation for the factorial function, specifically n!, where it is expressed as approximately equal to sqrt(2*pi*n) * ((n/e)^n), with a small error term. This theorem helps in estimating large values of factorials more efficiently than direct computation methods."
+                "query": "Stirling's Formula",
+                "refined_query": "Theorem (Generalized Stirling Approximation):\nThis formula provides an approximation for factorial calculations, where the nth factorial is estimated as approximately equal to sqrt(2*pi*n) * ((n/e)^n), with a correction term that becomes less significant as n increases. This estimation helps in simplifying complex mathematical computations involving large numbers and their factorials."
             },
             "Natural language query": {
                 "metrics": {
@@ -2160,13 +2160,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6490310383385475,
+                    "normalized_discounted_cumulative_gain": 0.6497176218098671,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 1.8
+                    "duration": 2.8
                 },
-                "query": "Pick\u2019s Theorem",
-                "refined_query": "Theorem (Geometric Area Estimation):\nGiven any simple lattice polygon with integer coordinates, the area of this polygon can be calculated using its number of interior points and boundary points. The formula to determine the area is expressed as A = i/2 + b - 1, where 'i' represents the count of internal vertices (points strictly inside the shape), and 'b' denotes the total number of lattice points on the perimeter."
+                "query": "Pick's Theorem",
+                "refined_query": "Theorem (Geometric Area Estimation):\nGiven any simple lattice polygon with integer coordinates, the area of this polygon can be calculated using its number of interior points and boundary points. The formula is expressed as A = i/2 + b - 1, where 'i' represents the count of internal vertices, 'b' denotes the total number of boundary points, and 'A' signifies the estimated area in square units."
             },
             "Natural language query": {
                 "metrics": {
@@ -2241,13 +2241,13 @@
             "Title query": {
                 "metrics": {
                     "top_k_accuracy": 1,
-                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
-                    "reciprocal_rank": 0.5,
-                    "rank": 2,
-                    "duration": 2.7
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.4
                 },
-                "query": "Ptolemy\u2019s Theorem",
-                "refined_query": "Theorem (Generalized Version of the Area Relationship in Triangles):\nFor any triangle, if we denote its sides as 'a', 'b' and 'c', with opposite angles represented by A, B, C respectively. The theorem states that the sum of areas swept out by these two pairs of a-side and b-side (and c-side) is equal to half the product of their respective diagonals multiplied together but in reverse order i.e., area(a,b) + area(c,A) = 1/2 * diagonal_AC * diagonal_BC\n"
+                "query": "Ptolemy's Theorem",
+                "refined_query": "Theorem (The Geometric Relationship of Cyclic Quadrilaterals):\nFor any cyclic quadrilateral, the sum of a pair of opposite sides is equal to the total length of the other two pairs when measured in the same unit. This theorem provides an important relationship between the side lengths and diagonals within such geometric figures.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -2305,10 +2305,10 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.2
+                    "duration": 1.1
                 },
-                "query": "Bertrand\u2019s Postulate",
-                "refined_query": "Theorem (Prime Number Gaps): For every natural number greater than two, there exists at least one prime number between that given number and twice the same. This theorem asserts a minimum gap of 2 units among consecutive primes for all numbers above two in the set of positive integers."
+                "query": "Bertrand's Postulate",
+                "refined_query": "Theorem (Prime Number Gaps):\nFor every natural number greater than or equal to 2, there exists at least one prime number that is strictly between the given integer and twice its value.\n"
             },
             "Natural language query": {
                 "metrics": {
@@ -2361,45 +2361,45 @@
         "all_queries": {
             "top_k_accuracy": {
                 "sample_size": 170,
-                "average": 0.8411764705882353
+                "average": 0.8470588235294118
             },
             "normalized_discounted_cumulative_gain": {
                 "sample_size": 170,
-                "average": 0.5961140797460601
+                "average": 0.6002131620774197
             },
             "reciprocal_rank": {
                 "sample_size": 170,
-                "average": 0.5903672233304798
+                "average": 0.5959797562224243
             },
             "rank": {
                 "sample_size": 170,
-                "average": 10.435294117647059
+                "average": 10.205882352941176
             },
             "duration": {
                 "sample_size": 170,
-                "average": 1.3658823529411748
+                "average": 1.3911764705882337
             }
         },
         "Title query": {
             "top_k_accuracy": {
                 "sample_size": 85,
-                "average": 0.8235294117647058
+                "average": 0.8352941176470589
             },
             "normalized_discounted_cumulative_gain": {
                 "sample_size": 85,
-                "average": 0.5752008188742169
+                "average": 0.5833989835369361
             },
             "reciprocal_rank": {
                 "sample_size": 85,
-                "average": 0.5673508844097083
+                "average": 0.5785759501935975
             },
             "rank": {
                 "sample_size": 85,
-                "average": 11.870588235294118
+                "average": 11.411764705882353
             },
             "duration": {
                 "sample_size": 85,
-                "average": 1.442352941176471
+                "average": 1.4929411764705882
             }
         },
         "Natural language query": {
