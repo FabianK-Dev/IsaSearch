@@ -33,9 +33,6 @@ pprint(config)
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
 
-# Clean up tokenizer to memory
-del tokenizer
-
 print("Loading prompts...")
 prompts = load_prompts(config)
 
@@ -44,6 +41,9 @@ document_tree = build_document_tree(config, solr)
 
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
+
+# Clean up tokenizer to memory
+del tokenizer
 
 print("Loading ChromaDB embedding function...")
 embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/multi-qa-distilbert-cos-v1", device="cuda" if torch.cuda.is_available() else "cpu")
