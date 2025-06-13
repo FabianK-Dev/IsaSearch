@@ -147,7 +147,6 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 },
                 "query": query,
                 "refined_query": results_dict["refined_query"],
-                "duration": results_dict["duration"],
             }
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
