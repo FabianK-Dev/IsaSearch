@@ -36,7 +36,7 @@
                             <a class="nav-link" href="#" target="_blank" rel="noopener">Repository</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/search/example search query?refine_query=true" target="_blank" rel="noopener">API Example</a>
+                            <a class="nav-link" href="/search?query=example search query&refine_query=true" target="_blank" rel="noopener">API Example</a>
                         </li>
                     </ul>
                 </div>
@@ -111,7 +111,8 @@ bijections have inverses, bubblesort, ..."></textarea>
             if (!input)
                 return;
 
-            fetch("/search/" + input + "?refine_query=" + refineQuery)
+            console.log(encodeURI(input));
+            fetch("/search?query=" + encodeURIComponent(input) + "&refine_query=" + refineQuery)
             .then(response => {
                 if (!response.ok) {
                     response.text().then(res => {
