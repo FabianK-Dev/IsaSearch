@@ -33,6 +33,9 @@ pprint(config)
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
 
+# Clean up tokenizer to memory
+del tokenizer
+
 print("Loading prompts...")
 prompts = load_prompts(config)
 
@@ -49,7 +52,7 @@ print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, embedder, document_tree)
 
 print("Loading LLM pipeline and gerneration arguments...")
-model = get_llm(config, prompts, tokenizer)
+model = get_llm(config)
 
 print("Check if loading LLM output cache is enabled via config...")
 llm_output_cache = get_llm_output_cache(config)
