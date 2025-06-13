@@ -111,7 +111,6 @@ bijections have inverses, bubblesort, ..."></textarea>
             if (!input)
                 return;
 
-            console.log(encodeURI(input));
             fetch("/search?query=" + encodeURIComponent(input) + "&refine_query=" + refineQuery)
             .then(response => {
                 if (!response.ok) {
