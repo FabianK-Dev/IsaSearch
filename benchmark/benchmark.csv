@@ -35,7 +35,7 @@ gödels-incompleteness-theorem-2,Gödel’s Incompleteness Theorem 2,"[ {""entit
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"[ {""entity_kname"":""Quadratic_Reciprocity.Quadratic_Reciprocity|thm""}, {""entity_kname"": ""More_Residues.QuadRes'HasIntRoot|thm""}, {""entity_kname"": ""QuadRes.QuadRes_iff|thm""}, {""entity_kname"": ""More_Residues.QuadResHasIntRoot|thm""}, {""entity_kname"": ""More_Residues.QuadResHasTwoIntRoots|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_cong|thm""}, {""entity_kname"": ""QuadRes.QuadRes_set_prime|thm""}, {""entity_kname"": ""Euler_Criterion.l12|thm""}, {""entity_kname"": ""More_Residues.QuadResImplQuadRes'2|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_mult|thm""}, {""entity_kname"": ""QuadRes.card_QuadRes_set_prime|thm""} ]","theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q ? 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,https://en.wikipedia.org/wiki/Quadratic_reciprocity#Statement_of_the_theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q - 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,https://en.wikipedia.org/wiki/Quadratic_reciprocity#Statement_of_the_theorem,,
 the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the Angle,"[ {""entity_kname"":""Impossible_Geometry.impossibility_of_trisecting_angle_pi_over_3|thm""} ]","theorem impossibility_of_trisecting_angle_pi_over_3:
   ""Point (cos (pi / 9)) 0 ∉ constructible""
 ",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle,"The angle pi/3 radians ([...] 60°) is constructible. [...] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility,,
@@ -77,7 +77,7 @@ fundamental-theorem-of-integral-calculus,Fundamental Theorem of Integral Calculu
 demoivres-theorem,DeMoivre’s Theorem,"[ {""entity_kname"":""Complex.DeMoivre|thm""}, {""entity_kname"":""Complex.DeMoivre2|thm""}, {""entity_kname"": ""Complex_Transcendental.DeMoivre|thm""}, {""entity_kname"": ""FFT.root_unity|thm""}, {""entity_kname"": ""Complex.cos_n_Re_cis_pow_n|thm""}, {""entity_kname"": ""Complex_Transcendental.Euler|thm""}, {""entity_kname"": ""Complex.sin_n_Im_cis_pow_n|thm""} ]","lemma DeMoivre: ""(cis a) ^ n = cis (real n * a)""
 
 lemma DeMoivre2: ""(rcis r a) ^ n = rcis (r ^ n) (real n * a)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Complex.html,HOL,DeMoivre’s Theorem,for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin ? nx,https://en.wikipedia.org/wiki/De_Moivre%27s_formula,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Complex.html,HOL,DeMoivre’s Theorem,for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin nx,https://en.wikipedia.org/wiki/De_Moivre%27s_formula,,
 liouvilles-theorem-and-the-construction-of-transcendental-numbers,Liouville’s Theorem and the Construction of Transcendental Numbers,"[ {""entity_kname"":""Liouville_Numbers.transcendental_liouville_constant|thm""}, {""entity_kname"": ""Pi_Transcendental.transcendental_pi|thm""}, {""entity_kname"": ""Hermite_Lindemann.pi_transcendental|thm""}, {""entity_kname"": ""Pi_Transcendental.transcendental_i_pi|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arctan|thm""}, {""entity_kname"": ""Pi_Irrational.pi_irrational|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arccos|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_Arcsin|thm""}, {""entity_kname"": ""Contrib.trancl_subseteq|thm""}, {""entity_kname"": ""Liouville_Numbers.liouville.transcendental|thm""}, {""entity_kname"": ""Hermite_Lindemann.transcendental_tan|thm""} ]","corollary transcendental_liouville_constant:
   ""¬algebraic (standard_liouville (λ_. 1) 10)""
 ",https://isa-afp.org/entries/Liouville_Numbers.shtml,Liouville_Numbers,Liouville’s Theorem and the Construction of Transcendental Numbers,"irrational but does not have this property, so it cannot be algebraic and must be transcendental",https://en.wikipedia.org/wiki/Liouville_number#Liouville_numbers_and_transcendence,,
@@ -86,7 +86,7 @@ lagranges-four-square-theorem,Lagrange’s Four-Square Theorem,"[ {""entity_knam
 all-primes-1-mod-4-equal-the-sum-of-two-squares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[ {""entity_kname"":""TwoSquares.sum_of_two_squares_prime|thm""} ]","theorem two_squares:
   assumes ""prime (p :: nat)""
   shows   ""(∃a b. p = a⇧2 + b⇧2) = [p ≠ 3] (mod 4)
-",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[...] contains no factor p^k, where prime p ? 3 (mod 4) and k is odd",https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem,,
+",https://www.isa-afp.org/entries/SumSquares.html,SumSquares,All Primes (1 mod 4) Equal the Sum of Two Squares,"[...] contains no factor p^k, where prime p =* 3 (mod 4) and k is odd",https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem,,
 greens-theorem,Green’s theorem,"[
   { ""entity_kname"": ""Green.green_typeI_typeII_chain.GreenThm_typeI_typeII_divisible_region|fact"" },
   { ""entity_kname"": ""Green.R2.Greens_thm_type_II|fact"" },
@@ -131,7 +131,7 @@ schroeder-bernstein-theorem,Schroeder-Bernstein Theorem,"[ {""entity_kname"":""I
   assumes ""inj_on f A"" and ""f ` A ⊆ B""
     and   ""inj_on g B"" and ""g ` B ⊆ A""
   shows   ""∃h. bij_betw h A B""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL/Inductive.html,HOL,Schroeder-Bernstein Theorem,"there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A ? B",https://en.wikipedia.org/wiki/Schr%C3%B6der%E2%80%93Bernstein_theorem,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL/Inductive.html,HOL,Schroeder-Bernstein Theorem,"there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A → B",https://en.wikipedia.org/wiki/Schr%C3%B6der%E2%80%93Bernstein_theorem,,
 leibnitzs-series-for-pi,Leibnitz’s Series for Pi,"[ {""entity_kname"":""Transcendental.pi_series|thm""} ]","theorem pi_series:
   ""pi / 4 = (∑ k. (-1)^k * 1 / real (k*2+1))""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL/Transcendental.html,HOL,Leibnitz’s Series for Pi,pi [...] as an alternating series,https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80,,
@@ -377,7 +377,7 @@ greatest-common-divisor-algorithm,Greatest Common Divisor Algorithm,,"lemma gcd_
 perfect-number-theorem,Perfect Number Theorem,"[ {""entity_kname"":""Perfect.perfect_number_theorem|thm""} ]","theorem perfect_number_theorem:
   assumes even: ""even m"" and perfect: ""perfect m""
   shows ""∃ n . m = 2^n*(2^(n+1) - 1) ∧ prime ((2::nat)^(n+1) - 1)""
-",https://isa-afp.org/entries/Perfect-Number-Thm.shtml,Perfect-Number-Thm,Perfect Number Theorem,"an even number is perfect iff it has the form 2^(p?1) * (2^p - 1), where 2^p ? 1 is a prime number",https://en.wikipedia.org/wiki/Euclid%E2%80%93Euler_theorem,,
+",https://isa-afp.org/entries/Perfect-Number-Thm.shtml,Perfect-Number-Thm,Perfect Number Theorem,"an even number is perfect [iff] it has the form 2^(p – 1) * (2^p - 1), where 2^p - 1 is a prime number",https://en.wikipedia.org/wiki/Euclid%E2%80%93Euler_theorem,,
 order-of-a-subgroup,Order of a Subgroup,,"proposition (in group) lagrange_finite:
   assumes ""finite (carrier G)"" and ""subgroup H G""
   shows ""card (rcosets H) * card H = order G""
