@@ -19,7 +19,7 @@ prime-number-theorem,Prime Number Theorem,"[ {""entity_kname"":""Prime_Number_Th
   ""primes_pi x = real (card {p::nat. prime p ? p ? x})""
 
 corollary prime_number_theorem: ""primes_pi ?[at_top] (?x. x / ln x)""",https://www.isa-afp.org/entries/Prime_Number_Theorem.html,?,Prime Number Theorem,"Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",https://en.wikipedia.org/wiki/Prime_number_theorem#Statement,,
-g�dels-incompleteness-theorem-1,G�del�s Incompleteness Theorem 1,"[ {""entity_kname"":""Goedel_I.Goedel_I|thm""}, {""entity_kname"":""Abstract_First_Goedel.Goedel_Form_Proofs.goedel_first_ex|thm""} ]","theorem Goedel_I:
+gödels-incompleteness-theorem-1,G�del�s Incompleteness Theorem 1,"[ {""entity_kname"":""Goedel_I.Goedel_I|thm""}, {""entity_kname"":""Abstract_First_Goedel.Goedel_Form_Proofs.goedel_first_ex|thm""} ]","theorem Goedel_I:
   assumes ""� {} ? Fls""
   obtains ? where
       ""{} ? ? IFF Neg (PfP ???)""
@@ -27,7 +27,7 @@ g�dels-incompleteness-theorem-1,G�del�s Incompleteness Theorem 1,"[ {""ent
       ""� {} ? Neg ?""
       ""eval_fm e ?""
       ""ground_fm ?""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,G�del�s Incompleteness Theorem 1,Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...],https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem,,
-g�dels-incompleteness-theorem-2,G�del�s Incompleteness Theorem 2,"[ {""entity_kname"":""Goedel_II.Goedel_II|thm""}, {""entity_kname"":""Jeroslow_Simplified.Jeroslow_Godel_Second.jeroslow_godel_second|thm""}, {""entity_kname"": ""Deduction.Deduct_with_False.consistent_def3|thm""}, {""entity_kname"": ""Instance.Goedel_I|thm""}, {""entity_kname"": ""Epistemic_Logic.inconsistent_imply|thm""}, {""entity_kname"": ""Abstract_First_Goedel.Goedel_Form.goedel_first_theEasyHalf|thm""}, {""entity_kname"": ""Derivability_Conditions.CleanRepr_Proofs.consistent_not_prv_not_prv_PPf|thm""}, {""entity_kname"": ""Abstract_First_Goedel.Goedel_Form_Classical_HBL1_rev_prv.goedel_first_theHardHalf|thm""}, {""entity_kname"": ""FOL_Fitting.deriv_consistency|thm""} ]","theorem Goedel_II:
+gödels-incompleteness-theorem-2,G�del�s Incompleteness Theorem 2,"[ {""entity_kname"":""Goedel_II.Goedel_II|thm""}, {""entity_kname"":""Jeroslow_Simplified.Jeroslow_Godel_Second.jeroslow_godel_second|thm""}, {""entity_kname"": ""Deduction.Deduct_with_False.consistent_def3|thm""}, {""entity_kname"": ""Instance.Goedel_I|thm""}, {""entity_kname"": ""Epistemic_Logic.inconsistent_imply|thm""}, {""entity_kname"": ""Abstract_First_Goedel.Goedel_Form.goedel_first_theEasyHalf|thm""}, {""entity_kname"": ""Derivability_Conditions.CleanRepr_Proofs.consistent_not_prv_not_prv_PPf|thm""}, {""entity_kname"": ""Abstract_First_Goedel.Goedel_Form_Classical_HBL1_rev_prv.goedel_first_theHardHalf|thm""}, {""entity_kname"": ""FOL_Fitting.deriv_consistency|thm""} ]","theorem Goedel_II:
   assumes ""� {} ? Fls""
     shows ""� {} ? Neg (PfP ?Fls?)""",https://isa-afp.org/entries/Incompleteness.shtml,Incompleteness,G�del�s Incompleteness Theorem 2,"[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem,,
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"[ {""entity_kname"":""Quadratic_Reciprocity.Quadratic_Reciprocity|thm""}, {""entity_kname"": ""More_Residues.QuadRes'HasIntRoot|thm""}, {""entity_kname"": ""QuadRes.QuadRes_iff|thm""}, {""entity_kname"": ""More_Residues.QuadResHasIntRoot|thm""}, {""entity_kname"": ""More_Residues.QuadResHasTwoIntRoots|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_cong|thm""}, {""entity_kname"": ""QuadRes.QuadRes_set_prime|thm""}, {""entity_kname"": ""Euler_Criterion.l12|thm""}, {""entity_kname"": ""More_Residues.QuadResImplQuadRes'2|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_mult|thm""}, {""entity_kname"": ""QuadRes.card_QuadRes_set_prime|thm""} ]","theorem Quadratic_Reciprocity:
@@ -340,7 +340,7 @@ theorem-of-ceva,Theorem of Ceva,"[ {""entity_kname"":""Ceva.Cevas|thm""}, {""ent
   shows ""dist a f * dist b d * dist c e = dist f b * dist d c * dist e a""
 ",https://www.isa-afp.org/entries/Ceva.html,Ceva,Theorem of Ceva,"[...] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",https://en.wikipedia.org/wiki/Ceva%27s_theorem,,
 cantors-theorem,Cantor�s Theorem,,lemma Cantors_paradox: ?f. f ` A = Pow A,https://isabelle.in.tum.de/dist/library/HOL/HOL/Fun.html,HOL,Cantor�s Theorem,"[...] for any set A, the set of all subsets of A [...] has a strictly greater cardinality than A itself",https://en.wikipedia.org/wiki/Cantor%27s_theorem,true,Lemma does not exist anymore.
-lh�pitals-rule,L�H�pital�s Rule,"[ {""entity_kname"":""Deriv.lhopital|thm""} ]","lemma lhopital:
+lhôpitals-rule,L�H�pital�s Rule,"[ {""entity_kname"":""Deriv.lhopital|thm""} ]","lemma lhopital:
   fixes f g f' g' :: ""real ? real""
   assumes ""f ?x? 0"" and ""g ?x? 0""
   assumes ""??F u in at x. g u ? 0""
