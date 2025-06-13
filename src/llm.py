@@ -27,12 +27,12 @@ def save_llm_output_cache(llm_output_cache, config):
     with open(LLM_OUTPUT_CACHE, "w") as file:
         json.dump(llm_output_cache, file, indent=4)
 
-def get_llm(config, prompts, tokenizer):
-    print("Calculating max number of tokens required for search refinement prompt...")
-    token_ids = tokenizer.encode(prompts["search_refine"])
-    num_tokens = len(token_ids)
-
-    model = GPT4All(config["llm_name"], device="cuda" if torch.cuda.is_available() else "cpu", n_ctx=num_tokens + config["sampling_parameters"]["max_tokens"])
+def get_llm(config):
+    model = GPT4All(
+        config["llm_name"],
+        device="cuda" if torch.cuda.is_available() else "cpu",
+        n_ctx=1024
+    )
     return model
 
 def get_llm_output_cache(config):
