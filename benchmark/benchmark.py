@@ -143,13 +143,11 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                     "normalized_discounted_cumulative_gain": normalized_discounted_cumulative_gain(results_list, target_identifier),
                     "reciprocal_rank": reciprocal_rank(results_list, target_identifier),
                     "rank": rank(results_list, target_identifier),
-                    "duration": results_dict["duration"]
+                    "duration": round(results_dict["duration"] * 10) / 10 # Round to 1 decimal to avoid having a new duration for each benchmark run
                 },
                 "query": query,
                 "refined_query": results_dict["refined_query"],
-                "results[:10]": top_results,
                 "duration": results_dict["duration"],
-                "target_identifier": target_identifier[0]
             }
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
