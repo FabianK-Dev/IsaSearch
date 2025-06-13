@@ -141,7 +141,7 @@ def search_results_to_docs(search_results, solr, config):
         # Add direct link to file in remote repository
         sub_path = search_results["results"][doc_id]["file"].split("/thys/")
         if len(sub_path) > 1:
-            search_results["results"][doc_id]["remote_url"] = config["afp_remote_thys_folder_url"] + sub_path[1] + "#L" + str(search_results["results"][doc_id]["start_line"])
+            search_results["results"][doc_id]["remote_url"] = config["afp_remote_thys_folder_url"] + "/" + sub_path[1] + "#L" + str(search_results["results"][doc_id]["start_line"])
         else:
             search_results["results"][doc_id]["remote_url"] = "#"
 
