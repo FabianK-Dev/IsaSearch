@@ -35,10 +35,10 @@ gödels-incompleteness-theorem-2,Gödel’s Incompleteness Theorem 2,"[ {""entit
 law-of-quadratic-reciprocity,Law of Quadratic Reciprocity,"[ {""entity_kname"":""Quadratic_Reciprocity.Quadratic_Reciprocity|thm""}, {""entity_kname"": ""More_Residues.QuadRes'HasIntRoot|thm""}, {""entity_kname"": ""QuadRes.QuadRes_iff|thm""}, {""entity_kname"": ""More_Residues.QuadResHasIntRoot|thm""}, {""entity_kname"": ""More_Residues.QuadResHasTwoIntRoots|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_cong|thm""}, {""entity_kname"": ""QuadRes.QuadRes_set_prime|thm""}, {""entity_kname"": ""Euler_Criterion.l12|thm""}, {""entity_kname"": ""More_Residues.QuadResImplQuadRes'2|thm""}, {""entity_kname"": ""Residues_Properties.QuadRes_mult|thm""}, {""entity_kname"": ""QuadRes.card_QuadRes_set_prime|thm""} ]","theorem Quadratic_Reciprocity:
   assumes ""prime p"" ""2 < p"" ""prime q"" ""2 < q"" ""p ≠ q""
   shows ""Legendre p q * Legendre q p = (-1) ^ ((p - 1) div 2 * ((q - 1) div 2))""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q ? 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,,,
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Number_Theory/Quadratic_Reciprocity.html,HOL,Law of Quadratic Reciprocity,Define q^* = (-1)^((q ? 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable,https://en.wikipedia.org/wiki/Quadratic_reciprocity#Statement_of_the_theorem,,
 the-impossibility-of-trisecting-the-angle,The Impossibility of Trisecting the Angle,"[ {""entity_kname"":""Impossible_Geometry.impossibility_of_trisecting_angle_pi_over_3|thm""} ]","theorem impossibility_of_trisecting_angle_pi_over_3:
   ""Point (cos (pi / 9)) 0 ∉ constructible""
-",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle,"The angle pi/3 radians ([...] 60�) is constructible. [...] It is impossible to construct a 20� angle. This implies that a 60� angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility,,
+",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Trisecting the Angle,"The angle pi/3 radians ([...] 60°) is constructible. [...] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility,,
 the-impossibility-of-doubling-the-cube,The Impossibility of Doubling the Cube,"[ {""entity_kname"":""Impossible_Geometry.impossibility_of_doubling_the_cube|thm""} ]","theorem impossibility_of_doubling_the_cube:
   ""x^3 = 2 ⟹ (Point x 0) ∉ constructible""",https://isa-afp.org/entries/Impossible_Geometry.shtml,Impossible_Geometry,The Impossibility of Doubling the Cube,"Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",https://en.wikipedia.org/wiki/Doubling_the_cube,,
 the-volume-of-a-sphere,The Volume of a Sphere,"[ {""entity_kname"":""Ball_Volume.content_ball|thm""} ]","theorem content_ball:
@@ -206,7 +206,7 @@ solutions-to-pells-equation,Solutions to Pell’s Equation,"[ {""entity_kname"":
 solutions-to-pells-equation,Infinitely many solutions to Pell’s Equation,"[ {""entity_kname"":""Pell.pell_solutions_infinite|thm""} ]","corollary pell_solutions_infinite:
   fixes D :: nat
   assumes ""∄k. D = k⇧2""
-  shows   ""infinite {(x :: int, y :: int). x⇧2 - D * y⇧2 = 1}""",https://www.isa-afp.org/entries/Pell.html,Pell,Solutions to Pell’s Equation,"as long as n is not a perfect square, [x^2 � ny^2 = 1] has infinitely many distinct integer solutions",https://en.wikipedia.org/wiki/Pell's_equation,,
+  shows   ""infinite {(x :: int, y :: int). x⇧2 - D * y⇧2 = 1}""",https://www.isa-afp.org/entries/Pell.html,Pell,Solutions to Pell’s Equation,"as long as n is not a perfect square, [x^2 - ny^2 = 1] has infinitely many distinct integer solutions",https://en.wikipedia.org/wiki/Pell's_equation,,
 minkowskis-fundamental-theorem,Minkowski’s Fundamental Theorem,"[ {""entity_kname"":""Minkowskis_Theorem.minkowski|thm""}, {""entity_kname"": ""Minkowskis_Theorem.minkowski|thm""}, {""entity_kname"": ""Minkowskis_Theorem.minkowski_compact|thm""} ]","theorem minkowski:
   fixes B :: ""(real ^ 'n) set""
   assumes ""convex B"" and symmetric: ""uminus ` B ⊆ B""
@@ -521,7 +521,7 @@ cramers-rule,Cramer’s Rule,"[ {""entity_kname"":""Determinants.cramer|thm""} ]
   fixes A ::""real^'n^'n""
   assumes d0: ""det A ≠ 0""
   shows ""A *v x = b ⟷ x = (χ k. det(χ i j. if j=k then b$i else A$i$j) / det A)""
-",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer’s Rule,"[...] n�n matrix A has [...] nonzero determinant, [...] solution for [...] unknowns x_i are [...] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case,true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
+",https://isabelle.in.tum.de/dist/library/HOL/HOL-Analysis/Determinants.html,HOL,Cramer’s Rule,"[...] n x n matrix A has [...] nonzero determinant, [...] solution for [...] unknowns x_i are [...] det(A_i)/det(A)",https://en.wikipedia.org/wiki/Cramer%27s_rule#General_case,true,"Has to be skipped because target command is „proposition“. The AI search only searches for documents with command „theorem“, „lemma“ or „corollary“"
 bertrands-postulate,Bertrand’s Postulate,"[ {""entity_kname"":""Bertrand.bertrand|thm""} ]","theorem bertrand: ""n > 1 ⟹ ∃p∈{n<..<2*n}. prime p""
 ",https://www.isa-afp.org/entries/Bertrands_Postulate.shtml,Bertrands_Postulate,Bertrand’s Postulate,"[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",https://en.wikipedia.org/wiki/Bertrand%27s_postulate,,
 buffon-needle-problem,Buffon Needle Problem,,"theorem buffon_short:
