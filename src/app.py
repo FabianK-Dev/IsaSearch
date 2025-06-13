@@ -60,10 +60,11 @@ def web():
 def static_files(filename):
     return send_from_directory("html", filename)
 
-@app.get("/search/<query>")
-def search_endpoint(query):
-    print(f"Received search query: {query}")
+@app.get("/search")
+def search_endpoint():
+    query = request.args.get("query", "")
     refine_query = request.args.get("refine_query", "true").lower() == "true"
+    print(f"Received search query: {query}")
 
     results_dict = search(query, collection, prompts, model, config, document_tree, refine_query, llm_output_cache=llm_output_cache)
     results_list = search_results_to_docs(results_dict, solr, config)
