@@ -28,10 +28,13 @@
 
 
 ## Hintergrund
-### Isabelle (Wiederholung?)
-### AFP (Wiederholung?)
-### Theoreme in der formalen Verifikation
-### Lexikalische Suche vs. Semantische Suche
+- Isabelle (Wiederholung?)
+- AFP (Wiederholung?)
+- Theoreme in der formalen Verifikation
+- Was ist ein Theorem?
+- Bedeutung in der formalen Verifikation?
+- Lexikalische Suche vs. Semantische Suche
+- Transformer-Architektur erklären
 
 
 ## Methodik
