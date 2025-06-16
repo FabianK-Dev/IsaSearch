@@ -2,19 +2,12 @@
 
 ## AI search
 - [x] Choose specific model via config
-- [ ] CPU vs. GPU: add error handling
 
 ## Benchmark
 - [x] Maybe use Freek Wiedijk's 100 Theore  ms list (Wiedijk, F.: Formalizing 100 theorems, https://www.cs.ru.nl/~freek/100/) (of which about 90 are implemented in the AFP)
 - [x] List of models to compare via config
 - [x] Response time
-- [ ] Search query: more difficulty version of Natural Language Query
-- Precision@k (e.g. k=10)
-- Recall@k
-- F1-Score
-- [x] ~~Average Precision~~
-- [x] ~~Mean Average Precision~~
-- [x] Discounted cumulative gain
+- [x] Search query: more difficulty version of Natural Language Query
 - [x] Mean Reciprocal Rank
 - [x] Normalized Discounted Cumulative Gain?
 
@@ -25,16 +18,9 @@
 - total: 1*2*3 = 5 runs
 
 ## Deployment
-- [ ] FastAPI
-- [ ] UI with React
+- [ ] Flask
+- [ ] UI with Bootstrap
 
 ## Optional
 - [x] Docker image
 - [x] ~~Pytests~~
-- [ ] Warning threshold
-- [ ] Handle bad LLM refinements or <BEGIN>false<END>
-
-# Paper
-- How to interpret the Score?
-- Average score?
-- CPU vs. GPU?
