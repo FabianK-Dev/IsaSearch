@@ -1,0 +1,62 @@
+%\usepackage[letterpaper,top=3.0cm, bottom=3.0cm, footnotesep=1.0cm]{geometry}
+\usepackage[letterpaper,margin=1in]{geometry} % e. Set margins of 1 inch (2.54 cm.) on all four sides of the paper. 
+\usepackage{mathptmx} % d. ...in a simple roman face except where indicated below (§3). 
+\usepackage[singlespacing]{setspace} % Set line spacing to 1 throughout the document
+\usepackage{fancyhdr} 
+
+% Set the headheight to at least 14.49998pt
+\setlength{\headheight}{14.49998pt}
+
+% Optionally adjust \topmargin if necessary
+% \addtolength{\topmargin}{-2.49998pt}
+\usepackage{relsize}
+
+\usepackage[bottom]{footmisc}
+\usepackage{tabularx}
+    
+\pagestyle{empty}        % No page numbers
+
+% Set paragraph indentation to 1.5cm
+\setlength{\parindent}{2em}
+
+%%%Using XeTeX (xelatex, lulatex):
+%\usepackage{polyglossia}
+%\usepackage{fontspec}
+%\usepackage{xunicode}
+%\usepackage{xltxtra}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage[english,german]{babel}
+
+\usepackage{graphicx}
+
+%\setmainfont[Mapping=tex-text]{Linux Libertine O} %Falls nicht vorhanden müssen die LinLibertine-ttf-Dateien nach C:\windows\fonts verschoben werden
+
+\usepackage{booktabs}    % For nice-looking tables
+\usepackage{natbib}      % Citation support (required for crossrefs)
+\usepackage{expex}
+\bibpunct[:]{(}{)}{;}{a}{}{,} % Defaults for in-text citations
+\usepackage{bibentry}    % Print individual references
+
+\usepackage{acronym}
+\usepackage{multicol}
+
+% TODO: set authors name
+%vorgelegt von\\
+%Name des Verfassers/der Verfasserin\\
+\author{Author's name}
+
+\usepackage{scrhack} % Recommended to avoid potential conflicts
+\usepackage{microtype}
+
+\usepackage[acronym,xindy,toc]{glossaries} % TODO: include "acronym" if glossary and acronym should be separated
+\makeglossaries
+\loadglsentries{pages/glossary.tex} % important update for glossaries, before document
+
+\usepackage{ragged2e}
+
+% Set up hyphenation rules for the language package when mistakes happen
+\babelhyphenation[english]{
+an-oth-er
+ex-am-ple
+}

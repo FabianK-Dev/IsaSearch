@@ -1,0 +1,231 @@
+\documentclass[12pt,letterpaper]{article} % a. Set paper size to Letter, 8½ x 11. 
+
+% TODO: change author's name in settings
+\input{settings}
+
+\begin{document}
+
+% TODO: decide on used language
+%\selectlanguage{english}
+\selectlanguage{german}
+
+% TODO: change thesis information
+
+\begin{center}\uppercase{Ludwig-Maximilians-Universität München}\end{center}
+\iflanguage{english}{
+\begin{center}\uppercase{Chair of Theoretical Computer Science and Theorem Proving}\end{center}
+}
+{}
+\iflanguage{german}{
+\begin{center}\uppercase{Lehr- und Forschungseinheit für Theoretische Informatik und Theorembeweisen}\end{center}
+}
+{}
+
+\vspace*{10mm}
+\begin{center}
+\includegraphics[height=40mm]{sigillum.png}
+\end{center}
+\vspace*{10mm}
+
+% TODO: decide if english or german
+
+\iflanguage{english}{
+%%%Block Englisch:
+\title{Thesis Title}
+\date{\vspace{-3ex}}
+{\let\newpage\relax\maketitle}
+\thispagestyle{empty}
+
+\begin{center}
+\begin{large}
+\begin{Large}
+Thesis type (Bachelor's Thesis / Master's Thesis, \ldots)\\
+\end{Large}
+in course type (Computer Science, Computer Science plus Mathematics, \ldots) \\
+\end{large}
+\end{center}
+\vspace{1cm}
+\begin{center}
+\begin{large}
+Supervisor: Prof. Dr. Jasmin Blanchette\\
+\end{large}
+\end{center}
+\begin{center}
+\begin{large}
+Advisor: Advisor's name\\
+\end{large}
+\end{center}
+%%%Ende Block Englisch
+}{}
+
+\iflanguage{german}{
+%%%Block Deutsch:
+\title{Titel der Arbeit}
+\date{\vspace{-5ex}}
+{\let\newpage\relax\maketitle}
+\thispagestyle{empty}
+\begin{center}
+\begin{large}
+\begin{Large}
+Thesis type (Bachelor's Thesis / Master's Thesis, \ldots)\\
+\end{Large}
+im Studiengang 'Studiengang (Informatik, Informatik plus Mathematik, \ldots)' \\
+\end{large}
+\end{center}
+\vspace{1cm}
+\begin{center}
+\begin{large}
+Betreuer: Prof. Jasmin Blanchette\\
+\end{large}
+\end{center}
+\begin{center}
+\begin{large}
+Mentor: Name des Mentors/der Mentorin\\
+\end{large}
+\end{center}
+%%%Ende Block Deutsch
+}{}
+
+\begin{center}
+\begin{large}
+\iflanguage{english}{
+Submission Date: \date{\today} \\
+}
+{}
+\iflanguage{german}{
+Ablieferungstermin: \date{\today} \\
+}
+{}
+\end{large}
+\end{center}
+
+\vspace{1,5cm}
+\input{pages/disclaimer}
+\input{pages/acknowledgements} % TODO: if you don't have anyone to thank for or don't wish to publish it, comment this line out.
+\input{pages/abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\setcounter{page}{1}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt} %obere Trennlinie
+
+\section{Introduction}
+This document serves as a template for bachelor or master theses in the 'Chair of Theoretical Computer Science and Theorem Proving' at \gls{lmu}. 
+By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage\{german\}$ the documents language is changed.
+\\ To build the main version run the command \texttt{make} in the terminal.
+\\The template follows the guidelines of the journal \emph{language} (\url{http://www.linguisticsociety.org/sites/default/files/style-sheet.pdf}).
+
+\section{Notes on form}
+\subsection{Formatting} 
+
+This LaTeX template uses the following formatting:
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+	\item font: Linux Libertine O (alternatively: Times New Roman)
+	\item font size: 12 pt
+	\item left and right margin: 3.5 cm, top and bottom margin: 3 cm
+    \item align: left
+	\item line spacing: one and a half (alternative: 15 pt line spacing with 12 pt font size)
+\end{itemize}
+
+\noindent
+When implementing the specifications in Word, it is essential to define style sheets.
+
+\subsection{Citation} 
+\label{sec:cit}
+
+The citation method follows the author-year system. Place reference is in the text, footnotes should only be used for explanations and comments. The following notes are taken from the \emph{language} bibliography template from \url{ron.artstein.org}:\newline
+
+\noindent
+The \emph{Language} style sheet makes a distinction between two kinds of in-text citations: citing a work and citing an author.
+\begin{itemize}
+\item Citing a work:
+  \begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parsep}{0pt}
+  \item Two authors are joined by an ampersand (\&).
+  \item More than two authors are abbreviated with \emph{et al.}
+  \item No parentheses are placed around the year (though parentheses
+    may contain the whole citation). 
+  \end{itemize}
+\item Citing an author:
+  \begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parsep}{0pt}
+  \item Two authors are joined by \emph{and}.
+  \item More than two authors are abbreviated with \emph{and colleagues}.
+  \item The year is surrounded by parentheses (with page numbers, if
+    present).
+  \end{itemize} 
+\end{itemize}
+To provide for both kinds of citations, \verb+language.bst+ capitalizes on the fact that \verb+natbib+ citation commands come in
+two flavors. In a typical style compatible with \verb+natbib+, ordinary commands such as \verb+\citet+ and \verb+\citep+ produce short
+citations abbreviated with \emph{et al.}, whereas starred commands such as \verb+\citet*+ and \verb+\citep*+ produce a citation with a
+full author list. Since \emph{Language} does not require citations with full authors, the style \verb+language.bst+ repurposes the starred commands to be used for citing the author. The following table shows how the \verb+natbib+ citation commands work with \verb+language.bst+.
+\begin{center}
+  \begin{tabular}{lll}
+    \toprule
+    Command & Two authors & More than two authors \\
+    \midrule
+    \verb+\citet+ & \citet{hale} & \citet{sprouse} \\
+    \verb+\citet*+ & \citet*{hale} & \citet*{sprouse} \\
+    \addlinespace
+    \verb+\citep+ & \citep{hale} & \citep{sprouse} \\
+    \verb+\citep*+ & \citep*{hale} & \citep*{sprouse} \\
+    \addlinespace
+    \verb+\citealt+ & \citealt{hale} & \citealt{sprouse} \\
+    \verb+\citealt*+ & \citealt*{hale} & \citealt*{sprouse} \\
+    \addlinespace
+    \verb+\citealp+ & \citealp{hale} & \citealp{sprouse} \\
+    \verb+\citealp*+ & \citealp*{hale} & \citealp*{sprouse} \\
+    \addlinespace
+    \verb+\citeauthor+ & \citeauthor{hale} & \citeauthor{sprouse} \\
+    \verb+\citeauthor*+ & \citeauthor*{hale} & \citeauthor*{sprouse} \\
+    \verb+\citefullauthor+ & \citefullauthor{hale} & \citefullauthor{sprouse} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+Authors of \emph{Language} articles would typically use \verb+\citet*+, \verb+\citep+, \verb+\citealt+ and \verb+\citeauthor*+, though they
+could use any of the above commands. There is no command for giving a full list of authors.
+
+\subsection{Bibliography}
+The bibliography of this template includes the references of the \emph{language} stylesheet as a sample bibliography.
+
+\pagebreak
+
+% TODO: appendix chapter
+\input{pages/appendix}
+
+\pagebreak
+
+\microtypesetup{protrusion=false}
+\listoffigures{}
+\listoftables{}
+\microtypesetup{protrusion=true}
+
+\clearpage
+\printglossaries
+
+\pagebreak
+
+\iflanguage{english}{
+\addcontentsline{toc}{section}{Bibliography}
+}
+{}
+\iflanguage{german}{
+\addcontentsline{toc}{section}{Literatur}
+}
+{}
+\pagestyle{fancy}
+
+\bibliographystyle{language-dt} %using language.bst
+\bibliography{bibliography} %bib-filename
+
+\nocite{*} %List all bib-entries
+
+\end{document}
