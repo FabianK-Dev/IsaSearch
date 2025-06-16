@@ -35,7 +35,7 @@ document_tree = build_document_tree(config, solr)
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
-# Clean up tokenizer to memory
+# Clean up tokenizer to free memory
 del tokenizer
 
 print("Loading ChromaDB embedding function...")
