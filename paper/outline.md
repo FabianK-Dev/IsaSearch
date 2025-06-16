@@ -2,7 +2,7 @@
 
 ## Einleitung
 
-### (Hintergrund und) Motivation
+### Bedeutung effizienter Theoremsuche
 - Isabelle: generischer interaktiver Theorembeweiser mit besonderem Schwerpunkt auf Higher-Order Logic
 - formale Verifizierung von Hard- und Software
 - AFP: peer-reviewte Datenbank von Beweisbibliotheken
@@ -13,18 +13,38 @@
 - Keine Ähnlichkeitserkennung oder intelligentes Ranking der Suchergebnisse
 - Schwierig für Nutzer bestehende Theoreme wider zu finden
 - Potential aktueller KI-Modelle für semantisches Retrieval zur Entwicklung einer KI-gestützte Theoremsuche
-
-### Zielsetzung
+- 
+### Problemstellung und Zielsetzung
 - Entwicklung einer KI-gestützten semantischen Theoremsuche
 - Vergleich verschiedener Konfigurationen und Suchstrategien für maximale Effektivität
 - Evaluierung mithilfe eins selbst-erstellten Benchmarks, das auf der Webseite "The Top 100 Theorems in Isabelle" von Dr. Freek Wiedijk basiert
 
-## (Hintergrund)
+### Beitrag der Arbeit
+
+### Forschungsfragen
+
+
+## Hintergrund
 - Isabelle
 - AFP
 - Theoreme in der formalen Verifikation
 - Lexikalische Suche vs. Semantische Suche
 
+
 ## Methodik
 
-## Implementierung
+### Programmaufbau
+
+### Suchstrategien
+
+### Benchmark
+
+
+## Evaluation & Diskussion
+
+
+## Fazit & Ausblick
+
+### Zusammenfassung
+
+### 
