@@ -15,7 +15,7 @@
 ## Zielsetzung
 - Ziel: Entwicklung und Evaluation einer KI-gestützten semantischen Suche nach Theoremen, Lemmas und Corollaries im AFP
 - Verwendung vortrainierter Transformer-Modelle in Form von LLM zur Textgenerierung von Theorem-Beschreibungen und Optimieren einer Suchanfrage, Bi-Encoder zur Ähnlichkeitssuche und ChromaDB zur effizienten Speicherung und Vektorsuche
-- Vergleich verschiedener Suchstrategien wie LLM-Umschreibung von Suchanfragen oder Metadatenintegration, anschließende Evaluation durch Benchmark
+- Vergleich verschiedener Suchstrategien wie LLM-Umschreibung von Suchanfragen oder Metadatenintegration, anschließende Evaluation und Analyse durch Benchmark
 - *(optional: Entwicklung der restAPI und Webseite, Docker-Container...?)*
 
 ## Forschungsfragen
