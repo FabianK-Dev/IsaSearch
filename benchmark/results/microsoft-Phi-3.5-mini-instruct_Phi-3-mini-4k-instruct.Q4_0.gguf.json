@@ -23,6 +23,17 @@
                 },
                 "query": "sqrt(2) is not rational",
                 "refined_query": "Theorem (Irrationality of Square Root):\nThe square root of any non-square natural number cannot be expressed as the ratio of two integers, thus it does not belong to the set of rational numbers.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7162905729544378,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.3
+                },
+                "query": "ratonl sqrt(2)",
+                "refined_query": "Theorem (The Irrationality of the Square Root of Two):\nThis theorem states that there is no pair of integers, p and q such that their ratio equals the square root of 2. In other words, it proves that sqrt(2) cannot be expressed as a fraction with integer values for both numerator (p) and denominator (q)."
             }
         }
     },
@@ -50,6 +61,17 @@
                 },
                 "query": "Every univariate polynomial of positive degree with complex coefficients has at least one complex root",
                 "refined_query": "Theorem (Complex Root Existence for Polynomials):\nFor any non-constant, single variable polynomial function defined over the set of complex numbers that possesses a positive leading coefficient degree, there exists at least one solution within the same domain.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.1208113026994942,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 1.7
+                },
+                "query": "uivariate Every posive polynomial complex degree least coefficients one root omplex",
+                "refined_query": "Theorem (Least Non-Zero Coefficient Root Theorem): For any positive, multidimensional polynomial with a real or complex coefficient system where the highest degree is at most 1, there exists at least one root that has non-zero coefficients in its expression."
             }
         }
     },
@@ -77,6 +99,17 @@
                 },
                 "query": "\n\nZ (the set of all integers) and Q (the set of all rational numbers) are countable",
                 "refined_query": "Theorem (Countability of Integers and Rational Numbers): \nThe sets Z, which represents the collection of all integer values, and Q, representing the group of all possible fractional or rational numbers are both capable of being listed in a sequence with each element having an associated natural number index. This implies that there exists a one-to-one correspondence between these two infinite sets and the set of positive integers N.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5378568116953066,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 1.2
+                },
+                "query": "(te Z integers) set he Q rational set numbers) countable",
+                "refined_query": "Theorem (Countability of Rational Numbers):\nThe set of all real and integer numbers within the range from negative infinity to positive infinity is a countably infinite collection, meaning that there exists an equivalent one-to-one correspondence between this set and the natural numbers.\n"
             }
         }
     },
@@ -104,6 +137,17 @@
                 },
                 "query": "The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...]",
                 "refined_query": "Theorem (Pythagorean Proposition): For any right-angled triangle, if you add up the areas of the squares built upon each leg and then compare it to the area of the square constructed on the hypotenuse side, they will be equal.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.27023815442731974,
+                    "reciprocal_rank": 0.08333333333333333,
+                    "rank": 12,
+                    "duration": 1.1
+                },
+                "query": "su The two areas legsquares area equals square hypotenuse",
+                "refined_query": "Theorem (Area of Right Triangle):\nThe combined area of the squares constructed on each side of a right-angled triangle is equal to the area of the largest square formed by its hypotenuse.\n"
             }
         }
     },
@@ -131,6 +175,17 @@
                 },
                 "query": "Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",
                 "refined_query": "Theorem (Prime Number Density):\nFor every positive real number x, the ratio of prime numbers less than or equal to x and their natural counterparts up to the logarithm of x serves as a close approximation for pi(x), which represents the count of primes not exceeding that value. "
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.4
+                },
+                "query": "pi(x) Let functn prime-counting number defined less primes equal real x, . number x log / good x pi(x) pproximaion",
+                "refined_query": "Theorem (Prime Number Density): \nFor a given positive integer x, the prime-counting function Pi(x), which represents the number of primes less than or equal to x, can be approximated using an expression involving logarithms and pi. This theorem provides a way to estimate the density of prime numbers within a specified range based on their distribution relative to natural logarithmic scales.\n"
             }
         }
     },
@@ -158,6 +213,17 @@
                 },
                 "query": "Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...]",
                 "refined_query": "Theorem (G\u00f6del's Incompleteness Theorem):\nIn any sufficiently complex mathematical framework that allows for basic number operations, there exists at least one statement or proposition which cannot be proven within the system itself due to its inherent limitations.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.14704034066641014,
+                    "reciprocal_rank": 0.058823529411764705,
+                    "rank": 17,
+                    "duration": 1.2
+                },
+                "query": "cnsistent Any systeformal within F amount certain elementary carried arithmetc incomplete",
+                "refined_query": "Theorem (Incompleteness of Elementary Arithmetic Systems): \nFor any formal system that is consistent and includes a specific set of arithmetic operations, there exists an expression or statement within the system's language which cannot be proven to either hold true or false using only those elementary rules.\n"
             }
         }
     },
@@ -185,6 +251,17 @@
                 },
                 "query": "[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",
                 "refined_query": "Theorem (G\u00f6del's Incompleteness):\nFor every logical framework that allows for basic mathematical operations to take place and remains consistent internally, there exists a statement within the system which asserts its own consistency but cannot be proven using only the rules and axioms defined in that same system.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8091518648863038,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "consistent For F stem certain within elementary amount arithmetic out, carred F consistency cannot F provd",
+                "refined_query": "Theorem (Incompleteness of Arithmetic):\nGiven any consistent system that includes basic number operations and logical reasoning, the statement \"This theory is complete,\" meaning it can prove or disprove every mathematical proposition within its scope, cannot be proven using only this foundational arithmetic framework.\n"
             }
         }
     },
@@ -212,6 +289,17 @@
                 },
                 "query": "Define q^* = (-1)^((q - 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable",
                 "refined_query": "Theorem (Quadratic Residues Congruence Relations): \nGiven a prime number q, the expression for its square root star function q* can be defined as (-1) raised to ((q - m)/2), multiplied by m. The congruency of x squared modulo p is solvable if and only if the corresponding quadratic residue's congruency with respect to prime number p, represented by q*, is also solvable when considered under a similar modular condition involving p instead of q.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.9857681710125065,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.4
+                },
+                "query": "q^* Define (-1((q = 1)/2) - q. * Then x^2 congruence p ~= mod solvable q~= x^2 mod q^* solvable p",
+                "refined_query": "Theorem (Quadratic Residues and Solutions): Given a positive integer n, if the number -1 raised to half of this value minus another given number is congruent to zero modulo q^*(n), where q^* represents an auxiliary function related to solvable quadratic residues p for x^2 modulo q^* times n equals p (modularly solved)."
             }
         }
     },
@@ -239,6 +327,17 @@
                 },
                 "query": "The angle pi/3 radians ([...] 60\u00b0) is constructible. [...] It is impossible to construct a 20\u00b0 angle. This implies that a 60\u00b0 angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",
                 "refined_query": "Theorem (Constructibility of Angles):\nThe specific measure represented by pi/3 radians or its equivalent in degrees is capable of being constructed using geometric methods. Conversely, the impossibility to construct a 20-degree angle leads to the conclusion that an exact division into three equal parts cannot be achieved for this particular degree measurement, and consequently, no arbitrary angles can have their measures trisected accurately through traditional construction techniques."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "angle The radis pi/3 60\u00b0) ( It constructible. impossible 20\u00b0 construct Tis angle. implies angle 60\u00b0 trsected, annt arbitrary thus canno angle trisected",
+                "refined_query": "Theorem (The Trichotomy of Constructibility Angles): If a given angle is represented by the ratio pi/3 and has 60 degrees as its measure, it signifies that this specific constructible angle cannot be constructed with only an arbitrary number of trisectors.\n"
             }
         }
     },
@@ -266,6 +365,17 @@
                 },
                 "query": "Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",
                 "refined_query": "Theorem (Impossibility of Constructing Cube Root with Straightedge and Compass): Given that the length required to double a unit cube, represented by x, satisfies the equation where its cubed value equals 2, it follows that this specific number cannot be constructed using only straightedge and compass methods.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.1
+                },
+                "query": "unit Doubling reqres cube line construction length segment x, = x^3 x 2, = onstructible 2^(1/3) number",
+                "refined_query": "Theorem (Cube Root Segment Construction): Given a unit-length line segment X in three dimensions that can be constructed using the doubling method and cube root technique, it represents an object with length equal to 2 raised to one third.\n"
             }
         }
     },
@@ -293,6 +403,17 @@
                 },
                 "query": "In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",
                 "refined_query": "Theorem (Spherical Volume Formula): In three-dimensional space, for any given sphere with its center at origin and having a fixed radius 'r', the volume contained within that sphere can be calculated using the formula V = 4/3 * pi * r^3."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 1.3
+                },
+                "query": "tree In volume dimeions, sphere inside = V 4/3*pi*r^3 radius r",
+                "refined_query": "Theorem (Volume Comparison of Sphere and Cylindrical Volume):\nIn a three-dimensional space where the dimensions are measured in cubic units, if there is an inscribed sphere within a cylinder with radius r, then the volume occupied by that sphere will be equal to four thirds times pi multiplied by the cube of its radius.\n"
             }
         }
     },
@@ -320,6 +441,17 @@
                 },
                 "query": "[...] area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",
                 "refined_query": "Theorem (Circumcircle Area-to-Diameter Ratio): The area of any given circle is exactly half the product of its circumference and radius. For instance, if we denote A as the area, C as the circumference, r as the radius, then mathematically expressed it can be written as: A equals one divided by two multiplied by twice pi times the square of the radius."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "hlf area times circference , radius = A 1/2 2*pi*r*r, * circle",
+                "refined_query": "Theorem (Halving the Circle Area Formula): Given a circle with radius r, if we take half of its area and multiply it by twice pi times the square of the radius, we obtain A/2 multiplied by 2*pi*(r^2).\n"
             }
         }
     },
@@ -347,6 +479,17 @@
                 },
                 "query": "[...] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",
                 "refined_query": "Theorem (Euler's Totient Conjecture):\nFor any pair of co-prime positive numbers where one number is denoted as 'a' and the other by its totient function value, their exponentiation with respect to the second number will result in a remainder equivalent to 1 when divided by the first.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.3
+                },
+                "query": "n f positive coprime^(phi(n)) integers, 1 congruent modulo n",
+                "refined_query": "Theorem (Euler's Totient Function and Coprime Integers): For a given natural number n, there are exactly phi(n) positive coprime integers that have distinct remainders when divided by n. These remainders form an arithmetic progression with 1 as the first term and modulus equal to n."
             }
         }
     },
@@ -374,6 +517,17 @@
                 },
                 "query": "[...] There are infinitely many prime numbers",
                 "refined_query": "Theorem (Euclid's Prime Infinitude):\nGiven any finite set of distinct positive integers, there will always exist a prime number not included in that set. This theorem asserts the existence of an infinite quantity of primes within the natural numbers domain.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 1.8
+                },
+                "query": "inintely There prime my numbers",
+                "refined_query": "Theorem (Prime Number Inclusion):\nFor any given set of natural numbers, if every element in the set is an infinite subset of primes, then all elements within that set are indeed prime numbers.\n"
             }
         }
     },
@@ -401,6 +555,17 @@
                 },
                 "query": "[...] The parallel postulate is independent of other axioms of Euclidean geometry",
                 "refined_query": "Theorem (Independence of the Parallel Postulate):\nThe unique characteristic that determines whether a line segment has exactly one parallel through a given point not on the same line, is independent and cannot be derived from or deduced using other fundamental principles in Euclidean geometry.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.1
+                },
+                "query": "pralel The independenpostulate Euclidean axioms geometry",
+                "refined_query": "Theorem (The Fundamental Axiom of Non-Circular Geometry):\nThis theorem establishes the foundational principles that govern a geometric system where no shapes are circular, and it builds upon Euclid's original set of axioms.\n"
             }
         }
     },
@@ -428,6 +593,17 @@
                 },
                 "query": "Any convex polyhedron's surface has Euler characteristic X = V - E + F = 2",
                 "refined_query": "Theorem (Euler's Polyhedral Formula):\nFor any three-dimensional geometric shape with flat faces, known as a convex polyhedron, the relationship between its vertices (V), edges (E), and faces (F) is given by Euler's characteristic formula which states that V - E + F equals 2.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.5
+                },
+                "query": "convex Any surfaceolyhedron's characteristic Euler = X V E - F + = 2",
+                "refined_query": "Theorem (Euler Characteristic of Convex Polyhedra):\nFor any convex polyhedron, the sum of its vertices minus twice the number of edges plus two is equal to a constant value.\n"
             }
         }
     },
@@ -455,6 +631,17 @@
                 },
                 "query": "[...] the precise summation of the reciprocals of the squares of the natural numbers [...] is [...] pi^2 / 6",
                 "refined_query": "Theorem (Basel Problem): The exact sum of inverses of squared natural numbers equals to Pi multiplied by one-sixth.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2890706505174035,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.9
+                },
+                "query": "umation precise squas reciprocals numbers natural / pi^2 6",
+                "refined_query": "Theorem (Reciprocity of Pythagoremian Numbers): For any two positive integers a and b, if the square root of their product equals to an integer c, then either both numbers are perfect squares or neither is. In this case where one number's reciprocal squared plus another yields \u03c0^2/6 when multiplied by itself.</END>\n\ntheorem pythagorean_recip:\n  assumes \"a and b\" such that \"(sqrt(ab)) = c\", with conditions on a, b being perfect squares or not.\n  shows \"((1/(sqrt(a))) + (1/sqrt(b))) * sqrt(a*b) = pi^2 / 6\"."
             }
         }
     },
@@ -482,6 +669,17 @@
                 },
                 "query": "[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other",
                 "refined_query": "Theorem (Differentiation and Integration Inverse Relationship): \nThe process of finding the derivative, which involves calculating rates of change for functions at specific points, can be reversed through integration. This reverse operation reconstructs a function from its rate of changes over an interval, demonstrating that differentiation and integration are inverse processes in calculus."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.13463441081950858,
+                    "reciprocal_rank": 0.05,
+                    "rank": 20,
+                    "duration": 1.7
+                },
+                "query": "fncion differentiatinfunction integrating inverses thought",
+                "refined_query": "Theorem (Inverse Function Differentiation): Given two functions, if one function is the inverse of another and they are differentiable at a certain point x, then their derivatives will be reciprocally related. That means when you take the derivative of an inverted function with respect to its original counterpart's input variable.</END>\n\ntheorem inv_diff:\n  assumes \"F(x) is inverse of G(y)\" and \"Both F'(a) and (1/G')(b) exist\"\n  shows \"(dF/dx)(a) = 1 / ((dG/dy)(b))\""
             }
         }
     },
@@ -509,6 +707,17 @@
                 },
                 "query": "for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin nx",
                 "refined_query": "Theorem (De Moivre's Theorem): For every complex number in the form of a*e^(i\u03b8), where 'a' is any real number and \u03b8 represents an angle, raising this expression to the power of n results in another complex number with magnitude equal to |a|^n * e^(in\u03b8) and argument equivalent to n\u03b8.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.17503974711964884,
+                    "reciprocal_rank": 0.09090909090909091,
+                    "rank": 11,
+                    "duration": 1.4
+                },
+                "query": "number real integ x (cos n + x sin = x)^n nx cos + nx sin",
+                "refined_query": "Theorem (Taylor Series Expansion for Cosine Function):\nFor any real number x, the expression involving powers of a variable and trigonometric functions can be represented as an infinite series where each term is derived from derivatives evaluated at zero. This theorem provides that cos(nx) + nx sin(n)/n^2 equals to its corresponding Taylor Series expansion around 0 for all natural numbers n.\n"
             }
         }
     },
@@ -536,6 +745,17 @@
                 },
                 "query": "irrational but does not have this property, so it cannot be algebraic and must be transcendental",
                 "refined_query": "Theorem (Transcendence of Non-Algebraic Irrational Numbers): If a number is irrational yet lacks the specified mathematical characteristic that defines an algebraic entity, it cannot belong to the set of algebraically defined numbers and must instead be classified as transcendental.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8769608757318292,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.4
+                },
+                "query": "poprty, irrational albraic cannot transcendental must",
+                "refined_query": "Theorem (Transcendence of Irrational Algebraic Numbers): \nAn algebraic number that is not rational will always be a transcendental number.\n"
             }
         }
     },
@@ -563,6 +783,17 @@
                 },
                 "query": "every nonnegative integer can be represented as a sum of four non-negative integer squares",
                 "refined_query": "Theorem (Four Squares Theorem):\nFor any given natural number, there exists an expression that represents it as the sum of four perfect square numbers. This theorem guarantees that every nonnegative integer can be uniquely represented in this manner using only positive integers and squares.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.1
+                },
+                "query": "onegative every reprented integer four sum integer non-negative squares",
+                "refined_query": "Theorem (Non-Negativity of Summation): For any set representing integers, the summation of a subset consisting only of non-negative square numbers will result in an outcome that is also non-negative.\n"
             }
         }
     },
@@ -590,6 +821,17 @@
                 },
                 "query": "[...] contains no factor p^k, where prime p =* 3 (mod 4) and k is odd",
                 "refined_query": "Theorem (Fermat's Little Theorem for Primes of the Form 4n+1):\nFor any integer a that does not have an even power factorization involving prime number p, where p satisfies the condition being congruent to 3 modulo 4 and k is odd, then raising a to the power of (p-1) will result in a remainder equal to a when divided by p.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.2
+                },
+                "query": "fctor contains primp^k, =* p (mod 3 4) odd k",
+                "refined_query": "Theorem (Modular Congruence of Prime Powers):\nFor any prime number p and a positive integer k that is an odd multiple of the exponent in the power, if f(p^k) belongs to set P modulo 3/4 congruent.\n"
             }
         }
     },
@@ -617,6 +859,17 @@
                 },
                 "query": "[...] line integral around a simple closed curve C to a double integral over the plane region D [...] bounded by C",
                 "refined_query": "Theorem (Green's Theorem):\nFor any smooth, positively oriented boundary of a simply connected and non-self intersecting area in two dimensions, the line integral around that curve is equal to twice the double integral over the plane region bounded by it.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.04554620161172903,
+                    "reciprocal_rank": 0.010101010101010102,
+                    "rank": 99,
+                    "duration": 1.3
+                },
+                "query": "ntegral line simplaround curve closed double C integral region plane boundedD C",
+                "refined_query": "Theorem (Fundamental Theorem of Calculus):\nFor any continuous function f(x) on a closed interval [a, b], the definite integral from a to b is equal to the difference between its antiderivative evaluated at b and a. This theorem establishes a connection between differentiation and integration within bounded regions in the Cartesian plane."
             }
         }
     },
@@ -644,6 +897,17 @@
                 },
                 "query": "[...] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers [...]",
                 "refined_query": "Theorem (Hilbert's Infinite Set Theorem):\nThis theorem states that there exist certain uncountable, or infinitely large sets which cannot be matched one to one with the countably infinite set known as natural numbers. These unique sets are often referred to as \"uncountable\" due to their larger cardinality compared to the infinity of natural numbers. "
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.22864677860547536,
+                    "reciprocal_rank": 0.125,
+                    "rank": 8,
+                    "duration": 2.0
+                },
+                "query": "ses infinite put cant correspondence one-to-one set infinite natural numbers",
+                "refined_query": "Theorem (Continuum Hypothesis for Infinite Sets): There exists no bijective function between the set of all real numbers and the set of positive integers, given that both sets are considered to be infinitely countable.\n"
             }
         }
     },
@@ -671,6 +935,17 @@
                 },
                 "query": "[...] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0",
                 "refined_query": "Theorem (Euclidean Triplet Construction): Given any two positive integers where the first is greater than the second, there exists a Pythagorean triple that can be derived from these values using an arithmetic progression.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.1
+                },
+                "query": "ormula fundamentalythagorean generating given triples pair arbitrary integer > n > n 0",
+                "refined_query": "Theorem (Fundamental Theorem of Thales):\nFor any positive integer greater than zero, there exists a Pythagorein triplet consisting of three integers whose squares sum up to the square of an arbitrary larger integer.\n"
             }
         }
     },
@@ -698,6 +973,17 @@
                 },
                 "query": "There is no set whose cardinality is strictly between that of the integers and the real numbers",
                 "refined_query": "Theorem (Continuum Hypothesis): There exists no mathematical entity with a size or quantity greater than countable infinity, yet lesser than uncountable infinity. This theorem asserts that there is an absence of any set whose cardinality lies between the integers and real numbers in terms of their infinite sizes."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 2.6
+                },
+                "query": "etThere cardinality ose integers strictly numbers real",
+                "refined_query": "Theorem (Dedekind's Cut Distinction): The set of all rational numbers is countably infinite, while the set of irrational numbers between any two distinct rational points on a number line has an uncountable cardinality. This theorem establishes that there are strictly more real numbers than integers and rational numbers combined."
             }
         }
     },
@@ -725,6 +1011,17 @@
                 },
                 "query": "there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A \u2192 B",
                 "refined_query": "Theorem (Injection to Bijectivity): If two distinct injection mappings exist from set A to set B and vice versa, it guarantees the existence of an inverse bijection between sets A and B.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2559580248098155,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 2.4
+                },
+                "query": "injective exist: functions -> A g: B B A -> A sets B, bijective exists h:function \u2192 A B",
+                "refined_query": "Theorem (Inverses of Injectivity and Bijectiveness): \nFor any set A with a subset function f mapping from another set B to A, if there is an injective function g that maps elements in the domain back into B, then it implies the existence of a bijective inverse h. This means for every element b in B, its corresponding image under g can be uniquely traced back through h to find the original value from subset A."
             }
         }
     },
@@ -752,6 +1049,17 @@
                 },
                 "query": "pi [...] as an alternating series",
                 "refined_query": "Theorem (Alternate Series Representation of Pi):\nPi can be expressed as the sum of an infinite, converging sequence where each term is calculated by subtracting twice its preceding odd factorial from thrice the previous even factorial. This series alternates between positive and negative terms in a specific pattern that converges to pi.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.1
+                },
+                "query": "altrnting pi series",
+                "refined_query": "Theorem (Alternating Series Expansion):\nThis theorem describes an infinite sequence of numbers where each term alternates in sign, and the absolute values decrease monotonically. The sum of this sequence converges to a specific value as more terms are added.\n"
             }
         }
     },
@@ -779,6 +1087,17 @@
                 },
                 "query": "[...] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees",
                 "refined_query": "Theorem (Triangle Angle Sum Property): In any flat, two-dimensional geometric plane following Euclid's principles, if you add up the interior angles of a triangle, their total measure will consistently equal 180 degrees.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.6
+                },
+                "query": "mesures sum angles ierior Euclidean triangle always space 180 degrees",
+                "refined_query": "Theorem (Euclid's Exterior Angle Theorem): In any given plane, the measure of an exterior angle in a triangle is equal to or greater than 180 degrees. This theorem stems from Euclidean geometry and highlights that for every interior angle i of a triangle with vertices A(i), B((i+1) modulo n + 1), and C((i+2) modulo n + 1), the sum of angles at vertex B and C is always greater than or equal to the measure of angle i.\n"
             }
         }
     },
@@ -798,7 +1117,7 @@
                     "normalized_discounted_cumulative_gain": 0.054793185501041654,
                     "reciprocal_rank": 0.013888888888888888,
                     "rank": 72,
-                    "duration": 1.3
+                    "duration": 1.2
                 },
                 "query": "Ramsey's Theorem",
                 "refined_query": "Theorem (Generalized Ramsey Property): Given any positive integer k, there exists at least one coloring of the edges between all possible pairs in a complete graph with n vertices such that no matter how you partition these vertices into two non-empty sets based on their colors, either set will contain exactly k elements forming an independent subgraph.\n"
@@ -813,6 +1132,17 @@
                 },
                 "query": "how big must some structure be to guarantee that a particular property holds?",
                 "refined_query": "Theorem (Minimum Size for Property Satisfaction):\nThis theorem determines the smallest size or threshold of an object, set, or system required in order to ensure that it possesses and satisfies a specific given characteristic.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.2
+                },
+                "query": "mstbig guarantee struure property particular holds?",
+                "refined_query": "Theorem (Minimum Spanning Tree Big-M Method Guarantee): Given any graph with weighted edges, if the MST algorithm is applied using a big-M method and certain structural properties are met by particular vertices or subsets of the graph, then these specific conditions will be satisfied within the resulting minimum spanning tree.\n"
             }
         }
     },
@@ -840,6 +1170,17 @@
                 },
                 "query": "the infinite series formed by summing all positive unit fractions",
                 "refined_query": "Theorem (Leibniz's Series):\nThe mathematical expression that represents the sum of an infinitely long sequence, where each term is a fraction with 1 as its numerator and consecutive natural numbers starting from 2 up to infinity in denominators. This series converges to the value known as pi divided by two or half-pi.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6510995809325253,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "sris infinite summingormed unit positive fractions",
+                "refined_query": "Theorem (Harmonic Series Divergence):\nGiven an infinite series of the reciprocal values of natural numbers, where each term is a fraction with its numerator as 1 and denominator equal to that number itself, this theorem states that such a sum will grow without bound or diverge.\n"
             }
         }
     },
@@ -867,6 +1208,17 @@
                 },
                 "query": "infinite sum of terms that are expressed in terms of the function's derivatives at a single point",
                 "refined_query": "Theorem (Infinite Series Representation):\nFor any given mathematical expression, if it is possible to represent an infinite series as the summation of its derivative values evaluated at a specific point.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.06105946170456531,
+                    "reciprocal_rank": 0.021739130434782608,
+                    "rank": 46,
+                    "duration": 1.1
+                },
+                "query": "uminfinite expressederms function's terms single derivatives point",
+                "refined_query": "Theorem (Unique Derivative Point of Infinite Term Function):\nFor an infinite term expression, there exists a specific value at which the derivative is uniquely determined by considering all possible infinitesimal changes in each individual term.\n"
             }
         }
     },
@@ -894,6 +1246,17 @@
                 },
                 "query": "for any continuous function f [...] there is a point x_0 such that f(x_0) = x_0",
                 "refined_query": "Theorem (Fixed Point for Continuous Functions):\nFor every real-valued, continuously varying mathematical relationship or function, there exists at least one specific point within its domain where the value of that particular input is equal to itself.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.2
+                },
+                "query": "untion continuous pot f f(x_0) x_0 x_0 =",
+                "refined_query": "Theorem (Continuity of Piecewise Functions):\nFor any function that is defined piece-by-piece, if the value at a specific point within its domain matches with the corresponding output for another specified input and position in the domain, then this property holds true across all points in their respective domains.\n"
             }
         }
     },
@@ -921,6 +1284,17 @@
                 },
                 "query": "If all of the coefficients a, b, c, and d of the cubic equation are real numbers, then it has at least one real root [...]",
                 "refined_query": "Theorem (Real Root Existence for Real Coefficients Cubic Equation): \nIf an nth degree polynomial with all its coefficients being real values is given in the form ax^3 + bx^2 + cx + d = 0, then it guarantees at least one solution that yields a real number when substituted into the equation. "
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.637572219370887,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.6
+                },
+                "query": "oefficients If b,  cubic c, real equation numbers, one least root real",
+                "refined_query": "Theorem (Cubic Polynomial Root Theorem): Given coefficients of a cubic polynomial with real roots and an integer order n, there exists at least one positive real number that is the smallest among all these roots."
             }
         }
     },
@@ -948,6 +1322,17 @@
                 },
                 "query": "the arithmetic mean of a list of non-negative real numbers is greater than or equal to the geometric mean of the same list",
                 "refined_query": "Theorem (Inequality between Arithmetic and Geometric Mean):\nFor any collection of non-negative real values, their arithmetic average will always be at least as large as their geometric mean.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 2.0
+                },
+                "query": "man arithmetic non-gative list numbers real equal greater geometric list mean",
+                "refined_query": "Theorem (Ordering and Mean of Non-negative Real Numbers):\nGiven any set of non-negative real numbers, the theorem states that there exists a well-defined order among them. Furthermore, it establishes an equality relation for comparing their magnitudes using greater than or equal to conditions, as well as defines how to calculate the mean value based on this ordered list. "
             }
         }
     },
@@ -975,6 +1360,17 @@
                 },
                 "query": "as long as n is not a perfect square, [x^2 - ny^2 = 1] has infinitely many distinct integer solutions",
                 "refined_query": "Theorem (Dirichlet's Unit Theorem for Non-Square Integers):\nFor any non-square natural number n, the equation x\u00b2 - ny\u00b2, where y is an arbitrary natural number and 1 does not equal to zero times y\u00b2, will have infinitely many unique integer solutions.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.31546487678572877,
+                    "reciprocal_rank": 0.125,
+                    "rank": 8,
+                    "duration": 1.2
+                },
+                "query": " long square, perft - x^2 = ny^2 1 many infinitely integer distinct solution",
+                "refined_query": "Theorem (Infinite Solutions for Quadratic Diophantine Equations): Given a quadratic equation of the form ax\u00b2 + bx + c, where coefficients are integers and there exists an infinite number of pairs of distinct integer solutions (m, n) that satisfy this equation.\n"
             }
         }
     },
@@ -1002,6 +1398,17 @@
                 },
                 "query": "every convex set in R^n which is symmetric to the origin and has volume greater than 2^n contains a non-zero integer point",
                 "refined_query": "Theorem (Brouwer's Fixed Point for Convex Symmetric Sets):\nFor any convex set in n-dimensional space that is symmetric about the origin and has volume greater than 2^n, there exists at least one nonzero integer point within it.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 1.2
+                },
+                "query": "onvex every R^n seorigin symmetric greater volume 2^n non-zero contains poin integer",
+                "refined_query": "Theorem (Poincar\u00e9 Inequality for Symmetric Positive Definite Matrices): For any real n-dimensional space, if a matrix is positive definite and symmetric with volume greater than 2^n times the norm of its origin vector minus one, then there exists an integer point within this set.\n"
             }
         }
     },
@@ -1036,6 +1443,17 @@
                 },
                 "query": "nth number is the number of dots in the triangular arrangement with n dots on each side",
                 "refined_query": "Theorem (Triangle Number Formula):\nFor any positive integer n, representing a triangle's position where there are exactly n dots along one side and equal number of dots in the adjacent sides forming an equilateral triangular arrangement. The total count of these arranged dot patterns is given by the formula for calculating the nth Triangle Number.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7368577470280463,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.3
+                },
+                "query": "umer nth dots numberrrangement triangular dots n side",
+                "refined_query": "Theorem (Dyck's Theorem on Staircase Shapes):\nFor any positive integer n, there exists a staircase shape with exactly n dots arranged in such a way that the number of upward and downward steps is equal. This represents an alternative visual representation for counting permutations using triangular arrangements.\n"
             }
         }
     },
@@ -1063,6 +1481,17 @@
                 },
                 "query": "The binomial coefficient binom(n, k) appears as the kth entry in the nth row of Pascal's triangle",
                 "refined_query": "Theorem (Positioning Binomial Coefficient within Pascal's Triangle): The mathematical expression for choosing 'k' elements from a set of 'n' items, denoted as binom(n, k), corresponds to the specific element located at position 'k' in the nth row when constructing Pascal's triangle.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4367467095119258,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 1.3
+                },
+                "query": "bnomial The binom(ncoefficient appears k) entry kth nth Pascal's row triangle",
+                "refined_query": "Theorem (The Binomial Coefficient Formula): \nFor any non-negative integers n and k, the number of ways to choose k elements from a set of n distinct items is given by the binomial coefficient formula. This value corresponds to the entry in the nth row and kth position of Pascal's triangle.\n"
             }
         }
     },
@@ -1090,6 +1519,17 @@
                 },
                 "query": "number of possible partitions of a non-negative integer n",
                 "refined_query": "Theorem (Partition Counting Principle): The total number of distinct ways to partition an arbitrary non-negative whole number, denoted as 'n', into smaller positive integers is given by the specific formula or expression that calculates this count."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.934771911403949,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.1
+                },
+                "query": "pssble number non-negive partitions n integer",
+                "refined_query": "Theorem (Generalized Partition Theorem): For any positive whole number, there exists an infinite set of unique combinations that sum up to the given value without considering order. These sets are known as partitioned non-negative integers for a specific integer n."
             }
         }
     },
@@ -1117,6 +1557,17 @@
                 },
                 "query": "highest order polynomial equation that can be solved by radicals in the general case",
                 "refined_query": "Theorem (Abel-Ruffini Theorem): In algebra, there exists no single formula using only arithmetic operations and root extraction to solve all possible quintic equations with rational coefficients. This theorem highlights that the general solution of polynomial equations higher than fourth degree cannot be expressed in terms of radicals alone."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.19823986317056053,
+                    "reciprocal_rank": 0.03125,
+                    "rank": 32,
+                    "duration": 1.8
+                },
+                "query": "rdr highest equationolynomial radicals solved case general",
+                "refined_query": "Theorem (Generalized Solution for Radical Equations):\nThis theorem provides an approach to solve equations involving higher-degree polynomial expressions with roots and their corresponding radical solutions in a generalized manner.\n"
             }
         }
     },
@@ -1144,6 +1595,17 @@
                 },
                 "query": "the limit as n -> \\inf of the distribution of (\\bar{X}_n - \\mu) * sqrt(n) is a normal distribution with mean 0 and variance \\sigma^2",
                 "refined_query": "Theorem (Central Limit Theorem for Sample Means):\nThe average of an increasing number of independent, identically distributed random variables, each subtracted by their common mean, will converge to a normal distribution with zero as the expected value and variance equal to that of the original variable.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.4
+                },
+                "query": "n limit \\inf -> (ar{X}_n distribution \\mu) - * normal sqrt(n) mean distribuion 0 \\sigma^2 variance",
+                "refined_query": "Theorem (Limit of Normal Distribution's Mean as n Approaches Infinity):\nFor a given random variable X with its probability distribution function, denoted by P(X), the difference between the mean and standard deviation multiplied by the square root of natural number n approaches zero when considering the limit as n tends towards infinity. This indicates that the normalized variance converges to 0 in this scenario."
             }
         }
     },
@@ -1171,6 +1633,17 @@
                 },
                 "query": "for any two positive coprime integers a and d, there are [...] infinitely many primes that are congruent to a mod d",
                 "refined_query": "Theorem (Dirichlet's Congruence Theorem for Primes): For every pair of distinct natural numbers greater than zero which have no common divisor other than 1, there exists an infinite number of prime integers that are congruent to a modulo d.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.7
+                },
+                "query": "poitive two integersoprime infinitely d, primes many congruent mod",
+                "refined_query": "Theorem (Infinitely Many Distinct Primes): There are an infinite number of pairs of positive prime numbers that have a difference greater than one.\n"
             }
         }
     },
@@ -1198,6 +1671,17 @@
                 },
                 "query": "every square matrix over a commutative ring satisfies its own characteristic equation",
                 "refined_query": "Theorem (Matrix Characteristic Equation Identity):\nFor any given square matrix A, if the elements of this matrix belong to a commutative ring and it holds that substituting each element into their respective polynomial equations derived from its characteristic equation results in zeroes on both sides for all rows and columns within the matrix itself.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.20184908658209985,
+                    "reciprocal_rank": 0.03333333333333333,
+                    "rank": 30,
+                    "duration": 1.6
+                },
+                "query": "qure every commutati matrix satisfies ring equation characteristic",
+                "refined_query": "Theorem (Matrix Commutativity and Characteristic Equation):\nFor any square matrix, if it commutes with another given matrix under multiplication operation, then the resulting product of matrices will satisfy a specific linear algebraic relation known as the characteristic equation.\n"
             }
         }
     },
@@ -1225,6 +1709,17 @@
                 },
                 "query": "[...] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",
                 "refined_query": "Theorem (Fermat's Little Theorem): For every natural number greater than one, the factorial of its predecessor plus one will always be a multiple of that number.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.1
+                },
+                "query": "n integer 1 > numb prime , iff (n 1)! - 1 + divisible n",
+                "refined_query": "Theorem (Wilson's Theorem for Prime Numbers):\nFor any natural number greater than one, it is a prime number if and only if the factorial of that number minus one divided by itself plus one results in an integer.\n"
             }
         }
     },
@@ -1252,6 +1747,17 @@
                 },
                 "query": "If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",
                 "refined_query": "Theorem (Finite Set Subset Count): For any given finite set that contains exactly n elements, there are a total count of distinct subset combinations equal to two raised by the power of n.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.2
+                },
+                "query": "SIf set finite = |Snumber n, subsets 2^n S",
+                "refined_query": "Theorem (Fundamental Counting Principle): If there is a one-to-one correspondence between the elements of two sets A and B with sizes equal to '|Snumber n', then for every subset X from set 2^n, its size will be less than or equal to |A|.\n"
             }
         }
     },
@@ -1279,6 +1785,17 @@
                 },
                 "query": "The best-known [numbers that are not algebraic] are pi and e",
                 "refined_query": "Theorem (Non-Algebraic Transcendental Numbers): The most well-recognized numbers, which do not belong to the set of algebraically solvable quantities, include \u03c0 (pi) and e.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2559580248098155,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 1.3
+                },
+                "query": "bstknown The algebrainumbers e pi",
+                "refined_query": "Theorem (Euler's Identity in Algebra):\nThis theorem establishes the relationship between five fundamental mathematical constants, namely 0, 1, i (the imaginary unit), e (base of natural logarithms), and pi. It states that their product equals -1 when expressed as a complex number: e^(i*pi) + 1 = 0.\n"
             }
         }
     },
@@ -1306,6 +1823,17 @@
                 },
                 "query": "[...] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",
                 "refined_query": "Theorem (Odd Degree Vertex Condition for Undirected Graphs): In an undirected graph where either zero or two vertices have odd degrees, and all other non-zero degree vertices are part of a single connected component.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.09874831019439155,
+                    "reciprocal_rank": 0.018867924528301886,
+                    "rank": 53,
+                    "duration": 1.2
+                },
+                "query": "graph undirected zo exactly vertices two degree, odd vertices degree nonzerosingle belong connected componnt",
+                "refined_query": "Theorem (Strong Connectivity in Undirected Graphs with Exactly Two Degrees): In an undirected graph where all vertices have a degree of two, except for odd-degree vertices which do not possess single connections, the resulting structure is strongly connected.\n"
             }
         }
     },
@@ -1333,6 +1861,17 @@
                 },
                 "query": "products of the lengths of the line segments on each chord are equal",
                 "refined_query": "Theorem (Intersecting Chords Product Property): For any two intersecting chords in a circle, the product of their respective segment lengths is constant and remains unchanged regardless of which points along the chords serve as endpoints for measurement.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.7
+                },
+                "query": "lnghs products segmen line equal chord",
+                "refined_query": "Theorem (Chords Equal Length in Intersecting Line Segments): Given two intersecting segments, the product of their lengths is equivalent to that of any corresponding chords connecting them."
             }
         }
     },
@@ -1360,6 +1899,17 @@
                 },
                 "query": "[...] the extension field Q(e^\\alpha_1, ..., e^\\alpha_n) has transcendence degree n over Q",
                 "refined_query": "Theorem (Transcendence Degree of Extension Fields): \nFor a given set of algebraic numbers {e^\u03b11, ..., e^\u03b1n}, the extension field formed by adding these elements to the rational number system Q has transcendence degree equal to n over Q. "
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5706417189553201,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 1.3
+                },
+                "query": "ied extension ..., Q^\\alpha_1, transcendence e^\\alpha_n) n degree Q",
+                "refined_query": "Theorem (Transfinite Degree of Algebraic Extensions): If an algebraic field extension is constructed by iteratively applying the Ikedle-Edwards operation, starting from a base element and using transcendental numbers as exponents up to degree n over Q, then it results in a structure with increasing complexity.\n"
             }
         }
     },
@@ -1387,6 +1937,17 @@
                 },
                 "query": "the area of a triangle in terms of the three side lengths a, b, c",
                 "refined_query": "Theorem (Heron's Formula for Triangle Area):\nGiven any non-degenerate triangle with sides measuring length 'a', 'b', and 'c', there exists an expression that calculates the area of this triangle using these three side lengths. This formula does not involve angles or altitude, but solely relies on the relationship between the given side lengths to determine the area.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.4
+                },
+                "query": "ringle area three tes lengths side b, a, c",
+                "refined_query": "Theorem (Triangle Inequality for Area and Sides):\nGiven any triangle with sides of length 'b', 'a', and 'c', the sum of the lengths of any two sides must be greater than the third side, ensuring a valid geometric shape. Additionally, this theorem implies that the area can also be determined using Heron's formula based on these three given side lengths."
             }
         }
     },
@@ -1414,6 +1975,17 @@
                 },
                 "query": "a k-combination of a set S is a subset of k distinct elements of S",
                 "refined_query": "Theorem (Definition of K-Combinations): A selection from the given collection, consisting of exactly k unique items chosen without repetition and in no particular order, represents an example of a k-combination within that set.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.1
+                },
+                "query": "etk-combination subs S distinct k S elements",
+                "refined_query": "Theorem (Distinct Elements in Euclidean Combinations):\nGiven any set of natural numbers, if we have an euklidian combination that includes a subset with exactly 'k' unique elements from the original set, then these k distinct elements are part of S.\n"
             }
         }
     },
@@ -1441,6 +2013,17 @@
                 },
                 "query": "average of the results obtained from a large number of independent random samples converges to the true value",
                 "refined_query": "Theorem (Central Limit Theorem for Sample Means):\nWhen taking an extensive collection of unrelated and independently generated sample measurements, their average will approach the actual mean as more data points are included.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8212377705398237,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "rsults average largobtained independent number samples random converges valuetrue",
+                "refined_query": "Theorem (Convergence of Random Samples to Mean): Given multiple, independently chosen large sample sizes from a population with an unknown distribution that are randomly selected and have the property of averaging out values over time, these samples will converge towards the true mean value.\n"
             }
         }
     },
@@ -1468,6 +2051,17 @@
                 },
                 "query": "Let a and b be integers with greatest common divisor d. Then there exist integers x and y such that ax + by = d",
                 "refined_query": "Theorem (Congruence Relations for Greatest Common Divisors):\nGiven any two integers a and b, if their greatest common divisor is known to be d, then there exist specific integer values x and y that satisfy the linear combination ax + by = d.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16666666666666666,
+                    "reciprocal_rank": 0.015873015873015872,
+                    "rank": 63,
+                    "duration": 1.1
+                },
+                "query": " Let greatest inters divisor common Then d. exist x integers + ax =",
+                "refined_query": "Theorem (Euclidean Algorithm for Greatest Common Divisor):\nGiven two positive integers, there exists a pair of non-negative integer values such that their greatest common divisor can be expressed as the remainder when one number is divided by another.\n"
             }
         }
     },
@@ -1495,6 +2089,17 @@
                 },
                 "query": "[...] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",
                 "refined_query": "Theorem (Centroid Construction in Triangle): Given any triangle with vertices labeled as ABC and midpoints on its opposing sides DEF. If lines are drawn from each vertex A, B, C to a common point O that intersects the opposite side at points D, E, F respectively, then this configuration establishes the centroid of the triangle.</END>\n\ntheorem tri_centroid:\n  assumes \"Triangle ABC with midpoints DEF\" and \"Lines from vertices AO, BO, CO to meet sides AD, BE, CF at D, E, F\"\n  shows \"Point O is the Centroid of Triangle ABC.\""
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.47996604708948526,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 1.6
+                },
+                "query": "ABC, triangle lis let BO, AO, drawn CO vertices point common meet O opposie D, sides F E,",
+                "refined_query": "Theorem (Common Meeting Point of Triangle's Vertices): Given a triangle ABC with the line segments BO, AO and CO intersecting at their common vertex O. The opposite vertices B and D are connected by segment FE."
             }
         }
     },
@@ -1529,6 +2134,17 @@
                 },
                 "query": "evaluating limits of indeterminate forms using derivatives",
                 "refined_query": "Theorem (L'H\u00f4pital's Rule for Indefinite Limits):\nWhen attempting to evaluate the limit of a function that results in an indeterminate form, such as 0/0 or infinity/infinity, one can apply derivatives to both numerator and denominator functions. By differentiating these components with respect to their independent variable(s), it is possible to resolve the original indeterminate limit into a determinate value using standard limits rules for simpler expressions involving ratios of differences in function values.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.31546487678572877,
+                    "reciprocal_rank": 0.125,
+                    "rank": 8,
+                    "duration": 1.3
+                },
+                "query": "lmis evaluating formsndeterminate derivatives using",
+                "refined_query": "Theorem (L'H\u00f4pital's Rule for Indeterminate Forms):\nWhen faced with an indeterminate form of the type 0/0 or infinity/infinity during differentiation, L'H\u00f4pital's rule can be applied to evaluate the limit by taking derivatives of both numerator and denominator functions.\n"
             }
         }
     },
@@ -1556,6 +2172,17 @@
                 },
                 "query": "triangle that has two sides of equal length and two angles of equal measure",
                 "refined_query": "Theorem (Isosceles Right Triangle): A triangle is defined as an Isosceles Right Triangle if it possesses a characteristic wherein its base and height are congruent in length, while the two non-right angles maintain equal measures.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 1.2
+                },
+                "query": "wotriangle equal sid two length equal angles measure",
+                "refined_query": "Theorem (Isosceles Triangle Angle-Side Relationship):\nFor any triangle, if it has a base side of the same length as another non-base side and both sides are not parallel to each other, then all three angles opposite those two equal sides will also be congruent.\n"
             }
         }
     },
@@ -1583,6 +2210,17 @@
                 },
                 "query": "When summing infinitely many terms, the [series in question] can either be convergent or divergent",
                 "refined_query": "Theorem (Convergence and Divergence of Infinite Series): \nThis theorem states that when adding an infinite number of elements together to form a series, the resultant sum will either approach a finite value or increase without bound. The outcome is determined by whether the terms in the series tend towards zero as they progress infinitely."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7263750653228215,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.2
+                },
+                "query": "suming When many infitely series terms, either question convergent divergent",
+                "refined_query": "Theorem (Convergence and Divergence of Infinite Series):\nFor an infinite sequence or sum where each term is defined by a specific property, the overall value will be considered to have limits if it approaches a finite number as more terms are added. Conversely, if adding additional terms causes the total not to approach any limiting value, then the series can be classified as divergent."
             }
         }
     },
@@ -1610,6 +2248,17 @@
                 },
                 "query": "The best-known [numbers that are not algebraic] are [e and] pi",
                 "refined_query": "Theorem (Non-Algebraic Transcendental Numbers): The most recognized examples of numbers that cannot be expressed as roots of polynomial equations with rational coefficients include the mathematical constants euler's number, denoted by 'e', and pi. \n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6208433896450612,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 2.3
+                },
+                "query": "bstknown The algebrainumbers pi e",
+                "refined_query": "Theorem (Transcendental Numbers and Pi):\nThis theorem refers to the unique set of numbers that are not solutions to any non-zero polynomial equation with rational coefficients, which includes famous constants such as \u03c0.\n"
             }
         }
     },
@@ -1637,6 +2286,17 @@
                 },
                 "query": "taking the number n of terms being added [...], multiplying by the sum of the first and last number in the progression [...], and dividing by 2",
                 "refined_query": "Theorem (Halley's Rule for Arithmetic Progressions):\nGiven an arithmetic sequence with n terms, where each term is obtained from adding a constant difference to the previous one, if we multiply this sum by the first and last numbers in that progression and then divide it all by 2, we obtain the average of those two boundary values.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2,
+                    "reciprocal_rank": 0.03225806451612903,
+                    "rank": 31,
+                    "duration": 1.2
+                },
+                "query": "number taking termn , added sum multiplying first number last , progression ividing 2",
+                "refined_query": "Theorem (Arithmetic Geometric Progression):\nGiven an initial value and a common ratio, the sequence generated by adding each subsequent term to the previous one while multiplying it with the first number before dividing by two forms an arithmetic-geometric progression.\n"
             }
         }
     },
@@ -1671,6 +2331,17 @@
                 },
                 "query": "an even number is perfect [iff] it has the form 2^(p \u2013 1) * (2^p - 1), where 2^p - 1 is a prime number",
                 "refined_query": "Theorem (Even Perfect Numbers Characterization):\nAn integer qualifies as an even perfect number if and only if it can be expressed in the form of two multiplied together, where one factor equals 2 raised to a power minus one, and the other is a prime number that also satisfies this condition.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.4
+                },
+                "query": "number even iff pfect 2^(p form 1) \u2013 * - (2^p 2^p 1), - prime 1 number",
+                "refined_query": "Theorem (Even Numbers and Exponential Relationship):\nFor any natural number p, a given property holds for an even number if it is true when the expression 2 raised to power of p minus one times two raised to the power of twice p plus one equals -1. Conversely, this same relationship indicates that prime numbers are not divisible by two without remainder.\n"
             }
         }
     },
@@ -1690,7 +2361,7 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.5
+                    "duration": 1.4
                 },
                 "query": "Sylow's Theorem",
                 "refined_query": "Theorem (Generalized Sylow Subgroup Existence):\nFor any finite group G and prime number p, if the order of subgroup H is divisible by p to a certain power but not higher powers, then there exists at least one such subgroup within G that has this specific property. This theorem guarantees the existence and uniqueness (up to conjugation) of these subgroups in relation to their respective orders based on prime factors.\n"
@@ -1705,6 +2376,17 @@
                 },
                 "query": "for every prime factor p of the order of a finite group G, there exists a [...] p-subgroup of G of order p^n",
                 "refined_query": "Theorem (Fundamental Theorem on Finite Groups and Their Subgroups): For any given prime factor that divides the total number of elements in an infinite group, there exists a corresponding subgroup within this finite group whose order is equal to the power of said prime factor.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "rime every p factofinite order G, group exists G p-subgroup p^n order",
+                "refined_query": "Theorem (Existence of P-Subgroups in Finite Groups): For any prime number p and a finite ordered group G with an element r that generates the entire group, there exists at least one subgroup within G whose order is equal to p raised to some natural exponent n.\n"
             }
         }
     },
@@ -1732,6 +2414,17 @@
                 },
                 "query": "given r, s, [...] contains a monotonically increasing subsequence of length r or a monotonically decreasing subsequence of length s",
                 "refined_query": "Theorem (Monotonic Subsequences Extraction):\nFor any sequence with elements [r,s,...,z], there exists either an increasing subsequence composed of r consecutive terms or a decreasing subsequence consisting of s consecutive terms.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.18457569677956817,
+                    "reciprocal_rank": 0.1111111111111111,
+                    "rank": 9,
+                    "duration": 1.2
+                },
+                "query": ", given contains sincreasing monotonically length subsequence r decreasing mnotonically length subsequence",
+                "refined_query": "Theorem (Monotone Subsequences Theorem):\nGiven any sequence, there exists a non-decreasing and another non-increasing monotonic subsequences within it. These subsequences maintain the original order of elements in their respective increasing or decreasing patterns throughout the entirety of the given sequence."
             }
         }
     },
@@ -1759,6 +2452,17 @@
                 },
                 "query": "first proving a simple case, then showing if we assume the claim is true for a given case, then the next case is also true",
                 "refined_query": "Theorem (Mathematical Induction):\nThe process of demonstrating that a statement or property holds true by initially proving it in an initial base case. Then, assuming its validity for any given natural number n and using this assumption to prove the truthfulness of the subsequent value n+1.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.1
+                },
+                "query": "roving first case,imple assume showing true claim given next case, also casetrue",
+                "refined_query": "Theorem (Roving First Case Principle):\nGiven an initial assumption that a certain statement is valid in the simplest possible scenario, we can then proceed to prove its truth by considering subsequent cases and verifying their consistency with this base case.\n"
             }
         }
     },
@@ -1786,6 +2490,17 @@
                 },
                 "query": "for a given planar arc between two endpoints, at least one point at which the tangent to the arc is parallel to the secant through its endpoints",
                 "refined_query": "Theorem (Tangential Points on Arc):\nFor any plane curve represented by an arc with two distinct endpoints, there exists a point along this arc where the tangent line drawn at that specific location is parallel to the secant formed between its endpoint points.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.3
+                },
+                "query": "lanar given two arleast endpoints, point one tangent parallel arc endpoints ecant",
+                "refined_query": "Theorem (Tangency and Parallelism of Arcs):\nGiven any pair of at least the minimum endpoint points for a line segment or an arc, if there exists another point that is both tangential to these two endpoints and parallel in direction, then this third point lies on the same straight path as defined by the first two.\n"
             }
         }
     },
@@ -1798,7 +2513,7 @@
                     "normalized_discounted_cumulative_gain": 0.6736525857061149,
                     "reciprocal_rank": 0.5,
                     "rank": 2,
-                    "duration": 1.6
+                    "duration": 1.5
                 },
                 "query": "Fourier Series",
                 "refined_query": "Theorem (The Fundamental Theorem of Harmonic Analysis): The Fourier series is an expression that represents any periodic function as the sum of simple oscillating functions, specifically sines and cosines. This theorem provides a way to decompose complex waveforms into their constituent frequencies with equal or varying amplitudes."
@@ -1813,6 +2528,17 @@
                 },
                 "query": "[...] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",
                 "refined_query": "Theorem (Convergence of Fourier Series): Any continuous periodic function can be expressed as an infinite sum of sinusoidal components - sine and cosine terms. This representation, known as a Fourier series, ensures that the partial sums converge to represent the original smoothly varying function accurately over its period."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6983348066718188,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.4
+                },
+                "query": "sm function cosinesines smooth example series functions, converge function orginal",
+                "refined_query": "Theorem (Convergence of Fourier Series): A trigonometric series composed of sine and cosine terms converges to the original continuous periodic function within a given interval.\n"
             }
         }
     },
@@ -1840,6 +2566,17 @@
                 },
                 "query": "[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n",
                 "refined_query": "Theorem (Euler's Polynomial Formula for Summation): \nThis theorem states that there exists an algebraic expression, specifically a polynomial function with respect to 'n', which accurately represents the sum of each positive integer raised to any given power p. This formula provides a direct relationship between the powers and their corresponding summations up to n terms without requiring iterative addition for every term in sequence.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.2
+                },
+                "query": "su expresses powers th n first integers positive polynomial n",
+                "refined_query": "Theorem (Polynomial Representation of Fibonacci Sequence):\nFor any natural number, there exists an integer sequence where each term is the sum of its two preceding terms. This property can be expressed using a polynomial function that accurately represents these first n positive integers in the series.\n"
             }
         }
     },
@@ -1867,6 +2604,17 @@
                 },
                 "query": "[...] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms",
                 "refined_query": "Theorem (Cauchy-Schwarz Inequality for Inner Product Spaces): \nFor any pair of elements within a given inner product space, there exists an upper limit to their inner product value. This bound is determined by the multiplication of the norms associated with each individual element in that vector set."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.34480025382955176,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 1.2
+                },
+                "query": "ound upper productnner vectors two product inner space product terms norms vctor",
+                "refined_query": "Theorem (Inner Product and Norm Relationship):\nGiven any vector in an n-dimensional Euclidean space, the sum of products between corresponding elements from a pair of vectors is equal to the product of their respective norms. This relationship holds true for all pairs of inner product spaces within that same dimensionality."
             }
         }
     },
@@ -1894,6 +2642,17 @@
                 },
                 "query": "if f is a continuous function whose domain contains the interval [a, b], then it takes on any given value between f(a) and f(b)",
                 "refined_query": "Theorem (Intermediate Value Property for Continuous Functions):\nFor every real number c that lies in the range of a continuous function f, where its domain includes an interval [a, b], there exists at least one point x within this interval such that f(x) equals to c. This implies that between any two values produced by f on the interval [a, b], all other real numbers can be found as well.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16580128695114155,
+                    "reciprocal_rank": 0.03125,
+                    "rank": 32,
+                    "duration": 1.1
+                },
+                "query": "continuous f whoseunction contains domain a, interval b takes , value given (a) f(b)",
+                "refined_query": "Theorem (Continuity of Functions on Intervals):\nFor any continuous function f defined over an interval [a, b], the limit as x approaches a from within this interval is equal to the value that the function takes at point a.\n"
             }
         }
     },
@@ -1921,6 +2680,17 @@
                 },
                 "query": "states that every integer greater than 1 can be represented uniquely as a product of prime numbers, up to the order of the factors",
                 "refined_query": "Theorem (Prime Factorization Theorem): For any natural number n > 1, there exists exactly one set of prime numbers whose multiplication equals n, regardless of their arrangement.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.862203552867226,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "eery states greaternteger represented 1 product uniquely prime order numbers,factors",
+                "refined_query": "Theorem (Unique Factorization Property for Greatest Integers):\nFor any integer greater than one, it can be expressed as a unique combination of prime factors. No two different sets of prime factorizations will result in the same product when multiplied together to form that specific greatest integer value.\n"
             }
         }
     },
@@ -1948,6 +2718,17 @@
                 },
                 "query": "sum of the reciprocals of all prime numbers diverges",
                 "refined_query": "Theorem (Prime Number Reciprocity Divergence): If you take every distinct prime number and sum up their respective reciprocal values, this series will not converge to a finite limit."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2890648263178879,
+                    "reciprocal_rank": 0.1,
+                    "rank": 10,
+                    "duration": 1.1
+                },
+                "query": "reipocals sum numbers ime diverges",
+                "refined_query": "Theorem (Divergence of Rational Numbers Series):\nIf the series formed by adding pairs of reciprocals from a set of natural numbers does not converge to any finite value, then it is said that this sum diverges.\n"
             }
         }
     },
@@ -1975,6 +2756,17 @@
                 },
                 "query": "Dissection of Cubes: A cube cannot be cubed.",
                 "refined_query": "Theorem (Cube Dissection Conjecture): Given any three-dimensional geometric shape, if it is assumed to have the properties and characteristics similar to a perfect cube but with an irregular structure that prevents its division into smaller cubic units without altering their original dimensions or proportions, then such a dissection cannot be achieved.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7039180890341347,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.2
+                },
+                "query": "Cbe: Dissection cube cubed. cannot",
+                "refined_query": "Theorem (Discrepancy in Cube Volume):\nGiven any two dissections of the same shape, if one has a larger volume than another when each is scaled by their respective scaling factors raised to the power of three, then there exists an inherent difference between these cubes' volumes.\n"
             }
         }
     },
@@ -2002,6 +2794,17 @@
                 },
                 "query": "[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...]",
                 "refined_query": "Theorem (Unique Common Neighbor Property for Finite Graphs): \nFor any given finite graph, if each pair of distinct vertices shares precisely a single adjacent vertex together, then the specified property holds true within that particular graph.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.19195872000656014,
+                    "reciprocal_rank": 0.027777777777777776,
+                    "rank": 36,
+                    "duration": 1.8
+                },
+                "query": "grphs finite every pperty vertices two one exactly neighbor common",
+                "refined_query": "Theorem (Vertex-Disjoint Path Property): In any given graph, if there are finitely many properties associated with each vertex that require having an exact and unique set of neighbors for a path to exist between two vertices.\n"
             }
         }
     },
@@ -2029,6 +2832,17 @@
                 },
                 "query": "[...] sum of the digits must be divisible by 3 [...]",
                 "refined_query": "Theorem (Digital Root Divisibility Rule):\nFor any integer, if its digital root - obtained by repeatedly adding up all individual digits until only a single digit remains - is divisible by three without leaving a remainder, then the original number itself must also be divisible by three.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3010299956639812,
+                    "reciprocal_rank": 0.1111111111111111,
+                    "rank": 9,
+                    "duration": 1.2
+                },
+                "query": "diit sum divisible mus3",
+                "refined_query": "Theorem (Divisibility Property of Sum):\nFor any natural numbers m and u, if the sum of all multiples less than or equal to a number n that are divisible by both m and u is greater than zero, then this total sum satisfies certain conditions related to their common factors.\n"
             }
         }
     },
@@ -2063,6 +2877,17 @@
                 },
                 "query": "Two triangles are in perspective axially [iff] they are in perspective centrally.",
                 "refined_query": "Theorem (Perspective Centric and Axiomatic Conditions for Triangle Perspectivity): \nIf two triangles satisfy the condition of being in central perspectivity, then it is guaranteed that they also fulfill the criteria required for axial perspective. Conversely, if a pair of triangles meet all conditions necessary for axial perspective, this implies their state as centrally perspective."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.21610586933707615,
+                    "reciprocal_rank": 0.1,
+                    "rank": 10,
+                    "duration": 1.6
+                },
+                "query": "tiagles Two axially pspective perspective iff centrally.",
+                "refined_query": "Theorem (Tile's Axiom of Central Perspectve): In two-dimensional geometry, a central perspectve view is equivalent to having an axisymmetric representation.\n"
             }
         }
     },
@@ -2090,6 +2915,17 @@
                 },
                 "query": "[...] permutation of the elements of a set in which no element appears in its original position",
                 "refined_query": "Theorem (Kirkman's Schoolgirl Problem):\nGiven any group of five students, it is possible to arrange them into non-adjacent seating positions for an equal number of days such that no student sits in their original seat throughout the entire period.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.0
+                },
+                "query": "eemnts permutation elent set original appears position",
+                "refined_query": "Theorem (Original Position Preservation in Permutations):\nFor any given element within an ordered collection, there exists at least one specific arrangement where the said element retains its initial relative position when compared to other elements.\n"
             }
         }
     },
@@ -2117,6 +2953,17 @@
                 },
                 "query": "f(x) is [...] f(r) and (x - r) [times a lower-degree polynomial]",
                 "refined_query": "Theorem (Taylor's Theorem):\nGiven any real number x, the function value at that point can be approximated by evaluating f(r), where r is some fixed reference point within a given interval. Additionally, this approximation includes an error term represented as a product of (x - r) and a polynomial with lower degree than the original function's derivative terms up to order k-1."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.3
+                },
+                "query": "(r f(x) - (x times rpolynomial lower-degree",
+                "refined_query": "Theorem (Rational Root Polynomial Degree Relationship):\nFor any rational number r and a polynomial with real coefficients, if the result of substituting x into f(x) divided by x times its lowest degree term is an integer multiple of r, then this implies that r is indeed a root of the given polynomial.\n"
             }
         }
     },
@@ -2144,6 +2991,17 @@
                 },
                 "query": "asymptotic approximation for factorials [...] accurate results even for small values of n",
                 "refined_query": "Theorem (Accurate Asymptotic Approximation for Factorial Function): This theorem provides a method to obtain precise outcomes when estimating the value of factorials, which remains reliable even as we consider smaller values of n.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.766433990956823,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 1.1
+                },
+                "query": "ppoximation asymptot accurate factorials even results values small n",
+                "refined_query": "Theorem (Approximation of Asymptotic Accurate Factorial Function): Given an integer, the function that provides a close approximation to its exact factorial value will yield increasingly accurate outcomes as the input number approaches zero.\n"
             }
         }
     },
@@ -2178,6 +3036,17 @@
                 },
                 "query": "formula for the area of a simple polygon with integer vertex coordinates",
                 "refined_query": "Theorem (Area Calculation Formula for Integer-Coordinate Polygons):\nGiven a simple, non-self-intersecting polygon whose vertices are defined by pairs of integers representing their x and y coordinates on the Cartesian plane, there exists an algebraic expression that accurately computes its area. This formula takes into account all vertex points to determine the total enclosed space within the boundary formed by these integer coordinate points.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.186493900634435,
+                    "reciprocal_rank": 0.016129032258064516,
+                    "rank": 62,
+                    "duration": 1.2
+                },
+                "query": "aeaformula polygon sile vertex integer coordinates",
+                "refined_query": "Theorem (Polygon Vertex Coordinate Formula):\nGiven any simple, closed-polygon with an even number of vertices and each vertex represented by a pair of integers indicating its coordinate on the plane. The theorem provides a formula to calculate these integer coordinates based on the polygon's structure and properties."
             }
         }
     },
@@ -2205,6 +3074,17 @@
                 },
                 "query": "same birthday [...] 23 people are needed for that probability to exceed 50%",
                 "refined_query": "Theorem (Collision Probability in Birthdays Problem): Given any group of individuals, the likelihood of at least two sharing a common birthday increases significantly as the size of this group surpasses twenty-three. This threshold is when the probability exceeds fifty percent."
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 1.2
+                },
+                "query": "2 brthday needed peop exceed probability 50%",
+                "refined_query": "Theorem (Probability of Exceeding Two Birthdays):\nGiven that the likelihood of having more than two birthdays in a year is greater than fifty percent, it implies there exists at least one instance where three or more individuals share their birthday within the same calendar period.\n"
             }
         }
     },
@@ -2232,6 +3112,17 @@
                 },
                 "query": "relates the lengths of the sides of a triangle to the cosine of one of its angles",
                 "refined_query": "Theorem (Cosine-Angel Relationship in Triangles): \nThis theorem establishes that for any given triangle, there exists an inherent connection between the lengths of its sides and the cosine value associated with one of its angles. Specifically, it states that if a triangle has side lengths A, B, and C corresponding to their respective opposite angles \u03b1, \u03b2, and \u03b3 respectively, then the ratio of any two specific sides is equal to the cosine of half of the angle between them.</END>\n\ntheorem tri_cos:\n  assumes \"Triangle ABC with sides a=AB, b=BC, c=CA\"\n  shows \"Cos(\u03b1/2) = (a^2 + c^2 - b^2)/4ac for \u03b1\""
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3333333333333333,
+                    "reciprocal_rank": 0.14285714285714285,
+                    "rank": 7,
+                    "duration": 1.4
+                },
+                "query": "lnghs relates trianglsides one cosine angles",
+                "refined_query": "Theorem (Law of Sines):\nFor any triangle, the ratio between each side length and its corresponding opposite angle's sine value is constant. In other words, for a given triangle with sides A, B, C and angles \u03b1, \u03b2, \u03b3 respectively, it holds that: sin(\u03b1)/A = sin(\u03b2)/B = sin(\u03b3)/C\n"
             }
         }
     },
@@ -2244,7 +3135,7 @@
                     "normalized_discounted_cumulative_gain": 1.0,
                     "reciprocal_rank": 1.0,
                     "rank": 1,
-                    "duration": 1.4
+                    "duration": 1.3
                 },
                 "query": "Ptolemy's Theorem",
                 "refined_query": "Theorem (The Geometric Relationship of Cyclic Quadrilaterals):\nFor any cyclic quadrilateral, the sum of a pair of opposite sides is equal to the total length of the other two pairs when measured in the same unit. This theorem provides an important relationship between the side lengths and diagonals within such geometric figures.\n"
@@ -2259,6 +3150,17 @@
                 },
                 "query": "product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides",
                 "refined_query": "Theorem (Diagonal Length Product Equality): The total length obtained by multiplying the respective lengths of each diagonal in a polygon is equivalent to the combined product of corresponding side lengths taken two at a time.</END>\n\nInput: \"a function f(x) that maps every natural number x into itself\"\nParaphrase: "
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 1.2
+                },
+                "query": "legths product equaliagonals products sum pairs lengths opposite sides",
+                "refined_query": "Theorem (Euler's Formula for Equilateral Triangles): The relationship between the side length of an equilateral triangle and its perimeter can be expressed as a product, where each term in this product is equal to half the sum of the lengths of opposite sides.\n"
             }
         }
     },
@@ -2286,6 +3188,17 @@
                 },
                 "query": "[...] over-generous inclusion, followed by compensating exclusion [...]",
                 "refined_query": "Theorem (Balanced Inclusive and Exclusive Principle):\nFor any set S of elements with an initial inclusive condition that encompasses more than necessary members, there exists a subsequent exclusive operation to refine the selection by excluding exactly those extra members.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.21840743681816419,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 1.2
+                },
+                "query": "inluion, over-generousompensating followed exclusion",
+                "refined_query": "Theorem (Inclusive Overcompensation Principle):\nFor any set of elements and an associated property, if the inclusion principle is applied to compensate for potential exclusions within a subset, then all relevant inclusions are considered in determining whether or not the overcompensating condition holds true. "
             }
         }
     },
@@ -2320,6 +3233,17 @@
                 },
                 "query": "[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",
                 "refined_query": "Theorem (Bertrand's Postulate): For every integer greater than three, there is always a prime number that lies between the given integer and half of twice its value minus two.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.20801459767650948,
+                    "reciprocal_rank": 0.037037037037037035,
+                    "rank": 27,
+                    "duration": 1.3
+                },
+                "query": "n integer 3, > let exists prime one number n p p < < - 2n 2",
+                "refined_query": "Theorem (Prime Number Theorem for Natural Numbers):\nFor any natural number greater than two, there is at least one prime number that lies between it and its double.\n"
             }
         }
     },
@@ -2354,30 +3278,41 @@
                 },
                 "query": "number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients",
                 "refined_query": "Theorem (Descartes' Rule of Signs): The maximum possible count of distinct positive real roots for a given polynomial equation corresponds to the quantity of alternating signs observed within its ordered list of non-zero, sequential coefficients.\n"
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.27023815442731974,
+                    "reciprocal_rank": 0.08333333333333333,
+                    "rank": 12,
+                    "duration": 1.1
+                },
+                "query": "poitive number rootseal sign number sequence changes polynomial's coefficients",
+                "refined_query": "Theorem (Root-Sign Relation in Polynomial Coefficient Changes):\nFor any positive integer n, if a given polynomial has its roots represented by the natural numbers and altering this root number sequence results in changes to the corresponding coefficients of the polynomial.\n"
             }
         }
     },
     "summary": {
         "all_queries": {
             "top_k_accuracy": {
-                "sample_size": 170,
-                "average": 0.8470588235294118
+                "sample_size": 255,
+                "average": 0.7686274509803922
             },
             "normalized_discounted_cumulative_gain": {
-                "sample_size": 170,
-                "average": 0.6002131620774197
+                "sample_size": 255,
+                "average": 0.5449830999203695
             },
             "reciprocal_rank": {
-                "sample_size": 170,
-                "average": 0.5959797562224243
+                "sample_size": 255,
+                "average": 0.5341683892157808
             },
             "rank": {
-                "sample_size": 170,
-                "average": 10.205882352941176
+                "sample_size": 255,
+                "average": 15.36078431372549
             },
             "duration": {
-                "sample_size": 170,
-                "average": 1.3911764705882337
+                "sample_size": 255,
+                "average": 1.3858823529411757
             }
         },
         "Title query": {
@@ -2399,7 +3334,7 @@
             },
             "duration": {
                 "sample_size": 85,
-                "average": 1.4929411764705882
+                "average": 1.488235294117647
             }
         },
         "Natural language query": {
@@ -2422,6 +3357,28 @@
             "duration": {
                 "sample_size": 85,
                 "average": 1.2894117647058823
+            }
+        },
+        "Noisy natural language query": {
+            "top_k_accuracy": {
+                "sample_size": 85,
+                "average": 0.611764705882353
+            },
+            "normalized_discounted_cumulative_gain": {
+                "sample_size": 85,
+                "average": 0.4345229756062704
+            },
+            "reciprocal_rank": {
+                "sample_size": 85,
+                "average": 0.41054565520249475
+            },
+            "rank": {
+                "sample_size": 85,
+                "average": 25.67058823529412
+            },
+            "duration": {
+                "sample_size": 85,
+                "average": 1.3800000000000001
             }
         }
     }

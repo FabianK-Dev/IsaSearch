@@ -8,11 +8,15 @@ from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from chromadb.utils import embedding_functions
+from nltk.corpus import stopwords
 
 import json
 import pandas as pd
 import os
 import torch
+import nltk
+import random
+import re
 
 print("Loading config...")
 with open("config.json", "r") as file:
@@ -57,11 +61,16 @@ model = get_llm(config)
 print("Check if loading LLM output cache is enabled via config...")
 llm_output_cache = get_llm_output_cache(config)
 
+print("Downloading/Updating NLTK resources (punkt and stopwords)...")
+nltk.download('punkt')
+nltk.download('stopwords')
+stop_words_set = set(stopwords.words('english'))
+
 print("Loading benchmark CSV...")
 benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
 benchmark_df = benchmark_df.reset_index()
 
-query_columns = ['Title query', 'Natural language query']
+query_columns = ['Title query', 'Natural language query', 'Noisy natural language query']
 benchmark_results = {}
 
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
@@ -110,7 +119,34 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         continue
 
     for query_type in query_columns:
-        query = row[query_type]
+        if query_type == "Noisy natural language query":
+            query = row["Natural language query"]
+            random.seed(129869)
+
+            query = query.replace("[...]", " ")
+            query = query.replace("[", " ")
+            query = query.replace("]", " ")
+            
+            # Replace two or more white spaces through single whitespace
+            plain_text = re.sub(r'\s+', ' ', query).strip()
+
+            query_tokens = query.split()
+            query_tokens = [word for word in query_tokens if word not in stop_words_set]
+
+            i = 0
+            while i < len(query_tokens) - 1:
+                if random.random() < 0.9:
+                    temp_word = query_tokens[i]
+                    query_tokens[i] = query_tokens[i+1]
+                    query_tokens[i+1] = temp_word
+                    i += 2 # Add 2 to avoid double swapping
+                else:
+                    i += 1
+
+            query = " ".join(query_tokens)
+            query = ''.join([s for s in query if random.random() < 0.9])
+        else:
+            query = row[query_type]
 
         if not pd.isna(query):
             print(f"Searching: \"{query}\"")
