@@ -13,10 +13,11 @@
 - Keine Treffer bei abweichenden Begriffen oder Reihenfolge der Begriffe
 - Keine Ähnlichkeitserkennung oder intelligentes Ranking der Suchergebnisse
 - Schwierig für Nutzer bestehende Theoreme wider zu finden
-- gleichzeitig aber: Potential aktueller KI-Modelle für semantisches Retrieval zur Entwicklung einer KI-gestützte Theoremsuche
-- Entwicklung einer KI-gestützte Theoremsuche
-- Verwendung vortrainierter Transformer-Modelle zur semantischen Ähnlichkeitssuche
-- Vergleich verschieder Konfigurationen und Suchstrategien wie Query-Refinement oder Metadatenintegration
+- gleichzeitig aber: Potential aktueller KI-Modelle für semantisches Retrieval
+- Ziel: Entwicklung und Evaluation einer KI-gestützten semantischen Suche nach Theoremen, Lemmas und Corollaries im AFP
+- Verwendung vortrainierter Transformer-Modelle in Form von LLM zur Textgenerierung, Bi-Encoder zur Ähnlichkeitssuche und ChromaDB zur effizienten Speicherung und Vektorsuche
+- Vergleich verschieder Konfigurationen und Suchstrategien wie Query-Refinement oder Metadatenintegration, anschließende Evlauation durch Benchmark
+- Entwicklung der restAPI und Webseite
 
 ### Forschungsfragen
 - Wie effektiv sind LLMs bei der Umschreibung von formalen Theoremen, um deren Auffindbarkeit durch Suchanfragen des Nutzers zu verbessern?
