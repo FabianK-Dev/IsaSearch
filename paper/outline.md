@@ -8,15 +8,21 @@
 - stetig wachsende Zahl an Einträgen und formalen Theoremen im AFP (Quelle: Mining the Archive of Formal Proofs", https://www.isa-afp.org/statistics/ (darf ich das zitieren?))
 - Wiederverwendung bestehender Theorem essenziell um Duplikate zu vermeiden => zu wenig (Quelle: Mining the Archive of Formal Proofs" > Conclusion)
 
-### Problemstellung und Zielsetzung
+### Problemstellung & Zielsetzung
 - Suchmaschinen wie isa-afp.org oder FindFacts oder Befehle wie find_theorems oder grep erlauben nur lexikalische Suche => keine Semantische Suche
 - Keine Treffer bei abweichenden Begriffen oder Reihenfolge der Begriffe
 - Keine Ähnlichkeitserkennung oder intelligentes Ranking der Suchergebnisse
 - Schwierig für Nutzer bestehende Theoreme wider zu finden
-- Potential aktueller KI-Modelle für semantisches Retrieval zur Entwicklung einer KI-gestützte Theoremsuche
+- gleichzeitig aber: Potential aktueller KI-Modelle für semantisches Retrieval zur Entwicklung einer KI-gestützte Theoremsuche
+- Entwicklung einer KI-gestützte Theoremsuche
+- Verwendung vortrainierter Transformer-Modelle zur semantischen Ähnlichkeitssuche
+- Vergleich verschieder Konfigurationen und Suchstrategien wie Query-Refinement oder Metadatenintegration
 
-### Beitrag der Arbeit
 ### Forschungsfragen
+- Wie effektiv sind LLMs bei der Umschreibung von formalen Theoremen, um deren Auffindbarkeit durch Suchanfragen des Nutzers zu verbessern?
+- Wie wirkt sich das Optimieren einer Suchanfrage durch LLMs oder das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Abstract des Entries, auf die Suchqualtität aus?
+- Wie effektiv ist die Theoremsuche laut des Benchmarks und wie robust ist sie gegenüber simulierten Fehlern bei Suchanfragen?
+
 ### (optional: Aufbau der Arbeit?)
 
 
