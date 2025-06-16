@@ -124,9 +124,9 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             random.seed(129869)
 
             query = query.replace("[...]", " ")
-            query = query.replace("[", " ")
-            query = query.replace("]", " ")
-            
+            query = re.sub(r"[\[\]\.\,\:]", " ", query)
+            query = query.lower()
+
             # Replace two or more white spaces through single whitespace
             plain_text = re.sub(r'\s+', ' ', query).strip()
 
