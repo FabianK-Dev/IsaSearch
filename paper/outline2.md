@@ -104,23 +104,30 @@
 
 ## Vergleich der Suchstrategien
 - Beste Strategie: Ohne Metadata + Hybrid Queries.
-- jeden Query-Typ auswerten
+- jeden Query-Typ auswerten, d.h. die durchschnittlichen gemessenen Werte für jede Metrik für jede Query beschreiben
 
 ## Erklärung von Performance-Unterschieden
 - Einfluss von Metadaten und Query Refinement
 - Beispiel
 - Metadaten machen Suche schlechter
 - Refined Queries helfen
-- LLM tendiert zur Reproduktion von Train-Prompts bei langen Prompts *(schwer zu erklären)*
+- LLM tendiert zur Reproduktion von Train-Prompts bei langen Prompts (schwer zu erklären, warum)
+- wenn die LLM-Umschreibung von Suchanfragen falsch ist sind die Ergebnisse fast immer falsch/schlecht => Beispiel
+
 
 # Limitationen
+- *(Frage: lieber als eigenes Kapitel oder als Unterkapitel von "Ergebnis und Analyse?)*
 - Benchmark hardware-technisch beschränkt (GPU hat nicht genug VRAM oder Modelle wie DeepSeek sind laut LLM Benchmark sehr gut aber zu groß)
-- Programm funktioniert schlecht auf ressourcenbeschränkten Geräten
+- Programm funktioniert schlecht auf ressourcenbeschränkten Geräten (z.B. Laptops)
+- Die LLM-Umschreibung zu deaktivieren reduziert die Suchzeit erheblich und kann auf ressourcenbeschränkten Geräten helfen, reduziert aber auch die Suchqualität *(Soll ich hier fixe Werte z.B. 1,9 Sekunden Suchzeit nennen, auch wenn sie eigentlich hardware-abhängig sind?)*
 - Benchmark nur von einer Person annotiert/erstellt => Risiko von Bias oder Fehlern
 - wenn die LLM-Umschreibung von Suchanfragen falsch ist sind die Ergebnisse fast immer falsch
 
 
 # Zusammenfassung und Ausblick
+- Zusammenfassung
+- Idee für Zukunft: Nutzer bei Suchergebnissen fragen "sind diese Ergebnisse hilfreich?" => sowohl als Trainingsdaten um Bi-Encoder zu erweitern oder tatsächliche Suchqualität außerhalb des Benchmarks zu überprüfen
+- KI-Suche kann z.B. in CI/CD-Pipelines oder pre-commit-hooks verwendet werden, um frühzeitig duplizierte Theoreme zu erkennen (im AFP gibt es schon einige Duplikate)
 
 
 # Literaturverzeichnis
