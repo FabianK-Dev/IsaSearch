@@ -62,7 +62,10 @@
 - verbindet sich mit bereits laufender Solr-Datenbank
 - lädt aus der Solr-DB nur Dokumente mit dem "command" theorem/lemma/corollary
 - prüft für jedes Theorem, ob dieses bereits vom in der config festgelegten LLM beschrieben informalisiert wurde 
+- auch z.B. auf Caching und Standard-Konfiguration eingehen
+- Generierte LLM-Outputs werden gespeichert und können committet werden, um zu verhindern, das andere Nutzer die selben Outputs nochmal generieren müssen 
 - ...
+- bei einer Suchanfrage: LLM umschreibt die Suchanfrage, um die Suchqualität zu verbessern (optional und kann deaktiviert werden)
 - startet Flask-API-Server zur Bereitstellung einer REST-API
 
 ## Informalisierung der Theoreme
@@ -80,7 +83,18 @@
 - Quelle: Freek's "Top 100 Theorems in Isabelle"
 - Struktur der Benchmark-Tabelle: ID, Title, Theorem, Target Identifiers, Link, Session, Annotation als CSV *(soll ich jede column erklären?)*
 - Generierung der Queries: Title, Natural language query, noisy natural language query
-- Beispiel
+- Erklärung der Query-Arten und wie sie erstellt wurden (z.B. Zitat aus Wikipedia)
+- Beispiel für Query Arten und Ziel Theoreme
+
+## Benchmark-Pipeline und Vergleich der Suchstrategien
+- Ablauf des Benchmarks erklären
+- Verschiedene Suchstrategien erklären:
+  - Theorem-Embeddings ohne Metadaten + LLM-Suchanfragen-Umschreibung 
+  - Theorem-Embeddings mit Metadaten + LLM-Suchanfragen-Umschreibung 
+  - Theorem-Embeddings ohne Metadaten ohne LLM-Suchanfragen-Umschreibung 
+  - Theorem-Embeddings mit Metadaten ohne LLM-Suchanfragen-Umschreibung
+  - Theorem-Embeddings ohne Metadaten + Hybrid (Query + LLM-Suchanfragen-Umschreibung)
+  - Theorem-Embeddings mit Metadaten + Hybrid (Query + LLM-Suchanfragen-Umschreibung)
 
 ## Verwendete Metriken
 - jede Metrik als Formel erklären => was sagt diese Metrik aus?
@@ -89,7 +103,6 @@
 # Ergebnis und Analyse
 
 ## Vergleich der Suchstrategien
-- alle 5 Suchstrategien
 - Beste Strategie: Ohne Metadata + Hybrid Queries.
 - jeden Query-Typ auswerten
 
