@@ -1,5 +1,4 @@
 # KI-gestützte Theoremsuche in Isabelle: Ein transformerbasierter Ansatz
-- **(Frage: Passt der Titel?)**
 
 # Einleitung
 
@@ -26,8 +25,7 @@
 - Wie wirkt sich das Optimieren einer Suchanfrage durch LLMs oder das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Abstract des Entries, auf die Suchqualtität aus?
 - Wie effektiv ist die Theoremsuche laut des Benchmarks und wie robust ist sie gegenüber simulierten Fehlern bei Suchanfragen?
 
-## *(optional: Aufbau?)*
-- **(Frage: Soll ich den Aufbau erklären, also was in welchem Kapitel thematisiert wird?)**
+## (optional: Aufbau?)
 
 
 # Hintergrund
@@ -50,6 +48,7 @@
 ## ChromaDB
 - **(Frage: soll ich ChromaDB erklären oder nur kurz erwähnen/erklären?)**
 - z.B. "https://aclanthology.org/2024.findings-emnlp.470.pdf" geht nur kurz darauf ein
+- Ich persönlich finde fast, dass ein eigenes Unterkapitel zu viel dafür ist :)
 
 ## Verwandte Arbeiten
 - Gao, G., Ju, H., Jiang, J., Qin, Z., & Dong, B. (2024). A semantic search engine for Mathlib4. arXiv preprint arXiv:2403.13310.
@@ -120,10 +119,9 @@
 
 
 # Limitationen
-- **(Frage: lieber als eigenes Kapitel oder als Unterkapitel von "Ergebnis und Analyse?)**
 - Benchmark hardware-technisch beschränkt (GPU hat nicht genug VRAM oder Modelle wie DeepSeek sind laut LLM Benchmark sehr gut aber zu groß)
 - Programm funktioniert schlecht auf ressourcenbeschränkten Geräten (z.B. Laptops)
-- Die LLM-Umschreibung zu deaktivieren reduziert die Suchzeit erheblich und kann auf ressourcenbeschränkten Geräten helfen, reduziert aber auch die Suchqualität **(Frage: Soll ich hier fixe Werte z.B. 1,9 Sekunden Suchzeit nennen, auch wenn sie eigentlich hardware-abhängig sind?)**
+- Die LLM-Umschreibung zu deaktivieren reduziert die Suchzeit erheblich und kann auf ressourcenbeschränkten Geräten helfen, reduziert aber auch die Suchqualität **(Frage: Soll ich hier fixe Werte z.B. 1,9 Sekunden Suchzeit nennen, auch wenn sie eigentlich hardware-abhängig und damit nicht konsistent sind?)**
 - Benchmark nur von einer Person annotiert/erstellt => Risiko von Bias oder Fehlern
 - wenn die LLM-Umschreibung von Suchanfragen falsch ist sind die Ergebnisse fast immer falsch
 
