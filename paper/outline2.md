@@ -113,7 +113,9 @@
 - Einfluss von Metadaten und Query Refinement
 - Beispiel
 - Metadaten machen Suche schlechter
+- Beispiel
 - Refined Queries helfen
+- Beispiel
 - LLM tendiert zur Reproduktion von Train-Prompts bei langen Prompts (schwer zu erklären, warum)
 - wenn die LLM-Umschreibung von Suchanfragen falsch ist sind die Ergebnisse fast immer falsch/schlecht => Beispiel
 
