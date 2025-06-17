@@ -1,3 +1,5 @@
+# KI-gestützte Theoremsuche in Isabelle: Ein transformerbasierter Ansatz
+
 # Einleitung
 
 ## Motivation & Problemstellung
@@ -39,23 +41,29 @@
 - aber: unterstützen jeweils nur lexikalische Suche, keine Semantische Suche
 
 ## Transformerbasierte Sprachmodelle
-- soll ich Transformer "from scratch" erklären oder overkill?
+- soll ich Transformer "from scratch" erklären oder ist das zu viel?
 
 ## ChromaDB *(passt der Titel?)*
-- "from scratch" erklären oder mit vorherigem Unterkapitel mergen?
+- soll ich ChromaDB erklären oder nur kurz erwähnen/erklären?
 - z.B. "https://aclanthology.org/2024.findings-emnlp.470.pdf" geht nur kurz darauf ein
+- soll ich dieses Unterkapitel mit "Transformerbasierte Sprachmodelle" mergen (statt extra einem Unterkapitel nur für ChromaDB?)
 
 ## Verwandte Arbeiten
 - Gao, G., Ju, H., Jiang, J., Qin, Z., & Dong, B. (2024). A semantic search engine for Mathlib4. arXiv preprint arXiv:2403.13310.
-- FindFacts
+- Huch, F., & Krauss, A. (2022). FindFacts: a scalable theorem search. arXiv preprint arXiv:2204.14191.
+- genügen 2 Verwandte Arbeiten?
 
 
 # Methodik
 
 ## Programmaufbau
-- benötigt fertigen FindFacts-Index (= Solr-DB), d.h. baut darauf auf
+- Detaillierte Schritt-für-Schritt Erklärung des Programm-Ablaufs, z.B.:
+- benötigt fertigen FindFacts-Index, d.h. baut darauf auf
+- verbindet sich mit bereits laufender Solr-Datenbank
 - lädt aus der Solr-DB nur Dokumente mit dem "command" theorem/lemma/corollary
+- prüft für jedes Theorem, ob dieses bereits vom in der config festgelegten LLM beschrieben informalisiert wurde 
 - ...
+- startet Flask-API-Server zur Bereitstellung einer REST-API
 
 ## Informalisierung der Theoreme
 - Prompt zeigen
