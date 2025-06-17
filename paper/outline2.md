@@ -66,11 +66,12 @@
 - startet Flask-API-Server zur Bereitstellung einer REST-API
 
 ## Informalisierung der Theoreme
-- Prompt zeigen
-- warum ausgerechnet das LLM microsoft/Phi-3.5-mini-instruct
-- technische Limitationen
-- Wahl anhand von LLM Leaderboard
-- Beispiel
+- was ist "Informalisierung" der Theorem?
+  - => LLM umschreibt den Theorem-Code in informale Sprache, damit es leichter zum Finden ist
+- warum ausgerechnet das LLM microsoft/Phi-3.5-mini-instruct?
+  - => technische Limitationen
+  - => Wahl anhand von LLM Leaderboard
+- Beispiel: Prompt, Input Theorem, Umschreibung *(Frage: Prompt-Beispiel lieber hier oder in den Anhang mit Referenz?)*
 
 
 # Benchmark
