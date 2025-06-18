@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Titel&colon; KI-gest&uuml;tzte Theoremsuche in Isabelle&colon; Ein transformerbasierter Ansatz</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="titel-ki-gestützte-theoremsuche-in-isabelle-ein-transformerbasierter-ansatz">Titel: KI-gestützte Theoremsuche in Isabelle: Ein transformerbasierter Ansatz</h1>
+<ul>
+<li><a href="#titel-ki-gest%C3%BCtzte-theoremsuche-in-isabelle-ein-transformerbasierter-ansatz">Titel: KI-gestützte Theoremsuche in Isabelle: Ein transformerbasierter Ansatz</a></li>
+<li><a href="#1-einleitung">1. Einleitung</a>
+<ul>
+<li><a href="#11-motivation--problemstellung">1.1. Motivation &amp; Problemstellung</a></li>
+<li><a href="#12-zielsetzung">1.2. Zielsetzung</a></li>
+<li><a href="#13-forschungsfragen">1.3. Forschungsfragen</a></li>
+<li><a href="#14-optional-aufbau">1.4. (optional: Aufbau?)</a></li>
+</ul>
+</li>
+<li><a href="#2-hintergrund">2. Hintergrund</a>
+<ul>
+<li><a href="#21-isabelle-afp-und-formale-beweise">2.1. Isabelle, AFP und formale Beweise</a></li>
+<li><a href="#22-bestehende-suchmechanismen">2.2. Bestehende Suchmechanismen</a></li>
+<li><a href="#23-transformerbasierte-sprachmodelle">2.3. Transformerbasierte Sprachmodelle</a></li>
+<li><a href="#24-chromadb">2.4. ChromaDB</a></li>
+<li><a href="#25-verwandte-arbeiten">2.5. Verwandte Arbeiten</a></li>
+</ul>
+</li>
+<li><a href="#3-methodik">3. Methodik</a>
+<ul>
+<li><a href="#31-programmaufbau">3.1. Programmaufbau</a></li>
+<li><a href="#32-informalisierung-der-theoreme">3.2. Informalisierung der Theoreme</a></li>
+</ul>
+</li>
+<li><a href="#4-benchmark">4. Benchmark</a>
+<ul>
+<li><a href="#41-aufbau-des-benchmarks">4.1. Aufbau des Benchmarks</a></li>
+<li><a href="#42-benchmark-pipeline-und-vergleich-der-suchstrategien">4.2. Benchmark-Pipeline und Vergleich der Suchstrategien</a></li>
+<li><a href="#43-verwendete-metriken">4.3. Verwendete Metriken</a></li>
+</ul>
+</li>
+<li><a href="#5-ergebnis-und-analyse">5. Ergebnis und Analyse</a>
+<ul>
+<li><a href="#51-vergleich-der-suchstrategien">5.1. Vergleich der Suchstrategien</a></li>
+<li><a href="#52-erkl%C3%A4rung-von-performance-unterschieden">5.2. Erklärung von Performance-Unterschieden</a></li>
+</ul>
+</li>
+<li><a href="#6-limitationen">6. Limitationen</a></li>
+<li><a href="#7-zusammenfassung-und-ausblick">7. Zusammenfassung und Ausblick</a></li>
+<li><a href="#8-literaturverzeichnis">8. Literaturverzeichnis</a></li>
+</ul>
+<h1 id="1-einleitung">1. Einleitung</h1>
+<h2 id="11-motivation--problemstellung">1.1. Motivation &amp; Problemstellung</h2>
+<ul>
+<li>Isabelle: generischer interaktiver Theorembeweiser mit besonderem Schwerpunkt auf Higher-Order Logic</li>
+<li>formale Verifizierung von Hard- und Software</li>
+<li>AFP: peer-reviewte Datenbank von Beweisbibliotheken</li>
+<li>stetig wachsende Zahl an Einträgen und formalen Theoremen im AFP (Quelle: Mining the Archive of Formal Proofs&quot;, <a href="https://www.isa-afp.org/statistics/">https://www.isa-afp.org/statistics/</a> <strong>(Frage: Darf ich die Statistik mit der Anzahl der Theoreme im AFP zitieren?)</strong>)</li>
+<li>Wiederverwendung bestehender Theorem essenziell um Duplikate zu vermeiden =&gt; zu wenig (Quelle: Mining the Archive of Formal Proofs&quot; &gt; Conclusion)</li>
+<li>Suchmaschinen wie <a href="http://isa-afp.org">isa-afp.org</a> oder FindFacts oder Befehle wie find_theorems oder grep erlauben nur lexikalische Suche =&gt; keine Semantische Suche</li>
+<li>Keine Treffer bei abweichenden Begriffen oder Reihenfolge der Begriffe</li>
+<li>Keine Ähnlichkeitserkennung oder intelligentes Ranking der Suchergebnisse</li>
+<li>Schwierig für Nutzer bestehende Theoreme wieder zu finden</li>
+<li>gleichzeitig aber: Potential aktueller KI-Modelle für semantisches Retrieval</li>
+</ul>
+<h2 id="12-zielsetzung">1.2. Zielsetzung</h2>
+<ul>
+<li>Ziel: Entwicklung und Evaluation einer KI-gestützten semantischen Suche nach Theoremen, Lemmas und Corollaries im AFP</li>
+<li>Verwendung vortrainierter Transformer-Modelle in Form von LLM zur Textgenerierung von Theorem-Beschreibungen und Optimieren einer Suchanfrage, Bi-Encoder zur Ähnlichkeitssuche und ChromaDB zur effizienten Speicherung und Vektorsuche</li>
+<li>Vergleich verschiedener Suchstrategien wie LLM-Umschreibung von Suchanfragen oder Metadatenintegration, anschließende Evaluation und Analyse durch Benchmark</li>
+<li><em>(optional: Entwicklung der restAPI und Webseite, Docker-Container...?)</em></li>
+</ul>
+<h2 id="13-forschungsfragen">1.3. Forschungsfragen</h2>
+<ul>
+<li>Wie effektiv sind LLMs bei der Umschreibung von formalen Theoremen, um deren Auffindbarkeit durch Suchanfragen des Nutzers zu verbessern?</li>
+<li>Wie wirkt sich das Optimieren einer Suchanfrage durch LLMs oder das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Abstract des Entries, auf die Suchqualtität aus?</li>
+<li>Wie effektiv ist die Theoremsuche laut des Benchmarks und wie robust ist sie gegenüber simulierten Fehlern bei Suchanfragen?</li>
+</ul>
+<h2 id="14-optional-aufbau">1.4. (optional: Aufbau?)</h2>
+<h1 id="2-hintergrund">2. Hintergrund</h1>
+<h2 id="21-isabelle-afp-und-formale-beweise">2.1. Isabelle, AFP und formale Beweise</h2>
+<ul>
+<li><strong>(Frage: Soll ich mich hier wiederholen? Ich erkläre in <em>Motivation &amp; Problemstellung</em> ja schon, was das AFP und Isabelle ist)</strong></li>
+<li>Isabelle</li>
+<li>AFP: besteht aus Entries, die aus formalen Theoremen, Definitionen, Beweisen, etc. bestehen</li>
+<li>außerdem: Paper mit Title, Abstract</li>
+</ul>
+<h2 id="22-bestehende-suchmechanismen">2.2. Bestehende Suchmechanismen</h2>
+<ul>
+<li><strong>(Frage: Soll ich mich hier wie oben wieder wiederholen)</strong></li>
+<li>FindFacts, <a href="http://isa-afp.org">isa-afp.org</a>, find_theorem, grep?</li>
+<li>Was ist FindFacts? Wie funktioniert die bisherige Suche?</li>
+<li>aber: unterstützen jeweils nur lexikalische Suche, keine Semantische Suche</li>
+</ul>
+<h2 id="23-transformerbasierte-sprachmodelle">2.3. Transformerbasierte Sprachmodelle</h2>
+<ul>
+<li><strong>(Frage: soll ich Transformer &quot;from scratch&quot; erklären oder ist das zu viel?)</strong></li>
+</ul>
+<h2 id="24-chromadb">2.4. ChromaDB</h2>
+<ul>
+<li><strong>(Frage: soll ich ChromaDB erklären oder nur kurz erwähnen/erklären?)</strong></li>
+<li>z.B. &quot;<a href="https://aclanthology.org/2024.findings-emnlp.470.pdf">https://aclanthology.org/2024.findings-emnlp.470.pdf</a>&quot; geht nur kurz darauf ein</li>
+<li>Ich persönlich finde fast, dass ein eigenes Unterkapitel zu viel dafür ist :)</li>
+</ul>
+<h2 id="25-verwandte-arbeiten">2.5. Verwandte Arbeiten</h2>
+<ul>
+<li>Gao, G., Ju, H., Jiang, J., Qin, Z., &amp; Dong, B. (2024). A semantic search engine for Mathlib4. arXiv preprint arXiv:2403.13310.</li>
+<li>Huch, F., &amp; Krauss, A. (2022). FindFacts: a scalable theorem search. arXiv preprint arXiv:2204.14191.</li>
+<li>genügen 2 Verwandte Arbeiten?</li>
+</ul>
+<h1 id="3-methodik">3. Methodik</h1>
+<h2 id="31-programmaufbau">3.1. Programmaufbau</h2>
+<ul>
+<li>Detaillierte Schritt-für-Schritt Erklärung des Programm-Ablaufs, z.B.:</li>
+<li>benötigt fertigen FindFacts-Index, d.h. baut darauf auf</li>
+<li>verbindet sich mit bereits laufender Solr-Datenbank</li>
+<li>lädt aus der Solr-DB nur Dokumente mit dem &quot;command&quot; theorem/lemma/corollary</li>
+<li>prüft für jedes Theorem, ob dieses bereits vom in der config festgelegten LLM beschrieben informalisiert wurde</li>
+<li>auch z.B. auf Caching und Standard-Konfiguration eingehen</li>
+<li>Generierte LLM-Outputs werden gespeichert und können committet werden, um zu verhindern, das andere Nutzer die selben Outputs nochmal generieren müssen</li>
+<li>...</li>
+<li>bei einer Suchanfrage: LLM umschreibt die Suchanfrage, um die Suchqualität zu verbessern (optional und kann deaktiviert werden)</li>
+<li>startet Flask-API-Server zur Bereitstellung einer REST-API</li>
+</ul>
+<h2 id="32-informalisierung-der-theoreme">3.2. Informalisierung der Theoreme</h2>
+<ul>
+<li>was ist &quot;Informalisierung&quot; der Theorem?
+<ul>
+<li>=&gt; LLM umschreibt den Theorem-Code in informale Sprache, damit es leichter zum Finden ist</li>
+</ul>
+</li>
+<li>warum ausgerechnet das LLM microsoft/Phi-3.5-mini-instruct?
+<ul>
+<li>=&gt; technische Limitationen</li>
+<li>=&gt; Wahl anhand von LLM Leaderboard</li>
+</ul>
+</li>
+<li>Beispiel: Prompt, Input Theorem, Umschreibung</li>
+<li><strong>(Frage: Prompt-Beispiel lieber hier oder in den Anhang mit Referenz?)</strong></li>
+</ul>
+<h1 id="4-benchmark">4. Benchmark</h1>
+<h2 id="41-aufbau-des-benchmarks">4.1. Aufbau des Benchmarks</h2>
+<ul>
+<li>Quelle: Freek's &quot;Top 100 Theorems in Isabelle&quot;</li>
+<li>Struktur der Benchmark-Tabelle: ID, Title, Theorem, Target Identifiers, Link, Session, Annotation als CSV <em>(soll ich jede column erklären?)</em></li>
+<li>Generierung der Queries: Title, Natural language query, noisy natural language query</li>
+<li>Erklärung der Query-Arten und wie sie erstellt wurden (z.B. Zitat aus Wikipedia)</li>
+<li>Beispiel für Query Arten und Ziel Theoreme</li>
+</ul>
+<h2 id="42-benchmark-pipeline-und-vergleich-der-suchstrategien">4.2. Benchmark-Pipeline und Vergleich der Suchstrategien</h2>
+<ul>
+<li>Ablauf des Benchmarks erklären</li>
+<li>Verschiedene Suchstrategien erklären:
+<ul>
+<li>Theorem-Embeddings ohne Metadaten + LLM-Suchanfragen-Umschreibung</li>
+<li>Theorem-Embeddings mit Metadaten + LLM-Suchanfragen-Umschreibung</li>
+<li>Theorem-Embeddings ohne Metadaten ohne LLM-Suchanfragen-Umschreibung</li>
+<li>Theorem-Embeddings mit Metadaten ohne LLM-Suchanfragen-Umschreibung</li>
+<li>Theorem-Embeddings ohne Metadaten + Hybrid (Query + LLM-Suchanfragen-Umschreibung)</li>
+<li>Theorem-Embeddings mit Metadaten + Hybrid (Query + LLM-Suchanfragen-Umschreibung)</li>
+</ul>
+</li>
+</ul>
+<h2 id="43-verwendete-metriken">4.3. Verwendete Metriken</h2>
+<ul>
+<li>jede Metrik als Formel erklären =&gt; was sagt diese Metrik aus?</li>
+</ul>
+<h1 id="5-ergebnis-und-analyse">5. Ergebnis und Analyse</h1>
+<h2 id="51-vergleich-der-suchstrategien">5.1. Vergleich der Suchstrategien</h2>
+<ul>
+<li>Beste Strategie: Ohne Metadata + Hybrid Queries.</li>
+<li>jeden Query-Typ auswerten, d.h. die durchschnittlichen gemessenen Werte für jede Metrik für jede Query beschreiben</li>
+</ul>
+<h2 id="52-erklärung-von-performance-unterschieden">5.2. Erklärung von Performance-Unterschieden</h2>
+<ul>
+<li>Einfluss von Metadaten und Query Refinement</li>
+<li>Beispiel</li>
+<li>Metadaten machen Suche schlechter</li>
+<li>Beispiel</li>
+<li>Refined Queries helfen</li>
+<li>Beispiel</li>
+<li>LLM tendiert zur Reproduktion von Train-Prompts bei langen Prompts (schwer zu erklären, warum)</li>
+<li>wenn die LLM-Umschreibung von Suchanfragen falsch ist sind die Ergebnisse fast immer falsch/schlecht =&gt; Beispiel</li>
+</ul>
+<h1 id="6-limitationen">6. Limitationen</h1>
+<ul>
+<li>Benchmark hardware-technisch beschränkt (GPU hat nicht genug VRAM oder Modelle wie DeepSeek sind laut LLM Benchmark sehr gut aber zu groß)</li>
+<li>Programm funktioniert schlecht auf ressourcenbeschränkten Geräten (z.B. Laptops)</li>
+<li>Die LLM-Umschreibung zu deaktivieren reduziert die Suchzeit erheblich und kann auf ressourcenbeschränkten Geräten helfen, reduziert aber auch die Suchqualität <strong>(Frage: Soll ich hier fixe Werte z.B. 1,9 Sekunden Suchzeit nennen, auch wenn sie eigentlich hardware-abhängig und damit nicht konsistent sind?)</strong></li>
+<li>Benchmark nur von einer Person annotiert/erstellt =&gt; Risiko von Bias oder Fehlern</li>
+<li>wenn die LLM-Umschreibung von Suchanfragen falsch ist sind die Ergebnisse fast immer falsch</li>
+</ul>
+<h1 id="7-zusammenfassung-und-ausblick">7. Zusammenfassung und Ausblick</h1>
+<ul>
+<li>Zusammenfassung</li>
+<li>Idee für Zukunft: Nutzer bei Suchergebnissen fragen &quot;sind diese Ergebnisse hilfreich?&quot; =&gt; sowohl als Trainingsdaten um Bi-Encoder zu erweitern oder tatsächliche Suchqualität außerhalb des Benchmarks zu überprüfen</li>
+<li>KI-Suche kann z.B. in CI/CD-Pipelines oder pre-commit-hooks verwendet werden, um frühzeitig duplizierte Theoreme zu erkennen (im AFP gibt es schon einige Duplikate)</li>
+</ul>
+<h1 id="8-literaturverzeichnis">8. Literaturverzeichnis</h1>
+
+            
+            
+        </body>
+        </html>
