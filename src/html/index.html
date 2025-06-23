@@ -125,8 +125,10 @@ bijections have inverses, bubblesort, ..."></textarea>
                         resultList.innerText = "An error occured:\n" + res;
                     });
                 } else {
-                    resultList.innerHTML = "";
                     response.json().then(res => {
+                        resultList.innerHTML = "";
+                        llmRefinedQuery.innerHTML = "";
+
                         if (firstSearch) {
                             firstSearch = false;
                             aiWarning.style.display = "block";
@@ -134,7 +136,15 @@ bijections have inverses, bubblesort, ..."></textarea>
 
                         if (res.refined_query) {
                             llmRefinedQueryParent.style.display = "block";
-                            llmRefinedQuery.innerText = res.refined_query;
+
+                            try {
+                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
+                                generator = latexjs.parse(res.refined_query.replace("):\n", "): ").trim(), { generator: generator })
+                                llmRefinedQuery.appendChild(generator.domFragment());
+                            } catch(err) {
+                                console.log(err);
+                                llmRefinedQuery.innerText = res.refined_query.replace("):\n", "): ").trim();
+                            }
                         } else {
                             llmRefinedQueryParent.style.display = "none";
                         }
