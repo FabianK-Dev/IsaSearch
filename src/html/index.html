@@ -149,7 +149,8 @@ bijections have inverses, bubblesort, ..."></textarea>
                             }
 
                             if (node.src_code.split("\n").length > 5) {
-                                node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n") + "\n\n... (collapsed)"
+                                node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n")
+                                node.querySelector("#theoremCode").innerHTML = node.querySelector("#theoremCode").innerHTML + "<br><b>... (collapsed)</b>";
                                 node.querySelector("#theoremCodeExpand").style.display = "block";
 
                                 node.querySelector("#theoremCodeExpand").addEventListener("click", () => {
