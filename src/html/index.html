@@ -76,6 +76,10 @@ bijections have inverses, bubblesort, ..."></textarea>
                 <p style="font-size: 14px" id="theoremMetadata"></p>
 
                 <div class="alert alert-light lh-1" role="alert" style="font-family: 'Courier New', Courier, monospace; font-size: 16px;" id="theoremCode"></div>
+                
+                <p>
+                    <a href="javascript:void(0)" role="button" style="display: none;" id="theoremCodeExpand">+ Expand</a>
+                </p>
 
                 <h6><span class="badge text-bg-primary" id="">LLM Summary</span></h6>
                 <p id="theoremLLMSummary" style="font-size: 16px;"></p>
@@ -134,6 +138,7 @@ bijections have inverses, bubblesort, ..."></textarea>
 
                         for (const el of res.results) {
                             let node = template.cloneNode(true);
+                            node.src_code = el.src;
 
                             node.style.display = "block";
                             node.querySelector("#theoremTitle").innerText = el.theory;
@@ -143,7 +148,18 @@ bijections have inverses, bubblesort, ..."></textarea>
                                 node.querySelector("#theoremMetadata").innerHTML = '<a href="' + el.remote_url + '" target="_blank" rel="noopener">Open file</a> | ' + node.querySelector("#theoremMetadata").innerHTML;
                             }
 
-                            node.querySelector("#theoremCode").innerText = el.src;
+                            if (node.src_code.split("\n").length > 5) {
+                                node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n") + "\n\n... (collapsed)"
+                                node.querySelector("#theoremCodeExpand").style.display = "block";
+
+                                node.querySelector("#theoremCodeExpand").addEventListener("click", () => {
+                                    node.querySelector("#theoremCode").innerText = node.src_code;
+                                    node.querySelector("#theoremCodeExpand").style.display = "none";
+                                });
+                            } else {
+                                node.querySelector("#theoremCode").innerText = node.src_code
+                            }
+
                             node.querySelector("#theoremLLMSummary").innerText = el.llm_description.trim();
                             resultList.append(node);
                         }
