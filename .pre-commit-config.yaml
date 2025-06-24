@@ -10,6 +10,7 @@ repos:
         description: prevents giant files from being committed.
         entry: check-added-large-files
         language: python
+        exclude: 'artifacts/.*'
         stages: [pre-commit, pre-push, manual]
         minimum_pre_commit_version: 3.2.0
     -   id: check-ast
@@ -143,6 +144,7 @@ repos:
         description: ensures that a file is either empty, or ends with one newline.
         entry: end-of-file-fixer
         language: python
+        exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
         types: [text]
         stages: [pre-commit, pre-push, manual]
         minimum_pre_commit_version: 3.2.0
