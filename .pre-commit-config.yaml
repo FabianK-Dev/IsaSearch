@@ -2,6 +2,11 @@
 ## The following pre-commit hooks are suggested by https://github.com/pre-commit/pre-commit-hooks/blob/main/.pre-commit-hooks.yaml
 ## The repository "pre-commit-hooks", hosted at https://github.com/pre-commit/pre-commit-hooks, is licensed under MIT License and permits Commercial use, Modification, Distribution and Private use
 repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.0
+    hooks:
+    -   id: ruff-check
+    # -   id: ruff-format
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -133,12 +138,12 @@ repos:
         entry: detect-private-key
         language: python
         types: [text]
-    -   id: double-quote-string-fixer
-        name: fix double quoted strings
-        description: replaces double quoted strings with single quoted strings.
-        entry: double-quote-string-fixer
-        language: python
-        types: [python]
+    # -   id: double-quote-string-fixer
+    #     name: fix double quoted strings
+    #     description: replaces double quoted strings with single quoted strings.
+    #     entry: double-quote-string-fixer
+    #     language: python
+        # types: [python]
     -   id: end-of-file-fixer
         name: fix end of files
         description: ensures that a file is either empty, or ends with one newline.

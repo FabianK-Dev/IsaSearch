@@ -1,4 +1,3 @@
-from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from src.solr import docs_by_ids
 from src.llm import save_llm_output_cache
 
@@ -6,149 +5,179 @@ import os
 import time
 import chromadb
 
+
 def get_chromadb_collection(config, prompts, embedder, document_tree):
     # ChromaDB path
-    if not os.path.exists(config['chroma_db_path']):
-        os.makedirs(config['chroma_db_path'])
+    if not os.path.exists(config["chroma_db_path"]):
+        os.makedirs(config["chroma_db_path"])
 
     # ChromaDB client and collection
-    chroma_db_path = config['chroma_db_path'] + '/chroma_db'
+    chroma_db_path = config["chroma_db_path"] + "/chroma_db"
     print("Loading ChromaDB client at path '" + chroma_db_path + "'...")
 
     chroma_client = chromadb.PersistentClient(path=chroma_db_path)
-    collection = chroma_client.get_or_create_collection('afp_docs', embedding_function=embedder)
+    collection = chroma_client.get_or_create_collection(
+        "afp_docs", embedding_function=embedder
+    )
 
     # Get set of all already existing document IDs (saved at the source key)
     existing = set()
-    metadata_response = collection.get(include=['metadatas'])
+    metadata_response = collection.get(include=["metadatas"])
 
-    if 'metadatas' in metadata_response and metadata_response['metadatas'] is not None:
-        for item in metadata_response['metadatas']:
-            existing.add(item['source'])
+    if "metadatas" in metadata_response and metadata_response["metadatas"] is not None:
+        for item in metadata_response["metadatas"]:
+            existing.add(item["source"])
 
-    print('Preparing documents before adding to ChromaDB collection...')
+    print("Preparing documents before adding to ChromaDB collection...")
     filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
-    print(f'{len(filtered_tree)} documents are still missing in ChromaDB collection.')
+    print(f"{len(filtered_tree)} documents are still missing in ChromaDB collection.")
 
     for i in range(0, len(filtered_tree), 5000):
-        doc_ids = filtered_tree[i:i + 5000]
-        print(f'Processing documents {i} to {i + len(doc_ids)}...')
+        doc_ids = filtered_tree[i : i + 5000]
+        print(f"Processing documents {i} to {i + len(doc_ids)}...")
 
         doc_embeddings = []
         metadatas = []
 
         for doc_id in doc_ids:
             doc = document_tree[doc_id]
-            doc_src = doc['llm_description'].strip() + '\n\n' + doc['src'].strip()
-            embedding_str = prompts['embed'].format(doc_src=doc_src)
+            doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
+            embedding_str = prompts["embed"].format(doc_src=doc_src)
 
             doc_embeddings.append(embedding_str)
-            metadatas.append({'source': doc['id']})
+            metadatas.append({"source": doc["id"]})
 
-        collection.add(
-            documents=doc_embeddings,
-            ids=doc_ids,
-            metadatas=metadatas)
+        collection.add(documents=doc_embeddings, ids=doc_ids, metadatas=metadatas)
 
     return collection
 
-def search(search_query, collection, prompts, model, config, document_tree, refine_query=True, llm_output_cache=None):
+
+def search(
+    search_query,
+    collection,
+    prompts,
+    model,
+    config,
+    document_tree,
+    refine_query=True,
+    llm_output_cache=None,
+):
     start = time.time()
     cached_duration = None
     docs_to_retrieve = 100
     refined_query = None
 
     if refine_query:
-        llm_prompt = prompts['search_refine'].format(search_query=search_query)
+        llm_prompt = prompts["search_refine"].format(search_query=search_query)
 
         # TODO: Move this to a separate function
-        if llm_output_cache is not None and config['vllm_name'] in llm_output_cache and llm_prompt in llm_output_cache[config['vllm_name']]:
+        if (
+            llm_output_cache is not None
+            and config["vllm_name"] in llm_output_cache
+            and llm_prompt in llm_output_cache[config["vllm_name"]]
+        ):
             print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
-            refined_query = llm_output_cache[config['vllm_name']][llm_prompt]['output']
-            cached_duration = llm_output_cache[config['vllm_name']][llm_prompt]['output_duration']
+            refined_query = llm_output_cache[config["vllm_name"]][llm_prompt]["output"]
+            cached_duration = llm_output_cache[config["vllm_name"]][llm_prompt][
+                "output_duration"
+            ]
         else:
             llm_output_cache = llm_output_cache if llm_output_cache is not None else {}
             with model.chat_session():
                 refined_query = model.generate(
                     llm_prompt,
-                    max_tokens=config['sampling_parameters']['max_tokens'],
-                    temp=config['sampling_parameters']['temperature'],
-                    top_p=config['sampling_parameters']['top_p'],
-                    top_k=config['sampling_parameters']['top_k'],
-                    min_p=config['sampling_parameters']['min_p'])
+                    max_tokens=config["sampling_parameters"]["max_tokens"],
+                    temp=config["sampling_parameters"]["temperature"],
+                    top_p=config["sampling_parameters"]["top_p"],
+                    top_k=config["sampling_parameters"]["top_k"],
+                    min_p=config["sampling_parameters"]["min_p"],
+                )
 
             end = time.time()
-            output_duration  = end - start
+            output_duration = end - start
 
-            if config['vllm_name'] not in llm_output_cache:
-                llm_output_cache[config['vllm_name']] = {}
+            if config["vllm_name"] not in llm_output_cache:
+                llm_output_cache[config["vllm_name"]] = {}
 
-            llm_output_cache[config['vllm_name']][llm_prompt] = {
-                'output': refined_query,
-                'output_duration': output_duration
+            llm_output_cache[config["vllm_name"]][llm_prompt] = {
+                "output": refined_query,
+                "output_duration": output_duration,
             }
 
-            if config['enable_llm_output_cache']:
+            if config["enable_llm_output_cache"]:
                 save_llm_output_cache(llm_output_cache, config)
 
         try:
-            refined_query = refined_query.split('<BEGIN>')[1]
-            refined_query = refined_query.split('<END>')[0]
-        except Exception as err:
-            print(f"Warning: Could not extract refined query using <BEGIN> and <END> from text generated by LLM for query '" + search_query + "', thus using it for search as is.")
+            refined_query = refined_query.split("<BEGIN>")[1]
+            refined_query = refined_query.split("<END>")[0]
+        except Exception:
+            print(
+                "Warning: Could not extract refined query using <BEGIN> and <END> from text generated by LLM for query '"
+                + search_query
+                + "', thus using it for search as is."
+            )
 
-        query_text = prompts['retrieve'].format(search_query=search_query + '\n\n' + refined_query)
+        query_text = prompts["retrieve"].format(
+            search_query=search_query + "\n\n" + refined_query
+        )
     else:
-        query_text = prompts['retrieve'].format(search_query=search_query)
+        query_text = prompts["retrieve"].format(search_query=search_query)
 
     query_result = collection.query(
-        query_texts=[query_text],
-        n_results=docs_to_retrieve
+        query_texts=[query_text], n_results=docs_to_retrieve
     )
     results = {}
 
-    for metadata, distance in zip(query_result['metadatas'][0], query_result['distances'][0]):
-        result_id = metadata['source']
+    for metadata, distance in zip(
+        query_result["metadatas"][0], query_result["distances"][0]
+    ):
+        result_id = metadata["source"]
         results[result_id] = {
-            'distance': distance,
-            'id': result_id,
-            'llm_description': document_tree[result_id]['llm_description']
+            "distance": distance,
+            "id": result_id,
+            "llm_description": document_tree[result_id]["llm_description"],
         }
 
     end = time.time()
     search_duration = end - start
 
-    if cached_duration != None:
+    if cached_duration is not None:
         search_duration = search_duration + cached_duration
 
     return {
-        'results': results,
-        'duration': search_duration,
-        'refined_query': refined_query
+        "results": results,
+        "duration": search_duration,
+        "refined_query": refined_query,
     }
 
+
 def search_results_to_docs(search_results, solr, config):
-    ids = [_id for _id in search_results['results']]
+    ids = [_id for _id in search_results["results"]]
 
     for doc in docs_by_ids(solr, ids):
-        doc_id = doc['id']
+        doc_id = doc["id"]
         # Merge search_results with Solr documents
-        search_results['results'][doc_id] = {
-            **search_results['results'][doc_id],
-            **doc
-        }
+        search_results["results"][doc_id] = {**search_results["results"][doc_id], **doc}
 
         # Add direct link to file in remote repository
-        sub_path = search_results['results'][doc_id]['file'].split('/thys/')
+        sub_path = search_results["results"][doc_id]["file"].split("/thys/")
         if len(sub_path) > 1:
-            search_results['results'][doc_id]['remote_url'] = config['afp_remote_thys_folder_url'] + '/' + sub_path[1] + '#L' + str(search_results['results'][doc_id]['start_line'])
+            search_results["results"][doc_id]["remote_url"] = (
+                config["afp_remote_thys_folder_url"]
+                + "/"
+                + sub_path[1]
+                + "#L"
+                + str(search_results["results"][doc_id]["start_line"])
+            )
         else:
-            search_results['results'][doc_id]['remote_url'] = '#'
+            search_results["results"][doc_id]["remote_url"] = "#"
 
         # Remove HTML and XML from API response to lower response size and network usage
-        del search_results['results'][doc_id]['html'];
-        del search_results['results'][doc_id]['xml'];
+        del search_results["results"][doc_id]["html"]
+        del search_results["results"][doc_id]["xml"]
 
     # Convert search_results["results"] to a list => this makes sorting or receiving the nth result easier
-    search_results['results'] = [value for _, value in search_results['results'].items()]
+    search_results["results"] = [
+        value for _, value in search_results["results"].items()
+    ]
     return search_results
