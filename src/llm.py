@@ -1,9 +1,11 @@
-from pathlib import Path
-from gpt4all import GPT4All
 import glob
 import json
 import os
+
+from pathlib import Path
+
 import torch
+from gpt4all import GPT4All
 
 
 def load_prompts(config):

@@ -1,9 +1,10 @@
-from src.solr import docs_by_ids
-from src.llm import save_llm_output_cache
-
 import os
 import time
 import chromadb
+
+
+from src.solr import docs_by_ids
+from src.llm import save_llm_output_cache
 
 
 def get_chromadb_collection(config, prompts, embedder, document_tree):

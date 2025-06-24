@@ -1,8 +1,3 @@
-from vllm import LLM, SamplingParams
-from vllm.distributed.parallel_state import destroy_model_parallel
-from tqdm import tqdm
-from nltk.corpus import stopwords
-
 import gc
 import json
 import os
@@ -11,6 +6,13 @@ import tomllib
 import zlib
 import re
 import nltk
+
+
+from vllm import LLM, SamplingParams
+from vllm.distributed.parallel_state import destroy_model_parallel
+from tqdm import tqdm
+from nltk.corpus import stopwords
+
 
 cached_metadata = {}
 

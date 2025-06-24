@@ -1,15 +1,15 @@
+import json
+from pprint import pprint
+
+import torch
+from transformers import AutoTokenizer
+from chromadb.utils import embedding_functions
+from flask import Flask, request, send_from_directory
+
 from src.solr import connect_solr
 from src.documents import build_document_tree, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
 from src.llm import load_prompts, get_llm, get_llm_output_cache
-
-from transformers import AutoTokenizer
-from pprint import pprint
-from chromadb.utils import embedding_functions
-from flask import Flask, request, send_from_directory
-
-import json
-import torch
 
 print("Loading config...")
 with open("config.json", "r") as file:
