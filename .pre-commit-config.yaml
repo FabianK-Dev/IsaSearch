@@ -54,7 +54,7 @@ repos:
         entry: check-json
         language: python
         types: [json]
-        exclude: '.cache/*.json|artifacts/*.json|benchmark/results/*.json'
+        exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
     -   id: check-shebang-scripts-are-executable
         name: check that scripts with shebangs are executable
         description: ensures that (non-binary) files with a shebang are executable.
@@ -68,7 +68,7 @@ repos:
         description: sets a standard for formatting json files.
         entry: pretty-format-json
         language: python
-        exclude: '.cache/*.json|artifacts/*.json|benchmark/results/*.json'
+        exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
         types: [json]
     -   id: check-merge-conflict
         name: check for merge conflicts
