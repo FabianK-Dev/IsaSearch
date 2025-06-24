@@ -54,6 +54,7 @@ repos:
         entry: check-json
         language: python
         types: [json]
+        exclude: '.cache/*.json|artifacts/*.json|benchmark/results/*.json'
     -   id: check-shebang-scripts-are-executable
         name: check that scripts with shebangs are executable
         description: ensures that (non-binary) files with a shebang are executable.
@@ -62,13 +63,13 @@ repos:
         types: [text]
         stages: [pre-commit, pre-push, manual]
         minimum_pre_commit_version: 3.2.0
-    # Disabled to avoid benchmark JSON results getting pretty-formatted every time
-    # -   id: pretty-format-json
-    #     name: pretty format json
-    #     description: sets a standard for formatting json files.
-    #     entry: pretty-format-json
-    #     language: python
-    #     types: [json]
+    -   id: pretty-format-json
+        name: pretty format json
+        description: sets a standard for formatting json files.
+        entry: pretty-format-json
+        language: python
+        exclude: '.cache/*.json|artifacts/*.json|benchmark/results/*.json'
+        types: [json]
     -   id: check-merge-conflict
         name: check for merge conflicts
         description: checks for files that contain merge conflict strings.
