@@ -41,14 +41,14 @@ def normalized_discounted_cumulative_gain(results, target_identifier):
     idcg = 0
     for i in range(len(target_identifier)):
         idcg += 1 / math.log2(i + 2)
-    
+
     if idcg > 0:
         return dcg / idcg
     else:
         return 0
 
 # reciprocal_rank = (1 / rank) where rank_i is the rank of the first relevant document
-def reciprocal_rank(results, target_identifier): 
+def reciprocal_rank(results, target_identifier):
     for i, result in enumerate(results):
         if is_correct_target(result, target_identifier):
             return 1 / (i + 1)
@@ -64,38 +64,38 @@ def rank(results, target_identifier):
 
 def calculate_mean_metrics(benchmark_results):
     metrics = {
-        "all_queries": {}
+        'all_queries': {}
     }
 
     for target_id in benchmark_results:
-        is_skipped = "skipped" in benchmark_results[target_id]["metadata"] and benchmark_results[target_id]["metadata"]["skipped"]
+        is_skipped = 'skipped' in benchmark_results[target_id]['metadata'] and benchmark_results[target_id]['metadata']['skipped']
         if is_skipped:
-            print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True with reason: '" + benchmark_results[target_id]["metadata"]["skipped_reason"] + "'")
+            print("Skipping '" + target_id + "' in metrics mean calculation because it is marked as \"skipped\" = True with reason: '" + benchmark_results[target_id]['metadata']['skipped_reason'] + "'")
             continue
 
-        for query_type in benchmark_results[target_id]["queries"]:
+        for query_type in benchmark_results[target_id]['queries']:
             if query_type not in metrics:
                 metrics[query_type] = {}
 
-            for metric in benchmark_results[target_id]["queries"][query_type]["metrics"]:
-                metric_value = benchmark_results[target_id]["queries"][query_type]["metrics"][metric]
+            for metric in benchmark_results[target_id]['queries'][query_type]['metrics']:
+                metric_value = benchmark_results[target_id]['queries'][query_type]['metrics'][metric]
 
                 if metric not in metrics[query_type]:
-                    metrics[query_type][metric] = { "total": 0, "sample_size": 0 }
+                    metrics[query_type][metric] = { 'total': 0, 'sample_size': 0 }
 
-                metrics[query_type][metric]["total"] += metric_value
-                metrics[query_type][metric]["sample_size"] += 1
+                metrics[query_type][metric]['total'] += metric_value
+                metrics[query_type][metric]['sample_size'] += 1
 
-                if metric not in metrics["all_queries"]:
-                    metrics["all_queries"][metric] = { "total": 0, "sample_size": 0 }
+                if metric not in metrics['all_queries']:
+                    metrics['all_queries'][metric] = { 'total': 0, 'sample_size': 0 }
 
-                metrics["all_queries"][metric]["total"] += metric_value
-                metrics["all_queries"][metric]["sample_size"] += 1
+                metrics['all_queries'][metric]['total'] += metric_value
+                metrics['all_queries'][metric]['sample_size'] += 1
 
     # Calculate the average
     for query_type in metrics:
         for metric in metrics[query_type]:
-            metrics[query_type][metric]["average"] = metrics[query_type][metric]["total"] / metrics[query_type][metric]["sample_size"]
-            del metrics[query_type][metric]["total"]
+            metrics[query_type][metric]['average'] = metrics[query_type][metric]['total'] / metrics[query_type][metric]['sample_size']
+            del metrics[query_type][metric]['total']
 
     return metrics

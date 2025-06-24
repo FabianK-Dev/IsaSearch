@@ -64,13 +64,13 @@ repos:
         types: [text]
         stages: [pre-commit, pre-push, manual]
         minimum_pre_commit_version: 3.2.0
-    -   id: pretty-format-json
-        name: pretty format json
-        description: sets a standard for formatting json files.
-        entry: pretty-format-json
-        language: python
-        exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
-        types: [json]
+    # -   id: pretty-format-json
+    #     name: pretty format json
+    #     description: sets a standard for formatting json files.
+    #     entry: pretty-format-json
+    #     language: python
+    #     exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
+    #     types: [json]
     -   id: check-merge-conflict
         name: check for merge conflicts
         description: checks for files that contain merge conflict strings.

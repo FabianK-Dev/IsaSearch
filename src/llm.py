@@ -6,51 +6,51 @@ import os
 import torch
 
 def load_prompts(config):
-    prompts_folder = config["prompts_folder"]
+    prompts_folder = config['prompts_folder']
     prompts = {}
 
-    for file in glob.glob(prompts_folder + "/*.txt"):
+    for file in glob.glob(prompts_folder + '/*.txt'):
         prompt_name = Path(file).stem
 
-        with open(file, "r") as file:
+        with open(file, 'r') as file:
             data = file.read()
             prompts[prompt_name] = data
 
     return prompts
 
 def save_llm_output_cache(llm_output_cache, config):
-    print("Saving LLM output cache...")
+    print('Saving LLM output cache...')
 
-    CACHE_FOLDER = config["cache_folder"]
-    LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
+    CACHE_FOLDER = config['cache_folder']
+    LLM_OUTPUT_CACHE = f'{CACHE_FOLDER}/llm_output_cache.json'
 
-    with open(LLM_OUTPUT_CACHE, "w") as file:
+    with open(LLM_OUTPUT_CACHE, 'w') as file:
         json.dump(llm_output_cache, file, indent=4)
 
 def get_llm(config):
     model = GPT4All(
-        config["llm_name"],
-        device="cuda" if torch.cuda.is_available() else "cpu",
+        config['llm_name'],
+        device='cuda' if torch.cuda.is_available() else 'cpu',
         n_ctx=1024
     )
     return model
 
 def get_llm_output_cache(config):
     llm_output_cache = None
-    if config["enable_llm_output_cache"]:
-        CACHE_FOLDER = config["cache_folder"]
-        LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
+    if config['enable_llm_output_cache']:
+        CACHE_FOLDER = config['cache_folder']
+        LLM_OUTPUT_CACHE = f'{CACHE_FOLDER}/llm_output_cache.json'
 
         if not os.path.exists(LLM_OUTPUT_CACHE):
             print("Warning: LLM output cache file '" + LLM_OUTPUT_CACHE + "' does not exist, thus a new one will be created.")
             llm_output_cache = {}
         else:
-            print("Loading LLM output cache...")
-            with open(LLM_OUTPUT_CACHE, "r") as file:
+            print('Loading LLM output cache...')
+            with open(LLM_OUTPUT_CACHE, 'r') as file:
                 data = file.read()
                 llm_output_cache = json.loads(data)
-                print("Finished loading LLM output cache.")
+                print('Finished loading LLM output cache.')
     else:
-        print("LLM output caching is disabled in the config.")
+        print('LLM output caching is disabled in the config.')
 
     return llm_output_cache
