@@ -70,7 +70,6 @@ def search(
     if refine_query:
         llm_prompt = prompts["search_refine"].format(search_query=search_query)
 
-        # TODO: Move this to a separate function
         if (
             llm_output_cache is not None
             and config["vllm_name"] in llm_output_cache

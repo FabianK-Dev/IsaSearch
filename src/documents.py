@@ -47,17 +47,6 @@ def relevant_doc_keys(solr_document, config):
     }
 
 
-# # TODO: remove in future
-# benchmark_df = pd.read_csv('./benchmark/benchmark.csv')
-# benchmark_df = benchmark_df.reset_index()
-# target_identifiers = " ".join(benchmark_df["Target Identifier"].astype(str).tolist())
-
-# # TODO: remove in future
-# with open("benchmark/scrape_statistics.json", "r") as file:
-#     data = file.read()
-#     scrape_statistics = json.loads(data)
-
-
 def fetch_all_docs(solr, config):
     document_tree = {}
 
@@ -69,16 +58,7 @@ def fetch_all_docs(solr, config):
     )
     max_docs = results.raw_response["response"]["numFound"]
 
-    # TODO: remove in future
-    # allow = 0
     for result in results:
-        #     # TODO: remove in future
-        #     if "entity_kname" in result and result["entity_kname"] in target_identifiers:
-        #         result_filtered = relevant_doc_keys(result)
-        #         document_tree[result["id"]] = result_filtered
-        #         allow = 200
-        #     elif allow > 0:
-        #         allow -= 1
         result_filtered = relevant_doc_keys(result, config)
         document_tree[result["id"]] = result_filtered
 
@@ -91,16 +71,7 @@ def fetch_all_docs(solr, config):
             rows=docs_per_page,
         )
 
-        # TODO: remove in future
-        # allow = 0
         for result in results:
-            #     # TODO: remove in future
-            #     if "entity_kname" in result and result["entity_kname"] in target_identifiers:
-            #         result_filtered = relevant_doc_keys(result)
-            #         document_tree[result["id"]] = result_filtered
-            #         allow = 200
-            #     elif allow > 0:
-            #         allow -= 1
             result_filtered = relevant_doc_keys(result, config)
             document_tree[result["id"]] = result_filtered
 
