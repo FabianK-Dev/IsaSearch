@@ -2,6 +2,7 @@ import pysolr
 
 
 def connect_solr(config):
+    """Connects to a running Solr database which is reachable at config["solr_core_url"]. Afterwards a health check is done to ensure Solr is running correctly."""
     print("Connect to Solr at " + config["solr_core_url"] + "...")
     solr = pysolr.Solr(config["solr_core_url"], always_commit=True, timeout=10)
 
@@ -12,6 +13,7 @@ def connect_solr(config):
 
 
 def docs_by_ids(solr, ids):
+    """Given a list of Solr document IDs, return a list of all documents identified by the IDs."""
     id_strings = []
 
     for _id in ids:
