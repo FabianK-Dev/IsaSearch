@@ -18,8 +18,8 @@
 - total: 1*2*3 = 5 runs
 
 ## Deployment
-- [ ] Flask
-- [ ] UI with Bootstrap
+- [x] Flask
+- [x] UI with Bootstrap
 
 ## Optional
 - [x] Docker image

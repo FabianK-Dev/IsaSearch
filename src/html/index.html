@@ -7,6 +7,7 @@
     <title>AFP AI Search</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link href=" https://cdn.jsdelivr.net/npm/latex.js@0.12.6/dist/css/katex.min.css " rel="stylesheet">
 </head>
 
 <body>
@@ -77,6 +78,10 @@ bijections have inverses, bubblesort, ..."></textarea>
 
                 <div class="alert alert-light lh-1" role="alert" style="font-family: 'Courier New', Courier, monospace; font-size: 16px;" id="theoremCode"></div>
 
+                <p>
+                    <a href="javascript:void(0)" role="button" style="display: none; font-size: 14px;" id="theoremCodeExpand">+ Expand</a>
+                </p>
+
                 <h6><span class="badge text-bg-primary" id="">LLM Summary</span></h6>
                 <p id="theoremLLMSummary" style="font-size: 16px;"></p>
 
@@ -92,6 +97,8 @@ bijections have inverses, bubblesort, ..."></textarea>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
         crossorigin="anonymous"></script>
+
+    <script src=" https://cdn.jsdelivr.net/npm/latex.js@0.12.6/dist/latex.min.js "></script>
 
     <script>
         // Initialize tooltips
@@ -118,8 +125,10 @@ bijections have inverses, bubblesort, ..."></textarea>
                         resultList.innerText = "An error occured:\n" + res;
                     });
                 } else {
-                    resultList.innerHTML = "";
                     response.json().then(res => {
+                        resultList.innerHTML = "";
+                        llmRefinedQuery.innerHTML = "";
+
                         if (firstSearch) {
                             firstSearch = false;
                             aiWarning.style.display = "block";
@@ -127,13 +136,22 @@ bijections have inverses, bubblesort, ..."></textarea>
 
                         if (res.refined_query) {
                             llmRefinedQueryParent.style.display = "block";
-                            llmRefinedQuery.innerText = res.refined_query;
+
+                            try {
+                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
+                                generator = latexjs.parse(res.refined_query.replace("):\n", "): ").trim(), { generator: generator })
+                                llmRefinedQuery.appendChild(generator.domFragment());
+                            } catch(err) {
+                                console.log(err);
+                                llmRefinedQuery.innerText = res.refined_query.replace("):\n", "): ").trim();
+                            }
                         } else {
                             llmRefinedQueryParent.style.display = "none";
                         }
 
                         for (const el of res.results) {
                             let node = template.cloneNode(true);
+                            node.src_code = el.src;
 
                             node.style.display = "block";
                             node.querySelector("#theoremTitle").innerText = el.theory;
@@ -143,8 +161,29 @@ bijections have inverses, bubblesort, ..."></textarea>
                                 node.querySelector("#theoremMetadata").innerHTML = '<a href="' + el.remote_url + '" target="_blank" rel="noopener">Open file</a> | ' + node.querySelector("#theoremMetadata").innerHTML;
                             }
 
-                            node.querySelector("#theoremCode").innerText = el.src;
-                            node.querySelector("#theoremLLMSummary").innerText = el.llm_description.trim();
+                            if (node.src_code.split("\n").length > 5) {
+                                node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n")
+                                node.querySelector("#theoremCode").innerHTML = node.querySelector("#theoremCode").innerHTML + "<br><b>... (collapsed)</b>";
+                                node.querySelector("#theoremCodeExpand").style.display = "block";
+
+                                node.querySelector("#theoremCodeExpand").addEventListener("click", () => {
+                                    node.querySelector("#theoremCode").innerText = node.src_code;
+                                    node.querySelector("#theoremCodeExpand").style.display = "none";
+                                });
+                            } else {
+                                node.querySelector("#theoremCode").innerText = node.src_code
+                            }
+
+                            let llm_description = el.llm_description.replace("):\n", "): ").trim();
+
+                            try {
+                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
+                                generator = latexjs.parse(llm_description, { generator: generator })
+                                node.querySelector("#theoremLLMSummary").appendChild(generator.domFragment());
+                            } catch(err) {
+                                node.querySelector("#theoremLLMSummary").innerText = llm_description;
+                            }
+
                             resultList.append(node);
                         }
                     });

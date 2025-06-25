@@ -21,11 +21,11 @@ with open(CACHE_FILE, "r") as file:
 scrape_statistics = {
     "unique_sessions": [],
     "unknown_sessions": 0,
-    "unknwon_session_urls": []
+    "unknwon_session_urls": [],
 }
 
 with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
-    fieldnames = ['ID', 'Title', 'Theorem', 'Link', 'Session', 'Title query']
+    fieldnames = ["ID", "Title", "Theorem", "Link", "Session", "Title query"]
     writer = csv.DictWriter(file, fieldnames=fieldnames)
     writer.writeheader()
 
@@ -37,36 +37,44 @@ with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
 
         code_div = h2.find_next("div", class_="highlight")
         inner_text = code_div.get_text(strip=False) if code_div else "?"
-        #inner_text = inner_text.split("\n")[0]
+        # inner_text = inner_text.split("\n")[0]
 
         prev_a = h2.find_next("a", class_="uri")
         href = prev_a.get("href", "") if prev_a else "?"
-        
+
         if "/entries/" in href:
             session = href.split("/entries/")[1].split(".")[0]
-            
+
             if session not in scrape_statistics["unique_sessions"]:
-                scrape_statistics["unique_sessions"] = scrape_statistics["unique_sessions"] + [session]
+                scrape_statistics["unique_sessions"] = scrape_statistics[
+                    "unique_sessions"
+                ] + [session]
         elif "/library/" in href:
             session = href.split("/library/HOL/")[1].split("/")[0]
-            
+
             if session not in scrape_statistics["unique_sessions"]:
-                scrape_statistics["unique_sessions"] = scrape_statistics["unique_sessions"] + [session]
+                scrape_statistics["unique_sessions"] = scrape_statistics[
+                    "unique_sessions"
+                ] + [session]
         else:
             session = "?"
 
             if href not in scrape_statistics["unknwon_session_urls"]:
                 scrape_statistics["unknown_sessions"] += 1
-                scrape_statistics["unknwon_session_urls"] = scrape_statistics["unknwon_session_urls"] + [href]
+                scrape_statistics["unknwon_session_urls"] = scrape_statistics[
+                    "unknwon_session_urls"
+                ] + [href]
 
-        writer.writerow({
-            'ID': id_,
-            'Title': title,
-            'Theorem': inner_text,
-            'Link': href,
-            'Session': session,
-            'Title query': title
-        })
+        writer.writerow(
+            {
+                "ID": id_,
+                "Title": title,
+                "Theorem": inner_text,
+                "Link": href,
+                "Session": session,
+                "Title query": title,
+            }
+        )
 
         print("ID:", id_)
         print("Titel:", title)

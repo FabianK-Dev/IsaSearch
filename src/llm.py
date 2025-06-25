@@ -1,9 +1,12 @@
-from pathlib import Path
-from gpt4all import GPT4All
 import glob
 import json
 import os
+
+from pathlib import Path
+
 import torch
+from gpt4all import GPT4All
+
 
 def load_prompts(config):
     prompts_folder = config["prompts_folder"]
@@ -18,6 +21,7 @@ def load_prompts(config):
 
     return prompts
 
+
 def save_llm_output_cache(llm_output_cache, config):
     print("Saving LLM output cache...")
 
@@ -27,13 +31,15 @@ def save_llm_output_cache(llm_output_cache, config):
     with open(LLM_OUTPUT_CACHE, "w") as file:
         json.dump(llm_output_cache, file, indent=4)
 
+
 def get_llm(config):
     model = GPT4All(
         config["llm_name"],
         device="cuda" if torch.cuda.is_available() else "cpu",
-        n_ctx=1024
+        n_ctx=1024,
     )
     return model
+
 
 def get_llm_output_cache(config):
     llm_output_cache = None
@@ -42,7 +48,11 @@ def get_llm_output_cache(config):
         LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
 
         if not os.path.exists(LLM_OUTPUT_CACHE):
-            print("Warning: LLM output cache file '" + LLM_OUTPUT_CACHE + "' does not exist, thus a new one will be created.")
+            print(
+                "Warning: LLM output cache file '"
+                + LLM_OUTPUT_CACHE
+                + "' does not exist, thus a new one will be created."
+            )
             llm_output_cache = {}
         else:
             print("Loading LLM output cache...")
