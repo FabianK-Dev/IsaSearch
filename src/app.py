@@ -1,5 +1,5 @@
 """
-This module initializes all required components, i.e. Solr, tokenizer, prompts, document_tree, document_descriptions, ChromaDB, LLM and LLM output cache
+app.py: This module initializes all required components, i.e. Solr, tokenizer, prompts, document_tree, document_descriptions, ChromaDB, LLM and LLM output cache and opens a Flask server that serves both the REST API and the web UI.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
 - Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
@@ -10,14 +10,12 @@ This module initializes all required components, i.e. Solr, tokenizer, prompts, 
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
 
-Finally, Flask and package 'waitress' is used to serve both the rest API and static files (e.g. HTML)
+Finally, Flask and package 'waitress' is used to serve both the REST API and static files (e.g. HTML, images, etc.)
 """
 
 import json
 
-import torch
 from transformers import AutoTokenizer
-from chromadb.utils import embedding_functions
 from flask import Flask, request, send_from_directory
 
 from src.solr import connect_solr
@@ -46,16 +44,11 @@ document_tree = build_document_tree(config, solr)
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
-# Clean up tokenizer to free up memory
+print("Clean up tokenizer to free up memory")
 del tokenizer
 
-print("Loading ChromaDB embedding function...")
-embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="sentence-transformers/multi-qa-distilbert-cos-v1",
-    device="cuda" if torch.cuda.is_available() else "cpu",
-)
 print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, embedder, document_tree)
+collection = get_chromadb_collection(config, prompts, document_tree)
 
 print("Loading LLM...")
 model = get_llm(config)
@@ -88,7 +81,8 @@ def search_endpoint():
     refine_query = request.args.get("refine_query", "true").lower() == "true"
     print(f"Received search query: {query}")
 
-    # search
+    # Search the given query with refine_query enabled/disabled and provide all loaded variables from above
+    # search() returns a dict with document IDs only (instead of theorem source codes) to save RAM
     results_dict = search(
         query,
         collection,
@@ -99,6 +93,7 @@ def search_endpoint():
         refine_query,
         llm_output_cache=llm_output_cache,
     )
+    # Next, use the returned document IDs from search() and receive the corresponding documents by their IDs (including all data, such as theorem source code) from Solr
     results_list = search_results_to_docs(results_dict, solr, config)
 
     return results_list
@@ -109,6 +104,7 @@ if __name__ == "__main__":
         f"Serving Flask API on port {config['api_port']}... Open: http://localhost:{config['api_port']}/"
     )
     # Import the package here (and not at the start of the file) because it is only loaded if this script is run directly
+    # __name__ == "__main__" makes sure this condition is not True if app.py is imported (import src.app) => there is no need to open a flask server in that case
     from waitress import serve
 
     serve(app, host="0.0.0.0", port=config["api_port"], threads=1)
