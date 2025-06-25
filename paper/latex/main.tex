@@ -137,7 +137,9 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 - Anschließend wird eine Verbindung zur laufenden Solr-Instanz aufgebaut.\\
 - Ebenfalls werden alle Prompts, die als Vorlage im Ordner prompts gespeichert sind und später für Eingaben an das LLM verwendet werden, geladen.\\
 - Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderungen an das LLM berechnen zu können wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenizer geladen.\\
-- Hierbei wird für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert.
+- Hierbei wird für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert.\\
+- Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.\\
+
 
 \section{Notes on form}
 \subsection{Formatting}
