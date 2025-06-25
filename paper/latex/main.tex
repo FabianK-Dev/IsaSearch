@@ -1,4 +1,4 @@
-\documentclass[12pt,letterpaper]{article} % a. Set paper size to Letter, 8½ x 11. 
+\documentclass[12pt,letterpaper]{article} % a. Set paper size to Letter, 8½ x 11.
 
 % TODO: change author's name in settings
 \input{settings}
@@ -115,13 +115,25 @@ Ablieferungstermin: \date{\today} \\
 \renewcommand{\headrulewidth}{0pt} %obere Trennlinie
 
 \section{Introduction}
-This document serves as a template for bachelor or master theses in the 'Chair of Theoretical Computer Science and Theorem Proving' at \gls{lmu}. 
+This document serves as a template for bachelor or master theses in the 'Chair of Theoretical Computer Science and Theorem Proving' at \gls{lmu}.
 By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage\{german\}$ the documents language is changed.
 \\ To build the main version run the command \texttt{make} in the terminal.
 \\The template follows the guidelines of the journal \emph{language} (\url{http://www.linguisticsociety.org/sites/default/files/style-sheet.pdf}).
 
+\section{Methodik}
+\subsection{Programmaufbau}
+- Der gesamte Programmablauf, welcher die REST-API und die Webanwendung bereitstellt, wird beim Start der Anwendung in app.py im Wurzelverzeichnis des Repositorys initialisiert.\\
+- Die semantische KI-Suche baut auf einem vollständig indizierten FindFacts-Index auf, der über eine laufende Solr-Datenbank bereitgestellt wird.\\
+- FindFacts ist ein offizieller Bestandteil der aktuellen Isabelle-Distribution und ermöglicht eine Volltextsuche über formale Theorien.\\
+- Der FindFacts-Index wird mithilfe des Werkzeugs isabelle find_facts_index erstellt.\\
+- Dieses Werkzeug nutzt die bereits vorhandenen Session-Daten aus einem regulären isabelle build, um einen Suchindex für die Volltextsuche nach formalen Theorieinhalten zu generieren.\\
+- Es integriert intern Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist, die im JVM-Prozess eingebettet läuft.\\
+- Der erstellte Suchindex wird standardmäßig im Verzeichnis \$USER_HOME/.isabelle/ISABELLE_VERSION/find_facts/solr, gespeichert, wobei USER_HOME das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und ISABELLE_VERSION der Isabelle-Version entspricht, die installiert ist und mit welcher die FindFacts-Komponente aufgerufen wurde.\\
+- Der Name des Indexes kann über die Systemoption find_facts_database_name festgelegt werden.\\
+- Der erzeugte Index liegt in Form einer Solr-Datenbank vor\\
+
 \section{Notes on form}
-\subsection{Formatting} 
+\subsection{Formatting}
 
 This LaTeX template uses the following formatting:
 \begin{itemize}
@@ -136,7 +148,7 @@ This LaTeX template uses the following formatting:
 \noindent
 When implementing the specifications in Word, it is essential to define style sheets.
 
-\subsection{Citation} 
+\subsection{Citation}
 \label{sec:cit}
 
 The citation method follows the author-year system. Place reference is in the text, footnotes should only be used for explanations and comments. The following notes are taken from the \emph{language} bibliography template from \url{ron.artstein.org}:\newline
@@ -151,7 +163,7 @@ The \emph{Language} style sheet makes a distinction between two kinds of in-text
   \item Two authors are joined by an ampersand (\&).
   \item More than two authors are abbreviated with \emph{et al.}
   \item No parentheses are placed around the year (though parentheses
-    may contain the whole citation). 
+    may contain the whole citation).
   \end{itemize}
 \item Citing an author:
   \begin{itemize}
@@ -161,7 +173,7 @@ The \emph{Language} style sheet makes a distinction between two kinds of in-text
   \item More than two authors are abbreviated with \emph{and colleagues}.
   \item The year is surrounded by parentheses (with page numbers, if
     present).
-  \end{itemize} 
+  \end{itemize}
 \end{itemize}
 To provide for both kinds of citations, \verb+language.bst+ capitalizes on the fact that \verb+natbib+ citation commands come in
 two flavors. In a typical style compatible with \verb+natbib+, ordinary commands such as \verb+\citet+ and \verb+\citep+ produce short
