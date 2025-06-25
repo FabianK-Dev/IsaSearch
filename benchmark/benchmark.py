@@ -1,5 +1,5 @@
 from src.solr import connect_solr
-from src.documents import build_document_tree, get_document_descriptions
+from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
 from src.llm import load_prompts, get_llm, get_llm_output_cache
 from benchmark.metrics import (
@@ -46,16 +46,16 @@ print("Loading prompts...")
 prompts = load_prompts(config)
 
 print("Building document tree...")
-document_tree = build_document_tree(config, solr)
+document_index = build_document_index(config, solr)
 
 print("Getting document descriptions...")
-document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
+document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
 
 print("Clean up tokenizer to free up memory")
 del tokenizer
 
 print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, document_tree)
+collection = get_chromadb_collection(config, prompts, document_index)
 
 print("Loading LLM pipeline and gerneration arguments...")
 model = get_llm(config)
@@ -138,8 +138,8 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
     target_exists = False
     print("Searching document identified by '" + row["Target Identifier"] + "'...")
-    for doc_id in document_tree:
-        if is_correct_target(document_tree[doc_id], target_identifier):
+    for doc_id in document_index:
+        if is_correct_target(document_index[doc_id], target_identifier):
             target_exists = True
             break
 
@@ -194,7 +194,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 prompts,
                 model,
                 config,
-                document_tree,
+                document_index,
                 refine_query=True,
                 llm_output_cache=llm_output_cache,
             )

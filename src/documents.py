@@ -45,12 +45,12 @@ def relevant_doc_keys(solr_document, config):
         "entity_kname": solr_document.get("entity_kname", None),
         "metadata": get_entry_metadata(
             solr_document["session"], config
-        ),  # Always load metadata to ensure cached document_tree.json always contains it, regardless of config["add_metadata"]
+        ),  # Always load metadata to ensure cached document_index.json always contains it, regardless of config["add_metadata"]
     }
 
 
 def fetch_all_docs(solr, config):
-    document_tree = {}
+    document_index = {}
 
     docs_per_page = 10000
     results = solr.search(
@@ -62,7 +62,7 @@ def fetch_all_docs(solr, config):
 
     for result in results:
         result_filtered = relevant_doc_keys(result, config)
-        document_tree[result["id"]] = result_filtered
+        document_index[result["id"]] = result_filtered
 
     pages = math.ceil(max_docs / docs_per_page)
     for i in range(1, pages):
@@ -75,9 +75,9 @@ def fetch_all_docs(solr, config):
 
         for result in results:
             result_filtered = relevant_doc_keys(result, config)
-            document_tree[result["id"]] = result_filtered
+            document_index[result["id"]] = result_filtered
 
-    return document_tree
+    return document_index
 
 
 def prepare_metadata(metadata, stop_words_set):
@@ -101,7 +101,7 @@ def prepare_metadata(metadata, stop_words_set):
 
 
 def generate_document_descriptions(
-    config, document_tree, prompts, tokenizer, save_every=1000
+    config, document_index, prompts, tokenizer, save_every=1000
 ):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
@@ -121,8 +121,8 @@ def generate_document_descriptions(
     print("Finding documents that need to be described by the LLM...")
 
     filtered_docs = []
-    for doc_id in tqdm(document_tree):
-        doc = document_tree[doc_id]
+    for doc_id in tqdm(document_index):
+        doc = document_index[doc_id]
         checksum = zlib.adler32(doc["src"].encode("utf-8"))
 
         if doc["id"] not in document_descriptions:
@@ -269,9 +269,9 @@ def generate_document_descriptions(
     return document_descriptions
 
 
-def get_document_descriptions(config, document_tree, prompts, tokenizer):
+def get_document_descriptions(config, document_index, prompts, tokenizer):
     document_descriptions = generate_document_descriptions(
-        config, document_tree, prompts, tokenizer
+        config, document_index, prompts, tokenizer
     )
 
     print("Parsing LLM descriptions...")
@@ -286,40 +286,40 @@ def get_document_descriptions(config, document_tree, prompts, tokenizer):
             parsing_failed += 1
             llm_description = document_descriptions[doc_id]["llm_description"]
 
-        if doc_id in document_tree:
-            document_tree[doc_id]["llm_description"] = llm_description
+        if doc_id in document_index:
+            document_index[doc_id]["llm_description"] = llm_description
 
     if parsing_failed > 0:
         print(
             f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for {parsing_failed} documents, thus loading them as-is."
         )
 
-    return document_tree
+    return document_index
 
 
-def build_document_tree(config, solr):
+def build_document_index(config, solr):
     CACHE_FOLDER = config["cache_folder"]
-    DOCUMENT_TREE_CACHE = f"{CACHE_FOLDER}/document_tree.json"
+    DOCUMENT_INDEX_CACHE = f"{CACHE_FOLDER}/document_index.json"
 
-    if os.path.isfile(DOCUMENT_TREE_CACHE):
-        print(f"Cached {DOCUMENT_TREE_CACHE} already exists. Loading...")
+    if os.path.isfile(DOCUMENT_INDEX_CACHE):
+        print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
 
-        with open(DOCUMENT_TREE_CACHE, "r") as file:
+        with open(DOCUMENT_INDEX_CACHE, "r") as file:
             data = file.read()
 
-        document_tree = json.loads(data)
-        print(f"Finished loading {DOCUMENT_TREE_CACHE}")
+        document_index = json.loads(data)
+        print(f"Finished loading {DOCUMENT_INDEX_CACHE}")
     else:
         print(
-            f"{DOCUMENT_TREE_CACHE} does not already exist. Fetching all documents..."
+            f"{DOCUMENT_INDEX_CACHE} does not already exist. Fetching all documents..."
         )
-        document_tree = fetch_all_docs(solr, config)
+        document_index = fetch_all_docs(solr, config)
 
         # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
         if not os.path.exists(CACHE_FOLDER):
             os.makedirs(CACHE_FOLDER)
 
-        with open(DOCUMENT_TREE_CACHE, "w") as file:
-            json.dump(document_tree, file)
+        with open(DOCUMENT_INDEX_CACHE, "w") as file:
+            json.dump(document_index, file)
 
-    return document_tree
+    return document_index

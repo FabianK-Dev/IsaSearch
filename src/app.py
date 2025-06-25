@@ -1,10 +1,10 @@
 """
-app.py: This module initializes all required components, i.e. Solr, tokenizer, prompts, document_tree, document_descriptions, ChromaDB, LLM and LLM output cache and opens a Flask server that serves both the REST API and the web UI.
+app.py: This module initializes all required components, i.e. Solr, tokenizer, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and opens a Flask server that serves both the REST API and the web UI.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
 - Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
-- document_tree: Builds the document_tree, i.e. loads all documents (i.e. any theorem, lemma or corollary) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
+- document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma or corollary) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
 - document_descriptions: Loads or generates an informal description for each document using vLLM to allow more effective search with informal user queries
 - ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
 - LLM: Loads the configured LLM to refine user queries
@@ -19,7 +19,7 @@ from transformers import AutoTokenizer
 from flask import Flask, request, send_from_directory
 
 from src.solr import connect_solr
-from src.documents import build_document_tree, get_document_descriptions
+from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
 from src.llm import load_prompts, get_llm, get_llm_output_cache
 
@@ -39,16 +39,16 @@ print("Loading prompts...")
 prompts = load_prompts(config)
 
 print("Building document tree...")
-document_tree = build_document_tree(config, solr)
+document_index = build_document_index(config, solr)
 
 print("Getting document descriptions...")
-document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
+document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
 
 print("Clean up tokenizer to free up memory")
 del tokenizer
 
 print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, document_tree)
+collection = get_chromadb_collection(config, prompts, document_index)
 
 print("Loading LLM...")
 model = get_llm(config)
@@ -89,7 +89,7 @@ def search_endpoint():
         prompts,
         model,
         config,
-        document_tree,
+        document_index,
         refine_query,
         llm_output_cache=llm_output_cache,
     )
