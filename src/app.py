@@ -1,5 +1,5 @@
 """
-This module initializes all required components, i.e. Solr, tokenizer, prompts, document_tree, document_descriptions, ChromaDB, LLM and LLM output cache
+app.py: This module initializes all required components, i.e. Solr, tokenizer, prompts, document_tree, document_descriptions, ChromaDB, LLM and LLM output cache and opens a Flask server that serves both the REST API and the web UI.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
 - Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
@@ -10,7 +10,7 @@ This module initializes all required components, i.e. Solr, tokenizer, prompts, 
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
 
-Finally, Flask and package 'waitress' is used to serve both the rest API and static files (e.g. HTML)
+Finally, Flask and package 'waitress' is used to serve both the REST API and static files (e.g. HTML, images, etc.)
 """
 
 import json
