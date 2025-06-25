@@ -38,7 +38,7 @@ tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
 print("Loading prompts...")
 prompts = load_prompts(config)
 
-print("Building document tree...")
+print("Building document index...")
 document_index = build_document_index(config, solr)
 
 print("Getting document descriptions...")

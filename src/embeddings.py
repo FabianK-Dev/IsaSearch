@@ -38,11 +38,11 @@ def get_chromadb_collection(config, prompts, document_index):
             existing.add(item["source"])
 
     print("Preparing documents before adding to ChromaDB collection...")
-    filtered_tree = [doc_id for doc_id in document_index if doc_id not in existing]
-    print(f"{len(filtered_tree)} documents are still missing in ChromaDB collection.")
+    filtered_index = [doc_id for doc_id in document_index if doc_id not in existing]
+    print(f"{len(filtered_index)} documents are still missing in ChromaDB collection.")
 
-    for i in range(0, len(filtered_tree), 5000):
-        doc_ids = filtered_tree[i : i + 5000]
+    for i in range(0, len(filtered_index), 5000):
+        doc_ids = filtered_index[i : i + 5000]
         print(f"Processing documents {i} to {i + len(doc_ids)}...")
 
         doc_embeddings = []

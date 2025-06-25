@@ -45,7 +45,7 @@ tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
 print("Loading prompts...")
 prompts = load_prompts(config)
 
-print("Building document tree...")
+print("Building document index...")
 document_index = build_document_index(config, solr)
 
 print("Getting document descriptions...")
@@ -147,7 +147,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         print(
             "Warning: No target document identified by '"
             + row["Target Identifier"]
-            + "' exists in the document tree, thus skipping this entry."
+            + "' exists in the document index, thus skipping this entry."
         )
         benchmark_results[row["ID"]]["metadata"]["skipped"] = True
         benchmark_results[row["ID"]]["metadata"]["skipped_reason"] = (
