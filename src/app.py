@@ -44,7 +44,7 @@ document_tree = build_document_tree(config, solr)
 print("Getting document descriptions...")
 document_tree = get_document_descriptions(config, document_tree, prompts, tokenizer)
 
-# Clean up tokenizer to free up memory
+print("Clean up tokenizer to free up memory")
 del tokenizer
 
 print("Loading ChromaDB collection...")
@@ -81,6 +81,8 @@ def search_endpoint():
     refine_query = request.args.get("refine_query", "true").lower() == "true"
     print(f"Received search query: {query}")
 
+    # Search the given query with refine_query enabled/disabled and provide all loaded variables from above
+    # search() returns a dict with document IDs only (instead of theorem source codes) to save RAM
     results_dict = search(
         query,
         collection,
@@ -91,6 +93,7 @@ def search_endpoint():
         refine_query,
         llm_output_cache=llm_output_cache,
     )
+    # Next, use the returned document IDs from search() and receive the corresponding documents by their IDs (including all data, such as theorem source code) from Solr
     results_list = search_results_to_docs(results_dict, solr, config)
 
     return results_list
@@ -101,6 +104,7 @@ if __name__ == "__main__":
         f"Serving Flask API on port {config['api_port']}... Open: http://localhost:{config['api_port']}/"
     )
     # Import the package here (and not at the start of the file) because it is only loaded if this script is run directly
+    # __name__ == "__main__" makes sure this condition is not True if app.py is imported (import src.app) => there is no need to open a flask server in that case
     from waitress import serve
 
     serve(app, host="0.0.0.0", port=config["api_port"], threads=1)
