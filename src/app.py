@@ -81,7 +81,6 @@ def search_endpoint():
     refine_query = request.args.get("refine_query", "true").lower() == "true"
     print(f"Received search query: {query}")
 
-    # search
     results_dict = search(
         query,
         collection,
