@@ -138,8 +138,24 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 - Ebenfalls werden alle Prompts, die als Vorlage im Ordner prompts gespeichert sind und später für Eingaben an das LLM verwendet werden, geladen.\\
 - Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderungen an das LLM berechnen zu können wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenizer geladen.\\
 - Hierbei wird für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert.\\
-- Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.\\
+- Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Dokumente (Theoreme, Lemmata und Korollare) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.\\
+- In diesem Schritt wird ebenfalls für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert. Ist dies nicht der Fall diese mithilfe eines LLM generiert und lokal gespeichert (siehe Abschnitt \ref{sec:informalisierung}).\\
 
+% Evtl. neues Unterkapitel
+% https://arxiv.org/pdf/2411.06493
+- Um Dokumente effizient zu speichern wird ChromaDB, ein Open-Source Vektor-Datenbank für hochdimensionaler Embeddings, verwendet.\\
+- Für jedes geladene Dokument im Dokument-Index wird ein Embedding für dieses mithilfe eines vortrainierten Transformer-Modells berechnet\\
+- Dies geschicht indem eine festgelegte Prompt vor den eigentlichen Quelltext des Dokuments vorangestellt wird, was
+
+% - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
+% - Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz oder Kosinusähnlichkeit, zum Embedding der Suchanfrage berechnet, wobei kleiner Distanzen für höhere Relevanz stehen\\
+
+- In diesem Schritt wird ebenfalls für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert\\
+- Dies wird erreicht indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet.\\
+- Existiert noch keine gespeicherte informale Beschreibung für dieses Theorem im Ordner artifacts/, wird mithilfe
+
+\subsection{Informalisierung der Theoreme}
+\label{sec:informalisierung}
 
 \section{Notes on form}
 \subsection{Formatting}
