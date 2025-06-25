@@ -14,13 +14,11 @@ from benchmark.metrics import (
 from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
-from chromadb.utils import embedding_functions
 from nltk.corpus import stopwords
 
 import json
 import pandas as pd
 import os
-import torch
 import nltk
 import random
 import re
@@ -56,14 +54,8 @@ document_tree = get_document_descriptions(config, document_tree, prompts, tokeni
 # Clean up tokenizer to free up memory
 del tokenizer
 
-print("Loading ChromaDB embedding function...")
-embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="sentence-transformers/multi-qa-distilbert-cos-v1",
-    device="cuda" if torch.cuda.is_available() else "cpu",
-)
-
 print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, embedder, document_tree)
+collection = get_chromadb_collection(config, prompts, document_tree)
 
 print("Loading LLM pipeline and gerneration arguments...")
 model = get_llm(config)

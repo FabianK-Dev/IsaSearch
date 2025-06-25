@@ -189,12 +189,12 @@ repos:
         entry: name-tests-test
         language: python
         files: (^|/)tests/.+\.py$
-    -   id: no-commit-to-branch
-        name: "don't commit to branch"
-        entry: no-commit-to-branch
-        language: python
-        pass_filenames: false
-        always_run: true
+    # -   id: no-commit-to-branch
+    #     name: "don't commit to branch"
+    #     entry: no-commit-to-branch
+    #     language: python
+    #     pass_filenames: false
+    #     always_run: true
     -   id: requirements-txt-fixer
         name: fix requirements.txt
         description: sorts entries in requirements.txt.

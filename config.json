@@ -10,6 +10,7 @@
     "artifacts_folder": "artifacts/microsoft/Phi-3.5-mini-instruct",
     "prompts_folder": "prompts/microsoft-Phi",
     "chroma_db_path": "chroma_storages/microsoft/Phi-3.5-mini-instruct",
+    "chroma_db_embedder": "sentence-transformers/multi-qa-distilbert-cos-v1",
     "vllm_name": "microsoft/Phi-3.5-mini-instruct",
     "llm_name": "Phi-3-mini-4k-instruct.Q4_0.gguf",
     "theorem_max_length": 1000,

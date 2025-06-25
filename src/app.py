@@ -15,9 +15,7 @@ Finally, Flask and package 'waitress' is used to serve both the rest API and sta
 
 import json
 
-import torch
 from transformers import AutoTokenizer
-from chromadb.utils import embedding_functions
 from flask import Flask, request, send_from_directory
 
 from src.solr import connect_solr
@@ -49,13 +47,8 @@ document_tree = get_document_descriptions(config, document_tree, prompts, tokeni
 # Clean up tokenizer to free up memory
 del tokenizer
 
-print("Loading ChromaDB embedding function...")
-embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="sentence-transformers/multi-qa-distilbert-cos-v1",
-    device="cuda" if torch.cuda.is_available() else "cpu",
-)
 print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, embedder, document_tree)
+collection = get_chromadb_collection(config, prompts, document_tree)
 
 print("Loading LLM...")
 model = get_llm(config)

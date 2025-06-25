@@ -1,20 +1,28 @@
 import os
 import time
+import torch
 import chromadb
+from chromadb.utils import embedding_functions
 
 
 from src.solr import docs_by_ids
 from src.llm import save_llm_output_cache
 
 
-def get_chromadb_collection(config, prompts, embedder, document_tree):
+def get_chromadb_collection(config, prompts, document_tree):
+    print("Loading ChromaDB embedding function...")
+    embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name=config["chroma_db_embedder"],
+        device="cuda" if torch.cuda.is_available() else "cpu",
+    )
+
     # ChromaDB path
     if not os.path.exists(config["chroma_db_path"]):
         os.makedirs(config["chroma_db_path"])
 
     # ChromaDB client and collection
     chroma_db_path = config["chroma_db_path"] + "/chroma_db"
-    print("Loading ChromaDB client at path '" + chroma_db_path + "'...")
+    print("Loading ChromaDB collection at path '" + chroma_db_path + "'...")
 
     chroma_client = chromadb.PersistentClient(path=chroma_db_path)
     collection = chroma_client.get_or_create_collection(
