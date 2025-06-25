@@ -131,6 +131,8 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 - Der erstellte Suchindex wird standardmäßig im Verzeichnis \$USER_HOME/.isabelle/ISABELLE_VERSION/find_facts/solr, gespeichert, wobei USER_HOME das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und ISABELLE_VERSION der Isabelle-Version entspricht, die installiert ist und mit welcher die FindFacts-Komponente aufgerufen wurde.\\
 - Der Name des Indexes kann über die Systemoption find_facts_database_name festgelegt werden.\\
 - Der erzeugte Index liegt in Form einer Solr-Datenbank vor\\
+- Um den erzeugten FindFacts-Index später in Python auslesen zu können, muss eine laufende Solr-Instanz verfügbar sein,
+die den entsprechenden Index-Ordner als Solr-Core einbindet.\\
 
 \section{Notes on form}
 \subsection{Formatting}
