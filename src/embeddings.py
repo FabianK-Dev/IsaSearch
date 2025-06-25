@@ -9,7 +9,7 @@ from src.solr import docs_by_ids
 from src.llm import save_llm_output_cache
 
 
-def get_chromadb_collection(config, prompts, document_tree):
+def get_chromadb_collection(config, prompts, document_index):
     print("Loading ChromaDB embedding function...")
     embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
         model_name=config["chroma_db_embedder"],
@@ -38,18 +38,18 @@ def get_chromadb_collection(config, prompts, document_tree):
             existing.add(item["source"])
 
     print("Preparing documents before adding to ChromaDB collection...")
-    filtered_tree = [doc_id for doc_id in document_tree if doc_id not in existing]
-    print(f"{len(filtered_tree)} documents are still missing in ChromaDB collection.")
+    filtered_index = [doc_id for doc_id in document_index if doc_id not in existing]
+    print(f"{len(filtered_index)} documents are still missing in ChromaDB collection.")
 
-    for i in range(0, len(filtered_tree), 5000):
-        doc_ids = filtered_tree[i : i + 5000]
+    for i in range(0, len(filtered_index), 5000):
+        doc_ids = filtered_index[i : i + 5000]
         print(f"Processing documents {i} to {i + len(doc_ids)}...")
 
         doc_embeddings = []
         metadatas = []
 
         for doc_id in doc_ids:
-            doc = document_tree[doc_id]
+            doc = document_index[doc_id]
             doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
             embedding_str = prompts["embed"].format(doc_src=doc_src)
 
@@ -67,7 +67,7 @@ def search(
     prompts,
     model,
     config,
-    document_tree,
+    document_index,
     refine_query=True,
     llm_output_cache=None,
 ):
@@ -143,7 +143,7 @@ def search(
         results[result_id] = {
             "distance": distance,
             "id": result_id,
-            "llm_description": document_tree[result_id]["llm_description"],
+            "llm_description": document_index[result_id]["llm_description"],
         }
 
     end = time.time()
