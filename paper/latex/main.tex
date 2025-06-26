@@ -139,6 +139,7 @@ Dies geschieht indem für jede Kombination aus Prompt und Theorem-Source-Code di
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als "Dokumente" abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
+% Info: installation.py lädt automatisch die gewünschte Version herunter
 % Warnung: selbe Version wie FindFacts-Index
 
 \subsection{Informalisierung der Theoreme}
@@ -170,7 +171,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
 
-\subsection{ChromaDB}
+\subsection{Einbettung und semantische Ähnlichkeitssuche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
 - Um effizient die semantische Ähnlichkeit zwischen einer Suchanfrage und einem Dokument zu berechnen, wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Embeddings, verwendet.\\
