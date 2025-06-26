@@ -155,6 +155,10 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 - Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner artifacts/ existiert oder dessen Quelltext verändert wurde, wird eine Prompt bestehend aus Anweisungen an das Sprachmodell, sowie dem Eigentlich Quelltext des Dokuments erstellt\\
 - Falls per Boolean-Parameter 'add\_metadata' in der Konfiguration aktiviert kann in diesem Schritt der Prompt und dem Quelltext zusätzlich noch Titel und Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.\\
 - Abschnitt \ref{sec:ergebnis_und_analyse} untersucht ob das Anhängen dieser Metadaten die Suchqualität verbessert\\
+- Bevor die Anweisungen dem Sprachmodell gestellt werden, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet\\
+- Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, was speziell für parallele Inferenz großer Sprachmodelle optimiert wurde\\
+- vLLM ermöglicht hier das parallele Generieren mehrerer Ausgaben\\
+- durch das Berechnen im vornherein, wie viele Tokens höchstens benötigt werden, wird pro Eingabe so wenig VRAM wie möglich reserviert, was wiederum erlaubt so viele Anweisungen wie hardwaretechnisch möglich gleichzeit dem Sprachmodell zu stellen
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 
 
