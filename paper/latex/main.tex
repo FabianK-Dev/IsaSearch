@@ -131,14 +131,15 @@ Nach erfolgreichem Ausführen des erstellten Suchindex wird dieser standardmäß
 %, der über eine laufende Solr-Datenbank bereitgestellt wird.
 %um einen Suchindex für die Volltextsuche Theorieinhalten zu generieren%.
 
-- Beim Starten des Programms wird zuerst die Konfiguration aus config.json geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.\\
-- Anschließend wird eine Verbindung zur laufenden Solr-Instanz aufgebaut.\\
-- Ebenfalls werden alle Prompts, die als Vorlage im Ordner prompts gespeichert sind und später für Eingaben an das LLM verwendet werden, geladen.\\
-- Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderungen an das LLM berechnen zu können wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenizer geladen.\\
-- Hierbei wird für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert.\\
-- Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (Dokumente) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.\\
-- In diesem Schritt werden ebenfalls für jedes Dokument Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im AFP vorkommt, extrahiert\\
-- diese Metadaten werden aus einer lokalen Kopie des Repositorys des AFP, dessen Pfad in der Konfiguration festgelegt werden kann, geladen\\
+Beim Starten des Programms wird zuerst die Konfiguration aus config.json geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
+Mithilfe dieser URL stellt das Programm eine Verbindung zur laufenden Solr-Instanz her.
+Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das LLM verwendet werden, geladen.
+Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderungen an das LLM berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenizer geladen.
+Dies geschieht indem für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert wird.
+Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als "Dokumente" abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
+In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
+Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
+% Warnung: selbe Version wie FindFacts-Index
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
