@@ -122,12 +122,12 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 
 \section{Methodik}
 \subsection{Programmaufbau}
-- Der gesamte Programmablauf, welcher die REST-API und die Webanwendung bereitstellt, wird beim Start der Anwendung in app.py im Wurzelverzeichnis des Repositorys initialisiert.\\
+- Der gesamte Programmablauf, welcher die REST-API und die Webanwendung bereitstellt, wird beim Starten von app.py im Wurzelverzeichnis des Repositorys initialisiert.\\
 - Die semantische KI-Suche baut auf einem vollständig indizierten FindFacts-Index auf, der über eine laufende Solr-Datenbank bereitgestellt wird.\\
 - FindFacts ist ein offizieller Bestandteil der aktuellen Isabelle-Distribution und ermöglicht eine Volltextsuche über Bestandteile formaler Theorien in Isabelle.\\
-- Der FindFacts-Index wird mithilfe des Werkzeugs isabelle find\_facts\_index erstellt.\\
-- Dieses Werkzeug nutzt die bereits vorhandenen Session-Daten aus einem regulären isabelle build oder erstellt einen neuen, falls noch keiner existiert, um einen Suchindex für die Volltextsuche nach formalen Theorieinhalten zu generieren.\\
-- Es integriert intern Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist, die im JVM-Prozess eingebettet läuft.\\
+- Ein FindFacts-Index wird durch das Kommando isabelle find\_facts\_index erstellt.\\
+- Hierbei werden die vorhandenen Session-Daten aus einem Isabelle-Build verwendet oder ein neuer gebaut, falls noch keiner existiert, um einen Suchindex für die Volltextsuche Theorieinhalten zu generieren.\\
+- FindFacts integriert intern Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft.\\
 - Der erstellte Suchindex wird standardmäßig im Verzeichnis \$USER\_HOME/.isabelle/ISABELLE\_VERSION/find\_facts/solr, gespeichert, wobei USER\_HOME das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und ISABELLE\_VERSION der Isabelle-Version entspricht, die installiert ist und mit welcher die FindFacts-Komponente aufgerufen wurde.\\
 - Der Name des Indexes kann über die Systemoption find\_facts\_database\_name festgelegt werden.\\
 - Der erzeugte Index liegt in Form einer Solr-Datenbank vor\\
