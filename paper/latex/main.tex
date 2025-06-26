@@ -142,12 +142,13 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
-- Ziel der Informalisierung ist es die geladenen formalen Theoreme aus dem AFP in informale Beschreibungen in natürlicher Sprache zu übersetzen\\
+- Ziel der Informalisierung ist es die geladenen formalen Theoreme aus dem AFP in informale Beschreibungen mithilfe eines LLM in natürlicher Sprache zu übersetzen\\
 - diese Beschreibungen machen die semantische Suche nach Theoremen deutlich effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems inhalten\\
 % evtl Beispiel?
 - sobald der Dokumente-Index vollständig generiert wurde, wird für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert. Ist dies nicht der Fall wird diese mithilfe eines LLM generiert und lokal gespeichert \\
 - Dies wird erreicht indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet.\\
-% TODO: explain why adler-32-algorithm
+- Der Grund, weswegen Adler-32 und nicht eine andere weiter verbreitete kryptologische Hashfunktion wie beispielsweise SHA-256, verwendet wurden ist der, dass Adler-32 (1) schneller als z.B. SHA-256 oder MD5 ist und (2) für Änderungen in Quelltext bereits voll ausreichend ist\\
+- Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert, sollte sich der Quelltext ändern\\
 - Existiert noch keine gespeicherte informale Beschreibung für dieses Theorem im Ordner artifacts/, identifizierbar anhand der Prüfsumme, wird mithilfe
 
 
