@@ -142,14 +142,18 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
-- ebenfalls für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert. Ist dies nicht der Fall wird diese mithilfe eines LLM generiert und lokal gespeichert \\
+- Ziel der Informalisierung ist es die geladenen formalen Theoreme aus dem AFP in informale Beschreibungen in natürlicher Sprache zu übersetzen\\
+- diese Beschreibungen machen die semantische Suche nach Theoremen deutlich effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems inhalten\\
+% evtl Beispiel?
+- sobald der Dokumente-Index vollständig generiert wurde, wird für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert. Ist dies nicht der Fall wird diese mithilfe eines LLM generiert und lokal gespeichert \\
 - Dies wird erreicht indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet.\\
-- Existiert noch keine gespeicherte informale Beschreibung für dieses Theorem im Ordner artifacts/, wird mithilfe
+% TODO: explain why adler-32-algorithm
+- Existiert noch keine gespeicherte informale Beschreibung für dieses Theorem im Ordner artifacts/, identifizierbar anhand der Prüfsumme, wird mithilfe
 
 
 \subsection{ChromaDB}
-% Evtl. neues Unterkapitel
-% https://arxiv.org/pdf/2411.06493
+% TODO: Evtl. neues Unterkapitel
+% SOURCE: https://arxiv.org/pdf/2411.06493
 - Um effizient die semantische Ähnlichkeit zwischen einer Suchanfrage und einem Dokument zu berechnen, wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Embeddings, verwendet.\\
 - Für jedes geladene Dokument im Dokument-Index wird ein Embedding mithilfe eines vortrainierten Transformer-Modells, welches in der Konfiguration festgelegt ist, berechnet
 - Dafür wird zunächst eine vordefinierte Prompt vor die informale Beschreibung eines Dokuments
