@@ -147,15 +147,15 @@ Ziel der Informalisierung ist es die geladenen formalen Theoreme aus dem Archive
 % evtl Beispiel?
 Nachdem der Dokumente-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) vollständig generiert wurde, wird für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert.
 Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet wird.
-Ich habe mich hierbei für Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) sehr schnell ist, (2) für Änderungen in Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits voll ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.\\
-- Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert, sollte sich der Quelltext ändern\\
-Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner artifacts/ existiert oder dessen Quelltext verändert wurde, wird eine Prompt bestehend aus Anweisungen an das Sprachmodell, sowie dem Eigentlich Quelltext des Dokuments erstellt\\
-- Falls per Boolean-Parameter 'add\_metadata' in der Konfiguration aktiviert kann in diesem Schritt der Prompt und dem Quelltext zusätzlich noch Titel und Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.\\
-- Abschnitt \ref{sec:ergebnis_und_analyse} untersucht ob das Anhängen dieser Metadaten die Suchqualität verbessert\\
-- Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet\\
-- Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, was optimiert für parallele Inferenz großer LLMs ist\\
-- vLLM ermöglicht hier das parallele Generieren mehrerer Ausgaben\\
-- durch die vorherige Token-Berechnung wird nur so viel VRAM pro Prompt reserviert wie nötig was wiederum die Parallelität maximiert und die verfügbare GPU-Kapazität optimal ausnutzt
+Ich habe mich hierbei für Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) sehr schnell ist, (2) für Änderungen in Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits voll ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
+Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich Quelltext für dieses Dokument ändert.
+Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird eine Eingabeaufforderung bestehend aus Anweisungen an das Sprachmodell, sowie dem eigentlich Quelltext des Dokuments erstellt.
+Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
+In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht ob das Anhängen dieser Metadaten die Suchqualität verbessert.
+Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Eingabeaufforderung berechnet.
+Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, was für parallele Inferenz großer LLMs optimiert ist.
+vLLM ermöglicht hier das parallele Generieren mehrerer Ausgaben\\
+Durch die vorherige Token-Berechnung wird nur genauso viel VRAM pro Prompt reserviert wie nötig, was wiederum die Parallelität maximiert und die verfügbare GPU-Kapazität optimal ausnutzt.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 
 \subsection{Wahl des Sprachmodells}
