@@ -122,6 +122,7 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 
 \section{Methodik}
 \subsection{Programmaufbau}
+\label{sec:programmaufbau}
 - Der gesamte Programmablauf, welcher die REST-API und die Webanwendung bereitstellt, wird beim Starten von app.py im Wurzelverzeichnis des Repositorys initialisiert.\\
 - Die semantische KI-Suche baut auf einem vollständig indizierten FindFacts-Index auf, der über eine laufende Solr-Datenbank bereitgestellt wird.\\
 - FindFacts ist ein offizieller Bestandteil der aktuellen Isabelle-Distribution und ermöglicht eine Volltextsuche über Bestandteile formaler Theorien in Isabelle.\\
@@ -152,6 +153,8 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 - Der Grund, weswegen Adler-32 und nicht eine andere weiter verbreitete kryptologische Hashfunktion wie beispielsweise SHA-256, verwendet wurden ist der, dass Adler-32 (1) schneller als z.B. SHA-256 oder MD5 ist und (2) für Änderungen in Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits voll ausreichend ist\\
 - Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert, sollte sich der Quelltext ändern\\
 - Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner artifacts/ existiert oder dessen Quelltext verändert wurde, wird eine Prompt bestehend aus Anweisungen an das Sprachmodell, sowie dem Eigentlich Quelltext des Dokuments erstellt\\
+- Falls per Boolean-Parameter 'add\_metadata' in der Konfiguration aktiviert kann in diesem Schritt der Prompt und dem Quelltext zusätzlich noch Titel und Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.\\
+- Abschnitt \ref{sec:ergebnis_und_analyse} untersucht ob das Anhängen dieser Metadaten die Suchqualität verbessert\\
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 
 
