@@ -153,22 +153,19 @@ Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im 
 Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht ob das Anhängen dieser Metadaten die Suchqualität verbessert.
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Eingabeaufforderung berechnet.
-Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, was für parallele Inferenz großer LLMs optimiert ist.
-vLLM ermöglicht hier das parallele Generieren mehrerer Ausgaben\\
+Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, was für parallele Inferenz großer LLMs optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht.
 Durch die vorherige Token-Berechnung wird nur genauso viel VRAM pro Prompt reserviert wie nötig, was wiederum die Parallelität maximiert und die verfügbare GPU-Kapazität optimal ausnutzt.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 
 \subsection{Wahl des Sprachmodells}
-- Die Wahl des verwendeten Sprachmodells basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit\\
+Die Wahl des verwendeten Sprachmodells basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
 % SOURCE: https://arxiv.org/abs/2311.12022
-- Von Experten in Bereichen der Biologie, Physik und Chemie erstellt\\
-- Das Open-Source-Projekt LLM Leaderboard bietet zudem eine Web-UI zum Vergleichen der Modelle\\
-- Um keine hohen Kosten durch externe API-Anfragen zu erzeugen, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle (z.B. Gemini, ChatGPT, Claude, etc.), und schloss proprietäre Modelle aus\\
-- Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung\\
-- was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt, da große Modelle mit vielen Parameter (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar\\
-- Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.\\
-- Beispielsweise verlangt das "Llama 3.1 Community License Agreement", dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.\\
-- das Modell, das alle Kriterien erfüllt und die höchstmögliche Position im Ranking hält, ist das Modell "Phi-3.5-mini-instruct" von Microsoft, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt\\
+Zudem bietet das Open-Source-Projekt "LLM Leaderboard" eine Web-UI zum Vergleichen der Modelle.
+Um keine hohen Kosten durch externe API-Anfragen zu verursachen, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
+Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parameter (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
+Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
+Beispielsweise verlangt das "Llama 3.1 Community License Agreement", dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
+Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell "Phi-3.5-mini-instruct" von Microsoft, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
 % TODO: Instruct vs. Base
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
