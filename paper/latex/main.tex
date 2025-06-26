@@ -143,14 +143,13 @@ Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des 
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
-- Ziel der Informalisierung ist es die geladenen formalen Theoreme aus dem AFP in informale Beschreibungen mithilfe eines LLM in natürlicher Sprache zu übersetzen\\
-- diese Beschreibungen machen die semantische Suche nach Theoremen deutlich effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems inhalten\\
+Ziel der Informalisierung ist es die geladenen formalen Theoreme aus dem Archive of Formal Proofs in informale Beschreibungen mithilfe eines LLM in natürlicher Sprache zu übersetzen. Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems beinhalten.
 % evtl Beispiel?
-- sobald der Dokumente-Index vollständig generiert wurde, wird für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert. Ist dies nicht der Fall wird diese mithilfe eines LLM generiert und lokal gespeichert \\
-- Dies wird erreicht indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet.\\
-- Der Grund, weswegen Adler-32 und nicht eine andere weiter verbreitete kryptologische Hashfunktion wie beispielsweise SHA-256, verwendet wurden ist der, dass Adler-32 (1) schneller als z.B. SHA-256 oder MD5 ist und (2) für Änderungen in Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits voll ausreichend ist\\
+Nachdem der Dokumente-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) vollständig generiert wurde, wird für jedes Dokument überprüft, ob bereits eine informale Beschreibung existiert.
+Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet wird.
+Ich habe mich hierbei für Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) sehr schnell ist, (2) für Änderungen in Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits voll ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.\\
 - Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert, sollte sich der Quelltext ändern\\
-- Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner artifacts/ existiert oder dessen Quelltext verändert wurde, wird eine Prompt bestehend aus Anweisungen an das Sprachmodell, sowie dem Eigentlich Quelltext des Dokuments erstellt\\
+Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner artifacts/ existiert oder dessen Quelltext verändert wurde, wird eine Prompt bestehend aus Anweisungen an das Sprachmodell, sowie dem Eigentlich Quelltext des Dokuments erstellt\\
 - Falls per Boolean-Parameter 'add\_metadata' in der Konfiguration aktiviert kann in diesem Schritt der Prompt und dem Quelltext zusätzlich noch Titel und Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.\\
 - Abschnitt \ref{sec:ergebnis_und_analyse} untersucht ob das Anhängen dieser Metadaten die Suchqualität verbessert\\
 - Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet\\
