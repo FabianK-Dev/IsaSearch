@@ -139,6 +139,8 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 - Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderungen an das LLM berechnen zu können wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenizer geladen.\\
 - Hierbei wird für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert.\\
 - Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet. Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (Dokumente) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.\\
+- In diesem Schritt werden ebenfalls für jedes Dokument Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im AFP vorkommt, extrahiert\\
+- diese Metadaten werden aus einer lokalen Kopie des Repositorys des AFP, dessen Pfad in der Konfiguration festgelegt werden kann, geladen\\
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
