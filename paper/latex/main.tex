@@ -197,25 +197,20 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 
 - Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um eine mathematische Definition oder ein Theorem handelt, (2) das Umschrieben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf Themengebiete zu fokussieren, die für das Archive of Formal Proofs relevant sind.
 
-- Hierfür wurde das quantifizierte Sprachmodell "Phi-3-mini-4k-instruct.Q4\_0.gguf" verwendet. Das Quantisieren von KI-Modelle ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float).
+- In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
+
+- Hierfür wurde das quantifizierte Sprachmodell "Phi-3-mini-4k-instruct.Q4\_0.gguf" verwendet. Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float).
 
 - Dies reduziert den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust.
 
 - Da zum jetzigen Zeitpunkt noch keine quantisierte Variante des Modells "Phi-3.5-mini-instruct", das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell "Phi-3-mini-4k-instruct" zurückgegriffen werden.
-
-In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 
 % Beispiel
 
 % Info, dass KI sich an Format halten soll
 % Limitation: KI ignoriert manchmal Forderung nach Format
 % TODO: prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
-
-- das bedeutet eine
 % FRAGE: Soll ich Embedding oder Einbettung sagen?
-
-- Dafür wird zunächst eine vordefinierte Prompt vor die informale Beschreibung eines Dokuments
-
 % - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
 % - Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz oder Kosinusähnlichkeit, zum Embedding der Suchanfrage berechnet, wobei kleiner Distanzen für höhere Relevanz stehen\\
 
