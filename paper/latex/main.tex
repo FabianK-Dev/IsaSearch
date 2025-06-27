@@ -188,7 +188,17 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 
 - Anschließend wird die semantische Ähnlichkeitssuche über eine REST-API bereitgestellt.
 
--
+- Ein Problem hierbei ist, dass Nutzer dazu tendieren ungenaue Suchanfragen zu stellen, welche nicht das gewünschte Suchergebnis liefern können.
+
+- Deswegen wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Eingabeaufforderung in Kombination mit der Nutzereingabe gestellt wird.
+
+- Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, Lemmas oder Korollars, sowie (2) einen passenden Titel dafür zu generieren.
+
+- Ebenfalls erhält das Sprachmodell die Information, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um eine mathematische Definition oder ein Theorem handelt, (2) das Umschrieben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf und Formalisierungen, die für das Archiv formaler Beweise relevant sind.
+
+% TODO: prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
+
+- das bedeutet eine
 % FRAGE: Soll ich Embedding oder Einbettung sagen?
 
 - Dafür wird zunächst eine vordefinierte Prompt vor die informale Beschreibung eines Dokuments
