@@ -180,7 +180,17 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 \subsection{Einbettung und semantische Ähnlichkeitssuche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
-- Um effizient die semantische Ähnlichkeit zwischen einer Suchanfrage und einem Dokument zu berechnen, wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Embeddings, verwendet.\\
+- Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
+
+- In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Vektoren, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
+
+- Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet. Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
+
+- Anschließend wird die semantische Ähnlichkeitssuche über eine REST-API bereitgestellt.
+
+-
+% FRAGE: Soll ich Embedding oder Einbettung sagen?
+
 - Dafür wird zunächst eine vordefinierte Prompt vor die informale Beschreibung eines Dokuments
 
 % - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
