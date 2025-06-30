@@ -201,13 +201,11 @@ Da derzeit noch keine quantisierte Variante des Modells "Phi-3.5-mini-instruct",
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 % ABSATZ
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
-Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $e_k \in E$ bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells "multi-qa-distilbert-cos-v1" berechnet.
+Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells "multi-qa-distilbert-cos-v1" berechnet.
 Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zum Embedding der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
-Das bedeutet, für die relevanteste Einbettung $e_r \in E$ gilt:
-
+Daraus folgt, dass für die relevanteste Einbettung $e_r \in E$ gilt:
 $$e_r = arg \underset{e_k \in E}{\text{min}}\ ||q - e_k||$$
-
-wobei $||q - e_k||$ die Distanz zwischen der Einbettung einer Suchanfrage $q$ und einer Kandidateneinbettung $e_k$ ist.
+wobei $||q - e_k||$ die Distanz zwischen der Einbettung einer Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
 
 % Beispiel
 
