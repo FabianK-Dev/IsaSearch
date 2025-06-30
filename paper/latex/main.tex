@@ -187,7 +187,9 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 
 - Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells "multi-qa-distilbert-cos-v1" eine Einbettung berechnet wird.
 
-% muss ich hier den Prozess der Einbettungsberechnung erklären?
+- Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
+
+% muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
 
 - Das Voranstellen einer Anweisung verbessert laut Studien die Suchqualität von Einbettungen in Zero-Shot-Situationen.
 
