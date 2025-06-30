@@ -195,7 +195,7 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 
 - Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 
-- Anschließend wird die semantische Ähnlichkeitssuche über eine REST-API bereitgestellt.
+- Anschließend wird mithilfe von Flask eine REST-API bereitgestellt, über die Nutzer Suchen initieren können.
 
 - Ein Problem hierbei ist, dass Nutzer dazu tendieren ungenaue Suchanfragen zu formulieren, welche nicht spezifisch genug sind oder zu wenig Übereinstimmung mit dem Quelltext des Dokuments oder dessen informaler Beschreibung haben, um das gesuchte Suchergebnis zu erhalten.
 % darf ich das schreiben oder zu ungenau/vage? brauch ich eine Quelle für die Behauptung, dass Nutzer zu ungenau sind
@@ -216,7 +216,9 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
 
-- Nach Umschreiben der Suchanfrage wird eine Einbettung für den String $s$ bestehend aus der ursprünglichen Suchanfrage konkateniert mit der umschriebenen Suchanfrage mithilfe desselben
+- Nach Umschreiben der Suchanfrage wird eine Einbettung für den String $s$ bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells "multi-qa-distilbert-cos-v1" berechnet.
+
+- Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz oder Kosinusähnlichkeit, zum Embedding der Suchanfrage berechnet, wobei kleiner Distanzen für höhere Relevanz stehen\\
 
 % Beispiel
 
@@ -225,7 +227,6 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 % TODO: prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
 % FRAGE: Soll ich Embedding oder Einbettung sagen?
 % - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
-% - Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz oder Kosinusähnlichkeit, zum Embedding der Suchanfrage berechnet, wobei kleiner Distanzen für höhere Relevanz stehen\\
 
 \section{Notes on form}
 \subsection{Formatting}
