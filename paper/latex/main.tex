@@ -218,7 +218,13 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 
 - Nach Umschreiben der Suchanfrage wird eine Einbettung für den String $s$ bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells "multi-qa-distilbert-cos-v1" berechnet.
 
-- Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz oder Kosinusähnlichkeit, zum Embedding der Suchanfrage berechnet, wobei kleiner Distanzen für höhere Relevanz stehen\\
+- Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz oder Kosinusähnlichkeit, zum Embedding der Suchanfrage berechnet, wobei kleiner Distanzen für höhere Relevanz stehen.
+
+- Das bedeutet, für die relevanteste Einbettung $e_r \in E$ gilt:
+
+$$e_r = arg \underset{e_k \in E}{\text{min}}\ ||q - e_k||$$
+
+wobei $||q - e_k||$ die Distanz zwischen der Einbettung einer Suchanfrage $q$ und einer Kandidateneinbettung $e_k$ ist.
 
 % Beispiel
 
