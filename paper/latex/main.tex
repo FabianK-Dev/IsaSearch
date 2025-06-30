@@ -182,7 +182,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 % SOURCE: https://arxiv.org/pdf/2411.06493
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
-
+% ABSATZ
 - Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet.
 
 - Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells "multi-qa-distilbert-cos-v1" eine Einbettung berechnet wird.
@@ -194,7 +194,7 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 - Das Voranstellen einer Anweisung verbessert laut Studien die Suchqualität von Einbettungen in Zero-Shot-Situationen.
 
 - Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
-
+% ABSATZ
 - Anschließend wird mithilfe von Flask eine REST-API bereitgestellt, über die Nutzer Suchen initieren können.
 
 - Ein Problem hierbei ist, dass Nutzer dazu tendieren ungenaue Suchanfragen zu formulieren, welche nicht spezifisch genug sind oder zu wenig Übereinstimmung mit dem Quelltext des Dokuments oder dessen informaler Beschreibung haben, um das gesuchte Suchergebnis zu erhalten.
@@ -213,7 +213,7 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 - Da zum jetzigen Zeitpunkt noch keine quantisierte Variante des Modells "Phi-3.5-mini-instruct", das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell "Phi-3-mini-4k-instruct" zurückgegriffen werden.
 
 - In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
-
+% ABSATZ
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
 
 - Nach Umschreiben der Suchanfrage wird eine Einbettung für den String $s$ bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells "multi-qa-distilbert-cos-v1" berechnet.
