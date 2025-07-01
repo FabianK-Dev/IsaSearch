@@ -141,7 +141,7 @@ Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderunge
 Dies geschieht indem für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert wird.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet.
-Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als "Dokumente" abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
+Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
 % Info: installation.py lädt automatisch die gewünschte Version herunter
@@ -171,14 +171,14 @@ Indem zuvor bereits kalkuliert wurde, wie viele Token für eine einzelne Eingabe
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
 % SOURCE: https://arxiv.org/abs/2311.12022
-Zudem bietet das Open-Source-Projekt "LLM Leaderboard" eine Web-UI zum Vergleichen der Modelle.
+Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-UI zum Vergleichen der Modelle.
 
 Um keine hohen Kosten durch externe API-Anfragen zu verursachen, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
 Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parameter (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
 Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
-Beispielsweise verlangt das "Llama 3.1 Community License Agreement", dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
+Beispielsweise verlangt das ``Llama 3.1 Community License Agreement``, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
-Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell "Phi-3.5-mini-instruct" von Microsoft, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
+Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} von Microsoft, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
 % TODO: Instruct vs. Base
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
@@ -189,23 +189,23 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
-Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet. Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells "multi-qa-distilbert-cos-v1" eine Einbettung berechnet wird. Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
+Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet. Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird. Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
 Es hat sich erwiesen, dass das Voranstellen einer Anweisung vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert. Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 
-Anschließend wird mithilfe des Pakets "Flask" eine REST-API bereitgestellt, über die Nutzer Suchen initieren können.
+Anschließend wird mithilfe des Pakets ``Flask`` eine REST-API bereitgestellt, über die Nutzer Suchen initieren können.
 Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
 % darf ich das schreiben oder zu ungenau/vage? brauch ich eine Quelle für die Behauptung, dass Nutzer zu ungenau sind
 Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Eingabeaufforderung in Kombination mit der Nutzereingabe gestellt wird.
 Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, Lemmas oder Korollars, sowie (2) einen passenden Titel dafür zu generieren.
 Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um eine mathematische Definition oder ein Theorem handelt, (2) das Umschrieben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf Themengebiete zu fokussieren, die für das Archive of Formal Proofs relevant sind.
 % Nutzer können das Umschreiben deaktivieren
-Hierfür wurde das quantifizierte Sprachmodell "Phi-3-mini-4k-instruct.Q4\_0.gguf" verwendet. Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert.
-Da derzeit noch keine quantisierte Variante des Modells "Phi-3.5-mini-instruct", das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell "Phi-3-mini-4k-instruct" zurückgegriffen werden.
+Hierfür wurde das quantifizierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} verwendet. Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert.
+Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
-Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells "multi-qa-distilbert-cos-v1" berechnet.
+Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} berechnet.
 Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zum Embedding der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e_r \in E$ gilt:
 $$e_r = arg \underset{e_k \in E}{\text{min}}\ ||q - e_k||$$
