@@ -127,7 +127,8 @@ Das Hauptprogramm, welches die REST-API und die Webseite bereitstellt, befindet 
 FindFacts ist eine Komponente, die ein direkter Bestandteil der Isabelle-Distribution ist und ermöglicht eine lexikalische Suche über formalen Theorien in Isabelle und dem Archive of Formal Proofs.
 Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_facts\_index} verwendet werden, was bereits vorhandene Session-Daten aus einem Isabelle-Build verwendet oder einen neuen baut, falls noch keiner existiert.
 
-Intern integriert FindFacts Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft. Die Solr-Datenbank ist nur innerhalb des Prozesses verfügbar und kann nicht von anderen Prozessen, beispielsweise über eine REST-API, angesteuert werden.
+Intern integriert FindFacts Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft.
+Die Solr-Datenbank ist nur innerhalb des Prozesses verfügbar und kann nicht von anderen Prozessen, beispielsweise über eine REST-API, angesteuert werden.
 Nach erfolgreichem Erstellen des Suchindexes wird dieser standardmäßig im Verzeichnis \texttt{\$USER\_HOME/.isabelle/ISABELLE\_VERSION/find\_facts/solr}, gespeichert, wobei \texttt{\$USER\_HOME} das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und \texttt{ISABELLE\_VERSION} der installierten Isabelle-Version entspricht, mit welcher die FindFacts-Komponente aufgerufen wurde.
 Der erzeugte FindFacts-Index liegt in Form einer Solr-Datenbank vor.
 Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz neben dem Hauptprogramm verfügbar sein, die den entsprechenden Index-Ordner als Solr-Core einbindet.
@@ -188,9 +189,12 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
-Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet. Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird. Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
+Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet.
+Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
+Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
-Es hat sich erwiesen, dass das Voranstellen einer Anweisung vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert. Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
+Es hat sich erwiesen, dass das Voranstellen einer Anweisung vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert.
+Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 
 Anschließend wird mithilfe des Pakets ``Flask`` eine REST-API bereitgestellt, über die Nutzer Suchen initieren können.
 Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
@@ -199,7 +203,8 @@ Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem
 Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, Lemmas oder Korollars, sowie (2) einen passenden Titel dafür zu generieren.
 Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um eine mathematische Definition oder ein Theorem handelt, (2) das Umschrieben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf Themengebiete zu fokussieren, die für das Archive of Formal Proofs relevant sind.
 % Nutzer können das Umschreiben deaktivieren
-Hierfür wurde das quantifizierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} verwendet. Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert.
+Hierfür wurde das quantifizierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} verwendet.
+Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert.
 Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 
