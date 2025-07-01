@@ -123,24 +123,23 @@ By commenting one of the commands $selectlanguage\{english\}$ or $selectlanguage
 \section{Methodik}
 \subsection{Programmaufbau}
 \label{sec:programmaufbau}
-Das Hauptprogramm, welches die REST-API und die Webseite bereitstellt befindet sich in der Datei app.py im Ordner \texttt{src} und erfordert einen vollständig indizierten FindFacts-Index.
+Das Hauptprogramm, welches die REST-API und die Webseite bereitstellt, befindet sich in der Datei \texttt{app.py} im Ordner \texttt{src} und erfordert einen vollständig indizierten FindFacts-Index.
 FindFacts ist eine Komponente, die ein direkter Bestandteil der Isabelle-Distribution ist und ermöglicht eine lexikalische Suche über formalen Theorien in Isabelle und dem Archive of Formal Proofs.
-Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_facts\_index} verwendet werden, was bereits vorhandene Session-Daten aus einem Isabelle-Build verwendet oder ein neuen baut, falls noch keiner existiert.
+Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_facts\_index} verwendet werden, was bereits vorhandene Session-Daten aus einem Isabelle-Build verwendet oder einen neuen baut, falls noch keiner existiert.
 
-Intern integriert FindFacts Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft, allerdings ist diese Solr-Datenbank nur innerhalb des Prozesses verfügbar und kann nicht von außerhalb, beispielsweise über eine REST-API angesteuert werden.
-Nach erfolgreichem Ausführen des erstellten Suchindex wird dieser standardmäßig im Verzeichnis \texttt{\$USER\_HOME/.isabelle/ISABELLE\_VERSION/find\_facts/solr}, gespeichert, wobei \texttt{\$USER\_HOME} das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und \texttt{ISABELLE\_VERSION} der installierten Isabelle-Version entspricht, mit welcher die FindFacts-Komponente aufgerufen wurde.
+Intern integriert FindFacts Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft. Die Solr-Datenbank ist nur innerhalb des Prozesses verfügbar und kann nicht von anderen Prozessen, beispielsweise über eine REST-API, angesteuert werden.
+Nach erfolgreichem Erstellen des Suchindexes wird dieser standardmäßig im Verzeichnis \texttt{\$USER\_HOME/.isabelle/ISABELLE\_VERSION/find\_facts/solr}, gespeichert, wobei \texttt{\$USER\_HOME} das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und \texttt{ISABELLE\_VERSION} der installierten Isabelle-Version entspricht, mit welcher die FindFacts-Komponente aufgerufen wurde.
 Der erzeugte FindFacts-Index liegt in Form einer Solr-Datenbank vor.
-Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz neben dem Hauptprogramm in app.py verfügbar sein, die den entsprechenden Index-Ordner als Solr-Core einbindet.
+Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz neben dem Hauptprogramm verfügbar sein, die den entsprechenden Index-Ordner als Solr-Core einbindet.
 %, der über eine laufende Solr-Datenbank bereitgestellt wird.
 %um einen Suchindex für die Volltextsuche Theorieinhalten zu generieren%.
 
-Beim Programmstart wird zunächst die Konfiguration aus config.json geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
+Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
-Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das LLM verwendet werden, geladen.
-Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderungen an das LLM berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenizer geladen.
-Dies geschieht indem für jede Kombination aus Prompt und Theorem-Source-Code die Anzahl benötigter Tokens gespeichert und der größte Wert gespeichert wird.
+Außerdem werden alle Eingabeaufforderungen, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
+Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderung an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen und für jede Kombination aus Eingabeaufforderung und Theorem-Quelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
 
-Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis .cache befindet.
+Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis \texttt{.cache} befindet.
 Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
@@ -149,22 +148,22 @@ Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des 
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
-Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem, Lemma oder Korollar anhand des Quelltexts in eine informale Beschreibung umschrieben wird, was im Programm-Code mithilfe eines großen Sprachmodells umgesetzt wird.
+Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem, Lemma oder Korollar anhand dessen Quelltexts mithilfe eines großen Sprachmodells in eine informale Beschreibung umschrieben wird.
 %TODO%
 Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems beinhalten.
 % evtl Beispiel?
 
 Nach erfolgreichem vollständigen Bauen des Dokument-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) überprüft die Anwendung für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
 Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet wird.
-Ich habe mich hierbei für Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) sehr schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
-Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich Quelltext für dieses Dokument ändert.
+Ich habe mich hierbei für Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
+Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
 
 Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird eine Eingabeaufforderung bestehend aus Anweisungen an das Sprachmodell, sowie dem eigentlich Quelltext des Dokuments erstellt.
-Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
+Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen dieser Metadaten die Suchqualität verbessert.
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Eingabeaufforderung berechnet.
-Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, was für parallele Inferenz großer LLMs optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht.
-Indem zuvor bereits kalkuliert wurde, wie viele Token für eine einzelne Eingabeaufforderung höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
+Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht.
+Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Eingabeaufforderung höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 % Vorgesehen, dass artifakte committet werden
 
