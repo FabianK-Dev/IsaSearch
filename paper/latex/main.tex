@@ -155,7 +155,7 @@ Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver,
 
 Nach erfolgreichem vollständigen Bauen des Dokument-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) überprüft die Anwendung für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
 Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet wird.
-Ich habe mich hierbei für Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
+Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
 
 Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird eine Eingabeaufforderung bestehend aus Anweisungen an das Sprachmodell, sowie dem eigentlich Quelltext des Dokuments erstellt.
@@ -170,9 +170,9 @@ Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Eingab
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
 % SOURCE: https://arxiv.org/abs/2311.12022
-Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-UI zum Vergleichen der Modelle.
+Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-Benutzeroberfläche zum Vergleichen der Modelle.
 
-Um keine hohen Kosten durch externe API-Anfragen zu verursachen, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
+Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
 Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parameter (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
 Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
 Beispielsweise verlangt das ``Llama 3.1 Community License Agreement``, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
