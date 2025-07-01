@@ -169,7 +169,7 @@ Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Eingab
 % Vorgesehen, dass artifakte committet werden
 
 \subsection{Wahl des Sprachmodells}
-Die Wahl des verwendeten Sprachmodells basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
+Die Wahl des verwendeten Sprachmodells basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
 % SOURCE: https://arxiv.org/abs/2311.12022
 Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-Benutzeroberfläche zum Vergleichen der Modelle.
 
@@ -186,11 +186,11 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 \subsection{Einbettung und semantische Ähnlichkeitssuche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
-Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
+Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
 Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet.
-Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltexts des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
+Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
 Es hat sich erwiesen, dass das Voranstellen einer Anweisung vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert.
@@ -210,10 +210,10 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben 
 
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
 Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} berechnet.
-Anschließend wird für jedes gespeicherte Embedding in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zum Embedding der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
-Daraus folgt, dass für die relevanteste Einbettung $e_r \in E$ gilt:
-$$e_r = arg \underset{e_k \in E}{\text{min}}\ ||q - e_k||$$
-wobei $||q - e_k||$ die Distanz zwischen der Einbettung einer Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
+Anschließend wird für jede gespeicherte Einbettung in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
+Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
+$$e^* = arg \underset{e_k \in E}{\text{min}}\ ||q - e_k||$$
+wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
 
 % Beispiel
 
