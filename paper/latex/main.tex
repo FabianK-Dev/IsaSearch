@@ -256,12 +256,23 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
   - Problem: eine Suchanfrage für ein gegebenes Theorem selbst auszudenken ist fehleranfällig, da der Author des Benchmarks potentiell manche Theoreme falsch missversteht
   - zudem besteht das Risiko von Voreingenommenheit
   - Aus diesem Grund: direkte Zitate einer Definition, Beschreibung oder Umschreibung des Theorems aus relevanten englischen Wikipedia Artikeln, wobei sichergestellt wurde, dass der Titel des Theorems nicht Teil der Beschreibung ist
+  - ebenso: irrelevante Satzteile des Zitats bewusst ausgelassen und durch Ellipsen (\texttt{[...]}) ersetzt um die Zitate kurz zu halten
   - reduziert oben genannte Risiken und simuliert ``echte`` Suchanfragen
   - wurde manuell für jedes Theorem in der Spalte ``Natural language query`` eingetragen
   - zusätzlich wird die Quelle des Zitat in Form des Links zur Webadresse des Wikipedia-Artikels und dessen Kapitell in der Spalte ``Natual language query source`` gespeichert
   % TODO: Beispiel
 
--
+- Verrauschte natürliche Sprache als Suchanfrage:
+  - Suchanfragen aus zuvor genannten Punkt evtl. unrealistisch präzise, beispielsweise viele Fachbegriffe, keine Tippfehler, etc.
+  - um noch realistischere Bedingungen zu simulieren wurde eine dritte Kategorie von Suchanfragen eingeführt, welche auf den Suchanfragen in natürlicher Sprache basieren
+  - verrauschen die Strings, die an die Suchmaschine geschickt werden indem die folgenden Regeln angewandt werden:
+    - Ellipsen (\texttt{[...]}) und Zeichensetzung werden entfernt-
+    - der gesamte String wird zu Kleinbuchstaben konvertiert
+    - Englische Füllworter (z.B: `a`, `the`, `and`, `but`, etc.) mit häufigem Aufkommen aber geringer Relevanz werden entfernt
+    - Aufeinanderfolgende Wörter werden mit einer Wahrscheinlichkeit von zehn Prozent vertauscht
+    - zudem: zehn Prozent der Zeichen des String werden zufällig entfernt
+    - um deterministisches Verhalten zwischen verschiedenen Testläufen zu ermöglichen wird ein fester Zufalls-Seed festgelegt
+
 
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
 
