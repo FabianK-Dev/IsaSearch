@@ -242,10 +242,28 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
 
 - die Liste beinhaltet ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Sessions des Archive of Formal Proofs ab
 
+- Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext, Session und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} ab.
+
+- Jede Zeile entspricht hierbei einem Theorem
+
+- Als nächstes wurden für jedes Theorem jeweils drei verschiedene Arten von Suchanfragen erstellt:
+
+- Titel des Theorems als Suchanfrage: Hierbei wird der Wert aus der "Titel"-Spalte, welche dem Titel des Theorems, wie er aus der Liste per übernommen wurde, als Suchanfrage gestellt. Der Vollständigkeit halber wurde diese Suchanfrage erneut in der Spalte "Title query" des Datei \texttt{benchmark.csv} gespeichert. % TODO: Beispiel
+
+- Natürliche Sprache als Suchanfrage:
+  - Ziel: eine realistische Suchanfrage in natürlicher Sprache für das jeweilige Theorem zu formulieren
+  - Problem: eine Suchanfrage für ein gegebenes Theorem selbst auszudenken ist fehleranfällig, da der Author des Benchmarks potentiell manche Theoreme falsch missversteht
+  - zudem besteht das Risiko von Voreingenommenheit
+  - Aus diesem Grund: direkte Zitate einer Definition, Beschreibung oder Umschreibung des Theorems aus relevanten englischen Wikipedia Artikeln, wobei sichergestellt wurde, dass der Titel des Theorems nicht Teil der Beschreibung ist
+  - reduziert oben genannte Risiken und simuliert ``echte`` Suchanfragen
+
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
 
 \section{Notes on form}
 \subsection{Formatting}
+
+% Limitationen: biased, fehler? hardware beschränkt, nicht bestes LLM verwendet, Theorem-Quelltexte mussten bis "proof" abgeschnitten werden, natürliche Beschreibungen limitiert auf 250 (?) Tokens, KI reproduziert Trainingsmaterial
+% Ausblick: Gemini, DeepSeek oder ChatGPT verwenden
 
 This LaTeX template uses the following formatting:
 \begin{itemize}
