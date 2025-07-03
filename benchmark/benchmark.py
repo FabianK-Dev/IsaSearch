@@ -31,10 +31,18 @@ with open("config.json", "r") as file:
 print("Loading Solr...")
 solr = connect_solr(config)
 
+results_suffix = "_"
 if config["add_metadata"]:
-    config["artifacts_folder"] = config["artifacts_folder"] + "-with-metadata"
-    config["prompts_folder"] = config["prompts_folder"] + "-with-metadata"
-    config["chroma_db_path"] = config["chroma_db_path"] + "-with-metadata"
+    results_suffix = results_suffix + "M"
+
+if config["add_user_query"]:
+    results_suffix = results_suffix + "U"
+
+if config["benchmark_search_refine"]:
+    results_suffix = results_suffix + "R"
+
+if results_suffix == "_":
+    results_suffix = "_baseline"
 
 print("Using config for benchmark:")
 pprint(config)
@@ -235,20 +243,13 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             }
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
-
-if config["add_metadata"]:
-    benchmark_llm_name = (
-        config["vllm_name"].replace("/", "-")
-        + "_"
-        + config["llm_name"].replace("/", "-")
-        + "_with_metadata"
-    )
-else:
-    benchmark_llm_name = (
-        config["vllm_name"].replace("/", "-")
-        + "_"
-        + config["llm_name"].replace("/", "-")
-    )
+benchmark_llm_name = (
+    results_suffix
+    + "_"
+    + config["vllm_name"].replace("/", "-")
+    + "_"
+    + config["llm_name"].replace("/", "-")
+)
 
 if not os.path.exists("./benchmark/results/"):
     os.makedirs("./benchmark/results/")
