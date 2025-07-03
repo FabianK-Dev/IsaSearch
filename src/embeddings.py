@@ -125,9 +125,12 @@ def search(
                 + "', thus using it for search as is."
             )
 
-        query_text = prompts["retrieve"].format(
-            search_query=search_query + "\n\n" + refined_query
-        )
+        if config["add_user_query"]:
+            search_query = search_query + "\n\n" + refined_query
+        else:
+            search_query = refined_query
+
+        query_text = prompts["retrieve"].format(search_query=search_query)
     else:
         query_text = prompts["retrieve"].format(search_query=search_query)
 
