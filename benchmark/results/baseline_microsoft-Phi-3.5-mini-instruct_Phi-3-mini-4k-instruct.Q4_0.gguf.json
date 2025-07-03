@@ -1,0 +1,3385 @@
+{
+    "square-root-of-2-is-irrational": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.9292488239937617,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.1
+                },
+                "query": "Square Root of 2 is Irrational",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8313156308136258,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "sqrt(2) is not rational",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.18017970715203896,
+                    "reciprocal_rank": 0.09090909090909091,
+                    "rank": 11,
+                    "duration": 0.0
+                },
+                "query": "ratonl sqrt(2)",
+                "refined_query": null
+            }
+        }
+    },
+    "fundamental-theorem-of-algebra": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.05718685316335169,
+                    "reciprocal_rank": 0.016666666666666666,
+                    "rank": 60,
+                    "duration": 0.0
+                },
+                "query": "Fundamental Theorem of Algebra",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.06783204105472322,
+                    "reciprocal_rank": 0.03225806451612903,
+                    "rank": 31,
+                    "duration": 0.0
+                },
+                "query": "Every univariate polynomial of positive degree with complex coefficients has at least one complex root",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "univariate every lynomial positive degree complex coefficients least one rot complex",
+                "refined_query": null
+            }
+        }
+    },
+    "denumerability-of-the-rational-numbers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.06474271459046577,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 0.0
+                },
+                "query": "Denumerability of the Rational Numbers",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4518331242472164,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "\n\nZ (the set of all integers) and Q (the set of all rational numbers) are countable",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2536607270828598,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "(the z set integer q (the set rational numbers) countable",
+                "refined_query": null
+            }
+        }
+    },
+    "pythagorean-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3333333333333333,
+                    "reciprocal_rank": 0.14285714285714285,
+                    "rank": 7,
+                    "duration": 0.0
+                },
+                "query": "Pythagorean Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.1810425967800402,
+                    "reciprocal_rank": 0.022222222222222223,
+                    "rank": 45,
+                    "duration": 0.0
+                },
+                "query": "The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.20184908658209985,
+                    "reciprocal_rank": 0.03333333333333333,
+                    "rank": 30,
+                    "duration": 0.0
+                },
+                "query": "reas sum two squar legs equals area square hypotenuse",
+                "refined_query": null
+            }
+        }
+    },
+    "prime-number-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16485085672216038,
+                    "reciprocal_rank": 0.015151515151515152,
+                    "rank": 66,
+                    "duration": 0.0
+                },
+                "query": "Prime Number Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "pi(x) let ime-counting function defined number primes less equal rea x number x x / x log good appoximatio pix)",
+                "refined_query": null
+            }
+        }
+    },
+    "g\u00f6dels-incompleteness-theorem-1": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6131471927654584,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "G\u00f6del's Incompleteness Theorem 1",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.1710330840677181,
+                    "reciprocal_rank": 0.09090909090909091,
+                    "rank": 11,
+                    "duration": 0.0
+                },
+                "query": "Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "formal consistentystem f within certain amount elementary arithmetic incompete carried",
+                "refined_query": null
+            }
+        }
+    },
+    "g\u00f6dels-incompleteness-theorem-2": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2767967112063589,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "G\u00f6del's Incompleteness Theorem 2",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.616915036760628,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "system consiste f within certain amount elementary arithmetic carried f cnsistency cannot proved f",
+                "refined_query": null
+            }
+        }
+    },
+    "law-of-quadratic-reciprocity": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.40704138753556657,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "Law of Quadratic Reciprocity",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.942349761138049,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Define q^* = (-1)^((q - 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.37376216920752164,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "q^* defin= (-1)^((q - 1)/2) * q congruence ~= x^2 p mod q solvable = x^2 q^* mod p solvable",
+                "refined_query": null
+            }
+        }
+    },
+    "the-impossibility-of-trisecting-the-angle": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Impossibility of Trisecting the Angle",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The angle pi/3 radians ([...] 60\u00b0) is constructible. [...] It is impossible to construct a 20\u00b0 angle. This implies that a 60\u00b0 angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "pi/3 angleadians ( 60\u00b0) constructible impossible construct 20\u00b0 implis angle 60\u00b0 angle cannot triseted arbirar thus angle cannot triected",
+                "refined_query": null
+            }
+        }
+    },
+    "the-impossibility-of-doubling-the-cube": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "The Impossibility of Doubling the Cube",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "unit doublincube requires construction line segment length x = x^3 2 x= 2^(1/3) number constructible",
+                "refined_query": null
+            }
+        }
+    },
+    "the-volume-of-a-sphere": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3333333333333333,
+                    "reciprocal_rank": 0.14285714285714285,
+                    "rank": 7,
+                    "duration": 0.0
+                },
+                "query": "The Volume of a Sphere",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3010299956639812,
+                    "reciprocal_rank": 0.1111111111111111,
+                    "rank": 9,
+                    "duration": 0.0
+                },
+                "query": "dimensions three vume inside sphere v = 4/3*pi*r^3 r radius",
+                "refined_query": null
+            }
+        }
+    },
+    "the-area-of-a-circle": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Area of a Circle",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "half area circumfence times radius = 1/2 * 2*pi*r*r circle",
+                "refined_query": null
+            }
+        }
+    },
+    "eulers-generalisation-of-fermats-little-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "Euler's Generalisation of Fermat's Little Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "[...] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "oprime n positive tegers a^(phi(n)) congruent 1 modulo n",
+                "refined_query": null
+            }
+        }
+    },
+    "the-infinitude-of-primes": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "The Infinitude of Primes",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "[...] There are infinitely many prime numbers",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.27894294565112987,
+                    "reciprocal_rank": 0.09090909090909091,
+                    "rank": 11,
+                    "duration": 0.0
+                },
+                "query": "may nfinitely prime nuers",
+                "refined_query": null
+            }
+        }
+    },
+    "the-independence-of-the-parallel-postulate": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Independence of the Parallel Postulate",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "[...] The parallel postulate is independent of other axioms of Euclidean geometry",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "osulate parallel indendent axioms euclidean geometry",
+                "refined_query": null
+            }
+        }
+    },
+    "polyhedron-formula": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16427204996205025,
+                    "reciprocal_rank": 0.014925373134328358,
+                    "rank": 67,
+                    "duration": 0.0
+                },
+                "query": "Polyhedron Formula",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Any convex polyhedron's surface has Euler characteristic X = V - E + F = 2",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "polyhedron's coex surface euler characteristic x = v - + e f = 2",
+                "refined_query": null
+            }
+        }
+    },
+    "eulers-summation-of-1-122-132-.": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4802943335523245,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "Euler's Summation of 1 + (1/2)^2 + (1/3)^2 + ...",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8330711251950038,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] the precise summation of the reciprocals of the squares of the natural numbers [...] is [...] pi^2 / 6",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5056098351829859,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "ummation precise riprocals squares natural numbers pi^2 / 6",
+                "refined_query": null
+            }
+        }
+    },
+    "fundamental-theorem-of-integral-calculus": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.9221235176732561,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Fundamental Theorem of Integral Calculus",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8786565188858405,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5670323299144779,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "untion differentiati integrating function thought inverses",
+                "refined_query": null
+            }
+        }
+    },
+    "demoivres-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "DeMoivre's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.9171606835666682,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin nx",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7157995529629807,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "number real xnteger n (cos x + sin = x)^n cos nx + sin nx",
+                "refined_query": null
+            }
+        }
+    },
+    "liouvilles-theorem-and-the-construction-of-transcendental-numbers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5900928477779063,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Liouville's Theorem and the Construction of Transcendental Numbers",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8749710536609455,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "irrational but does not have this property, so it cannot be algebraic and must be transcendental",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.776447253705096,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "roerty irrational caot algebraic must transcendental",
+                "refined_query": null
+            }
+        }
+    },
+    "lagranges-four-square-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "Lagrange's Four-Square Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "every nonnegative integer can be represented as a sum of four non-negative integer squares",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "onnegative every ieger represented sum four non-negative integer squares",
+                "refined_query": null
+            }
+        }
+    },
+    "all-primes-1-mod-4-equal-the-sum-of-two-squares": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "All Primes (1 mod 4) Equal the Sum of Two Squares",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2559580248098155,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 0.0
+                },
+                "query": "[...] contains no factor p^k, where prime p =* 3 (mod 4) and k is odd",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.25,
+                    "reciprocal_rank": 0.06666666666666667,
+                    "rank": 15,
+                    "duration": 0.0
+                },
+                "query": "factor contains p prime p =* 3 (mod 4) odd k",
+                "refined_query": null
+            }
+        }
+    },
+    "greens-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Green's theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.28236645733559745,
+                    "reciprocal_rank": 0.07692307692307693,
+                    "rank": 13,
+                    "duration": 0.0
+                },
+                "query": "[...] line integral around a simple closed curve C to a double integral over the plane region D [...] bounded by C",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.24885072422534077,
+                    "reciprocal_rank": 0.03125,
+                    "rank": 32,
+                    "duration": 0.0
+                },
+                "query": "integral line arnd simple closed curve c double integral region plane bouned c",
+                "refined_query": null
+            }
+        }
+    },
+    "the-non-denumerability-of-the-continuum": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.10889376106823218,
+                    "reciprocal_rank": 0.09090909090909091,
+                    "rank": 11,
+                    "duration": 0.0
+                },
+                "query": "The Non-Denumerability of the Continuum",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.13768706606145367,
+                    "reciprocal_rank": 0.025,
+                    "rank": 40,
+                    "duration": 0.0
+                },
+                "query": "[...] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.1527103703687228,
+                    "reciprocal_rank": 0.037037037037037035,
+                    "rank": 27,
+                    "duration": 0.0
+                },
+                "query": "sets infinite cann put one-to-one correspondence infinite set natural number",
+                "refined_query": null
+            }
+        }
+    },
+    "formula-for-pythagorean-triples": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "Formula for Pythagorean Triples",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "[...] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "formula fundameal generating pythagorean triples given arbitrary pair intgers > n n > 0",
+                "refined_query": null
+            }
+        }
+    },
+    "the-undecidability-of-the-continuum-hypothesis": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.36960055085300564,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "The Undecidability of the Continuum Hypothesis",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.465724730974925,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "There is no set whose cardinality is strictly between that of the integers and the real numbers",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.1669507438530884,
+                    "reciprocal_rank": 0.03225806451612903,
+                    "rank": 31,
+                    "duration": 0.0
+                },
+                "query": "whse set cardinalitytrictly integers real numbers",
+                "refined_query": null
+            }
+        }
+    },
+    "schroeder-bernstein-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Schroeder-Bernstein Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A \u2192 B",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "injective ext functions f -> b g b -> b sets exists bijective functionh b \u2192",
+                "refined_query": null
+            }
+        }
+    },
+    "leibnitzs-series-for-pi": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "Leibnitz's Series for Pi",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "pi [...] as an alternating series",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "altrnting pi series",
+                "refined_query": null
+            }
+        }
+    },
+    "sum-of-the-angles-of-a-triangle": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Sum of the Angles of a Triangle",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "measures sum interr angles triangle euclidean space always 180 degrees",
+                "refined_query": null
+            }
+        }
+    },
+    "the-ballot-problem": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_document_not_found"
+        },
+        "queries": {}
+    },
+    "ramseys-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Ramsey's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.06462745615384195,
+                    "reciprocal_rank": 0.02702702702702703,
+                    "rank": 37,
+                    "duration": 0.0
+                },
+                "query": "how big must some structure be to guarantee that a particular property holds?",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "mut big structure guantee particular property holds?",
+                "refined_query": null
+            }
+        }
+    },
+    "divergence-of-the-harmonic-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5853689082403368,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Divergence of the Harmonic Series",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.27796813432996803,
+                    "reciprocal_rank": 0.058823529411764705,
+                    "rank": 17,
+                    "duration": 0.0
+                },
+                "query": "the infinite series formed by summing all positive unit fractions",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "seies infinite formesumming positive unit fractions",
+                "refined_query": null
+            }
+        }
+    },
+    "taylors-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3391602052736161,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Taylor's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.20388396788834973,
+                    "reciprocal_rank": 0.045454545454545456,
+                    "rank": 22,
+                    "duration": 0.0
+                },
+                "query": "infinite sum of terms that are expressed in terms of the function's derivatives at a single point",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2822183340639232,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "um infinite terms pressed terms function's derivatives single point",
+                "refined_query": null
+            }
+        }
+    },
+    "brouwer-fixed-point-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5368596003428795,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "Brouwer Fixed Point Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.22639699852246684,
+                    "reciprocal_rank": 0.034482758620689655,
+                    "rank": 29,
+                    "duration": 0.0
+                },
+                "query": "for any continuous function f [...] there is a point x_0 such that f(x_0) = x_0",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "fnction continuous point x_0 f(x_0) = x_0",
+                "refined_query": null
+            }
+        }
+    },
+    "the-solution-of-a-cubic": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4714069718329427,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Solution of a Cubic",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5624769470499117,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "If all of the coefficients a, b, c, and d of the cubic equation are real numbers, then it has at least one real root [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3608771018079072,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "b coefficients c bic equation real numbers least one root real",
+                "refined_query": null
+            }
+        }
+    },
+    "arithmetic-mean-geometric-mean": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3010299956639812,
+                    "reciprocal_rank": 0.1111111111111111,
+                    "rank": 9,
+                    "duration": 0.0
+                },
+                "query": "Arithmetic Mean / Geometric Mean",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "the arithmetic mean of a list of non-negative real numbers is greater than or equal to the geometric mean of the same list",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "mean arithmetic lt non-negative real numbers greater equal geometric list man",
+                "refined_query": null
+            }
+        }
+    },
+    "solutions-to-pells-equation": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.22106472945750374,
+                    "reciprocal_rank": 0.045454545454545456,
+                    "rank": 22,
+                    "duration": 0.0
+                },
+                "query": "Solutions to Pell's Equation",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "as long as n is not a perfect square, [x^2 - ny^2 = 1] has infinitely many distinct integer solutions",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "n long perfect uare x^2 - ny^2 = 1 many infinitely distinct integer solutons",
+                "refined_query": null
+            }
+        }
+    },
+    "minkowskis-fundamental-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Minkowski's Fundamental Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "every convex set in R^n which is symmetric to the origin and has volume greater than 2^n contains a non-zero integer point",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "convex every set^n symmetric origin volume greater 2^n non-zero contains iteger point",
+                "refined_query": null
+            }
+        }
+    },
+    "puiseuxs-theorem": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "sum-of-the-reciprocals-of-the-triangular-numbers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7917443701739871,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Sum of the Reciprocals of the Triangular Numbers",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8759369729557638,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "nth number is the number of dots in the triangular arrangement with n dots on each side",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7059188535055204,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "umber nth number ds triangular arrangement n dots side",
+                "refined_query": null
+            }
+        }
+    },
+    "the-binomial-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.23046044099649018,
+                    "reciprocal_rank": 0.02040816326530612,
+                    "rank": 49,
+                    "duration": 0.0
+                },
+                "query": "The Binomial Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7653606369886217,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The binomial coefficient binom(n, k) appears as the kth entry in the nth row of Pascal's triangle",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7653606369886217,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "coefficient binoml binom(n k) appears kth entry nth row triangle pascal's",
+                "refined_query": null
+            }
+        }
+    },
+    "the-partition-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.37375307532335084,
+                    "reciprocal_rank": 0.14285714285714285,
+                    "rank": 7,
+                    "duration": 0.0
+                },
+                "query": "The Partition Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.9951388221503574,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "number of possible partitions of a non-negative integer n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "osible number partitns non-negative integer n",
+                "refined_query": null
+            }
+        }
+    },
+    "the-solution-of-the-general-quartic-equation": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Solution of the General Quartic Equation",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2103099178571525,
+                    "reciprocal_rank": 0.038461538461538464,
+                    "rank": 26,
+                    "duration": 0.0
+                },
+                "query": "highest order polynomial equation that can be solved by radicals in the general case",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.1965616322328226,
+                    "reciprocal_rank": 0.030303030303030304,
+                    "rank": 33,
+                    "duration": 0.0
+                },
+                "query": "oder highest polynoal equation solved radicals general case",
+                "refined_query": null
+            }
+        }
+    },
+    "the-central-limit-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Central Limit Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "the limit as n -> \\inf of the distribution of (\\bar{X}_n - \\mu) * sqrt(n) is a normal distribution with mean 0 and variance \\sigma^2",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "n limit -> \\i distribution (\\bar{x}_n - \\mu) * normal sqrt(n) distributon mean 0 variance \\sigma^2",
+                "refined_query": null
+            }
+        }
+    },
+    "dirichlets-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "Dirichlet's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "for any two positive coprime integers a and d, there are [...] infinitely many primes that are congruent to a mod d",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "ositive two coprimintegers infinitely many primes congruent mod",
+                "refined_query": null
+            }
+        }
+    },
+    "cayley-hamilton-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Cayley-Hamilton Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "every square matrix over a commutative ring satisfies its own characteristic equation",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3010299956639812,
+                    "reciprocal_rank": 0.1111111111111111,
+                    "rank": 9,
+                    "duration": 0.0
+                },
+                "query": "suare every matrix mmutative ring satisfies characteristic equation",
+                "refined_query": null
+            }
+        }
+    },
+    "wilsons-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "Wilson's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.1949590218937863,
+                    "reciprocal_rank": 0.029411764705882353,
+                    "rank": 34,
+                    "duration": 0.0
+                },
+                "query": "[...] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "n integer > 1 pme number iff (n - + 1)! 1 divisible n",
+                "refined_query": null
+            }
+        }
+    },
+    "the-number-of-subsets-of-a-set": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.09671320180863541,
+                    "reciprocal_rank": 0.0125,
+                    "rank": 80,
+                    "duration": 0.0
+                },
+                "query": "The Number of Subsets of a Set",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.14186890186599416,
+                    "reciprocal_rank": 0.05263157894736842,
+                    "rank": 19,
+                    "duration": 0.0
+                },
+                "query": "If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "st finite |s| = n nber subsets 2^n",
+                "refined_query": null
+            }
+        }
+    },
+    "pi-is-transcendental": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Pi is Transcendental",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The best-known [numbers that are not algebraic] are pi and e",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "nmbrs best-known algeaic pi e",
+                "refined_query": null
+            }
+        }
+    },
+    "the-koenigsberg-bridges-problem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Koenigsberg Bridges Problem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6542622128554084,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2775431104668664,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "graph undirect exactly zero two vertices odd degree vertices degree nonzro belong single connected comonent",
+                "refined_query": null
+            }
+        }
+    },
+    "product-of-segments-of-chords": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Product of Segments of Chords",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "products of the lengths of the line segments on each chord are equal",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "enths products line gments chord equal",
+                "refined_query": null
+            }
+        }
+    },
+    "the-hermite-lindemann-transcendence-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Hermite-Lindemann Transcendence Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.33192596420807413,
+                    "reciprocal_rank": 0.14285714285714285,
+                    "rank": 7,
+                    "duration": 0.0
+                },
+                "query": "[...] the extension field Q(e^\\alpha_1, ..., e^\\alpha_n) has transcendence degree n over Q",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4911492931622974,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "feld extension q(e^lpha_1 e^\\alpha_n) transcendence degree n q",
+                "refined_query": null
+            }
+        }
+    },
+    "herons-formula": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Heron's formula",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "the area of a triangle in terms of the three side lengths a, b, c",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "tiangle area terms ree side lengths b c",
+                "refined_query": null
+            }
+        }
+    },
+    "formula-for-the-number-of-combinations": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.13373003436102654,
+                    "reciprocal_rank": 0.043478260869565216,
+                    "rank": 23,
+                    "duration": 0.0
+                },
+                "query": "Formula for the Number of Combinations",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "a k-combination of a set S is a subset of k distinct elements of S",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "etk-combination subs k distinct elements",
+                "refined_query": null
+            }
+        }
+    },
+    "the-laws-of-large-numbers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Laws of Large Numbers",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7961602813933072,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "average of the results obtained from a large number of independent random samples converges to the true value",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.814390483993232,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "results average oained large number independent random samples converges vaue true",
+                "refined_query": null
+            }
+        }
+    },
+    "bezouts-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "Bezout's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "Let a and b be integers with greatest common divisor d. Then there exist integers x and y such that ax + by = d",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2559580248098155,
+                    "reciprocal_rank": 0.07142857142857142,
+                    "rank": 14,
+                    "duration": 0.0
+                },
+                "query": "b let integers grtest common divisor exist integers x + ax =",
+                "refined_query": null
+            }
+        }
+    },
+    "theorem-of-ceva": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Theorem of Ceva",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7178158820758964,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.35718136242753445,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "abc triangle t lines ao bo co drawn vertices point common meet oppositesides e f",
+                "refined_query": null
+            }
+        }
+    },
+    "cantors-theorem": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "lh\u00f4pitals-rule": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "L'H\u00f4pital's Rule",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.26264953503719357,
+                    "reciprocal_rank": 0.07692307692307693,
+                    "rank": 13,
+                    "duration": 0.0
+                },
+                "query": "evaluating limits of indeterminate forms using derivatives",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "imts evaluating inderminate forms using derivatives",
+                "refined_query": null
+            }
+        }
+    },
+    "isosceles-triangle-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.25,
+                    "reciprocal_rank": 0.06666666666666667,
+                    "rank": 15,
+                    "duration": 0.0
+                },
+                "query": "Isosceles Triangle Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16260831227163416,
+                    "reciprocal_rank": 0.014285714285714285,
+                    "rank": 70,
+                    "duration": 0.0
+                },
+                "query": "triangle that has two sides of equal length and two angles of equal measure",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16370565544521565,
+                    "reciprocal_rank": 0.014705882352941176,
+                    "rank": 68,
+                    "duration": 0.0
+                },
+                "query": "wo triangle sides ual length two angles equal measure",
+                "refined_query": null
+            }
+        }
+    },
+    "sum-of-a-geometric-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.18573274757977498,
+                    "reciprocal_rank": 0.125,
+                    "rank": 8,
+                    "duration": 0.0
+                },
+                "query": "Sum of a Geometric Series",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5766617417090295,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "When summing infinitely many terms, the [series in question] can either be convergent or divergent",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4551895033224648,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "nfinitely summing ny terms series question either convergent divergent",
+                "refined_query": null
+            }
+        }
+    },
+    "e-is-transcendental": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8619444060826102,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "e is Transcendental",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5965377185773229,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The best-known [numbers that are not algebraic] are [e and] pi",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.1751061027982024,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "nmbrs best-known algeaic e pi",
+                "refined_query": null
+            }
+        }
+    },
+    "sum-of-an-arithmetic-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.23981246656813146,
+                    "reciprocal_rank": 0.058823529411764705,
+                    "rank": 17,
+                    "duration": 0.0
+                },
+                "query": "Sum of an Arithmetic Series",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.21274605355336318,
+                    "reciprocal_rank": 0.04,
+                    "rank": 25,
+                    "duration": 0.0
+                },
+                "query": "taking the number n of terms being added [...], multiplying by the sum of the first and last number in the progression [...], and dividing by 2",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.21274605355336318,
+                    "reciprocal_rank": 0.04,
+                    "rank": 25,
+                    "duration": 0.0
+                },
+                "query": "number taking n rms added multiplying sum first last progression number diiding 2",
+                "refined_query": null
+            }
+        }
+    },
+    "greatest-common-divisor-algorithm": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "perfect-number-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "Perfect Number Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "an even number is perfect [iff] it has the form 2^(p \u2013 1) * (2^p - 1), where 2^p - 1 is a prime number",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "number even rfect iff form 2^(p \u2013 1) * - (2^p 1) 2^p - 1 number prime",
+                "refined_query": null
+            }
+        }
+    },
+    "order-of-a-subgroup": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "sylows-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Sylow's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "for every prime factor p of the order of a finite group G, there exists a [...] p-subgroup of G of order p^n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "prime every fact p order finite group g exists g p-subgroup order p^n",
+                "refined_query": null
+            }
+        }
+    },
+    "ascending-or-descending-sequences": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Ascending or Descending Sequences",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.13373003436102654,
+                    "reciprocal_rank": 0.043478260869565216,
+                    "rank": 23,
+                    "duration": 0.0
+                },
+                "query": "given r, s, [...] contains a monotonically increasing subsequence of length r or a monotonically decreasing subsequence of length s",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.2640681225725909,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "r given contains notonically increasing subsequence length r monotonically ubsequence decreasing length",
+                "refined_query": null
+            }
+        }
+    },
+    "the-principle-of-mathematical-induction": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6774891818833222,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Principle of Mathematical Induction",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "first proving a simple case, then showing if we assume the claim is true for a given case, then the next case is also true",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "proving first sple case showing assume claim true given next case case alo true",
+                "refined_query": null
+            }
+        }
+    },
+    "the-mean-value-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Mean Value Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "for a given planar arc between two endpoints, at least one point at which the tangent to the arc is parallel to the secant through its endpoints",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "planar given arcwo endpoints least one point tangent parallel arc secant edpoints",
+                "refined_query": null
+            }
+        }
+    },
+    "fourier-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5242502387882814,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "Fourier Series",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.06483650239506057,
+                    "reciprocal_rank": 0.01282051282051282,
+                    "rank": 78,
+                    "duration": 0.0
+                },
+                "query": "[...] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.03418367623754267,
+                    "reciprocal_rank": 0.015151515151515152,
+                    "rank": 66,
+                    "duration": 0.0
+                },
+                "query": "sum function sinecosines example smooth functions series converge function riginal",
+                "refined_query": null
+            }
+        }
+    },
+    "sum-of-kth-powers": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5175604188550379,
+                    "reciprocal_rank": 0.3333333333333333,
+                    "rank": 3,
+                    "duration": 0.0
+                },
+                "query": "Sum of kth powers",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6002840059935781,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.2236746826837794,
+                    "reciprocal_rank": 0.045454545454545456,
+                    "rank": 22,
+                    "duration": 0.0
+                },
+                "query": "sum expresses p-thowers first n positive integers polynomial n",
+                "refined_query": null
+            }
+        }
+    },
+    "the-cauchy-schwarz-inequality": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5651449728937398,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "The Cauchy-Schwarz Inequality",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.9058966372658582,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.854632985452327,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "bound upper inneproduct two vectors inner product space product terms vectr norms",
+                "refined_query": null
+            }
+        }
+    },
+    "the-intermediate-value-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8606538740764599,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "The Intermediate Value Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5939083933576124,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "if f is a continuous function whose domain contains the interval [a, b], then it takes on any given value between f(a) and f(b)",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8113488518484024,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "continuous f funion whose domain contains interval b takes value given f(a f(b)",
+                "refined_query": null
+            }
+        }
+    },
+    "fundamental-theorem-of-arithmetic": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.031611854308622345,
+                    "reciprocal_rank": 0.01694915254237288,
+                    "rank": 59,
+                    "duration": 0.0
+                },
+                "query": "Fundamental Theorem of Arithmetic",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8404417626746005,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "states that every integer greater than 1 can be represented uniquely as a product of prime numbers, up to the order of the factors",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.7634549586859078,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "every states inter greater 1 represented uniquely product prime order numbes factors",
+                "refined_query": null
+            }
+        }
+    },
+    "divergence-of-the-prime-reciprocal-series": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Divergence of the Prime Reciprocal Series",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "sum of the reciprocals of all prime numbers diverges",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "rcirocals sum prime nbers diverges",
+                "refined_query": null
+            }
+        }
+    },
+    "dissection-of-cubes-j.e.-littlewoods-elegant-proof": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.46927872602275644,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Dissection of Cubes (J.E. Littlewood's \u201celegant\u201d proof)",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.8361486112848545,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Dissection of Cubes: A cube cannot be cubed.",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.5413889802591175,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "cbe dissection cube cnot cubed",
+                "refined_query": null
+            }
+        }
+    },
+    "the-friendship-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Friendship Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "graphs finite propty every two vertices exactly one neighbor common",
+                "refined_query": null
+            }
+        }
+    },
+    "divisibility-by-three-rule": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Divisibility by Three Rule",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] sum of the digits must be divisible by 3 [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "dgis sum must divisib 3",
+                "refined_query": null
+            }
+        }
+    },
+    "lebesgue-measure-and-integration": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "desarguess-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Desargues's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Two triangles are in perspective axially [iff] they are in perspective centrally.",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "trangles two perspecve axially iff perspective centrally",
+                "refined_query": null
+            }
+        }
+    },
+    "derangements-formula": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Derangements Formula",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "[...] permutation of the elements of a set in which no element appears in its original position",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "elments permutation t element appears original position",
+                "refined_query": null
+            }
+        }
+    },
+    "the-factor-and-remainder-theorems": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Factor and Remainder Theorems",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "f(x) is [...] f(r) and (x - r) [times a lower-degree polynomial]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "fr) f(x) (x - r) tis lower-degree polynomial",
+                "refined_query": null
+            }
+        }
+    },
+    "stirlings-formula": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "Stirling's Formula",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4868885195797468,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "asymptotic approximation for factorials [...] accurate results even for small values of n",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.4825166852651959,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "pproximation asymptic factorials accurate results even small values n",
+                "refined_query": null
+            }
+        }
+    },
+    "the-triangle-inequality": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "picks-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.08406376813555873,
+                    "reciprocal_rank": 0.041666666666666664,
+                    "rank": 24,
+                    "duration": 0.0
+                },
+                "query": "Pick's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.39883874658084073,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "formula for the area of a simple polygon with integer vertex coordinates",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "ara formula simple pygon integer vertex coordinates",
+                "refined_query": null
+            }
+        }
+    },
+    "the-birthday-problem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "The Birthday Problem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "same birthday [...] 23 people are needed for that probability to exceed 50%",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "23birthday people need probability exceed 50%",
+                "refined_query": null
+            }
+        }
+    },
+    "the-law-of-cosines": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "The Law of Cosines",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6309297535714575,
+                    "reciprocal_rank": 0.5,
+                    "rank": 2,
+                    "duration": 0.0
+                },
+                "query": "relates the lengths of the sides of a triangle to the cosine of one of its angles",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.43067655807339306,
+                    "reciprocal_rank": 0.25,
+                    "rank": 4,
+                    "duration": 0.0
+                },
+                "query": "legths relates sidesriangle cosine one angles",
+                "refined_query": null
+            }
+        }
+    },
+    "ptolemys-theorem": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Ptolemy's Theorem",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.0,
+                    "reciprocal_rank": 0,
+                    "rank": 100,
+                    "duration": 0.0
+                },
+                "query": "product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.19342640361727081,
+                    "reciprocal_rank": 0.02857142857142857,
+                    "rank": 35,
+                    "duration": 0.0
+                },
+                "query": "lengths product dionals equal sum products lengths pairs opposite sides",
+                "refined_query": null
+            }
+        }
+    },
+    "principle-of-inclusionexclusion": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.23719771276929622,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "Principle of Inclusion/Exclusion",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.6131471927654584,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "[...] over-generous inclusion, followed by compensating exclusion [...]",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.16569576576522954,
+                    "reciprocal_rank": 0.08333333333333333,
+                    "rank": 12,
+                    "duration": 0.0
+                },
+                "query": "iclsion over-generousollowed compensating exclusion",
+                "refined_query": null
+            }
+        }
+    },
+    "cramers-rule": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_document_not_found"
+        },
+        "queries": {}
+    },
+    "bertrands-postulate": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Bertrand's Postulate",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.38685280723454163,
+                    "reciprocal_rank": 0.2,
+                    "rank": 5,
+                    "duration": 0.0
+                },
+                "query": "n integer > exists least one prime number n p < p < 2n 2 -",
+                "refined_query": null
+            }
+        }
+    },
+    "buffon-needle-problem": {
+        "metadata": {
+            "skipped": true,
+            "skipped_reason": "target_identifier_missing"
+        },
+        "queries": {}
+    },
+    "descartes-rule-of-signs": {
+        "metadata": {},
+        "queries": {
+            "Title query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 1.0,
+                    "reciprocal_rank": 1.0,
+                    "rank": 1,
+                    "duration": 0.0
+                },
+                "query": "Descartes Rule of Signs",
+                "refined_query": null
+            },
+            "Natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 1,
+                    "normalized_discounted_cumulative_gain": 0.3562071871080222,
+                    "reciprocal_rank": 0.16666666666666666,
+                    "rank": 6,
+                    "duration": 0.0
+                },
+                "query": "number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients",
+                "refined_query": null
+            },
+            "Noisy natural language query": {
+                "metrics": {
+                    "top_k_accuracy": 0,
+                    "normalized_discounted_cumulative_gain": 0.21274605355336318,
+                    "reciprocal_rank": 0.04,
+                    "rank": 25,
+                    "duration": 0.0
+                },
+                "query": "positive number re roots number sign changes sequence polynomial's coefficiets",
+                "refined_query": null
+            }
+        }
+    },
+    "summary": {
+        "all_queries": {
+            "top_k_accuracy": {
+                "sample_size": 255,
+                "average": 0.6352941176470588
+            },
+            "normalized_discounted_cumulative_gain": {
+                "sample_size": 255,
+                "average": 0.45901031300365513
+            },
+            "reciprocal_rank": {
+                "sample_size": 255,
+                "average": 0.4394979465245326
+            },
+            "rank": {
+                "sample_size": 255,
+                "average": 25.431372549019606
+            },
+            "duration": {
+                "sample_size": 255,
+                "average": 0.0003921568627450981
+            }
+        },
+        "Title query": {
+            "top_k_accuracy": {
+                "sample_size": 85,
+                "average": 0.6588235294117647
+            },
+            "normalized_discounted_cumulative_gain": {
+                "sample_size": 85,
+                "average": 0.45562774749703294
+            },
+            "reciprocal_rank": {
+                "sample_size": 85,
+                "average": 0.44093777343352464
+            },
+            "rank": {
+                "sample_size": 85,
+                "average": 26.49411764705882
+            },
+            "duration": {
+                "sample_size": 85,
+                "average": 0.0011764705882352942
+            }
+        },
+        "Natural language query": {
+            "top_k_accuracy": {
+                "sample_size": 85,
+                "average": 0.6823529411764706
+            },
+            "normalized_discounted_cumulative_gain": {
+                "sample_size": 85,
+                "average": 0.5316440650234219
+            },
+            "reciprocal_rank": {
+                "sample_size": 85,
+                "average": 0.5149262565849089
+            },
+            "rank": {
+                "sample_size": 85,
+                "average": 18.341176470588234
+            },
+            "duration": {
+                "sample_size": 85,
+                "average": 0.0
+            }
+        },
+        "Noisy natural language query": {
+            "top_k_accuracy": {
+                "sample_size": 85,
+                "average": 0.5647058823529412
+            },
+            "normalized_discounted_cumulative_gain": {
+                "sample_size": 85,
+                "average": 0.38975912649051125
+            },
+            "reciprocal_rank": {
+                "sample_size": 85,
+                "average": 0.36262980955516394
+            },
+            "rank": {
+                "sample_size": 85,
+                "average": 31.458823529411763
+            },
+            "duration": {
+                "sample_size": 85,
+                "average": 0.0
+            }
+        }
+    }
+}
