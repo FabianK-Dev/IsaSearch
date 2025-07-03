@@ -195,7 +195,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 model,
                 config,
                 document_index,
-                refine_query=True,
+                refine_query=config["benchmark_refine_query"],
                 llm_output_cache=llm_output_cache,
             )
             results_list = search_results_to_docs(results_dict, solr, config)["results"]
