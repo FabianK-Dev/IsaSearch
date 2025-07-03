@@ -34,6 +34,9 @@ solr = connect_solr(config)
 results_suffix = ""
 if config["add_metadata"]:
     results_suffix = results_suffix + "M"
+    config["artifacts_folder"] = config["artifacts_folder"] + "-with-metadata"
+    config["prompts_folder"] = config["prompts_folder"] + "-with-metadata"
+    config["chroma_db_path"] = config["chroma_db_path"] + "-with-metadata"
 
 if config["add_user_query"]:
     results_suffix = results_suffix + "U"
