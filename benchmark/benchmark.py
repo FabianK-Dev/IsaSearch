@@ -31,7 +31,7 @@ with open("config.json", "r") as file:
 print("Loading Solr...")
 solr = connect_solr(config)
 
-results_suffix = "_"
+results_suffix = ""
 if config["add_metadata"]:
     results_suffix = results_suffix + "M"
 
@@ -41,8 +41,8 @@ if config["add_user_query"]:
 if config["benchmark_search_refine"]:
     results_suffix = results_suffix + "R"
 
-if results_suffix == "_":
-    results_suffix = "_baseline"
+if results_suffix == "":
+    results_suffix = "baseline"
 
 print("Using config for benchmark:")
 pprint(config)
@@ -93,7 +93,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     if row["ID"] not in benchmark_results:
         benchmark_results[row["ID"]] = {"metadata": {}, "queries": {}}
 
-    if row["Skip"]:
+    if row["Skip"] == "true":
         print(
             "Warning: Entry at row index "
             + str(i)
