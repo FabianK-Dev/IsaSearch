@@ -229,7 +229,7 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
 \section{Benchmark}
 
 \subsection{Aufbau des Benchmarks}
-\label{sec:aufbau_des_benchmarks}
+\label{sec:aufbaudesbenchmarks}
 
 - Um objektiv die Leistung der semantischen Suchmaschine zu messen wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` von Dr. Freek Wiedijk basiert.
 
@@ -273,7 +273,7 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
     - Aufeinanderfolgende Wörter werden mit einer Wahrscheinlichkeit von zehn Prozent vertauscht
     - zudem: zehn Prozent der Zeichen des String werden zufällig entfernt
     - um deterministisches Verhalten zwischen verschiedenen Testläufen zu ermöglichen wird ein fester Zufalls-Seed festgelegt
-  - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
+%  - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
 
 - Zudem wird für jedes Theorem eine Liste an Ziel-Identifikatoren in Form einer Liste im JSON-Format in der Spalte ``Target Identifier`` gespeichert. Jedes Element in dieser Liste ist ein Dictionary und besteht aus einer Menge an Schlüsseln und dessen Werten, die für ein Suchkandidat gegeben sein müssen, damit dieser als korrektes Dokument erkannt wird.
 
@@ -295,7 +295,7 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
 
 - Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokument-Index existiert. Sollte sich beispielsweise die ID des Dokuments in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
 
-- Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbau_des_benchmarks} beschrieben wurden, an die Suchmaschine gestellt, wobei wie zuvor erklärt die Suchanfrage in verrauschter natürlicher Sprache dynamisch generiert wird.
+- Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbaudesbenchmarks} beschrieben wurden, an die Suchmaschine gestellt..
 
 - Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
 
@@ -303,7 +303,21 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
 
 - Abhängig von der Konfiguration können verschiedene Suchstrategien verglichen werden.
 
-- Indem die Parameter \texttt{add_metadata},
+- Indem die Boolean-Parameter \texttt{add\_metadata}, \texttt{add\_user\_query} und \texttt{benchmark\_search\_refine} entsprechend gesetzt werden, werden folgende Suchstrategien verglichen:
+
+\begin{enumerate}
+  \item Es wird nur die durch das Sprachmodell umschriebenen Suchanfrage verwendet. Dokumente werden ohne Metadaten eingebettet. (\texttt{add\_metadata = false}, \texttt{add\_user\_query = false}, \texttt{benchmark\_search\_refine = true})
+
+  \item Es wird nur die originale Nutzereingabe verwendet. Dokumente werden ohne Metadaten eingebettet. (\texttt{add\_metadata = false}, \texttt{add\_user\_query = true}, \texttt{benchmark\_search\_refine = false})
+
+  \item Die durch das Sprachmodell umschriebene Suchanfrage und die originale Nutzereingabe werden kombiniert. Dokumente werden ohne Metadaten eingebettet. (\texttt{add\_metadata = false}, \texttt{add\_user\_query = true}, \texttt{benchmark\_search\_refine = true})
+
+  \item Es wird nur die durch das Sprachmodell umschriebenen Suchanfrage verwendet. Dokumente werden mit Metadaten eingebettet. (\texttt{add\_metadata = true}, \texttt{add\_user\_query = false}, \texttt{benchmark\_search\_refine = true})
+
+  \item Es wird nur die originale Nutzereingabe verwendet. Dokumente werden mit Metadaten eingebettet. (\texttt{add\_metadata = true}, \texttt{add\_user\_query = true}, \texttt{benchmark\_search\_refine = false})
+
+  \item Die durch das Sprachmodell umschriebene Suchanfrage und die originale Nutzereingabe werden kombiniert. Dokumente werden ohne Metadaten eingebettet. (\texttt{add\_metadata = true}, \texttt{add\_user\_query = true}, \texttt{benchmark\_search\_refine = true})
+\end{enumerate}
 
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
 
