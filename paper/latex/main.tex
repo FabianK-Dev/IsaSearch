@@ -276,6 +276,15 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
   - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
 
 - Zudem wird für jedes Theorem eine Liste an Ziel-Identifikatoren in Form einer Liste im JSON-Format in der Spalte ``Target Identifier`` gespeichert. Jedes Element in dieser Liste ist ein Dictionary und besteht aus einer Menge an Schlüsseln und dessen Werten, die für ein Suchkandidat gegeben sein müssen, damit dieser als korrektes Dokument erkannt wird.
+
+- Theoreme können zudem im Benchmark deaktiviert oder übersprungen werden, indem in der Spalte ``Skip`` für die entsprechende Zeile ``true`` eingetragen wird.
+
+- In diesem Fall wird das Theorem im Benchmark-Durchlauf ausgelassen und, falls in der Spalte ``Annotation`` ein Grund angegeben ist, dieser auf der Konsole ausgegeben.
+
+% 8 + 85 = 93
+- Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems nicht \texttt{theorem}, \texttt{lemma} oder \texttt{corollary} entspricht.
+
+% Gründe für Skip: Lemma existiert nicht mehr, Command für Zieltheorem ist falsch, oder konnte aus anderem Grund nicht gefunden werden
 %Beispiel
 
 \subsection{Benchmark-Pipeline und Vergleich der Suchstrategien}
