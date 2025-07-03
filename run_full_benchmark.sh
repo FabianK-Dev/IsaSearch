@@ -1,5 +1,17 @@
 #!/bin/bash
 
+echo "WARNING: Running the full benchmark will delete all files in .cache and will temporarily update the config.json file. At the end of the run, the config.json will be reset using 'git checkout -- config.json'. Please type confirm and hit enter to continue..."
+read confirm
+
+if [ "$confirm" != "confirm" ];
+then
+  echo "Not confirmed."
+  exit
+fi
+
+# Delete all files in .cache/
+rm .cache/*
+
 # Don't add metadata to embeddings, refine the query but don't append the original user query
 jq '.add_metadata = false' config.json > tmp && mv tmp config.json
 jq '.add_user_query = false' config.json > tmp && mv tmp config.json
