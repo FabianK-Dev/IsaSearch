@@ -180,7 +180,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
             i = 0
             while i < len(query_tokens) - 1:
-                if random.random() < 0.9:
+                if random.random() < 0.1:
                     temp_word = query_tokens[i]
                     query_tokens[i] = query_tokens[i + 1]
                     query_tokens[i + 1] = temp_word
