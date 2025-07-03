@@ -274,6 +274,16 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
     - um deterministisches Verhalten zwischen verschiedenen Testläufen zu ermöglichen wird ein fester Zufalls-Seed festgelegt
   - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
 
+- Zudem wird für jedes Theorem eine Liste an Ziel-Identifikatoren in Form einer Liste im JSON-Format in der Spalte ``Target Identifier`` gespeichert. Jedes Element in dieser Liste ist ein Dictionary und besteht aus einer Menge an Schlüsseln und dessen Werten, die für ein Suchkandidat gegeben sein müssen, damit dieser als korrektes Dokument erkannt wird.
+%Beispiel
+
+\subsection{Benchmark-Pipeline und Vergleich der Suchstrategien}
+
+- Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} beschriebenen Schritten (Laden der Konfiguration, Verbinden mit der Solr-Datenbank, Erstellen des Dokument-Index, etc.) auf.
+
+- Als nächstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
+
+
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
 
 \section{Notes on form}
