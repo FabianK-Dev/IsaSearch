@@ -229,6 +229,7 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
 \section{Benchmark}
 
 \subsection{Aufbau des Benchmarks}
+\label{sec:aufbau_des_benchmarks}
 
 - Um objektiv die Leistung der semantischen Suchmaschine zu messen wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` von Dr. Freek Wiedijk basiert.
 
@@ -283,6 +284,16 @@ wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und 
 
 - Als nächstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
 
+- Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokument-Index existiert. Sollte sich beispielsweise die ID des Dokuments in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
+
+- Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbau_des_benchmarks} beschrieben wurden, an die Suchmaschine gestellt, wobei wie zuvor erklärt die Suchanfrage in verrauschter natürlicher Sprache dynamisch generiert wird.
+
+- Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
+
+- Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
+
+
+- Um verschiedene Suchstrategien zu vergleichen wird, abhängig von der Konfiguration,
 
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
 
