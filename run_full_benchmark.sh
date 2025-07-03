@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "WARNING: Running the full benchmark will delete all files in .cache and will temporarily update the config.json file. At the end of the run, the config.json will be reset using 'git checkout -- config.json'. Please type confirm and hit enter to continue..."
+echo "WARNING: Running the full benchmark will delete all files in .cache/ and will temporarily update the config.json file. At the end of the run, the config.json will be reset using 'git checkout -- config.json'. Please type confirm and hit enter to continue..."
 read confirm
 
 if [ "$confirm" != "confirm" ];
