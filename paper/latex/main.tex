@@ -346,9 +346,9 @@ wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage ist. Der reziprok
 Anders als der reziproke Rang misst der \textit{Normalized Discounted Cumulative Gain} zusätzlich die Reihenfolge der Suchergebnisse. Hierbei berechnet man zunächst die Metriken \textit{Discounted Cumulative Gain} (DCG) und \textit{Ideal Discounted Cumulative Gain} (IDCG):
 
 $$DCG = \sum_{i=1}^{n} \frac{r_i}{log_2(i+1)}$$
-$$IDCG = \sum_{i=1}^{|R_{rel}|} \frac{r_i}{log_2(i+1)}$$
+$$IDCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
 
-wobei $R_{rel}$ die Menge aller relevanten Suchergebnisse für eine Suchanfrage ist.
+wobei $R^*$ die Menge aller relevanten Suchergebnisse für eine Suchanfrage ist.
 
 - Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Daraus folgt:
 
