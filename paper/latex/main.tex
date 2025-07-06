@@ -335,15 +335,16 @@ $$Accuracy@k =
 0 & \text{sonst}
 \end{cases}$$
 
-- Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, z.B. die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
+- Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, beispielsweise die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
 
-Der reziproke Rang (RR) sei definiert als:
+Der reziproke Rang sei definiert als:
 
 $$RR = \frac{1}{r^*}$$
 
-wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage sei. Der reziproke Rang belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht.
+wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage ist. Der reziproke Rang belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der reziproke Rang beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt. Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
-- Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
+
+Anders als der reziproke Rang
 
 \section{Notes on form}
 \subsection{Formatting}
