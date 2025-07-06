@@ -335,11 +335,21 @@ $$Accuracy@k =
 0 & \text{sonst}
 \end{cases}$$
 
+- Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, z.B. die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
+
+Der reziproke Rang (RR) sei definiert als:
+
+$$RR = \frac{1}{r^*}$$
+
+wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage sei. Der reziproke Rang belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren.
+
+- Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
+
 \section{Notes on form}
 \subsection{Formatting}
 
 % Limitationen: biased, fehler? hardware beschränkt, nicht bestes LLM verwendet, Theorem-Quelltexte mussten bis "proof" abgeschnitten werden, natürliche Beschreibungen limitiert auf 250 (?) Tokens, KI reproduziert Trainingsmaterial
-% Ausblick: Gemini, DeepSeek oder ChatGPT verwenden
+% Ausblick: Gemini, DeepSeek oder ChatGPT verwenden, in isa-afp.org integrieren
 
 This LaTeX template uses the following formatting:
 \begin{itemize}
