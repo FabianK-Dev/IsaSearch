@@ -240,11 +240,11 @@ Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielswei
 Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext, Session und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} ab.
 Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiedene Arten von Suchanfragen erstellt wurden:
 \begin{enumerate}
-  \item Titel des Theorems als Suchanfrage:
+  \item \textbf{Titel des Theorems als Suchanfrage:}
   Hierbei wird der Wert aus der ``Titel``-Spalte, welche dem Titel des Theorems, wie er aus der Liste übernommen wurde, als Suchanfrage gestellt.
   Der Vollständigkeit halber wurde diese Suchanfrage erneut in der Spalte "Title query" des Datei \texttt{benchmark.csv} gespeichert.
 % TODO: Beispiel
-  \item Natürliche Sprache als Suchanfrage:
+  \item \textbf{Natürliche Sprache als Suchanfrage:}
   Ziel hierbei ist es eine realistische Suchanfrage in natürlicher Sprache für das jeweilige Theorem zu formulieren.
   Ein Problem besteht jedoch darin, dass das manuelle Formulieren einer Suchanfrage für jedes gegebene Theorem fehleranfällig ist, da bei der Erstellung potenziell Missverständnisse hinsichtlich der Bedeutung auftreten können oder das Risiko von Voreingenommenheit besteht.
   Aus diesem Grund wurden stattdessen direkte Zitate aus relevanten englischsprachigen Wikipedia-Artikeln, wie beispielsweise Definitionen, Beschreibungen oder Umschreibungen des Theorems, als Suchanfrage verwendet.
@@ -253,7 +253,7 @@ Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiede
   Zusätzlich wurde für jedes Zitat dessen Quelle in Form eines Links zur Webadresse des Wikipedia-Artikels in der Spalte ``Natual language query source`` gespeichert.
 % TODO: Beispie
 %- wurde reduziert oben genannte Risiken und simuliert ``echte`` Suchanfragen
-  \item Verrauschte natürliche Sprache als Suchanfrage:
+  \item \textbf{Verrauschte natürliche Sprache als Suchanfrage:}
   Die in der vorherigen Methode verwendeten Suchanfragen haben den Nachteil, dass diese oft unrealistisch präzise sind.
   Beispielsweise enthalten diese viele Fachbegriffe und keine Tippfehler, was für echte Suchanfragen untypisch ist.
   Um daher noch realistischere Bedingungen zu simulieren wurde eine dritte Kategorie von Suchanfragen eingeführt, welche auf den Suchanfragen in natürlicher Sprache basiert.
