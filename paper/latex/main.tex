@@ -279,15 +279,13 @@ Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen S
 
 \subsection{Benchmark-Pipeline und Vergleich der Suchstrategien}
 
-- Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} beschriebenen Schritten (Laden der Konfiguration, Verbinden mit der Solr-Datenbank, Erstellen des Dokument-Index, etc.) auf.
+Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} beschriebenen Schritten (Laden der Konfiguration, Verbinden mit der Solr-Datenbank, Erstellen des Dokument-Index, etc.) auf.
 
-- Als nächstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
-
-- Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokument-Index existiert. Sollte sich beispielsweise die ID des Dokuments in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
-
-- Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbaudesbenchmarks} beschrieben wurden, an die Suchmaschine gestellt..
-
-- Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
+Als erstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
+Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokument-Index existiert.
+Sollte sich beispielsweise die ID des Dokuments in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
+Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbaudesbenchmarks} beschrieben wurden, an die Suchmaschine gestellt.
+Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
 
 - Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
 
@@ -314,6 +312,7 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, welche Suchstrategi
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
 
 \subsection{Verwendete Metriken}
+\label{sec:verwendete_metriken}
 
 Um die Leistung der semantischen Suche zu messen und die verschiedenen Suchstrategien zu vergleichen, werden die folgenden Metriken verwendet.
 
