@@ -237,17 +237,17 @@ Ich habe mich für diese Liste als Grundlage für das Benchmark zum Testen der S
 Außerdem wird Dr. Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert und dient oft als Standardreferenz.
 Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Sessions des Archive of Formal Proofs ab.
 
-Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext, Session und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} ab.
+Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext, Session und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} abgespeichert.
 Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiedene Arten von Suchanfragen erstellt wurden:
 \begin{enumerate}
   \item \textbf{Titel des Theorems als Suchanfrage:}
-  Hierbei wird der Wert aus der ``Titel``-Spalte, welche dem Titel des Theorems, wie er aus der Liste übernommen wurde, als Suchanfrage gestellt.
+  Hierbei wird der Wert aus der ``Title``-Spalte, welche dem Titel des Theorems, so wie er aus der Liste übernommen wurde, entspricht, als Suchanfrage gestellt.
   Der Vollständigkeit halber wurde diese Suchanfrage erneut in der Spalte "Title query" des Datei \texttt{benchmark.csv} gespeichert.
 % TODO: Beispiel
   \item \textbf{Natürliche Sprache als Suchanfrage:}
   Ziel hierbei ist es eine realistische Suchanfrage in natürlicher Sprache für das jeweilige Theorem zu formulieren.
   Ein Problem besteht jedoch darin, dass das manuelle Formulieren einer Suchanfrage für jedes gegebene Theorem fehleranfällig ist, da bei der Erstellung potenziell Missverständnisse hinsichtlich der Bedeutung auftreten können oder das Risiko von Voreingenommenheit besteht.
-  Aus diesem Grund wurden stattdessen direkte Zitate aus relevanten englischsprachigen Wikipedia-Artikeln, wie beispielsweise Definitionen, Beschreibungen oder Umschreibungen des Theorems, als Suchanfrage verwendet.
+  Aus diesem Grund wurden stattdessen direkte Zitate aus relevanten englischsprachigen Wikipedia-Artikeln, wie beispielsweise Definitionen, Beschreibungen oder Umschreibungen des Theorems, als Suchanfragen verwendet.
   Dabei wurden der Titel des Theorems sowie irrelevante Satzteile des Zitats bewusst ausgelassen und durch Ellipsen (\texttt{[...]}) ersetzt um die Suchanfragen kurz zu halten und keine Hinweise auf das Zieltheorem vorwegzunehmen.
   Dieser Vorgang wurde manuell für jedes Theorem durchgeführt und das entsprechende direkte Zitat in der Spalte ``Natural language query`` eingetragen.
   Zusätzlich wurde für jedes Zitat dessen Quelle in Form eines Links zur Webadresse des Wikipedia-Artikels in der Spalte ``Natual language query source`` gespeichert.
@@ -274,7 +274,7 @@ Jedes Element in dieser Liste ist ein Dictionary und besteht aus einer Menge an 
 Theoreme können zudem im Benchmark deaktiviert oder übersprungen werden, indem in der Spalte ``Skip`` für die entsprechende Zeile ``true`` eingetragen wird.
 In diesem Fall wird das Theorem im Benchmark-Durchlauf ausgelassen und, falls in der Spalte ``Annotation`` ein Grund angegeben ist, dieser auf der Konsole ausgegeben.
 
-Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems nicht \texttt{theorem}, \texttt{lemma} oder \texttt{corollary} entspricht.
+Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems weder \texttt{theorem}, \texttt{lemma} noch \texttt{corollary} lautet und damit nicht in den Dokument-Index aufgenommen wurde.
 %Beispiel
 
 \subsection{Benchmark-Pipeline und Vergleich der Suchstrategien}
