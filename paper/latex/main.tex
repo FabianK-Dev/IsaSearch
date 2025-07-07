@@ -325,14 +325,14 @@ $$RR = \frac{1}{r^*}$$
 wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage ist. Der reziproke Rang belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der reziproke Rang beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
 Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
-Anders als der reziproke Rang misst der \textit{Normalized Discounted Cumulative Gain} zusätzlich die Reihenfolge der Suchergebnisse.
+Anders als der reziproke Rang beachtet der \textit{Normalized Discounted Cumulative Gain} (NDCG) zusätzlich die Reihenfolge mehrerer relevanter Suchergebnisse.
 Hierbei berechnet man zunächst die Metriken \textit{Discounted Cumulative Gain} (DCG) und \textit{Ideal Discounted Cumulative Gain} (IDCG):
-$$DCG = \sum_{i=1}^{n} \frac{r_i}{log_2(i+1)}$$
+$$DCG = \sum_{i=1}^{|R|} \frac{r_i}{log_2(i+1)}$$
 $$IDCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
-wobei $R^*$ die Menge aller relevanten Suchergebnisse für eine Suchanfrage ist.
-Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Daraus folgt:
+wobei $R^*$ die Menge aller relevanter Suchergebnisse für eine Suchanfrage ist.
+Der \textit{Normalized Discounted Cumulative Gain} wird nun als
 $$NDCG = \frac{DCG}{IDCG}$$
-Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
+berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
 \section{Notes on form}
 \subsection{Formatting}
