@@ -257,13 +257,13 @@ Verrauschte natürliche Sprache als Suchanfrage:
 Die in der vorherigen Methode verwendeten Suchanfragen haben den Nachteil, dass diese oft unrealistisch präzise sind.
 Beispielsweise enthalten diese viele Fachbegriffe und keine Tippfehler, was für echte Suchanfragen untypisch ist.
 Um daher noch realistischere Bedingungen zu simulieren wurde eine dritte Kategorie von Suchanfragen eingeführt, welche auf den Suchanfragen in natürlicher Sprache basieren.
-  - verrauschen die Strings, die an die Suchmaschine geschickt werden indem die folgenden Regeln angewandt werden:
-    - Ellipsen (\texttt{[...]}) und Zeichensetzung werden entfernt-
-    - der gesamte String wird zu Kleinbuchstaben konvertiert
-    - Englische Füllworter (z.B: `a`, `the`, `and`, `but`, etc.) mit häufigem Aufkommen aber geringer Relevanz werden entfernt
-    - Aufeinanderfolgende Wörter werden mit einer Wahrscheinlichkeit von zehn Prozent vertauscht
-    - zudem: zehn Prozent der Zeichen des String werden zufällig entfernt
-    - um deterministisches Verhalten zwischen verschiedenen Testläufen zu ermöglichen wird ein fester Zufalls-Seed festgelegt
+Dafür wurden die Suchanfragen der vorherigen Kategorie verrauscht, indem die folgenden Regeln angewandt wurden:
+  - Ellipsen (\texttt{[...]}) und Zeichensetzung werden entfernt.
+  - Der gesamte String wird zu Kleinbuchstaben konvertiert.
+  - Englische Füllworter (z.B: `a`, `the`, `and`, `but`, etc.) mit häufigem Aufkommen aber geringer inhaltlicher Relevanz werden entfernt.
+  - Aufeinanderfolgende Wörter werden mit einer Wahrscheinlichkeit von zehn Prozent vertauscht.
+  - Zehn Prozent der Zeichen des Such-Strings werden zufällig entfernt.
+Um deterministisches Verhalten zwischen verschiedenen Testläufen zu ermöglichen wird ein fester Zufalls-Seed festgelegt.
 %  - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
 
 - Zudem wird für jedes Theorem eine Liste an Ziel-Identifikatoren in Form einer Liste im JSON-Format in der Spalte ``Target Identifier`` gespeichert. Jedes Element in dieser Liste ist ein Dictionary und besteht aus einer Menge an Schlüsseln und dessen Werten, die für ein Suchkandidat gegeben sein müssen, damit dieser als korrektes Dokument erkannt wird.
