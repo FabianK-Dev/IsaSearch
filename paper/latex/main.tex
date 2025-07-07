@@ -340,15 +340,26 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 \begin{table}[H]
 \centering
 \scriptsize
-\begin{tabular}{llcccc}
+\begin{tabular}{llccccc}
 \toprule
-\textbf{Strategie} & \textbf{Suchanfragen-Typ} & \textbf{Accuracy@k} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} \\
+
+\textbf{Suchstrategie} & \textbf{Anfragetyp} & \textbf{Accuracy@k} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer} \\
 \midrule
-\multirow{4}{*}{Baseline}
-& A    & 0.0 & 0.0 & 0.0 & 0.0 \\
-& B    & 0.0 & 0.0 & 0.0 & 0.0 \\
-& C    & 0.0 & 0.0 & 0.0 & 0.0 \\
-& D    & 0.0 & 0.0 & 0.0 & 0.0 \\
+
+\multirow{4}{*}{Nur Nutzereingabe}
+& Alle Anfragen                  & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+& Titel-Anfrage                  & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+& Natürliche Sprache             & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+& Verrauschte natürliche Sprache & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+\midrule
+
+\multirow{4}{*}{Nur Nutzereingabe}
+& Alle Anfragen                  & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+& Titel-Anfrage                  & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+& Natürliche Sprache             & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+& Verrauschte natürliche Sprache & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+\midrule
+
 \bottomrule
 \end{tabular}
 \caption{}
