@@ -286,13 +286,10 @@ Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich 
 Sollte sich beispielsweise die ID des Dokuments in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
 Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbau_des_benchmarks} beschrieben wurden, an die Suchmaschine gestellt.
 Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
+Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
 
-- Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
-
-- Abhängig von der Konfiguration können verschiedene Suchstrategien verglichen werden.
-
-- Indem die Boolean-Parameter \texttt{add\_metadata}, \texttt{add\_user\_query} und \texttt{benchmark\_search\_refine} entsprechend gesetzt werden, werden folgende Suchstrategien verglichen:
-
+Abhängig von der Konfiguration können verschiedene Suchstrategien untersucht werden.
+Indem die Boolean-Parameter \texttt{add\_metadata}, \texttt{add\_user\_query} und \texttt{benchmark\_search\_refine} entsprechend gesetzt werden, werden folgende Suchstrategien verglichen:
 \begin{enumerate}
   \item Es wird nur die durch das Sprachmodell umschriebenen Suchanfrage verwendet. Dokumente werden ohne Metadaten eingebettet. (\texttt{add\_metadata = false}, \texttt{add\_user\_query = false}, \texttt{benchmark\_search\_refine = true})
 
@@ -306,7 +303,6 @@ Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:ve
 
   \item Die durch das Sprachmodell umschriebene Suchanfrage und die originale Nutzereingabe werden kombiniert. Dokumente werden ohne Metadaten eingebettet. (\texttt{add\_metadata = true}, \texttt{add\_user\_query = true}, \texttt{benchmark\_search\_refine = true})
 \end{enumerate}
-
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, welche Suchstrategie die beste Suchqualität erzielt.
 
 % https://web.archive.org/web/20081201024956/http://personal.stevens.edu/~nkahl/Top100Theorems.html
@@ -317,33 +313,26 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, welche Suchstrategi
 Um die Leistung der semantischen Suche zu messen und die verschiedenen Suchstrategien zu vergleichen, werden die folgenden Metriken verwendet.
 
 Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. $Accuracy@k$ misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert:
-
 $$Accuracy@k =
 \begin{cases}
 1 & \text{wenn } \exists i \leq k: r_i = 1 \\
 0 & \text{sonst}
 \end{cases}$$
-
-- Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, beispielsweise die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
+Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, beispielsweise die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
 
 Der reziproke Rang sei definiert als:
-
 $$RR = \frac{1}{r^*}$$
+wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage ist. Der reziproke Rang belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der reziproke Rang beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
+Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
-wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage ist. Der reziproke Rang belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der reziproke Rang beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt. Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
-
-Anders als der reziproke Rang misst der \textit{Normalized Discounted Cumulative Gain} zusätzlich die Reihenfolge der Suchergebnisse. Hierbei berechnet man zunächst die Metriken \textit{Discounted Cumulative Gain} (DCG) und \textit{Ideal Discounted Cumulative Gain} (IDCG):
-
+Anders als der reziproke Rang misst der \textit{Normalized Discounted Cumulative Gain} zusätzlich die Reihenfolge der Suchergebnisse.
+Hierbei berechnet man zunächst die Metriken \textit{Discounted Cumulative Gain} (DCG) und \textit{Ideal Discounted Cumulative Gain} (IDCG):
 $$DCG = \sum_{i=1}^{n} \frac{r_i}{log_2(i+1)}$$
 $$IDCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
-
 wobei $R^*$ die Menge aller relevanten Suchergebnisse für eine Suchanfrage ist.
-
-- Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Daraus folgt:
-
+Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Daraus folgt:
 $$NDCG = \frac{DCG}{IDCG}$$
-
-- Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
+Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
 \section{Notes on form}
 \subsection{Formatting}
