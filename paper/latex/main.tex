@@ -349,6 +349,8 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 - Durch das Kombinieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
+- Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine sehr schnelle durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
+
 \begin{table}[H]
 \centering
 \scriptsize
@@ -421,7 +423,7 @@ Verrauschte natürliche Sprache & 0.565 & 0.390 & 0.363 & 31.459 & 0.000 \\
 \section{Notes on form}
 \subsection{Formatting}
 
-% Limitationen: biased, fehler? hardware beschränkt, nicht bestes LLM verwendet, Theorem-Quelltexte mussten bis "proof" abgeschnitten werden, natürliche Beschreibungen limitiert auf 250 (?) Tokens, KI reproduziert Trainingsmaterial
+% Limitationen: biased, fehler, nicht alle target identifier gefunden? hardware beschränkt, nicht bestes LLM verwendet, Theorem-Quelltexte mussten bis "proof" abgeschnitten werden, natürliche Beschreibungen limitiert auf 250 (?) Tokens, KI reproduziert Trainingsmaterial
 % Ausblick: Gemini, DeepSeek oder ChatGPT verwenden, in isa-afp.org integrieren
 
 This LaTeX template uses the following formatting:
