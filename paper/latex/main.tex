@@ -354,7 +354,7 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 \begin{table}[H]
 \centering
-\scriptsize
+%\scriptsize
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Anfragetyp} & \textbf{Accuracy@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
@@ -430,7 +430,30 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Grund dafür ist, dass das Einbinden von Metadaten das Sprachmodell beim Informalisieren dazu bringt sich zu sehr auf den Inhalt der Metadaten, statt den tatsächlichen Inhalt des Theorems, zu fokussieren
 
+\begin{table}[h]
+\centering
+%\scriptsize
+\begin{tabular}{lcc}
+\toprule
+\textbf{Input} & \textbf{Mit Metadaten} & \textbf{Ohne Metadaten} \\
 
+\midrule
+
+Eingabe & \makecell[l]{\texttt{Links
+}} & \makecell[l]{\texttt{Rechts
+}} \\
+
+\midrule
+
+Ausgabe & \makecell[l]{\texttt{Links
+}} & \makecell[l]{\texttt{Rechts
+}} \\
+
+\bottomrule
+\end{tabular}
+\caption{Caption}
+\label{tab:prompts_vergleich}
+\end{table}
 
 \section{Notes on form}
 \subsection{Formatting}
