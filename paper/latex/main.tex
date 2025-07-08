@@ -345,6 +345,7 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 - Es ist erkennbar, dass die Suchstrategie, welche die durch das Sprachmodell umschriebene Suchanfrage und die originale Nutzereingabe kombiniert, jedoch Dokumente ohne Metadaten einbettet, die besten Suchergebnisse aufweist.
 
+% Move below down?
 - Die Benchmark-Ergebnis deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt die semantische Bedeutung der Suchanfrage widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
 
 - Durch das Kombinieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
@@ -419,6 +420,11 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \label{tab:suchstrategien_tabelle}
 \end{table}
 
+\subsection{Erklärung von Performance-Unterschieden}
+
+- intuitiv könnte man annehmen, dass das Einbetten der Dokumente mit dessen Metadaten, wie Titel und Zusammenfassung von dem entsprechenden Eintrag im Archive of Formal Proofs, dem Sprachmodell bei Umschreiben bzw. dem Embedding-Modell beim Suchen nach ähnlichen Vektoren,
+
+- Die Ergebnisse zeigen, dass das Einbetten der Dokumente mit Metadaten zu einer Verschlechterung der Ergebnisse führt
 
 \section{Notes on form}
 \subsection{Formatting}
