@@ -352,6 +352,7 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 - Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine sehr schnelle durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
 
+% TABELLE: Benchmark-Ergebnis
 \begin{table}[H]
 \centering
 %\scriptsize
@@ -428,8 +429,11 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Beispielsweise verschlechtert sich $Accuracy@10$ von 0,659 auf 0,494 bei verrauschten Suchanfragen wenn Dokumente mit Metadaten informalisiert werden
 
-- Grund dafür ist, dass das Einbinden von Metadaten das Sprachmodell beim Informalisieren dazu bringt sich zu sehr auf den Inhalt der Metadaten, statt den tatsächlichen Inhalt des Theorems, zu fokussieren
+- Grund dafür ist, dass das Einbinden von Metadaten das Sprachmodell beim Informalisieren dazu bringt sich auf den Inhalt der Metadaten statt den tatsächlichen Inhalt des Theorems, zu fokussieren
 
+- Tabelle \ref{tab:prompts_vergleich} demonstriert dies,
+
+% TABELLE: Prompt Vergleich
 \begin{table}[h]
 \centering
 %\scriptsize
