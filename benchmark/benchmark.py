@@ -223,9 +223,10 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                     "rank": i + 1,
                     "distance": distance,
                     "id": doc_id,
-                    "description": doc_description,
                     "entity_kname": doc_entity_kname,
-                    "src": doc_src.split("proof")[0][:1000] + "...",
+                    "embedding_string": doc_description.strip()
+                    + "\n\n"
+                    + doc_src.strip(),
                 }
 
                 top_results.append(res)
@@ -243,6 +244,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 },
                 "query": query,
                 "refined_query": results_dict["refined_query"],
+                "top_results": top_results,
             }
 
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
