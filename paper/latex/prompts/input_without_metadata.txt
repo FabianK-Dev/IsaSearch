@@ -1,0 +1,7 @@
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 256 tokens that is more accessible to mathematicians. [...] \\
+
+lemma get\_nat\_sqrt\_code [code]:
+
+\ \ "get\_nat\_sqrt n = [...]
+
+\ \ (let x = floor\_sqrt n in if $x^2$ = n then Some x else None) [...]" \\
