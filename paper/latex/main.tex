@@ -431,12 +431,21 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Grund dafür ist, dass das Einbinden von Metadaten das Sprachmodell beim Informalisieren dazu bringt sich auf den Inhalt der Metadaten statt den tatsächlichen Inhalt des Theorems, zu fokussieren
 
-\begin{mybox}{Input:}
-hi
-\end{mybox}
-\begin{mybox}{Output:}
-hi
-\end{mybox}
+\centering
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Input:}
+    Text
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Input:}
+    Text
+    \end{mybox}
+\end{minipage}
+\par
+\vspace{1em}
 
 - Tabelle \ref{tab:prompts_vergleich} demonstriert dies anhand eines Beispiels, indem die Eingabe einmal mit Metadaten und einmal ohne Metadaten und die Ausgabe gezeigt wird
 
