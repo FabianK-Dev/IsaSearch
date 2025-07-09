@@ -463,9 +463,11 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \captionof{figure}{Vergleich der Informalisierung von Dokumenten mit und ohne Metadaten als Eingabe. Die linke Ausgabe wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, was das Sprachmodell dazu veranlasst sich auf die Definition der Pellschen Gleichung, statt auf den Inhalt des Theorem-Quelltexts zu fokussieren.}
 \label{fig:metadata_vergleich}
 
-- Sprachmodelle tendieren dazu eine Vermutung über die Bedeutung des Eingabtexts zu bilden, wenn zusätzlicher Kontext mit angegeben wird.
+- Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird.
 
-- In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Theorem finden.
+- In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
+
+- Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht
 
 \section{Notes on form}
 \subsection{Formatting}
