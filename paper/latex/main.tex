@@ -471,7 +471,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
     \texttt{\input{prompts/output_without_metadata.txt}}
     \end{mybox}
 \end{minipage}
-\vspace{1em}
+%\vspace{1em}
 \raggedright
 \captionof{figure}{Vergleich der Informalisierung von Dokumenten mit und ohne Metadaten als Eingabe. Die linke Ausgabe wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, was das Sprachmodell dazu veranlasst sich auf die Definition der Pellschen Gleichung, statt auf den Inhalt des Theorem-Quelltexts zu fokussieren.}
 \label{fig:metadata_vergleich}
@@ -492,9 +492,49 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert
 
-%- ...
+%TC:ignore
+\centering
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Titel-Suchanfrage:}
+    \texttt{Fundamental Theorem of Algebra}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Suchanfrage in natürlicher Sprache:}
+    \texttt{Every univariate polynomial of positive degree with complex coefficients has at least one complex root}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Umschriebene Suchanfrage:}
+    \texttt{\input{prompts/refined_title_query.txt}}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Umschriebene Suchanfrage:}
+    \texttt{\input{prompts/refined_nl_query.txt}}
+    \end{mybox}
+\end{minipage}
+% \scriptsize
+% \begin{mybox}{Gesuchtes Theorem:}
+% \texttt{\input{prompts/refined_nl_query.txt}}
+% \end{mybox}
+% \normalsize
+%\vspace{1em}
+\raggedright
+\captionof{figure}{Vergleich der Umschreibung von Titel-Suchanfragen und Suchanfragen in natürlicher Sprache. Das Zieltheorem beider Suchanfragen}
+\label{fig:metadata_vergleich}
+\vspace{1em}
+%TC:endignore
 
-- dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden, da diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen in natürlicher Sprache zu erkennen und zuzuordnen
+- Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl die Formulierung beider Suchanfragen unterschiedlich sind
+
+- dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden
+- Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen
+-
 
 %TC:ignore
 \section{Notes on form}

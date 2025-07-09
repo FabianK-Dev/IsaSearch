@@ -1,0 +1,3 @@
+Theorem (Complex Root Theorem for Polynomials):
+
+For any non-constant, single variable polynomial function f(z) with real or complex coefficients that have a degree greater than zero, there exists at least one value of z in the set of complex numbers where the function evaluates to zero.
