@@ -356,6 +356,7 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 - Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine sehr schnelle durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
 
+%TC:ignore
 % TABELLE: Benchmark-Ergebnis
 \begin{table}[H]
 \centering
@@ -424,6 +425,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \caption{Ergebnisse der Suchstrategien hinsichtlich verschiedener Suchanfrage-Typen und Metriken}
 \label{tab:suchstrategien_tabelle}
 \end{table}
+%TC:endignore
 
 \subsection{Erklärung von Performance-Unterschieden}
 
@@ -437,6 +439,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten dem an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
 
+%TC:ignore
 \centering
 \begin{minipage}[t]{0.495\textwidth}
     \scriptsize
@@ -466,6 +469,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \vspace{1em}
 \captionof{figure}{Vergleich der Informalisierung von Dokumenten mit und ohne Metadaten als Eingabe. Die linke Ausgabe wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, was das Sprachmodell dazu veranlasst sich auf die Definition der Pellschen Gleichung, statt auf den Inhalt des Theorem-Quelltexts zu fokussieren.}
 \label{fig:metadata_vergleich}
+%TC:endignore
 
 - Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird.
 
