@@ -44,6 +44,10 @@
 \bibpunct[:]{(}{)}{;}{a}{}{,} % Defaults for in-text citations
 \usepackage{bibentry}    % Print individual references
 
+\usepackage{tcolorbox}
+\tcbset{colframe=gray, colback=white} % Globale Einstellungen
+\newtcolorbox{mybox}[1]{title=\textbf{#1}} % Box-Definition
+
 \usepackage{acronym}
 \usepackage{multicol}
 
