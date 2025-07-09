@@ -1,0 +1,3 @@
+Lemma (Natural Square Root Extraction):
+
+Given a non-negative integer `n`, the lemma defines a method to extract its natural square root. It first checks if `n` is divisible by 64 and then proceeds to check divisibility by 45045, 63, and 65. If all these conditions are met, it attempts to find a square root `x` such that `x` squared equals `n`. If such a square root exists, it returns `Some x`; otherwise, it returns `None`. The proof uses a combination of array subtraction and floor square root functions, with the assumption that the necessary definitions and helper functions are available.
