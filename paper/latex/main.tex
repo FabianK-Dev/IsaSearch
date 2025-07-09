@@ -349,12 +349,19 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 - Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben kombiniert, jedoch Dokumente ohne Metadaten einbettet, die besten Suchergebnisse aufweist.
 
+- Diese Suchstrategie ist jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben durch das Sprachmodell, welches diese Latenz erzeugt, zur Laufzeit erfolgt
+
+- Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
+
+- Die REST-API ermöglicht Nutzern das Umschreiben zu deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
+
+- Nutzer können selbst abwägen, ob die erhöhte Suchgeschwindigket den Qualitätsverlust rechtfertigt
+
 % Move below down?
 - Die Benchmark-Ergebnis deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt die semantische Bedeutung der Suchanfrage widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
 
 - Durch das Kombinieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
-- Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine sehr schnelle durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
 
 %TC:ignore
 % TABELLE: Benchmark-Ergebnis
