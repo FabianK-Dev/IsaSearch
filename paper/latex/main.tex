@@ -431,6 +431,8 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Grund dafür ist, dass das Einbinden von Metadaten das Sprachmodell beim Informalisieren dazu bringt sich auf den Inhalt der Metadaten statt den tatsächlichen Inhalt des Theorems, zu fokussieren
 
+- Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten dem an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
+
 \centering
 \begin{minipage}[t]{0.495\textwidth}
     \scriptsize
@@ -458,8 +460,8 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \end{minipage}
 \par
 \vspace{1em}
-
-- Tabelle \ref{tab:prompts_vergleich} demonstriert dies anhand eines Beispiels, indem die Eingabe einmal mit Metadaten und einmal ohne Metadaten und die Ausgabe gezeigt wird
+\captionof{figure}{Vergleich der Informalisierung von Dokumenten mit und ohne Metadaten als Eingabe. Die linke Ausgabe wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, was das Sprachmodell dazu veranlasst sich auf die Definition der Pellschen Gleichung, statt auf den Inhalt des Theorem-Quelltexts zu fokussieren.}
+\label{fig:metadata_vergleich}
 
 \section{Notes on form}
 \subsection{Formatting}
