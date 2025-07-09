@@ -425,13 +425,11 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert
 
-- Die Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
+- Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
 
-- Beispielsweise verschlechtert sich $Accuracy@10$ von 0,659 auf 0,494 bei verrauschten Suchanfragen wenn Dokumente mit Metadaten informalisiert werden
+- Beispielsweise sinkt die $Accuracy@10$ von 0,659 auf 0,494 bei verrauschten Suchanfragen wenn Dokumente mit Metadaten informalisiert werden
 
 - Grund dafür ist, dass das Einbinden von Metadaten das Sprachmodell beim Informalisieren dazu bringt sich auf den Inhalt der Metadaten statt den tatsächlichen Inhalt des Theorems, zu fokussieren
-
-- Tabelle \ref{tab:prompts_vergleich} demonstriert dies,
 
 % TABELLE: Prompt Vergleich
 \begin{table}[h]
@@ -458,6 +456,8 @@ Ausgabe & \makecell[l]{\texttt{Links
 \caption{Caption}
 \label{tab:prompts_vergleich}
 \end{table}
+
+- Tabelle \ref{tab:prompts_vergleich} demonstriert dies anhand eines Beispiels, indem die Eingabe einmal mit Metadaten und einmal ohne Metadaten und die Ausgabe gezeigt wird
 
 \section{Notes on form}
 \subsection{Formatting}
