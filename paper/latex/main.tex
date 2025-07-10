@@ -132,6 +132,14 @@ Ablieferungstermin: \date{\today} \\
 
 - Bestehende Suchmechanismen sind beispielsweise (1) das AFP mit einer integrierten lexikalischen Such selber, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
 
+- ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
+
+- (1) Beispielsweise finden die genannten Suchwerkzeuge keine Treffer wenn Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem AFP-Eintrag vorkommen
+
+- (2) Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking
+
+- (2) empfinden Nutzer es als schwierig
+
 \section{Methodik}
 \subsection{Programmaufbau}
 \label{sec:programmaufbau}
