@@ -538,7 +538,63 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - eine weitere wichtige Erkenntnis ist, dass die Suchqualität signifikant fällt wenn das Sprachmodell die Suchanfrage falsch umschreibt
 
-- das Anfügen der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet
+- die Präfix-Konkatenation der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet
+
+%TC:ignore
+\centering
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Suchanfrage in natürlicher Sprache:}
+    \texttt{[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Suchanfrage in natürlicher Sprache:}
+    \texttt{[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Umschriebene Suchanfrage ohne Präfix-Konkatenation:}
+    \texttt{\input{prompts/r_sum_of_kth_powers.txt}}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Umschriebene Suchanfrage mit Präfix-Konkatenation:}
+    \texttt{\input{prompts/ur_sum_of_kth_powers.txt}}
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Benchmark-Ergebnis der Suchanfrage:}
+
+    \begin{table}[H]
+    \centering
+    \scriptsize
+    \begin{tabular}{ccccc}
+    \toprule
+    \textbf{Accuracy@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
+    \midrule
+    0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+
+    \end{mybox}
+\end{minipage}
+\begin{minipage}[t]{0.495\textwidth}
+    \scriptsize
+    \begin{mybox}{Umschriebene Suchanfrage mit Präfix-Konkatenation:}
+    \texttt{\input{prompts/ur_sum_of_kth_powers.txt}}
+    \end{mybox}
+\end{minipage}
+\raggedright
+\captionof{figure}{Vergleich der Umschreibung von Titel-Suchanfragen und Suchanfragen in natürlicher Sprache. Das Zieltheorem beider Suchanfragen}
+\label{fig:metadata_vergleich}
+\vspace{1em}
+%TC:endignore
 
 %TC:ignore
 \section{Notes on form}

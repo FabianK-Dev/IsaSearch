@@ -1,0 +1,7 @@
+[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n \\
+
+
+
+Theorem (Euler's Polynomial Formula for Summation):
+
+The total when adding up the squares, cubes or any other power r raised to each number from 1 through n can be represented as a polynomial function of n. This formula provides an algebraic expression that encapsulates this summative relationship between powers and their corresponding integers within a given range.
