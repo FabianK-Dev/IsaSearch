@@ -349,10 +349,6 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 - Ebenso wird für jede Suchstrategie der Durchschnitt aller Anfragetypen für jede Metrik angegeben.
 
-% Move below down?
-%- Die Benchmark-Ergebnis deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt die semantische Bedeutung der Suchanfrage widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
--% Durch das Kombinieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
-
 %TC:ignore
 % TABELLE: Benchmark-Ergebnis
 \begin{table}[H]
@@ -426,13 +422,17 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben kombiniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist.
 
-- Diese Suchstrategie ist jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben durch das Sprachmodell, welches diese Latenz erzeugt, zur Laufzeit erfolgt
+- Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt deren semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
+
+- Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
+
+- Suchanfragen, welche durch das Sprachmodell umschrieben werden, sind jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt
 
 - Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
 
 - Bei Suchanfragen per REST-API ist es daher möglich über den Parameter \texttt{refine\_query} das Umschreiben zu deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
 
-- Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche für Suchanfrage das Umschreiben deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigket den Qualitätsverlust rechtfertigt
+- Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche das Umschreiben von Suchanfrage deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigket den Qualitätsverlust rechtfertigt
 
 \subsection{Erklärung von Performance-Unterschieden}
 
