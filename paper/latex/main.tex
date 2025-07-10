@@ -540,6 +540,8 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - die Präfix-Konkatenation der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet
 
+- Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchanfrage_falsch_umschrieben}
+
 %TC:ignore
 \centering
 \begin{minipage}[t]{0.495\textwidth}
@@ -568,7 +570,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \end{minipage}
 \raggedright
 \captionof{figure}{Vergleich der Umschreibung von Titel-Suchanfragen und Suchanfragen in natürlicher Sprache. Das Zieltheorem beider Suchanfragen}
-\label{fig:metadata_vergleich}
+\label{fig:suchanfrage_falsch_umschrieben}
 %TC:endignore
 
 %TC:ignore
@@ -605,7 +607,15 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
     \caption{Benchmark-Ergebnis mit Präfix-Konkatenation der ursprünglichen Nutzer-Suchanfrage}
     \end{table}
 \end{minipage}
+\vspace{1em}
 %TC:endignore
+
+- Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel
+
+- Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was jedoch irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist
+% https://en.wikipedia.org/wiki/Faulhaber%27s_formula
+% direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
+
 
 %TC:ignore
 \section{Notes on form}
