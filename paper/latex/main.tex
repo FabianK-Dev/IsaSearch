@@ -533,8 +533,12 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 - Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl die Formulierung beider Suchanfragen unterschiedlich sind
 
 - dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden
+
 - Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen
--
+
+- eine weitere wichtige Erkenntnis ist, dass die Suchqualität signifikant fällt wenn das Sprachmodell die Suchanfrage falsch umschreibt
+
+- das Anfügen der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet
 
 %TC:ignore
 \section{Notes on form}
