@@ -339,7 +339,7 @@ $$NDCG = \frac{DCG}{IDCG}$$
 berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
 \section{Ergebnis \& Analyse}
-\label{tab:ergebnis_und_analyse}
+\label{sec:ergebnis_und_analyse}
 
 - Tabelle \ref{tab:suchstrategien_tabelle} zeigt die Benchmark-Ergebnisse für alle untersuchten Suchstrategien
 
@@ -569,7 +569,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
     \end{mybox}
 \end{minipage}
 \raggedright
-\captionof{figure}{Vergleich der Umschreibung von Titel-Suchanfragen und Suchanfragen in natürlicher Sprache. Das Zieltheorem beider Suchanfragen}
+\captionof{figure}{Vergleich der Umschreibung von Titel-Suchanfragen und Suchanfragen in natürlicher Sprache.}
 \label{fig:suchanfrage_falsch_umschrieben}
 %TC:endignore
 
@@ -588,6 +588,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
     \bottomrule
     \end{tabular}
     \caption{Benchmark-Ergebnis ohne Präfix-Konkatenation der ursprünglichen Nutzer-Suchanfrage}
+    \label{tab:suchanfrage_falsch_umschrieben_ergebnis_ohne_prefix}
     \end{table}
 \end{minipage}
 \hspace{0.01\textwidth}
@@ -605,6 +606,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
     \bottomrule
     \end{tabular}
     \caption{Benchmark-Ergebnis mit Präfix-Konkatenation der ursprünglichen Nutzer-Suchanfrage}
+    \label{tab:suchanfrage_falsch_umschrieben_ergebnis_mit_prefix}
     \end{table}
 \end{minipage}
 \vspace{1em}
@@ -612,10 +614,11 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 
 - Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel
 
-- Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was jedoch irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist
+- Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
 
+- Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_ohne_prefix} und Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_mit_prefix}
 
 %TC:ignore
 \section{Notes on form}
