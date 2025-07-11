@@ -130,15 +130,16 @@ Ablieferungstermin: \date{\today} \\
 
 - obwohl die Wiederverwedung bestehender Theoreme essenziell ist um Duplikate zu vermeiden, findet sie in der Praxis zu wenig statt
 
-- Bestehende Suchmechanismen sind beispielsweise (1) das AFP selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
+- Bestehende Suchmechanismen, wie beispielsweise die im AFP integrierte Suchmaschine, FindFacts, Befehle wie \texttt{find\_theorems} oder Unix-Kommandos wie \texttt{grep}, bieten nur eine lexikalische Suche, jedoch keine semantische Suche, was einige Probleme mit sich bringt:
 
-- ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
-
-- (1) Beispielsweise finden die genannten Suchwerkzeuge keine Treffer wenn Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem AFP-Eintrag vorkommen
+- (1) Beispielsweise finden die genannten Suchwerkzeuge keine Treffer wenn Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem AFP-Eintrag vorkommen %Beispiel
 
 - (2) Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d.h. relevantere Suchergebnisse sind nicht als solche erkennbar
 
 - (3) Nutzer empfinden es außerdem als schwierig herauszufinden ob ein Theorem, das sie suchen, bereits im AFP vorhanden ist
+
+% - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
+% - Bestehende Suchmechanismen sind beispielsweise (1) das AFP selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
 
 \section{Hintergrund}
 
