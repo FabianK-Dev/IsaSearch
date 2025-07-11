@@ -124,7 +124,7 @@ Ablieferungstermin: \date{\today} \\
 \subsection{Motivation \& Problemstellung}
 - Die formale Verifizierung spielt eine entscheidende Rolle, um die Korrektheit von Hard- und Software zu beweisen.
 
-- Isabelle, ein generischer und interaktiver Theorembeweiser ermöglicht die Entwicklung und Verifikation von formalen Theoremen
+- Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Higher-Order Logic, ermöglicht die Entwicklung und Verifikation von formalen Theoremen
 
 - das Archive of Formal Proofs (AFP) ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen
 
@@ -162,9 +162,11 @@ Ablieferungstermin: \date{\today} \\
 
 \subsection{Isabelle, AFP und formale Beweise}
 
-- Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen mit Schwerpunkt auf Higher-Order Logic
+- Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen, sowie Hard- und Softwarebeweisen
 
-- Isabelle organisiert beweise in Theorien (\texttt{.thy}-Dateien), welche Typen wie Funktionen, Lemmas und Theoreme definiert, wobei jede Theorie Teil eines größeren Abhänigkeitsgraphen ist, was modulare Entwicklung und Wiederverwedung von bestehenden Theorien ermöglicht
+- obwohl Isabelle mehrere Objektlogiken unterstützt ist Isabelle/HOL für High-Order Logic besonders nützlich für reale Anwendungen
+
+- Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhänigkeitsgraphen ist, was modulare Entwicklung und Wiederverwedung von bestehenden Theorien ermöglicht
 
 \section{Methodik}
 \subsection{Programmaufbau}
