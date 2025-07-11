@@ -162,18 +162,30 @@ Ablieferungstermin: \date{\today} \\
 
 \subsection{Isabelle, AFP und formale Beweise}
 
-%T. Nipkow, L.C. Paulson, and M. Wenzel: Isabelle/HOL, Seite 3-8, 9-26
+%Teaching Higher-Order Logic Using Isabelle (Lund, Simon Tobias; Villadsen, Jørgen)
+%Isabelle/HOL: A Proof Assistant for Higher-Order Logic (Tobias Nipkow, Lawrence C. Paulson, Markus Wenzel)
+
+% "Isabelle is a generic system for implementing logical formalisms" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL p. 3
+% "developed at the University of Cambridge in collaboration with the Technical University of Munich under the direction of Dr. Lawrence C. Paulson and Prof. Tobias Nipkow"
 - Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen, sowie Hard- und Softwarebeweisen
 
+% "In contrast to other provers like PVS or the HOL-System by Gordon and Melham [Gordon, Melham, 1993], Isabelle is not restricted to a single, hard-coded logic" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
+% "Isabelle [26] is implemented in ML [17]" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
+% "Within this metalogic of Isabelle, a multitude of object logics like e.g. Higher Order Logic (HOL) or Zermelo-Fraenkel Set Theory (ZF) can be formalized" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
 - obwohl Isabelle mehrere Objektlogiken unterstützt ist Isabelle/HOL für High-Order Logic besonders nützlich für reale Anwendungen
 
+% "Working with Isabelle means creating theories. Roughly speaking, a theory is a named collection of types, functions, and theorems, much like a module in a programming language or a specification in a specification language" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
+% "Each theory T must reside in a theory file named T.thy" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
 - Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhänigkeitsgraphen ist, was modulare Entwicklung und Wiederverwebdung von bestehenden Theorien ermöglicht
 
+% SOURCE
 - Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden.
 
+% SOURCE
 - Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 
-- Die entsprechenden Kommands \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle haben die selbe Bedetutung und sind austauschbar, da sie denselben logischen Effekt haben und ausschließlich der dokumentarischen Kennzeichnung dienen.
+% "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
+- Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle haben die selbe Bedetutung und sind austauschbar, da sie denselben logischen Effekt haben und ausschließlich der dokumentarischen Kennzeichnung dienen.
 
 - Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
 
