@@ -169,7 +169,13 @@ Ablieferungstermin: \date{\today} \\
 
 - Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhänigkeitsgraphen ist, was modulare Entwicklung und Wiederverwebdung von bestehenden Theorien ermöglicht
 
-- Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren.
+- Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden.
+
+- Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
+
+- Die entsprechenden Kommands \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle haben die selbe Bedetutung und sind austauschbar, da sie denselben logischen Effekt haben und ausschließlich der dokumentarischen Kennzeichnung dienen.
+
+- sobald theorem einmal bewiesen ist
 
 \section{Methodik}
 \subsection{Programmaufbau}
