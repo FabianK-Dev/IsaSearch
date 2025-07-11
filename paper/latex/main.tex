@@ -140,9 +140,6 @@ Ablieferungstermin: \date{\today} \\
 
 - auf der anderen Seite stellen transformer-basierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können
 
-% - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
-% - Bestehende Suchmechanismen sind beispielsweise (1) das AFP selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
-
 \subsection{Zielsetzung \& Forschungsfragen}
 - Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren
 
@@ -196,6 +193,15 @@ Ablieferungstermin: \date{\today} \\
 - Zusätzlich beinhaltet jeder Eintrag ein Nachweisdokument im PDF-Format, welches einen Titel, eine Zusammenfassung des Eintrags und optional weitere Erklärungen oder zusätzlicher Kontext für die ausgewählten Theoreme oder Definitionen bereitstellt
 
 - Neben der online zugänglichen Stable- und Development-Version kann das AFP auch lokal geklont werden, da das gesamte Repository zusätzlich auch auf Heptapod, einem Fork von GitLab für Mercurial, bereitgestellt wird
+
+\subsection{Existierende Suchmechanismen}
+
+- Es existieren bereits einige Suchmaschinen und Werkzeuge, die zur Suche nach Theormen oder Einträgen im AFP verwendet werden können, welche jedoch alle auf eine lexikalische oder syntaktische Suche zurückggreifen und keine semantische Suche ermöglichen.
+
+- Dieses Kapitel erläutert diese Suchwerkzeuge
+
+% - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
+% - Bestehende Suchmechanismen sind beispielsweise (1) das AFP selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
 
 \section{Methodik}
 \subsection{Programmaufbau}
