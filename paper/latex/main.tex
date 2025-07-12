@@ -190,7 +190,7 @@ Ablieferungstermin: \date{\today} \\
 
 - Jeder Eintrag im AFP beinhaltet eine Sammlung von Theorien in \texttt{.thy}-Dateien, bestehend aus Definitionen, Lemmata, und Beweisen
 
-- Zusätzlich beinhaltet jeder Eintrag ein Nachweisdokument im PDF-Format, welches einen Titel, eine Zusammenfassung des Eintrags und optional weitere Erklärungen oder zusätzlicher Kontext für die ausgewählten Theoreme oder Definitionen bereitstellt
+- Zusätzlich beinhaltet jeder Eintrag ein Nachweisdokument im PDF-Format, welches einen Titel, eine Zusammenfassung des Eintrags, Schlüsselwörter, Authoren, Kategorien und optional weitere Erklärungen oder zusätzlicher Kontext für die ausgewählten Theoreme oder Definitionen bereitstellt.
 
 - Neben der online zugänglichen Stable- und Development-Version kann das AFP auch lokal geklont werden, da das gesamte Repository zusätzlich auch auf Heptapod, einem Fork von GitLab für Mercurial, bereitgestellt wird
 
@@ -200,7 +200,7 @@ Ablieferungstermin: \date{\today} \\
 
 - Dieses Kapitel erläutert vier bestehende Suchmechanismen, ihre Funktionsweise und geht auf ihre Einschränkungen in Bezug auf semantische Suche ein
 
-- AFP Web-Suche: die offizielle Webseite des Archive of Formal Proofs bietet eine Volltext-Suche auf Klient-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Authoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statische gehostet werden und erfordert keine serverseitige REST-API.
+- AFP Web-Suche: die offizielle Webseite des Archive of Formal Proofs bietet eine Volltext-Suche auf Klient-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Authoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statische gehostet werden und erfordert keine serverseitige REST-API. Nachteilhaft ist hierbei, dass (1) die Suche rein lexikalisch nach dem Booleschen-Retrieval-Modell des Information Retrieval funktioniert, wobei hierbei Einträge nur eingeschlossen werden, wenn alle eingegebenen Suchbegriffe exakt vorkommen. Synonyme, Tippfehler oder kleinste Abweichungen der Suchbegriffe sorgen dafür, dass ein Eintrag nicht als Suchergebnis aufgefunden wird. (2) Es werden außerdem ausschließlich die Metadaten eines Eintrags, nicht aber die im Eintrag beinhalteten Theoreme oder dessen Quelltext durchsucht. (3) Zudem findet kein semantisches Verständis der Suchbegriffe oder der Einträge statt, das bedeutet Wörter werden nur einzelnen betrachtet ohne Beachtung ihres Kontexts.
 
 % - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
 % - Bestehende Suchmechanismen sind beispielsweise (1) das AFP selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
