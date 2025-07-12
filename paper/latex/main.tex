@@ -200,7 +200,7 @@ Ablieferungstermin: \date{\today} \\
 
 - Dieses Kapitel erläutert vier bestehende Suchmechanismen, ihre Funktionsweise und geht auf ihre Einschränkungen in Bezug auf semantische Suche ein
 
-- AFP Web-Suche: die offizielle Webseite des Archive of Formal Proofs bietet eine Volltext-Suche auf Klient-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Authoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden.
+- AFP Web-Suche: die offizielle Webseite des Archive of Formal Proofs bietet eine Volltext-Suche auf Klient-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Authoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statische bleiben und erfordert keine serverseitige REST-API.
 
 % - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
 % - Bestehende Suchmechanismen sind beispielsweise (1) das AFP selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im AFP setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
