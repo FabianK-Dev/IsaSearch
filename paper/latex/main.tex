@@ -217,7 +217,7 @@ Alle drei genannten Suchmechanismen haben zwei entscheidende Nachteile: (1) Die 
 
 - Dieser erlaubt es, dass Transformer-Modelle Tokens, in einem vordefinierten Kontext-Fenster unabhängig von dessen Position zu betrachten. Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontext-Fenster von 128 000 Tokens.
 
-- Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
+- Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes. Beispielsweise zerlegt das Sprachmodell GPT-4o die Zeichensequenz ``\texttt{\textbackslash forall x \textbackslash in X\_y:}`` in die Token `\texttt{\textbackslash}`, `\texttt{forall}`, `\texttt{ x}`, `\texttt{ in}`, `\texttt{ X}`, `\texttt{\_y}` und `\texttt{:}`.
 
 - Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden kann.
 
