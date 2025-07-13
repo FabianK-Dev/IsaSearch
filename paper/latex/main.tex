@@ -213,9 +213,11 @@ Alle drei genannten Suchmechanismen haben zwei entscheidende Nachteile: (1) Die 
 
 \subsection{Transformerbasierte Sprachmodelle}
 
-- Transformer sind eine Architektur von neuronalen Netzwerken, die anderes als Recurrent Neural Networks (RNN), wie beispielsweise Long Short-Term Memory (LSTM), einen Aufmerksamkeitsmechanismus besitzen.
+- Transformer sind eine Architektur von neuronalen Netzwerken, die anderes als rekurrente neuronale Netze (RNN), wie beispielsweise Long Short-Term Memory (LSTM), einen Aufmerksamkeitsmechanismus besitzen.
 
-- Dieser erlaubt es, dass Transformer-Modelle Tokens, ..., in einem Kontext-Fenster, beispielsweise ... , zu betrachten, unabhänging von dessen Position
+- Dieser erlaubt es, dass Transformer-Modelle Tokens, in einem vordefinierten Kontext-Fenster, beispielsweise 512 Tokens, unabhänging von dessen Position zu betrachten.
+
+- Ein Token ist die kleinste Einheit bedeutungstragende einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
 
 - Dies hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden können
 
