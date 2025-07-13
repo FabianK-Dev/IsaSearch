@@ -215,7 +215,9 @@ Alle drei genannten Suchmechanismen haben zwei entscheidende Nachteile: (1) Die 
 
 - Transformer sind eine Architektur von neuronalen Netzwerken, die anderes als Recurrent Neural Networks (RNN), wie beispielsweise Long Short-Term Memory (LSTM), einen Aufmerksamkeitsmechanismus besitzen.
 
-- Dieser erlaubt es, dass Transformer-Modelle Tokens, ..., in einem Kontext-Fenster, beispielsweise ... , zu betrachten, unabhänging von dessen Position.
+- Dieser erlaubt es, dass Transformer-Modelle Tokens, ..., in einem Kontext-Fenster, beispielsweise ... , zu betrachten, unabhänging von dessen Position
+
+- Dies hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden können
 
 - Da Transformer-Modelle, anders als RNNs Eingangssequenzen nicht sequenziell verarbeiten benötigen diese weniger Trainingszeit.
 
