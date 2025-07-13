@@ -223,6 +223,12 @@ Alle drei genannten Suchmechanismen haben zwei entscheidende Nachteile: (1) Die 
 
 - Da Transformer-Modelle, anders als RNNs Eingangssequenzen nicht sequenziell verarbeiten benötigen diese zudem weniger Trainingszeit.
 
+- Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte in Satzeinbettungen repräsentiert werden.
+
+- In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben, auch wenn sie anders formuliert sind.
+
+- In dieser Bachelorarbeit wird das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}, das auf dem vortrainierten DistilBERT-Modell, einer kleineren Variante des BERT-Modells, basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
+
 \section{Methodik}
 \subsection{Programmaufbau}
 \label{sec:programmaufbau}
@@ -290,11 +296,10 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
-In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
+%In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
 Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet.
 Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
-Dieses Modell basiert auf dem vortrainierten DistilBERT-Modell, einer leichteren Variante des BERT-Modells, und wurde für semantische Ähnlichkeitssuchen optimiert.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
 Es hat sich erwiesen, dass das Voranstellen einer Anweisung vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert.
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
