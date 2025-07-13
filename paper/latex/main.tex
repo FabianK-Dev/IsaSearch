@@ -213,15 +213,15 @@ Alle drei genannten Suchmechanismen haben zwei entscheidende Nachteile: (1) Die 
 
 \subsection{Transformerbasierte Sprachmodelle}
 
-- Transformer sind eine Architektur von neuronalen Netzwerken, die anderes als rekurrente neuronale Netze (RNN), wie beispielsweise Long Short-Term Memory (LSTM), einen Aufmerksamkeitsmechanismus besitzen.
+- Transformer sind eine Architektur von neuronalen Netzwerken, die anders als rekurrente neuronale Netze (RNN), wie beispielsweise Long Short-Term Memory (LSTM), einen Aufmerksamkeitsmechanismus besitzen.
 
-- Dieser erlaubt es, dass Transformer-Modelle Tokens, in einem vordefinierten Kontext-Fenster, beispielsweise 512 Tokens, unabhänging von dessen Position zu betrachten.
+- Dieser erlaubt es, dass Transformer-Modelle Tokens, in einem vordefinierten Kontext-Fenster unabhängig von dessen Position zu betrachten. Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft, was in dieser Bachelorarbeit verwendet wird, ein Kontext-Fenster von 128 000 Tokens.
 
-- Ein Token ist die kleinste Einheit bedeutungstragende einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
+- Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
 
-- Dies hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden können
+- Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden kann.
 
-- Da Transformer-Modelle, anders als RNNs Eingangssequenzen nicht sequenziell verarbeiten benötigen diese weniger Trainingszeit.
+- Da Transformer-Modelle, anders als RNNs Eingangssequenzen nicht sequenziell verarbeiten benötigen diese zudem weniger Trainingszeit.
 
 \section{Methodik}
 \subsection{Programmaufbau}
