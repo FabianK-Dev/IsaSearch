@@ -613,11 +613,11 @@ Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwoh
 Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden. %Quelle?
 Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
 
-Eine weitere wichtige Erkenntnis ist, dass die Suchqualität signifikant fällt wenn das Sprachmodell die Suchanfrage falsch umschreibt
+\subsubsection{Kompensation von Fehlumschreibungen durch Präfix-Konkatenation}
 
-- die Präfix-Konkatenation der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet
-
-- Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchanfrage_falsch_umschrieben}:
+Wie zu erwarten, nimmt die Suchqualität signifikant ab wenn das Sprachmodell die Suchanfrage falsch umschreibt.
+Das Konkatenieren der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet.
+Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchanfrage_falsch_umschrieben}:
 
 %TC:ignore
 \centering
@@ -689,13 +689,11 @@ Eine weitere wichtige Erkenntnis ist, dass die Suchqualität signifikant fällt 
 \vspace{1em}
 %TC:endignore
 
-- Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel \citep{hale}
-
-- Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist
+Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel \citep{hale}
+Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist.
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
-
-- Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_ohne_prefix} und Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_mit_prefix} zeigt, dass die Präfix-Konkatenation der Nutzer-Suchanfrage die Suchqualität verbessert hat
+Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_ohne_prefix} und Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_mit_prefix} zeigt zudemm, dass die Präfix-Konkatenation der Nutzer-Suchanfrage die Suchqualität verbessert hat.
 
 %TC:ignore
 \section{Notes on form}
