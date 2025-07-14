@@ -121,15 +121,16 @@ Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf L
 Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen.
 Obwohl die Wiederverwedung bestehender Theoreme essenziell ist um Duplikate zu vermeiden, findet sie in der Praxis jedoch zu wenig statt.
 Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweises Filtern von Dateien.
-Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche, was einige Probleme mit sich bringt:
+Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, was einige Probleme mit sich bringt:
+\begin{enumerate}
+  \item Beispielsweise finden die genannten Suchwerkzeuge nicht das gewünschte Theorem wenn die Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem zugehörigen Eintrag im Archive of Formal Proofs formuliert sind. %Beispiel
 
-- (1) Beispielsweise finden die genannten Suchwerkzeuge keine Treffer wenn Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem AFP-Eintrag vorkommen %Beispiel
+  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d.h. relevantere Suchergebnisse sind nicht als solche erkennbarer als irrelevantere.
 
-- (2) Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d.h. relevantere Suchergebnisse sind nicht als solche erkennbar
+  \item Nutzer empfinden es außerdem als schwierig herauszufinden ob ein Theorem, das sie suchen, bereits im Archive of Formal Proofs vorhanden ist.
+\end{enumerate}
 
-- (3) Nutzer empfinden es außerdem als schwierig herauszufinden ob ein Theorem, das sie suchen, bereits im AFP vorhanden ist
-
-- auf der anderen Seite stellen transformer-basierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können
+Auf der anderen Seite stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können.
 
 \subsection{Zielsetzung \& Forschungsfragen}
 - Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren
