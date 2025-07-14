@@ -151,38 +151,28 @@ Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden
 
 %Teaching Higher-Order Logic Using Isabelle (Lund, Simon Tobias; Villadsen, Jørgen)
 %Isabelle/HOL: A Proof Assistant for Higher-Order Logic (Tobias Nipkow, Lawrence C. Paulson, Markus Wenzel)
-
 % "Isabelle is a generic system for implementing logical formalisms" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL p. 3
 % "developed at the University of Cambridge in collaboration with the Technical University of Munich under the direction of Dr. Lawrence C. Paulson and Prof. Tobias Nipkow"
-- Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen, sowie Hard- und Softwarebeweisen
-
+Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen, sowie Hard- und Softwarebeweisen.
 % "In contrast to other provers like PVS or the HOL-System by Gordon and Melham [Gordon, Melham, 1993], Isabelle is not restricted to a single, hard-coded logic" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
 % "Isabelle [26] is implemented in ML [17]" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
 % "Within this metalogic of Isabelle, a multitude of object logics like e.g. Higher Order Logic (HOL) or Zermelo-Fraenkel Set Theory (ZF) can be formalized" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
-- obwohl Isabelle mehrere Objektlogiken unterstützt ist Isabelle/HOL für High-Order Logic besonders nützlich für reale Anwendungen
-
+Obwohl Isabelle mehrere Objektlogiken unterstützt ist Isabelle/HOL für Logik höherer Stufe besonders nützlich für reale Anwendungen.
 % "Working with Isabelle means creating theories. Roughly speaking, a theory is a named collection of types, functions, and theorems, much like a module in a programming language or a specification in a specification language" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
 % "Each theory T must reside in a theory file named T.thy" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
-- Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhänigkeitsgraphen ist, was modulare Entwicklung und Wiederverwebdung von bestehenden Theorien ermöglicht
-
+Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhängikeitsgraphen ist, was modulare Entwicklung und Wiederverwendung von bestehenden Theorien ermöglicht.
 % SOURCE
-- Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden.
-
+Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden.
 % SOURCE
-- Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
-
+Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 % "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
-- Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle haben die selbe Bedetutung und sind austauschbar, da sie denselben logischen Effekt haben und ausschließlich der dokumentarischen Kennzeichnung dienen.
+Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben die selbe Bedetutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen.
+Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
 
-- Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
-
-- Das Archive of Formal Proofs ist eine peer-reviewte Datenbank von Beweisbibliotheken, die in Isabelle verifiziert wurden
-
-- Jeder Eintrag im AFP beinhaltet eine Sammlung von Theorien in \texttt{.thy}-Dateien, bestehend aus Definitionen, Lemmata, und Beweisen
-
-- Zusätzlich beinhaltet jeder Eintrag ein Nachweisdokument im PDF-Format, welches einen Titel, eine Zusammenfassung des Eintrags, Schlüsselwörter, Authoren, Kategorien und optional weitere Erklärungen oder zusätzlicher Kontext für die ausgewählten Theoreme oder Definitionen bereitstellt.
-
-- Neben der online zugänglichen Stable- und Development-Version kann das AFP auch lokal geklont werden, da das gesamte Repository zusätzlich auch auf Heptapod, einem Fork von GitLab für Mercurial, bereitgestellt wird
+Das Archive of Formal Proofs ist eine peer-reviewte Datenbank von Beweisbibliotheken, die in Isabelle verifiziert wurden.
+Jeder Eintrag im AFP beinhaltet eine Sammlung von Theorien in Form von \texttt{.thy}-Dateien, bestehend aus Definitionen, Theoremen, und Beweisen.
+Zusätzlich beinhaltet jeder Eintrag ein Nachweisdokument im PDF-Format, welches einen Titel, eine Zusammenfassung des Eintrags, Schlüsselwörter, Authoren, Kategorien und optional weitere Erklärungen oder zusätzlichen Kontext für die ausgewählten Theoreme oder Definitionen bereitstellt.
+Neben der online zugänglichen Stable- und Development-Version kann das Archive of Formal Proofs auch lokal geklont werden, da das gesamte Repository zusätzlich auch auf Heptapod, einem Fork von GitLab für Mercurial, bereitgestellt wird.
 
 \subsection{Existierende Suchmechanismen}
 
