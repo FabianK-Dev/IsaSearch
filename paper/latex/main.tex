@@ -196,11 +196,12 @@ Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachtei
 \subsection{Transformerbasierte Sprachmodelle}
 
 Transformer sind eine Architektur von neuronalen Netzwerken, die anders als rekurrente neuronale Netze, wie beispielsweise Long Short-Term Memory, einen Aufmerksamkeitsmechanismus besitzen.
-Dadurch können Transformer-Modelle Tokens innerhalb eines vordefinierten Kontextfenster unabhängig von ihrer Position betrachten. Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128 000 Tokens.
+Dadurch können Transformer-Modelle Tokens innerhalb eines vordefinierten Kontextfenster unabhängig von ihrer Position betrachten.
+Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128 000 Tokens.
 Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
 Beispielsweise zerlegt das Sprachmodell GPT-4o die Zeichensequenz \texttt{"\textbackslash forall x \textbackslash in X\_y:"} in die Token:
 \begin{verbatim}
-"\", "forall", " x", " in", " X", "\_y", ":"
+"\", "forall", " x", " in", " X", "_y", ":"
 \end{verbatim}
 
 Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden können.
@@ -306,7 +307,7 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben 
 Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} berechnet.
 Anschließend wird für jede gespeicherte Einbettung in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
-$$e^* = arg \underset{e_k \in E}{\text{min}}\ ||q - e_k||$$
+$$e^* = \underset{e_k \in E}{\text{arg min}}\ ||q - e_k||$$
 wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
 
 % Beispiel
