@@ -133,19 +133,17 @@ Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, w
 Auf der anderen Seite stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können.
 
 \subsection{Zielsetzung \& Forschungsfragen}
-- Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren
+Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren.
+Diese Arbeit vergleicht verschiedene Suchstrategien, wie das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen, sowie die Integration von Metdaten.
+Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks, sowie eine Analyse des erzielten Ergebnisses statt
 
-- Dabei werden verschiedene Suchstrategien, wie das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen, sowie die Integration von Metdaten verglichen
+Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden:
+\begin{enumerate}
+  \item \textit{Wie wirkt sich die Informalisierung formaler Theoreme oder das Optimieren von Suchanfragen durch Sprachmodelle auf deren Auffindbarkeit durch Nutzereingaben aus?}
 
-- Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks, sowie eine Analyse des erzielten Ergebnisses statt
+  \item \textit{Wie effektiv ist die entwickelte Suchmaschine und wie robust ist sie gegenüber verrauschten Suchanfragen?}
 
-- Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden:
-
-- \textit{Wie wirkt sich die Informalisierung formaler Theoreme oder das Optimieren von Suchanfragen durch Sprachmodelle auf deren Auffindbarkeit durch Nutzereingaben aus?}
-
-- \textit{Wie effektiv ist die entwickelte Suchmaschine und wie robust ist sie gegenüber verrauschten Suchanfragen?}
-
-- \textit{Wie wirkt sich das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Zusammenfassung des zugehörigen Eintrags im Archive of Formal Proofs, auf die Suchqualtität aus?}
+  \item \textit{Wie wirkt sich das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Zusammenfassung des zugehörigen Eintrags im Archive of Formal Proofs, auf die Suchqualtität aus?}
 
 \section{Hintergrund}
 
