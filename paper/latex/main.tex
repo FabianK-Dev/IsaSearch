@@ -434,7 +434,7 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 \subsection{Vergleich der Suchstrategien}
 
 Tabelle \ref{tab:suchstrategien_tabelle} zeigt die Benchmark-Ergebnisse für alle untersuchten Suchstrategien.
-Für jeden Suchanfrage-Typ sind die Durchschnittswerte aller Suchanfragen für dessen Metriken sichtbar
+Für jeden Suchanfrage-Typ sind die Durchschnittswerte aller Suchanfragen für dessen Metriken sichtbar.
 Ebenso wird für jede Suchstrategie der Durchschnitt aller Anfragetypen für jede Metrik angegeben.
 
 %TC:ignore
@@ -558,13 +558,11 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
 \vspace{1em}
 %TC:endignore
 
-- Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird.
+Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird.
+In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
+Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
 
-- In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
-
-- Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht
-
-- Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen
+Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen
 
 - Beispielsweise beträgt die Metrik $Accuracy@10$ für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Unterschied der Genauigkeits von nur 1,1\% entspricht
 
