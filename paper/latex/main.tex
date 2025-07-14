@@ -120,7 +120,8 @@ Die formale Verifizierung spielt eine entscheidende Rolle, um die Korrektheit vo
 Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Logik höherer Stufe, ermöglicht die Entwicklung und Verifikation von formalen Theoremen.
 Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen.
 Obwohl die Wiederverwedung bestehender Theoreme essenziell ist um Duplikate zu vermeiden, findet sie in der Praxis jedoch zu wenig statt.
-Bestehende Suchmechanismen sind beispielsweise (1) die im AFP direkt integrierte Suchmaschine, (2) FindFacts, eine Drill-Down-Suchmaschine zum Suchen formaler Inhalte in Isabelle-Theorien, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep}. Diese bieten jedoch alle nur eine lexikalische Suche und keine semantische Suche, was einige Probleme mit sich bringt:
+Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweises Filtern von Dateien.
+Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche, was einige Probleme mit sich bringt:
 
 - (1) Beispielsweise finden die genannten Suchwerkzeuge keine Treffer wenn Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem AFP-Eintrag vorkommen %Beispiel
 
