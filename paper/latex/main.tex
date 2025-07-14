@@ -519,6 +519,8 @@ Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suc
 
 \subsection{Erklärung von Performance-Unterschieden}
 
+\subsubsection{Einfluss von Metadaten auf die Informalisierung}
+
 Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
 Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
 Beispielsweise sinkt $Accuracy@10$ bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
@@ -562,13 +564,12 @@ Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu 
 In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
 Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
 
-Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen
+\subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
 
-- Beispielsweise beträgt die Metrik $Accuracy@10$ für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Unterschied der Genauigkeits von nur 1,1\% entspricht
-
-- Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungs-Schritt dient.
-
-- Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert
+Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen.
+Beispielsweise beträgt die Metrik $Accuracy@10$ für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
+Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungs-Schritt dient.
+Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
 
 %TC:ignore
 \centering
@@ -608,13 +609,11 @@ Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``
 \vspace{1em}
 %TC:endignore
 
-- Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl dessen Formulierungen unterschiedlich sind
+Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl die Formulierungen der Suchanfragen unterschiedlich sind.
+Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden. %Quelle?
+Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
 
-- dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden
-
-- Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen
-
-- eine weitere wichtige Erkenntnis ist, dass die Suchqualität signifikant fällt wenn das Sprachmodell die Suchanfrage falsch umschreibt
+Eine weitere wichtige Erkenntnis ist, dass die Suchqualität signifikant fällt wenn das Sprachmodell die Suchanfrage falsch umschreibt
 
 - die Präfix-Konkatenation der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet
 
