@@ -433,11 +433,9 @@ berechnet. Durch das Normalisieren des \textit{Discounted Cumulative Gain} wird 
 
 \subsection{Vergleich der Suchstrategien}
 
-- Tabelle \ref{tab:suchstrategien_tabelle} zeigt die Benchmark-Ergebnisse für alle untersuchten Suchstrategien
-
-- Für jeden Suchanfrage-Typ sind die Durchschnittswerte aller Suchanfragen für dessen Metriken sichtbar
-
-- Ebenso wird für jede Suchstrategie der Durchschnitt aller Anfragetypen für jede Metrik angegeben.
+Tabelle \ref{tab:suchstrategien_tabelle} zeigt die Benchmark-Ergebnisse für alle untersuchten Suchstrategien.
+Für jeden Suchanfrage-Typ sind die Durchschnittswerte aller Suchanfragen für dessen Metriken sichtbar
+Ebenso wird für jede Suchstrategie der Durchschnitt aller Anfragetypen für jede Metrik angegeben.
 
 %TC:ignore
 % TABELLE: Benchmark-Ergebnis
@@ -510,31 +508,22 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \end{table}
 %TC:endignore
 
-- Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben kombiniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist.
+Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist.
+Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
+Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
-- Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt deren semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
-
-- Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
-
-- Suchanfragen, welche durch das Sprachmodell umschrieben werden, sind jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt
-
-- Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
-
-- Bei Suchanfragen per REST-API ist es daher möglich über den Parameter \texttt{refine\_query} das Umschreiben zu deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
-
-- Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche das Umschreiben von Suchanfrage deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigket den Qualitätsverlust rechtfertigt
+Suchanfragen, welche durch das Sprachmodell umschrieben werden, sind jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
+Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
+Bei Suchanfragen per REST-API ist es daher möglich über den Parameter \texttt{refine\_query} das Umschreiben zu deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
+Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche das Umschreiben von Suchanfrage deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigket den Qualitätsverlust rechtfertigt.
 
 \subsection{Erklärung von Performance-Unterschieden}
 
-- intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert
-
-- Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
-
-- Beispielsweise sinkt die $Accuracy@10$ von 0,659 auf 0,494 bei verrauschten Suchanfragen wenn Dokumente mit Metadaten informalisiert werden
-
-- Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbinden der Metadaten sich auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht
-
-- Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten dem an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
+Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
+Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
+Beispielsweise sinkt $Accuracy@10$ bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
+Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbinden der Metadaten sich zu sehr auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht.
+Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
 
 %TC:ignore
 \centering
