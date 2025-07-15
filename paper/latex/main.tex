@@ -234,6 +234,7 @@ Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_
 
 Intern integriert FindFacts Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft.
 Die Solr-Datenbank ist nur innerhalb des Prozesses verfügbar und kann nicht von anderen Prozessen, beispielsweise über eine REST-API, angesteuert werden.
+Aus diesem Grund kann nicht direkt auf die Solr-Datenbank in FindFacts zugegriffen werden, weswegen Solr extern gestartet und die Datenbank dort importiert wird.
 Nach erfolgreichem Erstellen des Suchindexes wird dieser standardmäßig im Verzeichnis \texttt{\$USER\_HOME/.isabelle/ISABELLE\_VERSION/find\_facts/solr}, gespeichert, wobei \texttt{\$USER\_HOME} das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und \texttt{ISABELLE\_VERSION} der installierten Isabelle-Version entspricht, mit welcher die FindFacts-Komponente aufgerufen wurde.
 Der erzeugte FindFacts-Index liegt in Form einer Solr-Datenbank vor.
 Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz neben dem Hauptprogramm verfügbar sein, die den entsprechenden Index-Ordner als Solr-Core einbindet.
