@@ -247,6 +247,8 @@ Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
 Außerdem werden alle Eingabeaufforderungen, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
 Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderung an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen und für jede Kombination aus Eingabeaufforderung und Theorem-Quelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
+Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theorem-Quelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er das größtmögliche Kontextfenster pro Prompt festlegt.
+Kleinere Kontextfenster bedeuten, dass mehr Prompts gleichzeitig durch das Sprachmodell verarbeitet werden können.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis \texttt{.cache} befindet.
 Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
