@@ -391,7 +391,8 @@ Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiede
 \end{enumerate}
 
 Zudem wird für jedes Theorem eine Liste an Ziel-Identifikatoren in Form einer Liste im JSON-Format in der Spalte ``Target Identifier`` gespeichert.
-Jedes Element in dieser Liste ist ein Dictionary und besteht aus einer Menge an Schlüsseln und dessen Werten, die für ein Suchkandidat gegeben sein müssen, damit dieser als korrektes Dokument erkannt wird.
+Diese Liste legt fest, welche Suchergebnisse für eine Suchanfrage als korrekt gelten, wenn ihre Eigenschaften mit einem der Einträge in der Liste übereinstimmen.
+
 Theoreme können zudem im Benchmark deaktiviert oder übersprungen werden, indem in der Spalte ``Skip`` für die entsprechende Zeile ``true`` eingetragen wird.
 In diesem Fall wird das Theorem im Benchmark-Durchlauf ausgelassen und, falls in der Spalte ``Annotation`` ein Grund angegeben ist, dieser auf der Konsole ausgegeben.
 
