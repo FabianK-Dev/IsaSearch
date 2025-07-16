@@ -265,7 +265,9 @@ Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver,
 Dies liegt daran, dass durch das semantisch äquivalente Umschreiben eines Theorems die lexikalische Überlappung zwischen der umschriebenen informalen Beschreibung und der Suchanfrage höher ist als zwischen dem Quelltext und der Suchanfrage. % https://arxiv.org/pdf/2305.03653
 % evtl Beispiel?
 
-Nach erfolgreichem vollständigen Bauen des Dokument-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) überprüft die Anwendung für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
+Für jedes Theorem wird eine informelle Beschreibung benötigt.
+Diese sollen nur neu generiert werden, falls sich der Quelltext eines Theorems ändert oder noch keine Beschreibung exisitert.
+Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokument-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
 Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet wird.
 Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
