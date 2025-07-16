@@ -282,7 +282,7 @@ Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Eingab
 % Vorgesehen, dass artifakte committet werden
 
 \subsection{Wahl des Sprachmodells}
-Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
+Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
 % SOURCE: https://arxiv.org/abs/2311.12022
 Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-Benutzeroberfläche zum Vergleichen der Modelle.
 
@@ -297,6 +297,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
 
 \subsection{Einbettung und semantische Ähnlichkeitssuche}
+\label{sec:einbettung_semantische_suche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
