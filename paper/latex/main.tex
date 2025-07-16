@@ -460,6 +460,9 @@ Der Normalized Discounted Cumulative Gain wird nun als
 $$NDCG = \frac{DCG}{IDCG}$$
 berechnet. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
+Accuracy@k eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
+Der Normalized Discounted Cumulative Gain hingegen bewertet zusätzlich die Reihenfolge und Verteilung aller relevanter Ergebnisse und ist damit am aussagekräftigsten.
+
 \section{Ergebnis \& Analyse}
 \label{sec:ergebnis_und_analyse}
 
