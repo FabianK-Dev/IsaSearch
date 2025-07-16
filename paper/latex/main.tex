@@ -315,6 +315,7 @@ Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlun
 
 Anschließend wird mithilfe des Pakets ``Flask`` eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
 Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
+Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze undetaillierte Suchanfragen, z.B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
 Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Eingabeaufforderung in Kombination mit der Nutzereingabe gestellt wird.
 Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, Lemmas oder Korollars, sowie (2) einen passenden Titel dafür zu generieren.
