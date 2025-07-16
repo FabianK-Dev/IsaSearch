@@ -328,6 +328,7 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben 
 
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
 Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} berechnet.
+Hierbei ist $q$ die Einbettung des Eingabtexts in Form eines Vektors und $E$ der Einbettungsraum mit $E \subset \mathbb{R}^n$.
 Anschließend wird für jede gespeicherte Einbettung in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
 $$e^* = \underset{e_k \in E}{\text{arg min}}\ ||q - e_k||$$
