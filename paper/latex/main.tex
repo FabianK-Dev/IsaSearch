@@ -309,7 +309,7 @@ Eine ChromaDB-Sammlung ist eine gruppierte Menge an Einbettungen und ist verglei
 Hierfür wird für jedes Dokument ein String bestehend aus einer Prompt, der informalen Beschreibung, sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 Die vorangestellte Prompt fordert das Sentence-Transformer-Sprachmodell dazu auf, eine Repräsentation aus natürlicher Sprache und formaler Isabelle/HOL-Syntax zu erzeugen, um semantisch ähnliche Aussagen auffinden zu können.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
-Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert.
+Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 %\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
