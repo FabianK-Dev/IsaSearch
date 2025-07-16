@@ -735,6 +735,12 @@ Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_
 
 Obwohl die semantische KI-Suche vielversprechende Benchmark-Ergebnisse aufweist, unterliegt das Suchsystem trotzdem einigen Einschränkungen, die bei der Interpretation, Anwendung und für zukünftige Verbesserungen beachtet werden sollten.
 
+Zum einen war die Entwicklung der Suchmaschine und das Benchmarking hardwaretechnisch beschränkt, da die verwendete Grafikkarte, eine NVIDIA GeForce RTX 4070, nur über 12 GB VRAM verfügt.
+Dadurch konnten leisstungstärkere Sprachmodelle mit einer höheren Parameterzahl (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
+
+Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen, sowie das Umschreiben von Suchanfragen erheblich länger dauern wird.
+Es ist daher nicht empfehlenswert die semantische Suchmaschine ohne eine verfügbare Grafikkarte produktiv einzusetzen.
+
 %TC:ignore
 \section{Notes on form}
 \subsection{Formatting}
