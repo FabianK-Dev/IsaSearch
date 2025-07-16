@@ -351,7 +351,7 @@ Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbet
 \subsection{Aufbau des Benchmarks}
 \label{sec:aufbau_des_benchmarks}
 
-Um objektiv die Leistung der semantischen Suchmaschine zu messen wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` von Dr. Freek Wiedijk basiert.
+Um objektiv die Leistung der semantischen Suchmaschine zu messen wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` von Freek Wiedijk basiert.
 Dieses Projekt beinhaltet eine arbiträr zusammengestellte Liste von 100 Theoremen und verfolgt, wie viele davon in Beweisassistenten wie Isabelle, HOL Light oder Lean, formalisiert wurden.
 Ich habe mich für diese Liste als Grundlage für das Benchmark zum Testen der Suchmaschine entschieden, da es bisher kein Benchmark speziell für Suchmaschinen für Isabelle oder das Archive of Formal Proofs gibt.
 Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks, wie beispielsweise CoqGym für Coq oder das Flyspeck-Projekt für HOL Light, jedoch beinhalten diese keine annotierten Suchanfragen und eignen sich daher nicht als Benchmark für diese Bachelorarbeit.
@@ -556,6 +556,7 @@ Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suc
 \subsection{Erklärung von Performance-Unterschieden}
 
 \subsubsection{Einfluss von Metadaten auf die Informalisierung}
+\label{sec:einfluss_metadate_informalisierung}
 
 Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
 Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
@@ -650,6 +651,7 @@ Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekannt
 Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
 
 \subsubsection{Kompensation von Fehlumschreibungen durch Präfix-Konkatenation}
+\label{sec:kompensation_fehlumschreibungen}
 
 Wie zu erwarten, nimmt die Suchqualität signifikant ab wenn das Sprachmodell die Suchanfrage falsch umschreibt.
 Das Konkatenieren der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet.
@@ -743,6 +745,11 @@ Es ist daher nicht empfehlenswert die semantische Suchmaschine ohne eine verfüg
 
 Ein weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und annotiert wurde.
 Dies erhöht das Risiko von Voreingenommenheit oder Fehlern, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
+
+Darüber hinaus, beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
+Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur ist, abschneidet.
+
+%Zudem hat Abschnitt \ref{sec:einfluss_metadate_informalisierung} gezeigt, dass das Sprachmodell bei vagen, mehrdeutigen oder falsch formulierten Suchanfragen fehlerhafte Formulierungen erzeugen kann.
 
 %TC:ignore
 \section{Notes on form}
