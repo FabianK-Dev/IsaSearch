@@ -448,7 +448,7 @@ Zum Beispiel wird für $Accuracy@10$ ein erster relevanter Treffer auf Platz 11 
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
 $$RR = \frac{1}{r^*}$$
-wobei $r^*$ das erste relevante Suchergebnis einer Suchanfrage ist. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
+wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
 Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
 Anders als der Reciprocal Rank beachtet der Normalized Discounted Cumulative Gain zusätzlich die Reihenfolge mehrerer relevanter Suchergebnisse.
