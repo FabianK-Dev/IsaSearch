@@ -332,7 +332,8 @@ Hierbei ist $q$ die Einbettung des Eingabtexts in Form eines Vektors und $E$ der
 Anschließend wird für jede gespeicherte Einbettung in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
 $$e^* = \underset{e_k \in E}{\text{arg min}}\ ||q - e_k||$$
-wobei $||q - e_k||$ die Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
+wobei $||q - e_k||$ die euklidische Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
+Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbettung $e^*$, wenn der Abstand $||q - e_k||$ minimal ist, es also kein anderes $e_x \in E$ gibt, für das $||q - e_x||$ kleiner wäre.
 
 % Beispiel
 %\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z.B. Prompt, Embedding statt Eingabeaufforderung, Einbettung schreiben?}
