@@ -303,7 +303,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
 %In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
-Die informalisierten Dokumente werden in Form von Satzeinbettungen zusammen mit der Dokument-ID in einer ChromaDB-Sammlung eingebettet.
+Die informalisierten Dokumente werden in Form von Satzeinbettungen in einer ChromaDB-Sammlung eingebettet.
 Hierfür wird für jedes Dokument ein String bestehend aus einer Anweisung, der informalen Beschreibung, sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
 Es hat sich erwiesen, dass das Voranstellen einer Anweisung vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert.
@@ -396,7 +396,7 @@ Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} bes
 
 Als erstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
 Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokument-Index existiert.
-Sollte sich beispielsweise die ID des Dokuments in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
+Sollte sich beispielsweise der Name eines Theorems, Lemmas oder Korollars in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
 Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbau_des_benchmarks} beschrieben wurden, an die Suchmaschine gestellt.
 Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
 Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
