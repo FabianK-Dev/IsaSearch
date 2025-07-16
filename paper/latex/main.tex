@@ -213,8 +213,9 @@ Je näher zwei Vektoren im Vektorrraum liegen, desto ähnlicher ist ihre semanti
 
 Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
+Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert, wobei während des Trainings die Verlustfunktion MultipleNegativesRankingLoss mit Kosinus-Ähnlichkeit eingesetzt wurde.
+Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten.
 %\allowbreak
-
 \section{Methodik}
 
 Dieses Kapitel beschreibt den Aufbau der Anwendung, sowie die verwendeten Methoden.
