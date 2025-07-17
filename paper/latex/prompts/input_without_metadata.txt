@@ -4,4 +4,4 @@ lemma get\_nat\_sqrt\_code [code]:
 
 \ \ "get\_nat\_sqrt n = [...]
 
-\ \ (let x = floor\_sqrt n in if $x^2$ = n then Some x else None) [...]" \\
+\ \ (let x = floor\_sqrt n in if $x^2$ = n then Some x else None) [...]" \\ \\ \\ \\ \\ \\ \\

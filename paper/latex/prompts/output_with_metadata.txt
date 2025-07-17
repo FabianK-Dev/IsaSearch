@@ -1,3 +1,3 @@
 Theorem (Pell Equation Solution):
 
-Given the Pell equation, which is a specific type of Diophantine equation, there exists a fundamental solution that generates an infinite number of integer solutions. The theorem establishes that for a given non-square integer, one can find a pair of integers (x, y) such that x² - Dy² = 1, where D is the non-square integer. This fundamental solution can be used to produce all other solutions through a recursive process.
+Given the Pell equation, which is a specific type of Diophantine equation, there exists a fundamental solution that generates an infinite number of integer solutions. The theorem establishes that for a given non-square integer, one can find a pair of integers (x, y) such that x² - Dy² = 1, where D is the non-square integer. This fundamental solution can be used to produce all other solutions through a recursive process. \\ \\ \\
