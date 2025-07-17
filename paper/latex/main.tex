@@ -328,6 +328,7 @@ is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 \captionof{figure}{Prompt-Vorlage zum Informalisieren eines Theorems, wobei \{theorem\_content\} durch den Quelltext des Theorems ersetzt wird.}
 \label{fig:prompt_vorlage}
 \normalsize
+\justify
 
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
@@ -573,6 +574,10 @@ wobei $R^*$ die Menge aller relevanter Suchergebnisse für eine Suchanfrage ist.
 Der Normalized Discounted Cumulative Gain wird nun als
 $$NDCG = \frac{DCG}{IDCG}$$
 berechnet. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
+
+Neben den genannten Metriken werden zusätzlich auch der Rang des ersten relevanten Suchergebnisses, sowie die Suchdauer für jede Suchanfrage gespeichert.
+Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist und dient daher lediglich der Veranschaulichung.
+Die Suchdauer ist zudem von der verwendeten Hardware abhängig, weswegen die absoluten Werte auf anderen Geräten abweichen können.
 
 Accuracy@k eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
 Der Normalized Discounted Cumulative Gain hingegen bewertet zusätzlich die Reihenfolge und Verteilung aller relevanter Ergebnisse und ist damit am aussagekräftigsten.
