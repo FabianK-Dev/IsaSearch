@@ -549,16 +549,16 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, welche Suchstrategi
 
 Um die Leistung der semantischen Suche zu messen und die verschiedenen Suchstrategien zu vergleichen, werden die folgenden Metriken verwendet.
 
-Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. $Accuracy@k$ misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert:
-$$Accuracy@k =
+Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. $Hit@k$ misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert:
+$$Hit@k =
 \begin{cases}
 1 & \text{wenn } \exists i \leq k: r_i = 1 \\
 0 & \text{sonst}
 \end{cases}$$
 Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, beispielsweise die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
-Zwar ist Accuracy@k intuitiv verständlich, berücksichtigt jedoch nicht die genaue Anzahl und Position der relevanten Ergebnisse in den Top 10 Suchergebnissen, sondern prüft nur, ob zumindest ein relevantes Ergebnis vorhanden ist.
+Zwar ist Hit@k intuitiv verständlich, berücksichtigt jedoch nicht die genaue Anzahl und Position der relevanten Ergebnisse in den Top 10 Suchergebnissen, sondern prüft nur, ob zumindest ein relevantes Ergebnis vorhanden ist.
 Außerdem berücksichtigt die Metrik nicht, wie nah ein relevantes Ergebnis an den Top-Positionen liegt.
-Zum Beispiel wird für $Accuracy@10$ ein erster relevanter Treffer auf Platz 11 genauso schlecht bewertet, wie ein Treffer auf Platz 100.
+Zum Beispiel wird für $Hit@10$ ein erster relevanter Treffer auf Platz 11 genauso schlecht bewertet, wie ein Treffer auf Platz 100.
 
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
@@ -579,7 +579,7 @@ Neben den genannten Metriken werden zusätzlich auch der Rang des ersten relevan
 Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist und dient daher lediglich der Veranschaulichung.
 Die Suchdauer ist zudem von der verwendeten Hardware abhängig, weswegen die absoluten Werte auf anderen Geräten abweichen können.
 
-Accuracy@k eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
+Hit@k eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
 Der Normalized Discounted Cumulative Gain hingegen bewertet zusätzlich die Reihenfolge und Verteilung aller relevanter Ergebnisse und ist damit am aussagekräftigsten.
 
 \section{Ergebnis \& Analyse}
@@ -598,7 +598,7 @@ Ebenso wird für jede Suchstrategie der Durchschnitt aller Anfragetypen für jed
 %\scriptsize
 \begin{tabular}{lccccc}
 \toprule
-\textbf{Anfragetyp} & \textbf{Accuracy@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
+\textbf{Anfragetyp} & \textbf{Hit@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
 % START: Table content
 \midrule
 \multicolumn{6}{c}{\textbf{Umschriebene Suchanfrage + ohne Nutzereingabe + mit Metadaten informalisiert}} \\
@@ -678,7 +678,7 @@ Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suc
 
 Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
 Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
-Beispielsweise sinkt $Accuracy@10$ bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
+Beispielsweise sinkt $Hit@10$ bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
 Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbinden der Metadaten sich zu sehr auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht.
 Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
 
@@ -724,7 +724,7 @@ Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
 
 Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen.
-Beispielsweise beträgt die Metrik $Accuracy@10$ für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
+Beispielsweise beträgt die Metrik $Hit@10$ für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
 Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungs-Schritt dient.
 Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
 
@@ -814,7 +814,7 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
     \scriptsize
     \begin{tabular}{ccccc}
     \toprule
-    \textbf{Accuracy@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
+    \textbf{Hit@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
     \midrule
     1,000 & 0,359 & 0,100 & 10,000 & 1,500 \\
     % {'top_k_accuracy': 1, 'normalized_discounted_cumulative_gain': 0.35916358921525343, 'reciprocal_rank': 0.1, 'rank': 10, 'duration': 1.5}
@@ -832,7 +832,7 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
     \scriptsize
     \begin{tabular}{ccccc}
     \toprule
-    \textbf{Accuracy@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
+    \textbf{Hit@10} & \textbf{NDCG} & \textbf{RR} & \textbf{Rang} & \textbf{Suchdauer [s]} \\
     \midrule
     1,000 & 0,483 & 0,250 & 4,000 & 1,500 \\
     % {'top_k_accuracy': 1, 'normalized_discounted_cumulative_gain': 0.48373169011049044, 'reciprocal_rank': 0.25, 'rank': 4, 'duration': 1.5}
