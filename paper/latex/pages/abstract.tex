@@ -14,12 +14,12 @@ Außerdem bieten bestehende Suchmechanismen lediglich lexikalische, jedoch keine
 
 Ziel dieser Arbeit ist es eine transformerbasierte semantische Suchmaschine für eine effektivere Theoremsuche zu entwickeln und diese mithilfe eines manuell erstellten Benchmarks zu evaluieren.
 
-Dafür werden formale Theoreme durch das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft in natürliche Sprache informalisiert und mithilfe eines vortrainierten Sentence-Transformer-Sprachmodells in der Vektordatenbank ChromaDB eingebettet.
+Dafür werden formale Theoreme durch das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft in natürliche Sprache umschrieben und mithilfe eines vortrainierten Sentence-Transformer-Sprachmodells in der Vektordatenbank ChromaDB eingebettet.
 Um Suchanfragen der Nutzer zu präzisieren werden diese durch das Sprachmodell umformuliert und erweitert.
 Außerdem werden verschiedene Suchstrategien verglichen, indem Theoreme mit und ohne Metadaten informalisiert oder Suchanfragen mit und ohne Sprachmodell-Umschreibungen verarbeitet werden.
 
 Zur Evaluation wird ein Benchmark bestehend aus 93 Theoremen, die ein breites Spektrum der Mathematik abbilden, genutzt, wobei drei Arten von Suchanfragen untersucht werden: Theoremtitel, natürliche Sprache und verrauschte natürliche Sprache.
-Durch die Metriken $Accuracy@10$, Reciprocal Rank und Normalized Discounted Cumulative Gain wird die Leistung aller Suchanfragen gemessen.
+Durch die Metriken Accuracy@k, Reciprocal Rank und Normalized Discounted Cumulative Gain wird die Leistung aller Suchanfragen gemessen.
 
 Das Benchmark-Ergebnis ist vielversprechend und zeigt, dass Sprachmodell-Umschreibungen von Suchanfragen die Suche verbessern, das Einbinden von Metadaten beim Informalisieren von Theoremen allerdings die Suche negativ beeinflusst.
 
