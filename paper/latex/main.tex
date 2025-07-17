@@ -213,6 +213,10 @@ Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionswe
 
 Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachteile: (1) Die Suchmaschinen basieren rein auf lexikalischer Übereinstimmung, was bedeutet, dass für eine Suchanfrage Einträge nur als Suchergebnis eingeschlossen werden, wenn der eingegebene Suchbegriff exakt vorkommt. Synonyme, Tippfehler oder kleinste Abweichungen der Suchbegriffe sorgen dafür, dass ein Eintrag nicht als Suchergebnis aufgefunden wird. (2) Es findet zudem kein semantisches Verständis der Suchbegriffe oder der Einträge statt, d.h. Wörter werden nur einzelnen betrachtet ohne Beachtung ihres Kontexts, also beispielsweise ihrer Nachbarwörter. % Brauch ich hierfür eine Quelle?
 
+Diese Bachelorarbeit nutzt einen ähnlichen Ansetz, wie er in der Arbeit von Gao et al. (2024) beschrieben wird.
+Die Authoren beschreiben eine semantische Suchmaschine für Mathlib4, eine Bibliothek für den Theorembeweiser Lean 4, welche Sprachmodelle zum Informalisieren und Sentence-Transformer-Modelle zum Einbetten und Suchen von Theoremen in einer Vektordatenbank nutzt.
+Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beispielsweise zum Einbetten oder Informaliseren von Theoremen, wie in Abschnitt \ref{sec:informalisierung} beschrieben, gestellt werden, basieren auf Prompt-Beispielen des Repositorys der Arbeit von Gao et al., welches unter der Apache License 2.0 lizenziert ist und aufgrund ihrer Effektivität, teilweise angepasst und übernommen wurden.
+
 % - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
 % - Bestehende Suchmechanismen sind beispielsweise (1) das Archive of Formal Proofs selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im Archive of Formal Proofs setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
 
