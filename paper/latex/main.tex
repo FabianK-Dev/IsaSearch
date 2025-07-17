@@ -594,11 +594,13 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
     \end{mybox}
 \end{minipage}
 %\vspace{1em}
-\captionof{figure}{Vergleich der Informalisierung von Dokumenten mit und ohne Metadaten als Eingabe. Die linke Ausgabe wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, was das Sprachmodell dazu veranlasst sich auf die Definition der Pellschen Gleichung, statt auf den Inhalt des Theorem-Quelltexts zu fokussieren.}
+\captionof{figure}{Vergleich der Informalisierung von Dokumenten mit und ohne Metadaten als Eingabe.}
 \label{fig:metadata_vergleich}
 \vspace{1em}
 \justifying
 %TC:endignore
+
+Die linke Ausgabe in Abbildung \ref{fig:metadata_vergleich} wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
 
 Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird.
 In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
@@ -644,7 +646,6 @@ Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiede
 % \normalsize
 %\vspace{1em}
 \captionof{figure}{Vergleich der Umschreibung einer Titel-Suchanfragen und einer Suchanfrage in natürlicher Sprache.}
-\label{fig:metadata_vergleich}
 \vspace{1em}
 \justifying
 %TC:endignore
