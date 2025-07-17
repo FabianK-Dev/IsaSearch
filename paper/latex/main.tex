@@ -284,7 +284,7 @@ Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige 
 Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
 
-Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird eine Eingabeaufforderung bestehend aus Anweisungen an das Sprachmodell, sowie dem eigentlich Quelltext des Dokuments erstellt.
+Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird die Prompt, die in Abbildung \ref{fig:prompt_vorlage} gezeigt ist, bestehend aus Anweisungen an das Sprachmodell, sowie dem eigentlich Quelltext des Dokuments erstellt.
 Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen dieser Metadaten die Suchqualität verbessert.
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Eingabeaufforderung berechnet.
@@ -292,6 +292,42 @@ Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vL
 Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Eingabeaufforderung höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 % Vorgesehen, dass artifakte committet werden
+
+\scriptsize
+\begin{mybox}{Prompt-Vorlage zum Informalisieren eines Theorems:}
+\begin{lstlisting}[
+    breaklines=true, basicstyle=\ttfamily\scriptsize, columns=fixed,
+    literate={≠}{{\(\neq\)}}{1},
+]
+<|system|>
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate
+the formal theorem provided below into an informal statement in under 256 tokens that
+is more accessible to mathematicians. Please express the mathematical formulas in
+LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not
+skip this.
+
+=== Start of example input ===
+theorem degree_mult:
+assumes "p ≠ 0" and "q ≠ 0"
+shows "degree (p * q) = degree p + degree q"
+=== End of example input ===
+
+=== Start of example output ===
+<BEGIN>
+Theorem (Degree of the Product of Two Polynomials):
+Let \(p\) and \(q\) be non-zero polynomials over a field \(K\). Then the degree of
+the product \(p \cdot q\) is equal to the sum of the degrees of \(p\) and \(q\), that
+is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
+<END>
+=== End of example output ===<|end|>
+<|user|>
+{theorem_content}<|end|>
+<|assistant|>
+\end{lstlisting}
+\end{mybox}
+\captionof{figure}{Prompt-Vorlage zum Informalisieren eines Theorems, wobei \{theorem\_content\} durch den Quelltext des Theorems ersetzt wird.}
+\label{fig:prompt_vorlage}
+\normalsize
 
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
