@@ -411,61 +411,71 @@ Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen S
 \begin{table}[H]
 \centering
 \scriptsize
-%\begin{tabular}{|l|c|c|c|}
-%\begin{tabular}{|l|c|p{6cm}|p{6cm}|}
 \begin{tabularx}{\textwidth}{l>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
 \toprule
 \textbf{ID} & \textbf{Titel} & \textbf{Natürliche Sprache} & \textbf{Verrauschte natürliche Sprache} \\
 % START: Table content
 \midrule
 
-1 & Square Root of 2 is Irrational & sqrt(2) is not rational & ratonl sqrt(2) \\
+1 & Square Root of 2 is Irrational & sqrt(2) is not rational\footnotemark[1] & ratonl sqrt(2) \\
 
 \midrule
 
-2 & Fundamental Theorem of Algebra & Every univariate polynomial of positive degree with complex coefficients has at least one complex root & univariate every lynomial positive degree complex coefficients least one rot complex \\
+2 & Fundamental Theorem of Algebra & Every univariate polynomial of positive degree with complex coefficients has at least one complex root\footnotemark[2] & univariate every lynomial positive degree complex coefficients least one rot complex \\
 
 \midrule
 
 3 & Denumerability of the Rational Numbers &
 
-Z (the set of all integers) and Q (the set of all rational numbers) are countable & (the z set integer q (the set rational numbers) countable \\
+Z (the set of all integers) and Q (the set of all rational numbers) are countable\footnotemark[3] & (the z set integer q (the set rational numbers) countable \\
 
 \midrule
 
-4 & Pythagorean Theorem & The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...] & reas sum two squar legs equals area square hypotenuse \\
+4 & Pythagorean Theorem & The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...]\footnotemark[4] & reas sum two squar legs equals area square hypotenuse \\
 
 \midrule
 
-5 & Prime Number Theorem & Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x) & pi(x) let ime-counting function defined number primes less equal rea x number x x / x log good appoximatio pix) \\
+5 & Prime Number Theorem & Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)\footnotemark[5] & pi(x) let ime-counting function defined number primes less equal rea x number x x / x log good appoximatio pix) \\
 
 \midrule
+
 ... & ... & ... & ... \\
-\midrule
-
-89 & The Law of Cosines & relates the lengths of the sides of a triangle to the cosine of one of its angles & legths relates sidesriangle cosine one angles \\
 
 \midrule
 
-90 & Ptolemy's Theorem & product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides & lengths product dionals equal sum products lengths pairs opposite sides \\
+89 & The Law of Cosines & relates the lengths of the sides of a triangle to the cosine of one of its angles\footnotemark[6] & legths relates sidesriangle cosine one angles \\
 
 \midrule
 
-91 & Principle of Inclusion/Exclusion & [...] over-generous inclusion, followed by compensating exclusion [...] & iclsion over-generousollowed compensating exclusion \\
+90 & Ptolemy's Theorem & product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides\footnotemark[7] & lengths product dionals equal sum products lengths pairs opposite sides \\
 
 \midrule
 
-92 & Bertrand's Postulate & [...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2 & n integer > exists least one prime number n p < p < 2n 2 - \\
+91 & Principle of Inclusion/Exclusion & [...] over-generous inclusion, followed by compensating exclusion [...]\footnotemark[8] & iclsion over-generousollowed compensating exclusion \\
 
 \midrule
 
-93 & Descartes Rule of Signs & number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients & positive number re roots number sign changes sequence polynomial's coefficiets \\
-\bottomrule
+92 & Bertrand's Postulate & [...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2\footnotemark[9] & n integer > exists least one prime number n p < p < 2n 2 - \\
+
+\midrule
+
+93 & Descartes Rule of Signs & number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients\footnotemark[10] & positive number re roots number sign changes sequence polynomial's coefficiets \\
 % END: Table content
 \end{tabularx}
 \caption{TODO}
 \label{tab:benchmark_beispiel}
 \end{table}
+
+\footnotetext[1]{\url{https://en.wikipedia.org/wiki/Square_root_of_2\#Proofs_of_irrationality}}
+\footnotetext[2]{\url{https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra\#Equivalent_statements}}
+\footnotetext[3]{\url{https://en.wikipedia.org/wiki/Countable_set\#cite_note-25}}
+\footnotetext[4]{\url{https://en.wikipedia.org/wiki/Pythagorean_theorem}}
+\footnotetext[5]{\url{https://en.wikipedia.org/wiki/Prime_number_theorem\#Statement}}
+\footnotetext[6]{\url{https://en.wikipedia.org/wiki/Law_of_cosines}}
+\footnotetext[7]{\url{https://en.wikipedia.org/wiki/Ptolemy\%27s_theorem}}
+\footnotetext[8]{\url{https://en.wikipedia.org/wiki/Inclusion\%E2\%80\%93exclusion_principle}}
+\footnotetext[9]{\url{https://en.wikipedia.org/wiki/Bertrand\%27s_postulate}}
+\footnotetext[10]{\url{https://en.wikipedia.org/wiki/Descartes\%27_rule_of_signs}}
 
 \subsection{Benchmark-Pipeline und Vergleich der Suchstrategien}
 

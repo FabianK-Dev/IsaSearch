@@ -243,6 +243,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                     / 10,  # Round to 1 decimal to avoid having a new duration for each benchmark run
                 },
                 "query": query,
+                "source": row["Natual language query source"],
                 "refined_query": results_dict["refined_query"],
                 "top_results": top_results,
             }
