@@ -7,7 +7,7 @@
 \section*{Kurzfassung}
 }
 {}
-Die vorliegende Bachelorarbeit befasst sich mit der Entwicklung einer KI-gestützten semantischen Suche von Theoremen in Isabelle/HOL und dem Archive of Formal Proofs und dessen Evaluation.
+Die vorliegende Bachelorarbeit befasst sich mit der Entwicklung einer KI-gestützten semantischen Suche nach Theoremen in Isabelle/HOL und dem Archive of Formal Proofs, sowie dessen Evaluation.
 
 Die steigende Anzahl an formalen Bibliotheken erschwert die manuelle Suche nach Theoremen.
 Zudem ist die Wiederverwendung bestehender Theoreme essenziell, um Duplikate zu vermeiden.
@@ -15,8 +15,10 @@ Nutzer bestehender Suchmaschinen haben außerdem berichtet, dass sie es als schw
 
 Ziel dieser Arbeit ist es eine transformerbasierte semantische Suchmaschine für eine effektivere Theoremsuche zu entwickeln und diese mithilfe eines manuell erstellten Benchmarks zu evaluieren.
 
-Dafür werden formale Theoreme durch das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft in natürliche Sprache informalisiert und mithilfe eines vortrainierten Sentence-Transformer-Sprachmodell in der Vektordatenbank ChromaDB eingebettet.
-Um Suchanfragen der Nutzer zu präzisieren werden diese durch das Sprachmodell umformuliert.
-Außerdem werden verschiedene Suchstrategien verglichen, indem Theoreme mit und ohne Metadaten informalisiert oder Suchanfragen mit und ohne Sprachmodell-Umschreibungen analyisiert werden.
+Dafür werden formale Theoreme durch das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft in natürliche Sprache informalisiert und mithilfe eines vortrainierten Sentence-Transformer-Sprachmodells in der Vektordatenbank ChromaDB eingebettet.
+Um Suchanfragen der Nutzer zu präzisieren werden diese durch das Sprachmodell umformuliert und erweitert.
+Außerdem werden verschiedene Suchstrategien verglichen, indem Theoreme mit und ohne Metadaten informalisiert oder Suchanfragen mit und ohne Sprachmodell-Umschreibungen verarbeitet werden.
 
-\textbf{Keywords}: Artificial Intelligence, Healthcare Delivery, Patient Care, Diagnostic Accuracy, Treatment Optimization, Ethical Considerations, Regulatory Frameworks.
+
+
+\textbf{Keywords}: Theoremsuche, Formale Verifikation, Künstliche Intelligenz, Transformer-Modelle, Isabelle/HOL, Semantische Ähnlichkeit, Information Retrieval
