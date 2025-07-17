@@ -753,9 +753,14 @@ Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorem
 Wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, kann es passieren, dass Sprachmodelle Inhalte eines Textes halluzinieren oder falsch interpretieren.
 Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze undetaillierte Suchanfragen formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
 
+Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
+
 \section{Zusammenfassung \& Ausblick}
 
+In dieser Bachelorarbeit wurden eine semantische Theorem-Suchmaschine für Isabelle und das Archive of Formal Proofs entwickelt, sowie ein Benchmark zum Evaluierien der Suchqualtität entwickelt.
+Das Benchmark-Ergebnis zeigt, dass das Kobinierten aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und eine Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
 
+Zukünfigte Arbeiten
 
 %Zudem hat Abschnitt \ref{sec:einfluss_metadate_informalisierung} gezeigt, dass das Sprachmodell bei vagen, mehrdeutigen oder falsch formulierten Suchanfragen fehlerhafte Formulierungen erzeugen kann.
 
