@@ -9,9 +9,8 @@
 {}
 Die vorliegende Bachelorarbeit befasst sich mit der Entwicklung einer KI-gestützten semantischen Suche nach Theoremen in Isabelle/HOL und dem Archive of Formal Proofs, sowie dessen Evaluation.
 
-Die steigende Anzahl an formalen Bibliotheken erschwert die manuelle Suche nach Theoremen.
-Zudem ist die Wiederverwendung bestehender Theoreme essenziell, um Duplikate zu vermeiden.
-Nutzer bestehender Suchmaschinen haben außerdem berichtet, dass sie es als schwierig empfinden zu prüfen ob ein Theorem im Archive of Formal Proofs bereits exisitiert.
+Nutzer bestehender Suchmaschinen haben berichtet, dass sie es als schwierig empfinden zu prüfen ob ein Theorem im Archive of Formal Proofs bereits exisitiert.
+Hinzu kommt, dass die Wiederverwedung exisitierender formaler Inhalte wichtig, findet jedoch in der Praxis zu wenig stattfindet und bestehende Suchmechanismen lediglich eine lexikalische, jedoch keine semantischen Suche anbieten.
 
 Ziel dieser Arbeit ist es eine transformerbasierte semantische Suchmaschine für eine effektivere Theoremsuche zu entwickeln und diese mithilfe eines manuell erstellten Benchmarks zu evaluieren.
 
@@ -20,8 +19,8 @@ Um Suchanfragen der Nutzer zu präzisieren werden diese durch das Sprachmodell u
 Außerdem werden verschiedene Suchstrategien verglichen, indem Theoreme mit und ohne Metadaten informalisiert oder Suchanfragen mit und ohne Sprachmodell-Umschreibungen verarbeitet werden.
 
 Zur Evaluation wird ein Benchmark bestehend aus 93 Theoremen, die ein breites Spektrum der Mathematik abbilden, genutzt, wobei drei Arten von Suchanfragen untersucht werden: Theoremtitel, natürliche Sprache und verrauschte natürliche Sprache.
-Die Leistung wird mithilfe der Metriken $Accuracy@10$, Reciprocal Rank und Normalized Discounted Cumulative Gain gemessen.
+Durch die Metriken $Accuracy@10$, Reciprocal Rank und Normalized Discounted Cumulative Gain wird die Leistung aller Suchanfragen gemessen.
 
-Das Benchmark-Ergebnis ist vielversprechend und zeigt, dass Sprachmodell-Umschreibungen von Suchanfragen die Suche verbessern, das Einbinden von Metadaten beim Informalisieren von Theoremen allerdings die Suche negativ beinflusst.
+Das Benchmark-Ergebnis ist vielversprechend und zeigt, dass Sprachmodell-Umschreibungen von Suchanfragen die Suche verbessern, das Einbinden von Metadaten beim Informalisieren von Theoremen allerdings die Suche negativ beeinflusst.
 
 \textbf{Keywords}: Theoremsuche, Formale Verifikation, Künstliche Intelligenz, Transformer-Modelle, Isabelle/HOL, Semantische Ähnlichkeit, Information Retrieval
