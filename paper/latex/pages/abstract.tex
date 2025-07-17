@@ -19,6 +19,9 @@ Dafür werden formale Theoreme durch das Sprachmodell \texttt{Phi-3.5-mini-instr
 Um Suchanfragen der Nutzer zu präzisieren werden diese durch das Sprachmodell umformuliert und erweitert.
 Außerdem werden verschiedene Suchstrategien verglichen, indem Theoreme mit und ohne Metadaten informalisiert oder Suchanfragen mit und ohne Sprachmodell-Umschreibungen verarbeitet werden.
 
+Zur Evaluation wird ein Benchmark bestehend aus 93 Theoremen, die ein breites Spektrum der Mathematik abbilden, genutzt, wobei drei Arten von Suchanfragen untersucht werden: Theoremtitel, natürliche Sprache und verrauschte natürliche Sprache.
+Die Leistung wird mithilfe der Metriken $Accuracy@10$, Reciprocal Rank und Normalized Discounted Cumulative Gain gemessen.
 
+Das Benchmark-Ergebnis ist vielversprechend und zeigt, dass Sprachmodell-Umschreibungen von Suchanfragen die Suche verbessern, das Einbinden von Metadaten beim Informalisieren von Theoremen allerdings die Suche negativ beinflusst.
 
 \textbf{Keywords}: Theoremsuche, Formale Verifikation, Künstliche Intelligenz, Transformer-Modelle, Isabelle/HOL, Semantische Ähnlichkeit, Information Retrieval
