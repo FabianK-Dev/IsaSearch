@@ -1,0 +1,48 @@
+https://plantuml.online/uml/ZLJ1ZjCm4BtdAwoSu93sZX3IGbjfLI4AtHK7Ygf9CcbCxR5bEz0juc_u4twCiTEq2UAmjupVUvxdDtOiL4SueCYtJpwWpiNFJ8ZAQ6i8AOWldvRRX-9kS_zLW1SEVTY3bLFAPooBnvxm0yjzzmyCrixiKuBvSufjhOEgrQP6fJ1H_6Wb-vLbTl2tW81K0XsHUfCr12Z1CtJ7f1R5rYYtenSUBJWcYtlo0UZyCa_xCZWHlMkTqR1ucz0g5VkwdBHS3qQ7bYFdAqdr2ghWa-k6goPM4_q7LnEwNjf8nIkLeKOUPj-yeRvlgYDiL8rEv9PzsE3d2RqK8tXMnPFsQFgSz5kU0Zf2yR6BSGwUbUbgpiXLhVoEmZHYPPm69JREcCPpOCeSWSsjZPNOXmMDZHlpk4HHlBcu5Az4hYJVW1sjqqB7AKi-o9KNCqwiFxzhPbqZAkwfnjEDTqtxIfvxYvAFurWcgKa6fPTSuuuUMZGEDTusk0GpwhNfLqOzqfKOBCyzzqHPCdDXZftc4ShUKnAyBWed3sqeYidzY_9BSpx2o5L7X_ovmgMa4aDuZcJRLIrGutYOL3pgY-UapAutJCncjwJHdR4x_2_hr2jIUPRCn5DmqCP0nNiCKCV7b6N3Uqw9HG5lUJHQToJFCWr3ov1d_QkEpWSI_ogK2g94DiY4lm00
+
+@startuml
+
+package "System" {
+  component [REST-API] as rest_api
+  component [Web-UI] as web_ui
+  component [app.py] as app
+  component [Sprachmodelle] as sprachmodell
+}
+
+package "Datenbanken" {
+  database "Apache Solr\n(separate Instanz)" as solr
+  database "ChromaDB" as chroma_db
+}
+
+package "Komponenten" {
+  component [FindFacts] as findfacts
+}
+
+package "Ordner" {
+  file "config.json" as config
+  folder "prompts/" as prompts
+  folder ".cache/" as cache
+}
+
+package "Externe Quellen" {
+  cloud "Archive of Formal Proofs\n(lokale Kopie)" as afp
+}
+
+app --> config : "liest\nKonfiguration"
+app --> solr : "lädt\nFindFacts-Index"
+app --> chroma_db : "lädt/speichert\ninformalisierte\nTheoreme"
+app --> prompts : "lädt\nPrompts"
+app --> cache : "liest/schreibt\nDokumentindex"
+
+app <--right-- sprachmodell : "Theorem-Informalisierung"
+app <--right-- sprachmodell : "Theorem-Einbettung"
+app <--right-- sprachmodell : "Suchanfragen-Umschreibung"
+
+findfacts ..> solr : "erzeugt\nFindFacts-Index"
+
+app ..> afp : extrahiert Metadaten
+
+rest_api --> app : "kommuniziert\nmit"
+web_ui <-- app : "stellt bereit"
+
+@enduml
