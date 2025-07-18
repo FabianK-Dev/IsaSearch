@@ -186,11 +186,11 @@ Beispielsweise zerlegt das Sprachmodell GPT-4o die Zeichensequenz \texttt{"\text
 \end{verbatim}
 
 Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden können.
-Da Transformer-Modelle, anders als rekurrente neuronale Netze, Eingabesequenzen parallel verarbeiten, benötigen diese zudem weniger Trainingszeit.
+Da Transformer-Modelle, anders als rekurrente neuronale Netze, Eingabesequenzen parallel verarbeiten, benötigen diese zudem weniger Trainingszeit \citep{vaswani_attention_2023}.
 
 Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte in Satzeinbettungen repräsentiert werden.
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satzes, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird.
-Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind.
+Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind \citep[S. 2]{colangelo_comparative_2025}.
 
 Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
