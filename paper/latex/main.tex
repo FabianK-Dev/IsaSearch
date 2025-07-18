@@ -727,7 +727,7 @@ Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of 
 
 Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen.
 Beispielsweise beträgt die Metrik Hit@10 für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
-Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungs-Schritt dient.
+Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungsschritt dient.
 Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
 
 %TC:ignore
@@ -848,8 +848,9 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
 \justifying
 %TC:endignore
 
-Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel \citep{hale}
+Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel.
 Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist.
+% \citep{hale}
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
 Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_ohne_prefix} und Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_mit_prefix} zeigt zudem, dass die Präfix-Konkatenation der Nutzer-Suchanfrage die Suchqualität verbessert hat.
@@ -868,7 +869,7 @@ Ein weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und
 Dies erhöht das Risiko von Voreingenommenheit oder Fehlern, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
 
 Darüber hinaus, beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
-Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur ist, abschneidet.
+Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur sind, abschneidet.
 
 Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorems und (2) der Umschreibung der Suchanfrage durch das Sprachmodell.
 Wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, kann es passieren, dass Sprachmodelle Inhalte eines Textes halluzinieren oder falsch interpretieren.
@@ -878,13 +879,15 @@ Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte L
 
 \section{Zusammenfassung \& Ausblick}
 
-In dieser Bachelorarbeit wurden eine semantische Theorem-Suchmaschine für Isabelle und das Archive of Formal Proofs entwickelt, sowie ein Benchmark zum Evaluierien der Suchqualtität entwickelt.
+In dieser Bachelorarbeit wurde eine semantische Theorem-Suchmaschine für Isabelle und das Archive of Formal Proofs, sowie ein Benchmark zum Evaluierien der Suchqualtität entwickelt.
 Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und eine Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
-Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt und mit der originalen Suchanfrage konkateniert, jedoch keine Metadaten einschließt.
+Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt und mit der originalen Suchanfrage konkateniert, jedoch keine Metadaten einschließt, da diese die Informalisierung verschlechtern, indem sie das Sprachmodell vom eigentlichen Theoreminhalt ``ablenken``.
 
-Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z.B. DeepSeek-R1) oder proprietären Modellen (z.B. Gemini 2.5 Pro) evaluieren.
+Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z.B. DeepSeek-R1) oder proprietären Modellen (z.B. Gemini 2.5 Pro) evaluieren, da diese laut des GPQA-Benchmarks besser abschneiden und eventuell auch Theoreme besser informalisieren oder Suchanfragen effektiver umschreiben.
 
-Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden. Dieses Feedback könnte genutzt werden um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
+Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden.
+Dieses Feedback könnte genutzt werden um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
+Außerdem könnte in Zukunft die semantische KI-Suchmaschine direkt in die Suchmaschine des Archive of Formal Proofs integriert werden und für eine Suchanfrage automatisch auch relevante KI-Suchergebnisse laden.
 
 %Zudem hat Abschnitt \ref{sec:einfluss_metadate_informalisierung} gezeigt, dass das Sprachmodell bei vagen, mehrdeutigen oder falsch formulierten Suchanfragen fehlerhafte Formulierungen erzeugen kann.
 
