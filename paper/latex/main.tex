@@ -550,7 +550,7 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, welche Suchstrategi
 
 Um die Leistung der semantischen Suche zu messen und die verschiedenen Suchstrategien zu vergleichen, werden die folgenden Metriken verwendet.
 
-Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. Hit@k misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert:
+Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. Hit@k misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert \citep[S. 6, 15]{min_unihgkr_2025}:
 $$Hit@k =
 \begin{cases}
 1 & \text{wenn } \exists i \leq k: r_i = 1 \\
@@ -564,7 +564,7 @@ Zum Beispiel wird für Hit@10 ein erster relevanter Treffer auf Platz 11 genauso
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
 $$RR = \frac{1}{r^*}$$
-wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
+wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind \citep[S. 6]{brama_evaluation_2023}. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
 Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
 Anders als der Reciprocal Rank beachtet der Normalized Discounted Cumulative Gain zusätzlich die Reihenfolge mehrerer relevanter Suchergebnisse.
@@ -574,7 +574,7 @@ $$IDCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
 wobei $R^*$ die Menge aller relevanter Suchergebnisse für eine Suchanfrage ist.
 Der Normalized Discounted Cumulative Gain wird nun als
 $$NDCG = \frac{DCG}{IDCG}$$
-berechnet. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
+berechnet \citep[S. 6]{gao_semantic_2025} \citep[S. 6]{brama_evaluation_2023}. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
 Neben den genannten Metriken werden zusätzlich auch der Rang des ersten relevanten Suchergebnisses, sowie die Suchdauer für jede Suchanfrage gespeichert.
 Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist und dient daher lediglich der Veranschaulichung.
@@ -664,7 +664,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 %TC:endignore
 
 Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist.
-Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nach der ursprünglichen Suchanfrage einzeln gesucht wird.
+Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprünglichen Suchanfrage einzeln gesucht wird.
 Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
 Suchanfragen, welche durch das Sprachmodell umschrieben werden, sind jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
@@ -718,9 +718,9 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
 
 Die linke Ausgabe in Abbildung \ref{fig:metadata_vergleich} wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
 
-Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird.
+Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}.
 In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
-Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
+Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
 
@@ -768,7 +768,7 @@ Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiede
 
 Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl die Formulierungen der Suchanfragen unterschiedlich sind.
 Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden. %Quelle?
-Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
+Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells \citep[S. 1]{abdin_phi-3_2024} sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
 
 \subsubsection{Kompensation von Fehlumschreibungen durch Präfix-Konkatenation}
 \label{sec:kompensation_fehlumschreibungen}
@@ -848,7 +848,7 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
 %TC:endignore
 
 Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel.
-Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist.
+Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 2]{mircea_merca_alternative_2015}.
 % \citep{hale}
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
