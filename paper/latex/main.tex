@@ -193,9 +193,9 @@ In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung 
 Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind \citep[S. 2]{colangelo_comparative_2025}.
 
 Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
-DistilBERT ist eine komprimierte Variante des BERT-Modells, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
-Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde.
-Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten.
+DistilBERT ist eine komprimierte Variante des BERT-Modells \citep{devlin_bert_2019}, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
+Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert \citep[S. 8]{mallick_analyzing_2023}, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde \citep[S. 1]{sanh_distilbert_2020}.
+Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten \citep[S. 1]{reimers_sentence-bert_2019}.
 \section{Verwandte Arbeiten}
 
 Es existieren bereits einige Suchmaschinen und Werkzeuge, die zur Suche nach Theormen oder Einträgen im Archive of Formal Proofs verwendet werden können, welche jedoch alle auf eine lexikalische oder syntaktische Suche zurückgreifen und keine semantische Suche ermöglichen.
