@@ -551,7 +551,7 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, welche Suchstrategi
 
 Um die Leistung der semantischen Suche zu messen und die verschiedenen Suchstrategien zu vergleichen, werden die folgenden Metriken verwendet.
 
-Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. $Hit@k$ misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert:
+Sei $R = (r_1, r_2, ..., r_k)$ eine Liste an Suchergebnissen für eine Suchanfrage, wobei $r_i \in \{0, 1\}$ angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist. Hit@k misst, ob ein relevantes Resultat innerhalb der ersten $k$ Ergebnisse einer Suchanfragen existiert:
 $$Hit@k =
 \begin{cases}
 1 & \text{wenn } \exists i \leq k: r_i = 1 \\
@@ -581,7 +581,7 @@ Neben den genannten Metriken werden zusätzlich auch der Rang des ersten relevan
 Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist und dient daher lediglich der Veranschaulichung.
 Die Suchdauer ist zudem von der verwendeten Hardware abhängig, weswegen die absoluten Werte auf anderen Geräten abweichen können.
 
-Hit@k eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
+Hit@k ist eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
 Der Normalized Discounted Cumulative Gain hingegen bewertet zusätzlich die Reihenfolge und Verteilung aller relevanter Ergebnisse und ist damit am aussagekräftigsten.
 
 \section{Ergebnis \& Analyse}
