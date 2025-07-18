@@ -223,7 +223,7 @@ Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beis
 
 Dieses Kapitel beschreibt den Aufbau der Anwendung, sowie die verwendeten Methoden.
 
-Als erstes wird mithilfe von FindFacts eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt werden.
+Als erstes wird mithilfe von FindFacts \citep{huch_findfacts_2022} eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt werden.
 Die formalen Beschreibungen werden dann in ChromaDB, eine Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, gespeichert.
 Das Programm stellt eine REST-API bereit, welche Suchanfragen akzeptiert.
 Ein Sprachmodell umschreibt eingehende Suchanfragen, welche in Form eines Vektors eingebettet werden.
@@ -240,7 +240,7 @@ Mithilfe der euklidischen Distanz können dann die semantisch ähnlichsten Theor
 
 Als Programmiersprache wurde Python gewählt, da Python ``die meistbevorzugte Sprache für wissenschaftliches Rechnen, Data Science und maschinelles Lernen`` \citep[S. 1]{raschka_machine_2020} ist und sich somit für die Entwicklung KI-gestützter Anwendungen eignet.
 Das Hauptprogramm, welches die REST-API und die Webseite bereitstellt, befindet sich in der Datei \texttt{app.py} im Ordner \texttt{src} und erfordert einen vollständig indizierten FindFacts-Index.
-FindFacts \citep{huch_findfacts_2022} ist eine Komponente, die ein direkter Bestandteil der Isabelle-Distribution ist und ermöglicht eine lexikalische Suche über formalen Theorien in Isabelle und dem Archive of Formal Proofs.
+FindFacts ist eine Komponente, die ein direkter Bestandteil der Isabelle-Distribution ist und ermöglicht eine lexikalische Suche über formalen Theorien in Isabelle und dem Archive of Formal Proofs.
 Ein FindFacts-Index ist eine durchsuchbare Datenstruktur, welche mithilfe von FindFacts erstellt wurde und eine Auswahl an Isabelle-Theorien, beispielsweise aus dem Archive of Formal Proofs, speichert.
 Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_facts\_index} \citep[S. 45]{wenzel_isabelle_nodate} verwendet werden, was bereits vorhandene Isabelle-Sitzungsdaten, also die Zwischenergebnisse und Theorien, die Isabelle während eines Builds speichert, verwendet oder einen neuen baut, falls noch keiner existiert.
 
@@ -261,7 +261,7 @@ Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theo
 Kleinere Kontextfenster bedeuten, dass mehr Prompts gleichzeitig durch das Sprachmodell verarbeitet werden können.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
-Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
+Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente \footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
 % Info: installation.py lädt automatisch die gewünschte Version herunter
