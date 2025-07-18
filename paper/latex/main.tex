@@ -329,16 +329,16 @@ is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 \justify
 
 \subsection{Wahl des Sprachmodells}
-Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
+Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde \citep{rein_gpqa_2023}.
 % SOURCE: https://arxiv.org/abs/2311.12022
-Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-Benutzeroberfläche zum Vergleichen der Modelle, anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
+Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` \footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle, anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
 
 Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
 Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
 Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
-Beispielsweise verlangt das ``Llama 3.1 Community License Agreement``, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
+Beispielsweise verlangt das ``Llama 3.1 Community License Agreement`` \footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
-Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} von Microsoft, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
+Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
 % TODO: Instruct vs. Base
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
