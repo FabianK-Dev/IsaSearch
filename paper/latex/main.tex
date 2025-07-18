@@ -125,17 +125,17 @@ Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, w
 \begin{enumerate}
   \item Beispielsweise finden die genannten Suchwerkzeuge nicht das gewünschte Theorem wenn die Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem zugehörigen Eintrag im Archive of Formal Proofs formuliert sind. %Beispiel
 
-  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d.h. relevantere Suchergebnisse sind nicht als solche erkennbarer als irrelevantere.
+  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d.h. relevantere Suchergebnisse sind nicht als solche erkennbar als irrelevantere.
 
-  \item Nutzer empfinden es außerdem als schwierig herauszufinden ob ein Theorem, das sie suchen, bereits im Archive of Formal Proofs vorhanden ist.
+  \item Nutzer empfinden es außerdem als schwierig herauszufinden, ob ein Theorem, das sie suchen, bereits im Archive of Formal Proofs vorhanden ist.
 \end{enumerate}
 
 Auf der anderen Seite stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können.
 
 \subsection{Zielsetzung \& Forschungsfragen}
 Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren.
-Diese Arbeit vergleicht verschiedene Suchstrategien, wie das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen, sowie die Integration von Metdaten.
-Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks, sowie eine Analyse des erzielten Ergebnisses statt
+Diese Arbeit vergleicht verschiedene Suchstrategien, wie das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen, sowie die Integration von Metadaten.
+Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks, sowie eine Analyse des erzielten Ergebnisses statt.
 
 Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden:
 \begin{enumerate}
@@ -148,7 +148,7 @@ Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden
 
 \section{Hintergrund}
 
-\subsection{Isabelle, Archive of Formal Proofs und formale Beweise}
+\subsection{Isabelle \& das Archive of Formal Proofs}
 
 %Teaching Higher-Order Logic Using Isabelle (Lund, Simon Tobias; Villadsen, Jørgen)
 %Isabelle/HOL: A Proof Assistant for Higher-Order Logic (Tobias Nipkow, Lawrence C. Paulson, Markus Wenzel)
@@ -161,13 +161,13 @@ Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung
 Obwohl Isabelle mehrere Objektlogiken unterstützt ist Isabelle/HOL für Logik höherer Stufe besonders nützlich für reale Anwendungen.
 % "Working with Isabelle means creating theories. Roughly speaking, a theory is a named collection of types, functions, and theorems, much like a module in a programming language or a specification in a specification language" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
 % "Each theory T must reside in a theory file named T.thy" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
-Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhängikeitsgraphen ist, was modulare Entwicklung und Wiederverwendung von bestehenden Theorien ermöglicht.
+Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhängigkeitsgraphen ist, was modulare Entwicklung und Wiederverwendung von bestehenden Theorien ermöglicht.
 % SOURCE
 Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden.
 % SOURCE
 Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 % "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
-Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben die selbe Bedetutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen.
+Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben die selbe Bedeutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen.
 Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
 
 Das Archive of Formal Proofs ist eine peer-reviewte Datenbank von Beweisbibliotheken, die in Isabelle verifiziert wurden.
@@ -179,7 +179,7 @@ Neben der online zugänglichen Stable- und Development-Version kann das Archive 
 
 Transformer sind eine Architektur von neuronalen Netzwerken, die anders als rekurrente neuronale Netze, wie beispielsweise Long Short-Term Memory, einen Aufmerksamkeitsmechanismus besitzen.
 Dadurch können Transformer-Modelle Tokens innerhalb eines vordefinierten Kontextfenster unabhängig von ihrer Position betrachten.
-Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128 000 Tokens.
+Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-\allowbreak instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128 000 Tokens.
 Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
 Beispielsweise zerlegt das Sprachmodell GPT-4o die Zeichensequenz \texttt{"\textbackslash forall x \textbackslash in X\_y:"} in die Token:
 \begin{verbatim}
@@ -190,31 +190,30 @@ Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen we
 Da Transformer-Modelle, anders als rekurrente neuronale Netze, Eingabesequenzen parallel verarbeiten, benötigen diese zudem weniger Trainingszeit.
 
 Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte in Satzeinbettungen repräsentiert werden.
-In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satzes, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird.
-Je näher zwei Vektoren im Vektorrraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind.
+In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satzes, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird.
+Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind.
 
 Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
-Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert, wobei während des Trainings die Verlustfunktion MultipleNegativesRankingLoss mit Kosinus-Ähnlichkeit eingesetzt wurde.
+Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde.
 Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten.
-
 \section{Verwandte Arbeiten}
 
 Es existieren bereits einige Suchmaschinen und Werkzeuge, die zur Suche nach Theormen oder Einträgen im Archive of Formal Proofs verwendet werden können, welche jedoch alle auf eine lexikalische oder syntaktische Suche zurückgreifen und keine semantische Suche ermöglichen.
-Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionsweise und geht auf ihre Einschränkungen in Bezug auf semantische Suche ein.
+Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionsweise und geht auf ihre Einschränkungen in Bezug auf semantisches Suchen ein.
 
 \begin{itemize}
-  \item \textbf{Suchmaschine des Archive of Formal Proofs:} Die offizielle Webseite des Archive of Formal Proofs bietet eine Volltext-Suche auf Klient-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Authoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statische gehostet werden und erfordert keine serverseitige REST-API. Nachteilhaft ist hierbei, dass ausschließlich die Metadaten eines Eintrags, nicht aber die im Eintrag beinhalteten Theoreme oder dessen Quelltext durchsucht werden.
+  \item \textbf{Suchmaschine des Archive of Formal Proofs:} Die offizielle Webseite des Archive of Formal Proofs bietet eine Volltext-Suche auf Klient-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Authoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statisch gehostet werden und erfordert keine serverseitige REST-API. Nachteilhaft ist hierbei, dass ausschließlich die Metadaten eines Eintrags, nicht aber die im Eintrag beinhalteten Theoreme oder dessen Quelltext durchsucht werden.
 
-  \item \textbf{\texttt{find\_theorems}-Kommando:} Das in Isabelle eingebaute Kommando \texttt{find\_theorems} durchsucht formale Inhalte wie Theoreme, Lemmata oder Konstanten, jedoch nur in Theorien, die durch das Kommando \texttt{imports} in die aktuelle Theorie importiert wurden. \texttt{find\_theorems} wird hierbei verwendet, indem nach Namen, Anwendungsart oder einem gewissen Term-Muster eines Theorems, gefiltert werden kann. Um auf diese Weise jedoch das gesamte Archive of Formal Proofs zu durchsuchen, müsste dieses komplett in die aktuelle Sitzung geladen werden, was mit einem großen Arbeitsspeicherverbrauch verbunden wäre und damit in der Praxis zum Durchsuchen des gesamten Archive of Formal Proofs unbrauchbar ist.
+  \item \textbf{\texttt{find\_theorems}-Kommando:} Das in Isabelle eingebaute Kommando \texttt{find\_theorems} durchsucht formale Inhalte wie Theoreme, Lemmata oder Konstanten, jedoch nur in Theorien, die durch das Kommando \texttt{imports} in die aktuelle Theorie importiert wurden. \texttt{find\_theorems} wird hierbei verwendet, indem nach Namen, Typ oder einem gewissen Term-Muster eines Theorems, gefiltert werden kann. Um auf diese Weise jedoch das gesamte Archive of Formal Proofs zu durchsuchen, müsste dieses komplett in die aktuelle Theorie geladen werden, was mit einem großen Arbeitsspeicherverbrauch verbunden wäre und damit in der Praxis zum Durchsuchen des gesamten Archive of Formal Proofs unbrauchbar ist.
 
   \item \textbf{FindFacts:} FindFacts ist eine externe webbasierte Suchmaschine mit Drilldown-Funktionalität für formale Inhalte in Isabelle-Theorien, die Apache Solr nutzt. Bei Suchanfragen durchsucht es einen zuvor erstellten Suchindex, der eine Auswahl an Isabelle-Theorien, z.B. alle Theorien aus dem Archive of Formal Proofs, beinhalten kann. Anders als \texttt{find\_theorems} erfordet es nicht, dass alle Theorieinhalte gleichzeitig in den Arbeitsspeicher geladen werden und ist dadurch skalierbarer.
 \end{itemize}
 
 Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachteile: (1) Die Suchmaschinen basieren rein auf lexikalischer Übereinstimmung, was bedeutet, dass für eine Suchanfrage Einträge nur als Suchergebnis eingeschlossen werden, wenn der eingegebene Suchbegriff exakt vorkommt. Synonyme, Tippfehler oder kleinste Abweichungen der Suchbegriffe sorgen dafür, dass ein Eintrag nicht als Suchergebnis aufgefunden wird. (2) Es findet zudem kein semantisches Verständis der Suchbegriffe oder der Einträge statt, d.h. Wörter werden nur einzelnen betrachtet ohne Beachtung ihres Kontexts, also beispielsweise ihrer Nachbarwörter. % Brauch ich hierfür eine Quelle?
 
-Diese Bachelorarbeit nutzt einen ähnlichen Ansetz, wie er in der Arbeit von Gao et al. (2024) beschrieben wird.
-Die Authoren beschreiben eine semantische Suchmaschine für Mathlib4, eine Bibliothek für den Theorembeweiser Lean 4, welche Sprachmodelle zum Informalisieren und Sentence-Transformer-Modelle zum Einbetten und Suchen von Theoremen in einer Vektordatenbank nutzt.
+Diese Bachelorarbeit nutzt einen ähnlichen Ansatz, wie in der Arbeit von Gao et al. (2024) beschrieben.
+Die Authoren erstellen und evaluieren eine semantische Suchmaschine für Mathlib4, eine Bibliothek für den Theorembeweiser Lean 4, welche Sprachmodelle zum Informalisieren und Sentence-Transformer-Modelle zum Einbetten und Suchen von Theoremen in einer Vektordatenbank nutzt.
 Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beispielsweise zum Einbetten oder Informaliseren von Theoremen, wie in Abschnitt \ref{sec:informalisierung} beschrieben, gestellt werden, basieren auf Prompt-Beispielen des Repositorys der Arbeit von Gao et al., welches unter der Apache License 2.0 lizenziert ist und aufgrund ihrer Effektivität, teilweise angepasst und übernommen wurden.
 
 % - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
@@ -227,8 +226,8 @@ Dieses Kapitel beschreibt den Aufbau der Anwendung, sowie die verwendeten Method
 
 Als erstes wird mithilfe von FindFacts eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt werden.
 Die formalen Beschreibungen werden dann in ChromaDB, eine Vektordatenbank zum Speichern hochdimensionaler Einbettungen, gespeichert.
-Das Programm stellt dann eine REST-API bereit, welche Suchanfragen akzeptiert.
-Ein Sprachmodell umschreibt eingehende Suchanfragen, welche dann in Form eines Vektors eingebettet werden.
+Das Programm stellt eine REST-API bereit, welche Suchanfragen akzeptiert.
+Ein Sprachmodell umschreibt eingehende Suchanfragen, welche in Form eines Vektors eingebettet werden.
 Mithilfe der euklidischen Distanz können dann die semantisch ähnlichsten Theoreme zur Suchanfrage gesucht und zurückgegeben werden.
 
 \begin{figure}[!htb]
@@ -240,30 +239,30 @@ Mithilfe der euklidischen Distanz können dann die semantisch ähnlichsten Theor
 \subsection{Programmaufbau}
 \label{sec:programmaufbau}
 
-Als Programmiersprache wurde Python gewählt, da Python ``die meistbevorzugte Sprache für wissenschaftliches Rechnen, Data Science und maschinelles Lernen`` ist und somit passend für die Entwicklung KI-gestützter Anwendungen ist.
+Als Programmiersprache wurde Python gewählt, da Python ``die meistbevorzugte Sprache für wissenschaftliches Rechnen, Data Science und maschinelles Lernen`` (TODO: QUELLE) ist und sich somit für die Entwicklung KI-gestützter Anwendungen eignet.
 Das Hauptprogramm, welches die REST-API und die Webseite bereitstellt, befindet sich in der Datei \texttt{app.py} im Ordner \texttt{src} und erfordert einen vollständig indizierten FindFacts-Index.
 FindFacts ist eine Komponente, die ein direkter Bestandteil der Isabelle-Distribution ist und ermöglicht eine lexikalische Suche über formalen Theorien in Isabelle und dem Archive of Formal Proofs.
 Ein FindFacts-Index ist eine durchsuchbare Datenstruktur, welche mithilfe von FindFacts erstellt wurde und eine Auswahl an Isabelle-Theorien, beispielsweise aus dem Archive of Formal Proofs, speichert.
-Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_facts\_index} verwendet werden, was bereits vorhandene Isabelle-Sitzungs-Daten, also die Zwischenergebnisse und Theorien, die Isabelle während eines Builds speichert, verwendet oder einen neuen baut, falls noch keiner existiert.
+Um einen FindFacts-Index zu erstellen, kann das Kommando \texttt{isabelle find\_facts\_index} verwendet werden, was bereits vorhandene Isabelle-Sitzungsdaten, also die Zwischenergebnisse und Theorien, die Isabelle während eines Builds speichert, verwendet oder einen neuen baut, falls noch keiner existiert.
 
 Intern integriert FindFacts Apache Solr, eine Open-Source-Suchplattform, die in Java geschrieben ist und im JVM-Prozess eingebettet läuft.
 Die Solr-Datenbank ist nur innerhalb des Prozesses verfügbar und kann nicht von anderen Prozessen, beispielsweise über eine REST-API, angesteuert werden.
 Aus diesem Grund kann nicht direkt auf die Solr-Datenbank in FindFacts zugegriffen werden, weswegen Solr extern gestartet und die Datenbank dort importiert wird.
-Nach erfolgreichem Erstellen des Suchindexes wird dieser standardmäßig im Verzeichnis \texttt{\$USER\_HOME/.isabelle/ISABELLE\_VERSION/find\_facts/solr}, gespeichert, wobei \texttt{\$USER\_HOME} das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und \texttt{ISABELLE\_VERSION} der installierten Isabelle-Version entspricht, mit welcher die FindFacts-Komponente aufgerufen wurde.
+Nach erfolgreichem Erstellen des Suchindexes wird dieser standardmäßig im Verzeichnis \texttt{\$USER\_HOME/.isabelle/\$ISABELLE\_VERSION/find\_facts/solr}, gespeichert, wobei \texttt{\$USER\_HOME} das Home-Verzeichnis des aktuell angemeldeten Nutzers ist und \texttt{\$ISABELLE\_VERSION} der installierten Isabelle-Version entspricht, mit welcher die FindFacts-Komponente aufgerufen wurde.
 Der erzeugte FindFacts-Index liegt in Form einer Solr-Datenbank vor.
-Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz neben dem Hauptprogramm verfügbar sein, die den entsprechenden Index-Ordner als Solr-Core einbindet.
+Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz neben dem Hauptprogramm verfügbar sein, die den entsprechenden Indexordner als Solr-Core einbindet.
 %, der über eine laufende Solr-Datenbank bereitgestellt wird.
 %um einen Suchindex für die Volltextsuche Theorieinhalten zu generieren%.
 
 Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
-Außerdem werden alle Eingabeaufforderungen, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
-Um die größtmögliche Anzahl benötigter Tokens für eine Eingabeaufforderung an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen und für jede Kombination aus Eingabeaufforderung und Theorem-Quelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
+Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
+Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theorem-Quelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
 Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theorem-Quelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er das größtmögliche Kontextfenster pro Prompt festlegt.
 Kleinere Kontextfenster bedeuten, dass mehr Prompts gleichzeitig durch das Sprachmodell verarbeitet werden können.
 
-Als nächstes wird geprüft, ob sich im Wurzelverzeichnis ein zuvor gespeicherter Dokument-Index im Verzeichnis \texttt{.cache} befindet.
-Falls kein solcher Cache vorhanden ist, werden alle relevanten Theoreme, Lemmata und Korollare (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Python Dictionary, hier als Dokument-Index bezeichnet, gespeichert.
+Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
+Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
 % Info: installation.py lädt automatisch die gewünschte Version herunter
@@ -271,15 +270,15 @@ Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des 
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
-Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem, Lemma oder Korollar anhand dessen Quelltexts mithilfe eines großen Sprachmodells in eine informale Beschreibung umschrieben wird.
-%TODO%
+Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem anhand dessen Quelltexts mithilfe eines großen Sprachmodells in eine informale Beschreibung umschrieben wird.
+%, Lemma oder Korollar
 Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems beinhalten.
-Dies liegt daran, dass durch das semantisch äquivalente Umschreiben eines Theorems die lexikalische Überlappung zwischen der umschriebenen informalen Beschreibung und der Suchanfrage höher ist als zwischen dem Quelltext und der Suchanfrage. % https://arxiv.org/pdf/2305.03653
+Die Suche wird effektiver, da durch das semantisch äquivalente Umschreiben eines Theorems die lexikalische Überlappung zwischen der umschriebenen informalen Beschreibung und der Suchanfrage höher ist als zwischen dem Quelltext und der Suchanfrage. % https://arxiv.org/pdf/2305.03653
 % evtl Beispiel?
 
 Für jedes Theorem wird eine informelle Beschreibung benötigt.
 Diese sollen nur neu generiert werden, falls sich der Quelltext eines Theorems ändert oder noch keine Beschreibung exisitert.
-Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokument-Index (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
+Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokumentindex (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
 Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus berechnet wird.
 Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
@@ -287,9 +286,9 @@ Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale 
 Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird die Prompt, die in Abbildung \ref{fig:prompt_vorlage} gezeigt ist, bestehend aus Anweisungen an das Sprachmodell, sowie dem eigentlich Quelltext des Dokuments erstellt.
 Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen dieser Metadaten die Suchqualität verbessert.
-Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Eingabeaufforderung berechnet.
+Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet.
 Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht.
-Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Eingabeaufforderung höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
+Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Prompt höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 % Vorgesehen, dass artifakte committet werden
 
@@ -333,10 +332,10 @@ is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde.
 % SOURCE: https://arxiv.org/abs/2311.12022
-Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-Benutzeroberfläche zum Vergleichen der Modelle.
+Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` eine Web-Benutzeroberfläche zum Vergleichen der Modelle, anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
 
 Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
-Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parameter (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
+Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
 Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
 Beispielsweise verlangt das ``Llama 3.1 Community License Agreement``, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
@@ -349,8 +348,8 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 \label{sec:einbettung_semantische_suche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
-Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source Vektor-Datenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
-%In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorrraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
+Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
+%In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
 Die informalisierten Dokumente werden in Form von Satzeinbettungen in einer ChromaDB-Sammlung eingebettet.
 Eine ChromaDB-Sammlung ist eine gruppierte Menge an Einbettungen und ist vergleichbar mit einer Tabelle in einem relationalen Datenbanksystem wie MySQL.
@@ -365,11 +364,13 @@ Anschließend wird mithilfe des Pakets ``Flask`` eine REST-API bereitgestellt, �
 Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
 Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze undetaillierte Suchanfragen, z.B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
-Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Eingabeaufforderung in Kombination mit der Nutzereingabe gestellt wird.
-Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, Lemmas oder Korollars, sowie (2) einen passenden Titel dafür zu generieren.
+Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Prompt in Kombination mit der Nutzereingabe gestellt wird.
+Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, sowie (2) einen passenden Titel dafür zu generieren.
 Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um ein Theorem handelt, (2) das Umschreiben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf Themengebiete zu fokussieren, die für das Archive of Formal Proofs relevant sind.
+% , Lemmas oder Korollars
 % Nutzer können das Umschreiben deaktivieren
-Hierfür wurde das quantifizierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
+
+Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
 Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert.
 Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
@@ -377,14 +378,14 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben 
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
 Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} berechnet.
 Hierbei ist $q$ die Einbettung des Eingabtexts in Form eines Vektors und $E$ der Einbettungsraum mit $E \subset \mathbb{R}^n$.
-Anschließend wird für jede gespeicherte Einbettung in der Chroma-Datenbank die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
+Anschließend wird für jede gespeicherte Einbettung in der ChromaDB-Sammlung die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
 $$e^* = \underset{e_k \in E}{\text{arg min}}\ ||q - e_k||$$
 wobei $||q - e_k||$ die euklidische Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
-Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbettung $e^*$, wenn der Abstand $||q - e_k||$ minimal ist, es also kein anderes $e_x \in E$ gibt, für das $||q - e_x||$ kleiner wäre.
+Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbettung $e^*$, wenn der Abstand $||q - e_k||$ minimal ist, es also kein anderes $e_x \in E$ gibt, für das $||q - e_x||$ kleiner wäre. (TODO: QUELLE)
 
 % Beispiel
-%\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z.B. Prompt, Embedding statt Eingabeaufforderung, Einbettung schreiben?}
+%\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z.B. Prompt, Embedding statt Prompt, Einbettung schreiben?}
 % Info, dass KI sich an Format halten soll
 % Limitation: KI ignoriert manchmal Forderung nach Format
 % TODO: prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
@@ -401,14 +402,14 @@ Dieses Projekt beinhaltet eine arbiträr zusammengestellte Liste von 100 Theorem
 Ich habe mich für diese Liste als Grundlage für das Benchmark zum Testen der Suchmaschine entschieden, da es bisher kein Benchmark speziell für Suchmaschinen für Isabelle oder das Archive of Formal Proofs gibt.
 Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks, wie beispielsweise CoqGym für Coq oder das Flyspeck-Projekt für HOL Light, jedoch beinhalten diese keine annotierten Suchanfragen und eignen sich daher nicht als Benchmark für diese Bachelorarbeit.
 Außerdem wird Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert und dient oft als Standardreferenz für die Auswahl grundlegender Theoreme, die z.B. als Benchmark verwendet werden können.
-Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Sessions des Archive of Formal Proofs ab.
+Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Theorien des Archive of Formal Proofs ab.
 
-Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext, Session und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} abgespeichert.
+Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} abgespeichert.
 Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiedene Arten von Suchanfragen erstellt wurden:
 \begin{enumerate}
   \item \textbf{Titel des Theorems als Suchanfrage:}
   Hierbei wird der Wert aus der ``Title``-Spalte, welche dem Titel des Theorems, so wie er aus der Liste übernommen wurde, entspricht, als Suchanfrage gestellt.
-  Der Vollständigkeit halber wurde diese Suchanfrage erneut in der Spalte "Title query" des Datei \texttt{benchmark.csv} gespeichert.
+  Der Vollständigkeit halber wurde diese Suchanfrage erneut in der Spalte ``Title query`` der Datei \texttt{benchmark.csv} gespeichert.
 % TODO: Beispiel
   \item \textbf{Natürliche Sprache als Suchanfrage:}
   Ziel hierbei ist es eine realistische Suchanfrage in natürlicher Sprache für das jeweilige Theorem zu formulieren.
@@ -433,7 +434,7 @@ Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiede
     \item Aufeinanderfolgende Wörter werden mit einer Wahrscheinlichkeit von zehn Prozent vertauscht.
     \item Zehn Prozent der Zeichen des Such-Strings werden zufällig entfernt.
   \end{itemize}
-  Um deterministisches Verhalten zwischen verschiedenen Testläufen sicherzustellen wird ein fester Zufalls-Seed verwendet. Die oben genannten Regeln zum Erstellen verrauschter Suchanfragen habe ich eigenständig nach Überlegungen, wie realistische Fehler in Suchanfragen aussehen, entwickelt.
+  Um deterministisches Verhalten zwischen verschiedenen Benchmark-Läufen sicherzustellen wird ein fester Zufalls-Seed verwendet. Die oben genannten Regeln zum Erstellen verrauschter Suchanfragen habe ich eigenständig nach Überlegungen, wie realistische Fehler in Suchanfragen aussehen können, entwickelt.
 %  - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
 \end{enumerate}
 
@@ -443,7 +444,7 @@ Diese Liste legt fest, welche Suchergebnisse für eine Suchanfrage als korrekt g
 Theoreme können zudem im Benchmark deaktiviert oder übersprungen werden, indem in der Spalte ``Skip`` für die entsprechende Zeile ``true`` eingetragen wird.
 In diesem Fall wird das Theorem im Benchmark-Durchlauf ausgelassen und, falls in der Spalte ``Annotation`` ein Grund angegeben ist, dieser auf der Konsole ausgegeben.
 
-Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems weder \texttt{theorem}, \texttt{lemma} noch \texttt{corollary} lautet und damit nicht in den Dokument-Index aufgenommen wurde.
+Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems weder \texttt{theorem}, \texttt{lemma} noch \texttt{corollary} lautet und damit nicht in den Dokumentindex aufgenommen wurde.
 
 \begin{table}[H]
 \centering
@@ -516,14 +517,15 @@ Z (the set of all integers) and Q (the set of all rational numbers) are countabl
 
 \subsection{Benchmark-Pipeline und Vergleich der Suchstrategien}
 
-Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} beschriebenen Schritten (Laden der Konfiguration, Verbinden mit der Solr-Datenbank, Erstellen des Dokument-Index, etc.) auf.
+Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} beschriebenen Schritten (Laden der Konfiguration, Verbinden mit der Solr-Datenbank, Erstellen des Dokumentindex, etc.) auf.
 
 Als erstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
-Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokument-Index existiert.
-Sollte sich beispielsweise der Name eines Theorems, Lemmas oder Korollars in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
+Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokumentindex existiert.
+Sollte sich beispielsweise der Name eines Theorems in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
 Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbau_des_benchmarks} beschrieben wurden, an die Suchmaschine gestellt.
 Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
 Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
+%, Lemmas oder Korollars
 
 Abhängig von der Konfiguration können verschiedene Suchstrategien untersucht werden.
 Indem die Boolean-Parameter \texttt{add\_metadata}, \texttt{add\_user\_query} und \texttt{benchmark\_search\_refine} entsprechend gesetzt werden, werden folgende Suchstrategien verglichen:
