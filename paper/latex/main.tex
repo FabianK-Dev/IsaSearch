@@ -257,8 +257,8 @@ Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz 
 Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
 Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
-Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theorem-Quelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
-Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theorem-Quelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er das größtmögliche Kontextfenster pro Prompt festlegt.
+Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theoremquelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
+Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theoremquelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er das größtmögliche Kontextfenster pro Prompt festlegt.
 Kleinere Kontextfenster bedeuten, dass mehr Prompts gleichzeitig durch das Sprachmodell verarbeitet werden können.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
@@ -404,7 +404,7 @@ Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks,
 Außerdem wird Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert und dient oft als Standardreferenz für die Auswahl grundlegender Theoreme, die z.B. als Benchmark verwendet werden können.
 Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Theorien des Archive of Formal Proofs ab.
 
-Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theorem-Quelltext und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} abgespeichert.
+Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theoremquelltext und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} abgespeichert.
 Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiedene Arten von Suchanfragen erstellt wurden:
 \begin{enumerate}
   \item \textbf{Titel des Theorems als Suchanfrage:}
@@ -862,7 +862,7 @@ Obwohl die semantische KI-Suche vielversprechende Benchmark-Ergebnisse aufweist,
 Zum einen war die Entwicklung der Suchmaschine und das Benchmarking hardwaretechnisch beschränkt, da die verwendete Grafikkarte, eine NVIDIA GeForce RTX 4070, nur über 12 GB VRAM verfügt.
 Dadurch konnten leisstungstärkere Sprachmodelle mit einer höheren Parameterzahl (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
 
-Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen, sowie das Umschreiben von Suchanfragen erheblich länger dauern wird.
+Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen, sowie das Umschreiben von Suchanfragen erheblich länger dauert.
 Es ist daher nicht empfehlenswert die semantische Suchmaschine ohne eine verfügbare Grafikkarte produktiv einzusetzen.
 
 Ein weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und annotiert wurde.
@@ -879,7 +879,7 @@ Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte L
 
 \section{Zusammenfassung \& Ausblick}
 
-In dieser Bachelorarbeit wurde eine semantische Theorem-Suchmaschine für Isabelle und das Archive of Formal Proofs, sowie ein Benchmark zum Evaluierien der Suchqualtität entwickelt.
+In dieser Bachelorarbeit wurde eine semantische Theoremsuchmaschine für Isabelle und das Archive of Formal Proofs, sowie ein Benchmark zum Evaluierien der Suchqualtität entwickelt.
 Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und eine Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
 Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt und mit der originalen Suchanfrage konkateniert, jedoch keine Metadaten einschließt, da diese die Informalisierung verschlechtern, indem sie das Sprachmodell vom eigentlichen Theoreminhalt ``ablenken``.
 
@@ -887,6 +887,7 @@ Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden 
 
 Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden.
 Dieses Feedback könnte genutzt werden um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
+
 Außerdem könnte in Zukunft die semantische KI-Suchmaschine direkt in die Suchmaschine des Archive of Formal Proofs integriert werden und für eine Suchanfrage automatisch auch relevante KI-Suchergebnisse laden.
 
 %Zudem hat Abschnitt \ref{sec:einfluss_metadate_informalisierung} gezeigt, dass das Sprachmodell bei vagen, mehrdeutigen oder falsch formulierten Suchanfragen fehlerhafte Formulierungen erzeugen kann.
