@@ -392,3 +392,29 @@
 	annote = {Comment: 24 pages},
 	file = {PDF:files/169/Abdin et al. - 2024 - Phi-3 Technical Report A Highly Capable Language Model Locally on Your Phone.pdf:application/pdf},
 }
+
+@article{su_one_nodate,
+	title = {One {Embedder}, {Any} {Task}: {Instruction}-{Finetuned} {Text} {Embeddings}},
+	abstract = {We introduce INSTRUCTOR, a new method for computing text embeddings given task instructions: every text input is embedded together with instructions explaining the use case (e.g., task and domain descriptions). Unlike encoders from prior work that are more specialized, INSTRUCTOR is a single embedder that can generate text embeddings tailored to different downstream tasks and domains, without any further training. We first annotate instructions for 330 diverse tasks and train INSTRUCTOR on this multitask mixture with a contrastive loss. We evaluate INSTRUCTOR on 70 embedding evaluation tasks (66 of which are unseen during training), ranging from classification and information retrieval to semantic textual similarity and text generation evaluation. INSTRUCTOR, while having an order of magnitude fewer parameters than the previous best model, achieves state-of-the-art performance, with an average improvement of 3.4\% compared to the previous best results on the 70 diverse datasets. Our analysis suggests that INSTRUCTOR is robust to changes in instructions, and that instruction finetuning mitigates the challenge of training a single model on diverse datasets. Our model, code, and data are available at https: //instructor-embedding.github.io.},
+	language = {en},
+	author = {Su, Hongjin and Shi, Weijia and Kasai, Jungo and Wang, Yizhong and Hu, Yushi and Ostendorf, Mari and Yih, Wen-tau and Smith, Noah A and Zettlemoyer, Luke and Yu, Tao},
+	file = {PDF:files/164/Su et al. - One Embedder, Any Task Instruction-Finetuned Text Embeddings.pdf:application/pdf},
+}
+
+@misc{dettmers_llmint8_2022,
+	title = {{LLM}.int8(): 8-bit {Matrix} {Multiplication} for {Transformers} at {Scale}},
+	shorttitle = {{LLM}.int8()},
+	url = {http://arxiv.org/abs/2208.07339},
+	doi = {10.48550/arXiv.2208.07339},
+	abstract = {Large language models have been widely adopted but require signiﬁcant GPU memory for inference. We develop a procedure for Int8 matrix multiplication for feed-forward and attention projection layers in transformers, which cut the memory needed for inference by half while retaining full precision performance. With our method, a 175B parameter 16/32-bit checkpoint can be loaded, converted to Int8, and used immediately without performance degradation. This is made possible by understanding and working around properties of highly systematic emergent features in transformer language models that dominate attention and transformer predictive performance. To cope with these features, we develop a two-part quantization procedure, LLM.int8(). We ﬁrst use vector-wise quantization with separate normalization constants for each inner product in the matrix multiplication, to quantize most of the features. However, for the emergent outliers, we also include a new mixed-precision decomposition scheme, which isolates the outlier feature dimensions into a 16-bit matrix multiplication while still more than 99.9\% of values are multiplied in 8-bit. Using LLM.int8(), we show empirically it is possible to perform inference in LLMs with up to 175B parameters without any performance degradation. This result makes such models much more accessible, for example making it possible to use OPT-175B/BLOOM on a single server with consumer GPUs. We open source our software.},
+	language = {en},
+	urldate = {2025-07-14},
+	publisher = {arXiv},
+	author = {Dettmers, Tim and Lewis, Mike and Belkada, Younes and Zettlemoyer, Luke},
+	month = nov,
+	year = {2022},
+	note = {arXiv:2208.07339 [cs]},
+	keywords = {Computer Science - Machine Learning, Computer Science - Artificial Intelligence},
+	annote = {Comment: Published at NeurIPS 2022. Camera-ready version},
+	file = {PDF:files/165/Dettmers et al. - 2022 - LLM.int8() 8-bit Matrix Multiplication for Transformers at Scale.pdf:application/pdf},
+}

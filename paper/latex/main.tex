@@ -192,7 +192,7 @@ Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satzes, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird.
 Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind \citep[S. 2]{colangelo_comparative_2025}.
 
-Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
+Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1} \footnote{\url{https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1}}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells \citep{devlin_bert_2019}, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
 Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert \citep[S. 8]{mallick_analyzing_2023}, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde \citep[S. 1]{sanh_distilbert_2020}.
 Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten \citep[S. 1]{reimers_sentence-bert_2019}.
@@ -338,7 +338,7 @@ Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur V
 Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
 Beispielsweise verlangt das ``Llama 3.1 Community License Agreement`` \footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
-Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
+Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} \footnote{\url{https://huggingface.co/microsoft/Phi-3.5-mini-instruct}} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
 % TODO: Instruct vs. Base
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
@@ -347,7 +347,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 \label{sec:einbettung_semantische_suche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
-Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen, verwendet.
+Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB \footnote{\url{https://www.trychroma.com/}}, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, verwendet.
 %In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
 Die informalisierten Dokumente werden in Form von Satzeinbettungen in einer ChromaDB-Sammlung eingebettet.
@@ -355,22 +355,22 @@ Eine ChromaDB-Sammlung ist eine gruppierte Menge an Einbettungen und ist verglei
 Hierfür wird für jedes Dokument ein String bestehend aus einer Prompt, der informalen Beschreibung, sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 Die vorangestellte Prompt fordert das Sentence-Transformer-Sprachmodell dazu auf, eine Repräsentation aus natürlicher Sprache und formaler Isabelle/HOL-Syntax zu erzeugen, um semantisch ähnliche Aussagen auffinden zu können.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
-Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
+Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert \citep{su_one_nodate}, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 %\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
-Anschließend wird mithilfe des Pakets ``Flask`` eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
+Anschließend wird mithilfe des Pakets ``Flask`` \footnote{\url{https://pypi.org/project/Flask/}} eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
 Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
 Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze undetaillierte Suchanfragen, z.B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
-Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Prompt in Kombination mit der Nutzereingabe gestellt wird.
+Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Prompt in Kombination mit der Nutzereingabe gestellt wird \citep{jagerman_query_2023}.
 Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, sowie (2) einen passenden Titel dafür zu generieren.
 Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um ein Theorem handelt, (2) das Umschreiben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf Themengebiete zu fokussieren, die für das Archive of Formal Proofs relevant sind.
 % , Lemmas oder Korollars
 % Nutzer können das Umschreiben deaktivieren
 
-Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
-Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert.
+Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} \footnote{\url{https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf}} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
+Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert \citep{dettmers_llmint8_2022}.
 Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 
@@ -380,8 +380,8 @@ Hierbei ist $q$ die Einbettung des Eingabtexts in Form eines Vektors und $E$ der
 Anschließend wird für jede gespeicherte Einbettung in der ChromaDB-Sammlung die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
 $$e^* = \underset{e_k \in E}{\text{arg min}}\ ||q - e_k||$$
-wobei $||q - e_k||$ die euklidische Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist.
-Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbettung $e^*$, wenn der Abstand $||q - e_k||$ minimal ist, es also kein anderes $e_x \in E$ gibt, für das $||q - e_x||$ kleiner wäre. (TODO: QUELLE)
+wobei $||q - e_k||$ ``die euklidische Distanz zwischen der Einbettung der Suchanfrage $q$ und der Einbettung eines potentiellen Suchergebnisses $e_k$ ist`` \citep[S. 2]{sheng_lprotector_2024}.
+Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbettung $e^*$, wenn der Abstand $||q - e_k||$ minimal ist, es also kein anderes $e_x \in E$ gibt, für das $||q - e_x||$ kleiner wäre.
 
 % Beispiel
 %\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z.B. Prompt, Embedding statt Prompt, Einbettung schreiben?}
