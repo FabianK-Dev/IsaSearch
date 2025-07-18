@@ -286,7 +286,7 @@ Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im 
 Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen dieser Metadaten die Suchqualität verbessert.
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet.
-Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht.
+Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM \footnote{\url{https://pypi.org/project/vllm/}} genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht \citep[S. 7]{guo_gllm_2025}.
 Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Prompt höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 % Vorgesehen, dass artifakte committet werden

@@ -339,3 +339,20 @@
 	pages = {59--72},
 	file = {PDF:files/176/Maxino und Koopman - 2009 - The Effectiveness of Checksums for Embedded Control Networks.pdf:application/pdf},
 }
+
+
+@misc{guo_gllm_2025,
+	title = {{gLLM}: {Global} {Balanced} {Pipeline} {Parallelism} {System} for {Distributed} {LLM} {Serving} with {Token} {Throttling}},
+	shorttitle = {{gLLM}},
+	url = {http://arxiv.org/abs/2504.14775},
+	doi = {10.48550/arXiv.2504.14775},
+	abstract = {Pipeline parallelism has emerged as a predominant approach for deploying large language models (LLMs) across distributed nodes, owing to its lower communication overhead compared to tensor parallelism. While demonstrating high throughput in request serving, pipeline parallelism often suffers from performance limitations caused by pipeline bubbles, which are primarily resulted from imbalanced computation delays across batches. Existing methods like Sarathi-Serve attempt to address this through hybrid scheduling of chunked prefill and decode tokens using a fixed token budget. However, such methods may experience significant fluctuations due to either insufficient prefill tokens or uneven distribution of decode tokens, ultimately leading to computational imbalance. To overcome these inefficiencies, we present gLLM, a globally balanced pipeline parallelism system incorporating Token Throttling to effectively mitigate the pipeline bubbles. Our Token Throttling mechanism is a fine-grained scheduling policy that independently regulates the quantities of prefill and decode tokens, thus enabling balanced computation by leveraging global information from the inference system. Specifically, for decode tokens, gLLM maintains near-consistent token count across processing batches. For prefill tokens, it dynamically adjusts batch sizes based on both total pending tokens and the memory utilization rates of key-value cache (KV cache). Furthermore, gLLM runtime adopts an asynchronous execution and message passing architecture specifically optimized for pipeline parallelism characteristics. Experimental evaluations with representative LLMs show that gLLM achieves significant performance improvements, delivering 11\% to 398\% higher maximum throughput compared to state-of-the-art pipeline or tensor parallelism systems, while simultaneously maintaining lower latency.},
+	urldate = {2025-07-18},
+	publisher = {arXiv},
+	author = {Guo, Tianyu and Zhang, Xianwei and Du, Jiangsu and Chen, Zhiguang and Xiao, Nong and Lu, Yutong},
+	month = may,
+	year = {2025},
+	note = {arXiv:2504.14775 [cs]},
+	keywords = {Computer Science - Distributed, Parallel, and Cluster Computing},
+	file = {Preprint PDF:/home/fabian/Zotero/storage/3I72HDP5/Guo et al. - 2025 - gLLM Global Balanced Pipeline Parallelism System for Distributed LLM Serving with Token Throttling.pdf:application/pdf;Snapshot:/home/fabian/Zotero/storage/TM6PG4MR/2504.html:text/html},
+}
