@@ -560,7 +560,7 @@ $$Hit@k =
 Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, beispielsweise die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
 Zwar ist Hit@k intuitiv verständlich, berücksichtigt jedoch nicht die genaue Anzahl und Position der relevanten Ergebnisse in den Top 10 Suchergebnissen, sondern prüft nur, ob zumindest ein relevantes Ergebnis vorhanden ist.
 Außerdem berücksichtigt die Metrik nicht, wie nah ein relevantes Ergebnis an den Top-Positionen liegt.
-Zum Beispiel wird für $Hit@10$ ein erster relevanter Treffer auf Platz 11 genauso schlecht bewertet, wie ein Treffer auf Platz 100.
+Zum Beispiel wird für Hit@10 ein erster relevanter Treffer auf Platz 11 genauso schlecht bewertet, wie ein Treffer auf Platz 100.
 
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
@@ -680,7 +680,7 @@ Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suc
 
 Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
 Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
-Beispielsweise sinkt $Hit@10$ bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
+Beispielsweise sinkt Hit@10 bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
 Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbinden der Metadaten sich zu sehr auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht.
 Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
 
@@ -726,7 +726,7 @@ Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` im Archive of 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
 
 Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen.
-Beispielsweise beträgt die Metrik $Hit@10$ für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
+Beispielsweise beträgt die Metrik Hit@10 für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
 Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungs-Schritt dient.
 Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
 
