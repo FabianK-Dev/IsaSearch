@@ -331,12 +331,12 @@ is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde \citep{rein_gpqa_2023}.
 % SOURCE: https://arxiv.org/abs/2311.12022
-Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` \footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle, anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
+Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` \footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
 
 Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z. B. Gemini, ChatGPT, Claude, etc.) aus.
 Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
 Zudem wurden lizenzbeschränkte Modelle (z. B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
-Beispielsweise verlangt das ``Llama 3.1 Community License Agreement`` \footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
+Beispielsweise verlangt das ``Llama 3.1 Community License Agreement`` \footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist, nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
 Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} \footnote{\url{https://huggingface.co/microsoft/Phi-3.5-mini-instruct}} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
 % TODO: Instruct vs. Base
@@ -347,7 +347,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 \label{sec:einbettung_semantische_suche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
-Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern wird ChromaDB \footnote{\url{https://www.trychroma.com/}}, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, verwendet.
+Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern, wird ChromaDB \footnote{\url{https://www.trychroma.com/}}, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, verwendet.
 %In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
 Die informalisierten Dokumente werden in Form von Satzeinbettungen in einer ChromaDB-Sammlung eingebettet.
@@ -360,8 +360,8 @@ Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlun
 %\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
 Anschließend wird mithilfe des Pakets ``Flask`` \footnote{\url{https://pypi.org/project/Flask/}} eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
-Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
-Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze undetaillierte Suchanfragen, z. B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
+Ein Problem, welches sich hierbei ergibt, ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
+Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze wenig detaillierte Suchanfragen, z. B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
 Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Prompt in Kombination mit der Nutzereingabe gestellt wird \citep{jagerman_query_2023}.
 Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, sowie (2) einen passenden Titel dafür zu generieren.
@@ -370,13 +370,13 @@ Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sic
 % Nutzer können das Umschreiben deaktivieren
 
 Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} \footnote{\url{https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf}} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
-Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z. B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert \citep{dettmers_llmint8_2022}.
+Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzision der Modellparameter reduziert wird (z. B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert \citep{dettmers_llmint8_2022}.
 Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 
 %- Nach dem Umschreiben der Suchanfrage wird diese an die ursprüngliche Suchanfrage konkateniert und eine Einbettung für den neuen String bestehend aus Suchanfrage und Umschreibung
 Nachdem die Suchanfrage umschrieben wurde, wird eine Einbettung $q \in E$ für einen Eingabetext bestehend aus einer vorangestellten Anweisung, der ursprünglichen Suchanfrage und der umschriebenen Suchanfrage mithilfe desselben Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} berechnet.
-Hierbei ist $q$ die Einbettung des Eingabtexts in Form eines Vektors und $E$ der Einbettungsraum mit $E \subset \mathbb{R}^n$.
+Hierbei ist $q$ die Einbettung des Eingabetexts in Form eines Vektors und $E$ der Einbettungsraum mit $E \subset \mathbb{R}^n$.
 Anschließend wird für jede gespeicherte Einbettung in der ChromaDB-Sammlung die Distanz, beispielsweise mithilfe der euklidischen Distanz, zur Einbettung der Suchanfrage berechnet, wobei kleinere Distanzen für höhere Relevanz stehen.
 Daraus folgt, dass für die relevanteste Einbettung $e^* \in E$ gilt:
 $$e^* = \underset{e_k \in E}{\text{arg min}}\ ||q - e_k||$$
@@ -718,7 +718,7 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
 
 Die linke Ausgabe in Abbildung \ref{fig:metadata_vergleich} wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
 
-Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabtexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}.
+Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabetexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}.
 In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
 Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
 
@@ -872,7 +872,7 @@ Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt 
 
 Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorems und (2) der Umschreibung der Suchanfrage durch das Sprachmodell.
 Wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, kann es passieren, dass Sprachmodelle Inhalte eines Textes halluzinieren oder falsch interpretieren.
-Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze undetaillierte Suchanfragen formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
+Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze wenig detaillierte Suchanfragen formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
 
 Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
 
