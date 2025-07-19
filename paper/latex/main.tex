@@ -396,8 +396,8 @@ Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbet
 \subsection{Aufbau des Benchmarks}
 \label{sec:aufbau_des_benchmarks}
 
-Um objektiv die Leistung der semantischen Suchmaschine zu messen wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` \footnote{\url{https://www.cs.ru.nl/~freek/100/}} von Freek Wiedijk basiert.
-Dieses Projekt beinhaltet eine arbiträr zusammengestellte Liste von 100 Theoremen und verfolgt, wie viele davon in Beweisassistenten wie Isabelle, HOL Light oder Lean, formalisiert wurden.
+Um objektiv die Leistung der semantischen Suchmaschine zu messen, wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` \footnote{\url{https://www.cs.ru.nl/~freek/100/}} von Freek Wiedijk basiert.
+Dieses Projekt beinhaltet eine arbiträr zusammengestellte Liste von 100 Theoremen und verfolgt, wie viele davon in Beweisassistenten wie Isabelle, HOL Light oder Lean formalisiert wurden.
 Ich habe mich für diese Liste als Grundlage für das Benchmark zum Testen der Suchmaschine entschieden, da es bisher kein Benchmark speziell für Suchmaschinen für Isabelle oder das Archive of Formal Proofs gibt.
 Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks, wie beispielsweise CoqGym für Coq \footnote{\url{https://github.com/princeton-vl/CoqGym}} oder das Flyspeck-Projekt \footnote{\url{https://github.com/flyspeck/flyspeck}} für HOL Light, jedoch beinhalten diese keine annotierten Suchanfragen und eignen sich daher nicht als Benchmark für diese Bachelorarbeit.
 Außerdem wird Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert \citep{koepke_formalizing_nodate, kornilowicz_all_2017} und dient oft als Standardreferenz für die Auswahl grundlegender Theoreme, die z. B. als Benchmark verwendet werden können.
@@ -429,11 +429,11 @@ Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiede
   \begin{itemize}
     \item Ellipsen (\texttt{[...]}) und Zeichensetzung werden entfernt.
     \item Der gesamte String wird in Kleinbuchstaben konvertiert.
-    \item Englische Füllworter (z.B: `a`, `the`, `and`, `but`, etc.) mit häufigem Aufkommen aber geringer semantischer Relevanz werden entfernt.
+    \item Englische Füllwörter (z. B. `a`, `the`, `and`, `but`, etc.) mit häufigem Aufkommen aber geringer semantischer Relevanz werden entfernt.
     \item Aufeinanderfolgende Wörter werden mit einer Wahrscheinlichkeit von zehn Prozent vertauscht.
     \item Zehn Prozent der Zeichen des Such-Strings werden zufällig entfernt.
   \end{itemize}
-  Um deterministisches Verhalten zwischen verschiedenen Benchmark-Läufen sicherzustellen wird ein fester Zufalls-Seed verwendet. Die oben genannten Regeln zum Erstellen verrauschter Suchanfragen habe ich eigenständig nach Überlegungen, wie realistische Fehler in Suchanfragen aussehen können, entwickelt.
+  Um deterministisches Verhalten zwischen verschiedenen Benchmark-Läufen sicherzustellen wird ein fester Zufalls-Seed verwendet. Die oben genannten Regeln zum Erstellen verrauschter Suchanfragen wurden eigenständig nach Überlegungen, wie realistische Fehler in Suchanfragen aussehen können, entwickelt.
 %  - die verrauschte Suchanfrage wird während der Durchführung des Benchmarks in der Spalte ``Noisy natural language query`` in der Datei \texttt{benchmark.csv} ergänzt
 \end{enumerate}
 
