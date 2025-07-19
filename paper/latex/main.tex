@@ -223,7 +223,7 @@ Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beis
 
 Dieses Kapitel beschreibt den Aufbau der Anwendung sowie die verwendeten Methoden.
 
-Als erstes wird mithilfe von FindFacts \citep{huch_findfacts_2022} eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt wird.
+Als Erstes wird mithilfe von FindFacts \citep{huch_findfacts_2022} eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt wird.
 Die formalen Beschreibungen werden dann in ChromaDB, eine Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, gespeichert.
 Das Programm stellt eine REST-API bereit, welche Suchanfragen akzeptiert.
 Ein Sprachmodell umschreibt eingehende Suchanfragen, die in Form eines Vektors eingebettet werden.
@@ -518,11 +518,11 @@ Z (the set of all integers) and Q (the set of all rational numbers) are countabl
 
 Der Ablauf des Benchmarks baut auf den in Abschnitt \ref{sec:programmaufbau} beschriebenen Schritten (Laden der Konfiguration, Verbinden mit der Solr-Datenbank, Erstellen des Dokumentindex, etc.) auf.
 
-Als erstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
+Als Erstes wird das Benchmark im CSV-Format aus der Datei \texttt{benchmark.csv} geladen.
 Für jedes Theorem im Benchmark wird zunächst geprüft, ob dieses tatsächlich im Dokumentindex existiert.
-Sollte sich beispielsweise der Name eines Theorems in der Datenbank ändern, oder dieses nicht indiziert worden sein, wird es übersprungen.
+Sollte sich beispielsweise der Name eines Theorems in der Datenbank ändern oder dieses nicht indiziert worden sein, wird es übersprungen.
 Anderenfalls wird jede der Suchanfragen, welche in Abschnitt \ref{sec:aufbau_des_benchmarks} beschrieben wurden, an die Suchmaschine gestellt.
-Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie dessen Durchschnittswerte berechnet.
+Für jede Suchanfrage werden verschiedene Metriken, die in Abschnitt \ref{sec:verwendete_metriken} genauer erläutert werden, sowie deren Durchschnittswerte berechnet.
 Am Ende des Benchmarks werden die Ergebnisse in Form einer JSON-Datei im Ordner \texttt{benchmark/results} gespeichert.
 %, Lemmas oder Korollars
 
@@ -564,7 +564,7 @@ Zum Beispiel wird für Hit@10 ein erster relevanter Treffer auf Platz 11 genauso
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
 $$RR = \frac{1}{r^*}$$
-wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind \citep[S. 6]{brama_evaluation_2023}. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen spätere Treffer bleiben unberücksichtigt.
+wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind \citep[S. 6]{brama_evaluation_2023}. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen späterer Treffer bleiben unberücksichtigt.
 Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
 Anders als der Reciprocal Rank beachtet der Normalized Discounted Cumulative Gain zusätzlich die Reihenfolge mehrerer relevanter Suchergebnisse.
@@ -577,7 +577,7 @@ $$NDCG = \frac{DCG}{IDCG}$$
 berechnet \citep[S. 6]{gao_semantic_2025} \citep[S. 6]{brama_evaluation_2023}. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
 Neben den genannten Metriken werden zusätzlich auch der Rang des ersten relevanten Suchergebnisses sowie die Suchdauer für jede Suchanfrage gespeichert.
-Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist und dient daher lediglich der Veranschaulichung.
+Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist, sondern dient daher lediglich der Veranschaulichung.
 Die Suchdauer ist zudem von der verwendeten Hardware abhängig, weswegen die absoluten Werte auf anderen Geräten abweichen können.
 
 Hit@k ist eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
