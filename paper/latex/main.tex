@@ -143,7 +143,7 @@ Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden
 
   \item \textit{Wie effektiv ist die entwickelte Suchmaschine und wie robust ist sie gegenüber verrauschten Suchanfragen?}
 
-  \item \textit{Wie wirkt sich das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Zusammenfassung des zugehörigen Eintrags im Archive of Formal Proofs, auf die Suchqualtität aus?}
+  \item \textit{Wie wirkt sich das Einbetten von Metadaten eines entsprechenden Theorems, wie Titel oder Zusammenfassung des zugehörigen Eintrags im Archive of Formal Proofs, auf die Suchqualität aus?}
 \end{enumerate}
 
 \section{Hintergrund}
@@ -166,7 +166,7 @@ Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werd
 % SOURCE
 Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 % "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
-Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben die selbe Bedeutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen \citep[S. 63]{lund_teaching_2024}.
+Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben dieselbe Bedeutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen \citep[S. 63]{lund_teaching_2024}.
 Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
 
 Das Archive of Formal Proofs ist eine peer-reviewte Datenbank von Beweisbibliotheken, die in Isabelle verifiziert wurden \citep[S. 1]{blanchette_mining_2015} \citep[S. 1]{mackenzie_re-imagining_2022}.
@@ -178,14 +178,14 @@ Neben der online zugänglichen Stable- und Development-Version kann das Archive 
 
 Transformer sind eine Architektur von neuronalen Netzwerken, die anders als rekurrente neuronale Netze, wie beispielsweise Long Short-Term Memory, einen Aufmerksamkeitsmechanismus besitzen.
 Dadurch können Transformer-Modelle Tokens innerhalb eines vordefinierten Kontextfenster unabhängig von ihrer Position betrachten.
-Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-\allowbreak instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128 000 Tokens.
-Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z.B. ein Wort, Zeichen oder Teil eines Wortes.
+Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-\allowbreak instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128.000 Tokens.
+Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z. B. ein Wort, Zeichen oder Teil eines Wortes.
 Beispielsweise zerlegt das Sprachmodell GPT-4o die Zeichensequenz \texttt{"\textbackslash forall x \textbackslash in X\_y:"} in die Token:
 \begin{verbatim}
 "\", "forall", " x", " in", " X", "_y", ":"
 \end{verbatim}
 
-Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z.B. zwischen einer Definition und dessen Anwendung in einem langen Text, semantisch besser erfasst werden können.
+Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z. B. zwischen einer Definition und ihrer Anwendung in einem langen Text, semantisch besser erfasst werden können.
 Da Transformer-Modelle, anders als rekurrente neuronale Netze, Eingabesequenzen parallel verarbeiten, benötigen diese zudem weniger Trainingszeit \citep{vaswani_attention_2023}.
 
 Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte in Satzeinbettungen repräsentiert werden.
@@ -206,7 +206,7 @@ Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionswe
 
   \item \textbf{\texttt{find\_theorems}-Kommando:} Das in Isabelle eingebaute Kommando \texttt{find\_theorems} durchsucht formale Inhalte wie Theoreme, Lemmata oder Konstanten, jedoch nur in Theorien, die durch das Kommando \texttt{imports} in die aktuelle Theorie importiert wurden. \texttt{find\_theorems} wird hierbei verwendet, indem nach Namen, Typ oder einem gewissen Termmuster eines Theorems, gefiltert werden kann. Um auf diese Weise jedoch das gesamte Archive of Formal Proofs zu durchsuchen, müsste dieses komplett in die aktuelle Theorie geladen werden, was mit einem großen Arbeitsspeicherverbrauch verbunden wäre und damit in der Praxis zum Durchsuchen des gesamten Archive of Formal Proofs unbrauchbar ist \citep[S. 68]{wenzel_isabelleisar_nodate}.
 
-  \item \textbf{FindFacts:} FindFacts ist eine externe webbasierte Suchmaschine mit Drilldown-Funktionalität für formale Inhalte in Isabelle-Theorien, die Apache Solr \citep{solr} nutzt. Bei Suchanfragen durchsucht es einen zuvor erstellten Suchindex, der eine Auswahl an Isabelle-Theorien, z.B. alle Theorien aus dem Archive of Formal Proofs, beinhalten kann. Anders als \texttt{find\_theorems} erfordet es nicht, dass alle Theorieinhalte gleichzeitig in den Arbeitsspeicher geladen werden und ist dadurch skalierbarer \citep{huch_findfacts_2022}.
+  \item \textbf{FindFacts:} FindFacts ist eine externe webbasierte Suchmaschine mit Drilldown-Funktionalität für formale Inhalte in Isabelle-Theorien, die Apache Solr \citep{solr} nutzt. Bei Suchanfragen durchsucht es einen zuvor erstellten Suchindex, der eine Auswahl an Isabelle-Theorien, z. B. alle Theorien aus dem Archive of Formal Proofs, beinhalten kann. Anders als \texttt{find\_theorems} erfordet es nicht, dass alle Theorieinhalte gleichzeitig in den Arbeitsspeicher geladen werden und ist dadurch skalierbarer \citep{huch_findfacts_2022}.
 \end{itemize}
 
 Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachteile: (1) Die Suchmaschinen basieren rein auf lexikalischer Übereinstimmung, was bedeutet, dass für eine Suchanfrage Einträge nur als Suchergebnis eingeschlossen werden, wenn der eingegebene Suchbegriff exakt vorkommt. Synonyme, Tippfehler oder kleinste Abweichungen der Suchbegriffe sorgen dafür, dass ein Eintrag nicht als Suchergebnis aufgefunden wird. (2) Es findet zudem kein semantisches Verständis der Suchbegriffe oder der Einträge statt, d.h. Wörter werden nur einzelnen betrachtet ohne Beachtung ihres Kontexts, also beispielsweise ihrer Nachbarwörter. % Brauch ich hierfür eine Quelle?
@@ -253,7 +253,7 @@ Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz 
 %, der über eine laufende Solr-Datenbank bereitgestellt wird.
 %um einen Suchindex für die Volltextsuche Theorieinhalten zu generieren%.
 
-Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, welche Parameter wie z.B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
+Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, welche Parameter wie z. B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
 Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
 Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theoremquelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
@@ -333,9 +333,9 @@ Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokument
 % SOURCE: https://arxiv.org/abs/2311.12022
 Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` \footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle, anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
 
-Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z.B. Gemini, ChatGPT, Claude, etc.) aus.
-Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
-Zudem wurden lizenzbeschränkte Modelle (z.B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
+Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z. B. Gemini, ChatGPT, Claude, etc.) aus.
+Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
+Zudem wurden lizenzbeschränkte Modelle (z. B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
 Beispielsweise verlangt das ``Llama 3.1 Community License Agreement`` \footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
 Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} \footnote{\url{https://huggingface.co/microsoft/Phi-3.5-mini-instruct}} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
@@ -354,14 +354,14 @@ Die informalisierten Dokumente werden in Form von Satzeinbettungen in einer Chro
 Eine ChromaDB-Sammlung ist eine gruppierte Menge an Einbettungen und ist vergleichbar mit einer Tabelle in einem relationalen Datenbanksystem wie MySQL.
 Hierfür wird für jedes Dokument ein String bestehend aus einer Prompt, der informalen Beschreibung, sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 Die vorangestellte Prompt fordert das Sentence-Transformer-Sprachmodell dazu auf, eine Repräsentation aus natürlicher Sprache und formaler Isabelle/HOL-Syntax zu erzeugen, um semantisch ähnliche Aussagen auffinden zu können.
-% muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
+% muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
 Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert \citep{su_one_nodate}, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
-%\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z.B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
+%\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
 Anschließend wird mithilfe des Pakets ``Flask`` \footnote{\url{https://pypi.org/project/Flask/}} eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
 Ein Problem, welches sich hierbei ergibt ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
-Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze undetaillierte Suchanfragen, z.B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
+Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze undetaillierte Suchanfragen, z. B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
 Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Prompt in Kombination mit der Nutzereingabe gestellt wird \citep{jagerman_query_2023}.
 Das Sprachmodell erhält die Anweisung aus einer Suchanfrage eines Nutzers (1) eine genaue Beschreibung eines Theorems, sowie (2) einen passenden Titel dafür zu generieren.
@@ -370,7 +370,7 @@ Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sic
 % Nutzer können das Umschreiben deaktivieren
 
 Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} \footnote{\url{https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf}} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
-Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z.B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert \citep{dettmers_llmint8_2022}.
+Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzesion der Modellparameter reduziert wird (z. B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert \citep{dettmers_llmint8_2022}.
 Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
 
@@ -384,7 +384,7 @@ wobei $||q - e_k||$ ``die euklidische Distanz zwischen der Einbettung der Suchan
 Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbettung $e^*$, wenn der Abstand $||q - e_k||$ minimal ist, es also kein anderes $e_x \in E$ gibt, für das $||q - e_x||$ kleiner wäre.
 
 % Beispiel
-%\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z.B. Prompt, Embedding statt Prompt, Einbettung schreiben?}
+%\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z. B. Prompt, Embedding statt Prompt, Einbettung schreiben?}
 % Info, dass KI sich an Format halten soll
 % Limitation: KI ignoriert manchmal Forderung nach Format
 % TODO: prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
@@ -400,7 +400,7 @@ Um objektiv die Leistung der semantischen Suchmaschine zu messen wurde ein Bench
 Dieses Projekt beinhaltet eine arbiträr zusammengestellte Liste von 100 Theoremen und verfolgt, wie viele davon in Beweisassistenten wie Isabelle, HOL Light oder Lean, formalisiert wurden.
 Ich habe mich für diese Liste als Grundlage für das Benchmark zum Testen der Suchmaschine entschieden, da es bisher kein Benchmark speziell für Suchmaschinen für Isabelle oder das Archive of Formal Proofs gibt.
 Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks, wie beispielsweise CoqGym für Coq \footnote{\url{https://github.com/princeton-vl/CoqGym}} oder das Flyspeck-Projekt \footnote{\url{https://github.com/flyspeck/flyspeck}} für HOL Light, jedoch beinhalten diese keine annotierten Suchanfragen und eignen sich daher nicht als Benchmark für diese Bachelorarbeit.
-Außerdem wird Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert \citep{koepke_formalizing_nodate, kornilowicz_all_2017} und dient oft als Standardreferenz für die Auswahl grundlegender Theoreme, die z.B. als Benchmark verwendet werden können.
+Außerdem wird Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert \citep{koepke_formalizing_nodate, kornilowicz_all_2017} und dient oft als Standardreferenz für die Auswahl grundlegender Theoreme, die z. B. als Benchmark verwendet werden können.
 Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Theorien des Archive of Formal Proofs ab.
 
 Zum Erstellen des Benchmarks wurde zunächst die Liste aller in Isabelle formalisierten Theoreme samt Titel, Theoremquelltext und einer URL zum Eintrag im Archive of Formal Proofs, per Web-Scraping extrahiert und im CSV-Format in der Datei \texttt{benchmark.csv} im Ordner \texttt{benchmark} abgespeichert.
@@ -767,7 +767,7 @@ Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiede
 %TC:endignore
 
 Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl die Formulierungen der Suchanfragen unterschiedlich sind.
-Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden. %Quelle?
+Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden. %Quelle?
 Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells \citep[S. 1]{abdin_phi-3_2024} sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
 
 \subsubsection{Kompensation von Fehlumschreibungen durch Präfix-Konkatenation}
@@ -859,7 +859,7 @@ Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_
 Obwohl die semantische KI-Suche vielversprechende Benchmark-Ergebnisse aufweist, unterliegt das Suchsystem trotzdem einigen Einschränkungen, die bei der Interpretation, Anwendung und für zukünftige Verbesserungen beachtet werden sollten.
 
 Zum einen war die Entwicklung der Suchmaschine und das Benchmarking hardwaretechnisch beschränkt, da die verwendete Grafikkarte, eine NVIDIA GeForce RTX 4070, nur über 12 GB VRAM verfügt.
-Dadurch konnten leisstungstärkere Sprachmodelle mit einer höheren Parameterzahl (z.B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
+Dadurch konnten leisstungstärkere Sprachmodelle mit einer höheren Parameterzahl (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
 
 Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen, sowie das Umschreiben von Suchanfragen erheblich länger dauert.
 Es ist daher nicht empfehlenswert die semantische Suchmaschine ohne eine verfügbare Grafikkarte produktiv einzusetzen.
@@ -867,7 +867,7 @@ Es ist daher nicht empfehlenswert die semantische Suchmaschine ohne eine verfüg
 Ein weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und annotiert wurde.
 Dies erhöht das Risiko von Voreingenommenheit oder Fehlern, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
 
-Darüber hinaus, beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z.B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
+Darüber hinaus, beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
 Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur sind, abschneidet.
 
 Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorems und (2) der Umschreibung der Suchanfrage durch das Sprachmodell.
@@ -882,7 +882,7 @@ In dieser Bachelorarbeit wurde eine semantische Theoremsuchmaschine für Isabell
 Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und eine Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
 Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt und mit der originalen Suchanfrage konkateniert, jedoch keine Metadaten einschließt, da diese die Informalisierung verschlechtern, indem sie das Sprachmodell vom eigentlichen Theoreminhalt ``ablenken``.
 
-Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z.B. DeepSeek-R1) oder proprietären Modellen (z.B. Gemini 2.5 Pro) evaluieren, da diese laut des GPQA-Benchmarks besser abschneiden und eventuell auch Theoreme besser informalisieren oder Suchanfragen effektiver umschreiben.
+Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z. B. DeepSeek-R1) oder proprietären Modellen (z. B. Gemini 2.5 Pro) evaluieren, da diese laut des GPQA-Benchmarks besser abschneiden und eventuell auch Theoreme besser informalisieren oder Suchanfragen effektiver umschreiben.
 
 Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden.
 Dieses Feedback könnte genutzt werden um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
