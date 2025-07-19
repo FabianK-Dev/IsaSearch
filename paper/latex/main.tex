@@ -213,7 +213,7 @@ Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachtei
 
 Diese Bachelorarbeit nutzt einen ähnlichen Ansatz, wie in der Arbeit von \citet{gao_semantic_2025} beschrieben.
 Die Autoren erstellen und evaluieren eine semantische Suchmaschine für Mathlib4, eine Bibliothek für den Theorembeweiser Lean 4, welche Sprachmodelle zum Informalisieren und Sentence-Transformer-Modelle zum Einbetten und Suchen von Theoremen in einer Vektordatenbank nutzt.
-Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beispielsweise zum Einbetten oder Informaliseren von Theoremen, wie in Abschnitt \ref{sec:informalisierung} beschrieben, gestellt werden, basieren auf Prompt-Beispielen des Repositorys der Arbeit von Gao et al., welches unter der Apache License 2.0 lizenziert ist und aufgrund ihrer Effektivität, teilweise angepasst und übernommen wurden.
+Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beispielsweise zum Einbetten oder Informalisieren von Theoremen, wie in Abschnitt \ref{sec:informalisierung} beschrieben, gestellt werden, basieren auf Prompt-Beispielen des Repositorys der Arbeit von Gao et al., welches unter der Apache License 2.0 lizenziert ist und aufgrund ihrer Effektivität, teilweise angepasst und übernommen wurden.
 
 % - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
 % - Bestehende Suchmechanismen sind beispielsweise (1) das Archive of Formal Proofs selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im Archive of Formal Proofs setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
@@ -221,12 +221,12 @@ Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beis
 %\allowbreak
 \section{Methodik}
 
-Dieses Kapitel beschreibt den Aufbau der Anwendung, sowie die verwendeten Methoden.
+Dieses Kapitel beschreibt den Aufbau der Anwendung sowie die verwendeten Methoden.
 
-Als erstes wird mithilfe von FindFacts \citep{huch_findfacts_2022} eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt werden.
+Als erstes wird mithilfe von FindFacts \citep{huch_findfacts_2022} eine Datenbank aller formaler Theoreme erstellt, welche anschließend mithilfe eines Sprachmodells informalisiert, also in natürliche Sprache übersetzt wird.
 Die formalen Beschreibungen werden dann in ChromaDB, eine Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, gespeichert.
 Das Programm stellt eine REST-API bereit, welche Suchanfragen akzeptiert.
-Ein Sprachmodell umschreibt eingehende Suchanfragen, welche in Form eines Vektors eingebettet werden.
+Ein Sprachmodell umschreibt eingehende Suchanfragen, die in Form eines Vektors eingebettet werden.
 Mithilfe der euklidischen Distanz können dann die semantisch ähnlichsten Theoreme zur Suchanfrage gesucht und zurückgegeben werden.
 
 \begin{figure}[!htb]
@@ -253,7 +253,7 @@ Um diese später in Python auslesen zu können, muss eine laufende Solr-Instanz 
 %, der über eine laufende Solr-Datenbank bereitgestellt wird.
 %um einen Suchindex für die Volltextsuche Theorieinhalten zu generieren%.
 
-Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, welche Parameter wie z. B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
+Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, die Parameter wie z. B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
 Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
 Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theoremquelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
@@ -269,16 +269,16 @@ Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des 
 
 \subsection{Informalisierung der Theoreme}
 \label{sec:informalisierung}
-Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem anhand dessen Quelltexts mithilfe eines großen Sprachmodells in eine informale Beschreibung umschrieben wird.
+Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem anhand dessen Quelltextes mithilfe eines großen Sprachmodells in eine informale Beschreibung umschrieben wird.
 %, Lemma oder Korollar
 Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems beinhalten.
 Die Suche wird effektiver, da durch das semantisch äquivalente Umschreiben eines Theorems die lexikalische Überlappung zwischen der umschriebenen informalen Beschreibung und der Suchanfrage höher ist als zwischen dem Quelltext und der Suchanfrage. \citep[S. 1]{jagerman_query_2023}
 % evtl Beispiel?
 
 Für jedes Theorem wird eine informelle Beschreibung benötigt.
-Diese sollen nur neu generiert werden, falls sich der Quelltext eines Theorems ändert oder noch keine Beschreibung exisitert.
+Diese sollen nur neu generiert werden, falls sich der Quelltext eines Theorems ändert oder noch keine Beschreibung existiert.
 Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokumentindex (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
-Dies wird umgesetzt indem anhand des Quelltexts jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus \citep[S. 7]{maxino_effectiveness_2009} berechnet wird.
+Dies wird umgesetzt indem anhand des Quelltextes jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus \citep[S. 7]{maxino_effectiveness_2009} berechnet wird.
 Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist \citep[S. 2]{maxino_effectiveness_2009}, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek \footnote{\url{https://docs.python.org/3/library/zlib.html}} implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
 
@@ -677,7 +677,7 @@ Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suc
 \subsubsection{Einfluss von Metadaten auf die Informalisierung}
 \label{sec:einfluss_metadate_informalisierung}
 
-Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltexts zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
+Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltextes zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
 Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
 Beispielsweise sinkt Hit@10 bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
 Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbinden der Metadaten sich zu sehr auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht.
