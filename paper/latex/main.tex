@@ -556,8 +556,8 @@ $$Hit@k =
 1 & \text{wenn } \exists i \leq k: r_i = 1 \\
 0 & \text{sonst}
 \end{cases}$$
-Unter der Annahme, dass Nutzer typischerweise nur die ersten relevanten Suchergebnisse, beispielsweise die Top 10, beachten und nicht die gesamte Ergebnisliste durchsuchen, wurde $k = 10$ gewählt.
-Zwar ist Hit@k intuitiv verständlich, berücksichtigt jedoch nicht die genaue Anzahl und Position der relevanten Ergebnisse in den Top 10 Suchergebnissen, sondern prüft nur, ob zumindest ein relevantes Ergebnis vorhanden ist.
+Unter der Annahme, dass Nutzer nicht die gesamte Ergebnisliste durchsuchen und typischerweise nur die ersten Suchergebnisse, beispielsweise die ersten zehn, beachten, wurde $k = 10$ gewählt.
+Zwar ist Hit@k intuitiv verständlich, jedoch berücksichtigt es nicht die genaue Anzahl und Position der Ergebnisse in den ersten zehn Suchergebnissen, sondern überprüft nur, ob mindestens ein relevantes Ergebnis vorhanden ist.
 Außerdem berücksichtigt die Metrik nicht, wie nah ein relevantes Ergebnis an den Top-Positionen liegt.
 Zum Beispiel wird für Hit@10 ein erster relevanter Treffer auf Platz 11 genauso schlecht bewertet, wie ein Treffer auf Platz 100.
 
@@ -848,7 +848,7 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
 %TC:endignore
 
 Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel.
-Das Sprachmodell bezeichnet diese Suchanfrage jedoch fälschlicherweise als ``Euler's Polynomial Formula for Summation``, was irreführend ist, da die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 2]{mircea_merca_alternative_2015}.
+Diese Suchanfrage wird vom Sprachmodell jedoch als ``Euler's Polynomial Formula for Summation``, was nicht korrekt ist, weil die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 2]{mircea_merca_alternative_2015}.
 % \citep{hale}
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
