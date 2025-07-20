@@ -15,7 +15,7 @@
 	file = {PDF:files/103/Devlin et al. - 2019 - BERT Pre-training of Deep Bidirectional Transformers for Language Understanding.pdf:application/pdf},
 }
 
-@article{wenzel_isabelleisar_nodate,
+@manual{wenzel_isabelleisar_nodate,
 	title = {The {Isabelle}/{Isar} {Reference} {Manual}},
 	language = {en},
 	author = {Wenzel, Makarius},
@@ -119,7 +119,7 @@
 	urldate = {2025-07-14},
 	booktitle = {Lecture {Notes} in {Computer} {Science}},
 	publisher = {Springer International Publishing},
-	collaborator = {MacKenzie, Carlin and Huch, Fabian and Vaughan, James and Fleuriot, Jacques},
+	author = {MacKenzie, Carlin and Huch, Fabian and Vaughan, James and Fleuriot, Jacques},
 	year = {2022},
 	doi = {10.1007/978-3-031-16681-5_11},
 	note = {ISSN: 0302-9743, 1611-3349},
@@ -128,20 +128,24 @@
 }
 
 @misc{vaswani_attention_2023,
-	title = {Attention {Is} {All} {You} {Need}},
-	url = {http://arxiv.org/abs/1706.03762},
-	doi = {10.48550/arXiv.1706.03762},
-	abstract = {The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 Englishto-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.},
-	language = {en},
-	urldate = {2025-07-14},
-	publisher = {arXiv},
-	author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
-	month = aug,
-	year = {2023},
-	note = {arXiv:1706.03762 [cs]},
-	keywords = {Computer Science - Computation and Language, Computer Science - Machine Learning},
-	annote = {Comment: 15 pages, 5 figures},
-	file = {PDF:files/104/Vaswani et al. - 2023 - Attention Is All You Need.pdf:application/pdf},
+	author       = {Ashish Vaswani and
+                  Noam Shazeer and
+                  Niki Parmar and
+                  Jakob Uszkoreit and
+                  Llion Jones and
+                  Aidan N. Gomez and
+                  Lukasz Kaiser and
+					Illia Polosukhin},
+	title        = {Attention Is All You Need},
+	journal      = {CoRR},
+	volume       = {abs/1706.03762},
+	year         = {2017},
+	url          = {http://arxiv.org/abs/1706.03762},
+	eprinttype    = {arXiv},
+	eprint       = {1706.03762},
+	timestamp    = {Sat, 23 Jan 2021 01:20:40 +0100},
+	biburl  	     = {https://dblp.org/rec/journals/corr/VaswaniSPUJGKP17.bib},
+	bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
 
@@ -287,7 +291,7 @@
 	file = {Preprint PDF:/home/fabian/Zotero/storage/59NXTZW8/Raschka et al. - 2020 - Machine Learning in Python Main developments and technology trends in data science, machine learnin.pdf:application/pdf;Snapshot:/home/fabian/Zotero/storage/CVTHJQXY/2002.html:text/html},
 }
 
-@article{wenzel_isabelle_nodate,
+@manual{wenzel_isabelle_nodate,
 	title = {The {Isabelle} {System} {Manual}},
 	language = {en},
 	year = {2025},
@@ -295,12 +299,11 @@
 	file = {PDF:/home/fabian/Zotero/storage/TAFFSXFT/Wenzel - The Isabelle System Manual.pdf:application/pdf},
 }
 
-@online{solr,
+@misc{solr,
   author       = {{The Apache Software Foundation}},
   title        = {{Welcome to Apache Solr - Apache Solr}},
   year         = {2025},
-  url          = {https://solr.apache.org/},
-  urldate      = {2025-07-18},
+  howpublished = {\url{https://solr.apache.org/}},
   note         = {Zugriff am 18. Juli 2025}
 }
 
@@ -393,12 +396,14 @@
 	file = {PDF:files/169/Abdin et al. - 2024 - Phi-3 Technical Report A Highly Capable Language Model Locally on Your Phone.pdf:application/pdf},
 }
 
-@article{su_one_nodate,
-	title = {One {Embedder}, {Any} {Task}: {Instruction}-{Finetuned} {Text} {Embeddings}},
-	abstract = {We introduce INSTRUCTOR, a new method for computing text embeddings given task instructions: every text input is embedded together with instructions explaining the use case (e.g., task and domain descriptions). Unlike encoders from prior work that are more specialized, INSTRUCTOR is a single embedder that can generate text embeddings tailored to different downstream tasks and domains, without any further training. We first annotate instructions for 330 diverse tasks and train INSTRUCTOR on this multitask mixture with a contrastive loss. We evaluate INSTRUCTOR on 70 embedding evaluation tasks (66 of which are unseen during training), ranging from classification and information retrieval to semantic textual similarity and text generation evaluation. INSTRUCTOR, while having an order of magnitude fewer parameters than the previous best model, achieves state-of-the-art performance, with an average improvement of 3.4\% compared to the previous best results on the 70 diverse datasets. Our analysis suggests that INSTRUCTOR is robust to changes in instructions, and that instruction finetuning mitigates the challenge of training a single model on diverse datasets. Our model, code, and data are available at https: //instructor-embedding.github.io.},
-	language = {en},
-	author = {Su, Hongjin and Shi, Weijia and Kasai, Jungo and Wang, Yizhong and Hu, Yushi and Ostendorf, Mari and Yih, Wen-tau and Smith, Noah A and Zettlemoyer, Luke and Yu, Tao},
-	file = {PDF:files/164/Su et al. - One Embedder, Any Task Instruction-Finetuned Text Embeddings.pdf:application/pdf},
+@misc{su_one_nodate,
+      title={One Embedder, Any Task: Instruction-Finetuned Text Embeddings},
+      author={Hongjin Su and Weijia Shi and Jungo Kasai and Yizhong Wang and Yushi Hu and Mari Ostendorf and Wen-tau Yih and Noah A. Smith and Luke Zettlemoyer and Tao Yu},
+      year={2023},
+      eprint={2212.09741},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2212.09741},
 }
 
 @misc{dettmers_llmint8_2022,
@@ -419,11 +424,11 @@
 	file = {PDF:files/165/Dettmers et al. - 2022 - LLM.int8() 8-bit Matrix Multiplication for Transformers at Scale.pdf:application/pdf},
 }
 
-@article{koepke_formalizing_nodate,
-	title = {Formalizing {Sets} and {Numbers}, and some of {Wiedijk}’s ”100 {Theorems}” in {Naproche}},
-	language = {en},
-	author = {Koepke, Peter and Marcol, Mateusz and Schafer, Patrick},
-	file = {PDF:files/155/Koepke et al. - Formalizing Sets and Numbers, and some of Wiedijk’s ”100 Theorems” in Naproche.pdf:application/pdf},
+@misc{koepke_formalizing_nodate,
+  author={Koepke, Peter and Marcol, Mateusz and Schäfer, Patrick},
+  title={Formalizing Sets, Numbers, and some ``{Wiedijk} Theorems'' in {Naproche}},
+  year={2023},
+  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2023}, {Cambridge}, {UK}}
 }
 
 @article{kornilowicz_all_2017,
@@ -513,7 +518,7 @@
 	number = {6},
 	urldate = {2025-07-14},
 	journal = {The American Mathematical Monthly},
-	author = {{Mircea Merca}},
+	author = {Merca, Mircea},
 	year = {2015},
 	note = {Publisher: Informa UK Limited},
 	pages = {599},
