@@ -117,7 +117,7 @@ Ablieferungstermin: \date{\today} \\
 
 \subsection{Motivation \& Problemstellung}
 Die formale Verifizierung spielt eine entscheidende Rolle, um die Korrektheit von Hard- und Software zu beweisen.
-Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Logik höherer Stufe, ermöglicht die Entwicklung und Verifikation von formalen Theoremen \citep[S. 3]{nipkow_isabellehol_2002}.
+Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Logik höherer Stufe \citep[S. 1]{blanchette_isabelle_nodate}, ermöglicht die Entwicklung und Verifikation von formalen Theoremen \citep[S. 3, S. 9]{nipkow_isabellehol_2002}.
 Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen \citep[S. 3]{blanchette_mining_2015}.
 Obwohl die Wiederverwendung bestehender Theoreme essentiell ist, um Duplikate zu vermeiden, findet sie in der Praxis jedoch zu wenig statt \citep[S. 13]{blanchette_mining_2015}.
 Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine \citep[S. 3]{mackenzie_re-imagining_2022}, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien \citep{huch_findfacts_2022}, (3) Befehle wie \texttt{find\_theorems} \citep[S. 68]{wenzel_isabelleisar_nodate}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweises Filtern von Dateien.
@@ -154,7 +154,7 @@ Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden
 %Isabelle/HOL: A Proof Assistant for Higher-Order Logic (Tobias Nipkow, Lawrence C. Paulson, Markus Wenzel)
 % "Isabelle is a generic system for implementing logical formalisms" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL p. 3
 % "developed at the University of Cambridge in collaboration with the Technical University of Munich under the direction of Dr. Lawrence C. Paulson and Prof. Tobias Nipkow"
-Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen sowie Hard- und Softwarebeweisen \citep[S. 3]{nipkow_isabellehol_2002} und unterstützt mehrere Objektlogiken, wie beispielsweise Isabelle/HOL für Logik höherer Stufe \citep[S. 2]{blanchette_mining_2015}.
+Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung von mathematischen Theoremen sowie Hard- und Softwarebeweisen \citep[S. 1]{blanchette_isabelle_nodate} \citep[S. 3]{nipkow_isabellehol_2002} und unterstützt mehrere Objektlogiken, wie beispielsweise Isabelle/HOL für Logik höherer Stufe \citep[S. 1]{blanchette_isabelle_nodate} \citep[S. 2]{blanchette_mining_2015}.
 % "In contrast to other provers like PVS or the HOL-System by Gordon and Melham [Gordon, Melham, 1993], Isabelle is not restricted to a single, hard-coded logic" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
 % "Isabelle [26] is implemented in ML [17]" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL]
 % "Within this metalogic of Isabelle, a multitude of object logics like e.g. Higher Order Logic (HOL) or Zermelo-Fraenkel Set Theory (ZF) can be formalized" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
@@ -162,7 +162,7 @@ Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung
 % "Each theory T must reside in a theory file named T.thy" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
 Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhängigkeitsgraphen ist, was modulare Entwicklung und Wiederverwendung von bestehenden Theorien ermöglicht \citep[S. 4]{nipkow_isabellehol_2002}.
 % SOURCE
-Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden \citep{nipkow_isabellehol_2002}.
+Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden \citep[S. 7]{nipkow_isabellehol_2002}.
 % SOURCE
 Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 % "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
