@@ -556,14 +556,17 @@ $$Hit@k =
 0 & \text{sonst}
 \end{cases}$$
 Unter der Annahme, dass Nutzer nicht die gesamte Ergebnisliste durchsuchen und typischerweise nur die ersten Suchergebnisse, beispielsweise die ersten zehn, beachten, wurde $k = 10$ gewählt.
-Zwar ist Hit@k intuitiv verständlich, jedoch berücksichtigt es nicht die genaue Anzahl und Position der Ergebnisse in den ersten zehn Suchergebnissen, sondern überprüft nur, ob mindestens ein relevantes Ergebnis vorhanden ist.
+Hit@k leicht verständlich, berücksichtigt aber nicht die genaue Anzahl und Position der Ergebnisse in den ersten zehn Suchergebnissen und überprüft stattdessen nur, ob mindestens ein relevantes Ergebnis vorhanden ist.
 Außerdem berücksichtigt die Metrik nicht, wie nah ein relevantes Ergebnis an den Top-Positionen liegt.
 Zum Beispiel wird für Hit@10 ein erster relevanter Treffer auf Platz 11 genauso schlecht bewertet, wie ein Treffer auf Platz 100.
 
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
 $$RR = \frac{1}{r^*}$$
-wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind \citep[S. 6]{brama_evaluation_2023}. Der Reciprocal Rank belohnt Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren. Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht. Der Reciprocal Rank beachtet jedoch nur den Rang des ersten Treffers. Die Positionen späterer Treffer bleiben unberücksichtigt.
+wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind \citep[S. 6]{brama_evaluation_2023}.
+Der Reciprocal Rank bewertet Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren, positiv.
+Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht.
+Dabei gilt jedoch außerdem, dass der Reciprocal Rank nur den Rang des ersten Treffers und die Positionen späterer Treffer unberücksichtigt bleiben.
 Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
 Anders als der Reciprocal Rank beachtet der Normalized Discounted Cumulative Gain zusätzlich die Reihenfolge mehrerer relevanter Suchergebnisse.
@@ -662,13 +665,12 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \end{table}
 %TC:endignore
 
-Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist.
-Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprüngliche Suchanfrage einzeln gesucht wird.
+Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist, wass suggeriert, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprüngliche Suchanfrage einzeln gesucht wird.
 Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
-Suchanfragen, welche durch das Sprachmodell umschrieben werden, sind jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
-Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
-Bei Suchanfragen per REST-API ist es daher möglich über den Parameter \texttt{refine\_query} das Umschreiben zu deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
+Suchanfragen, welche durch das Sprachmodell umschrieben werden, dauern jedoch durchschnittlich etwa 1,5 Sekunden pro Anfrage, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
+Die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, bietet auf der anderen Seite eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
+Aus diesem Grund können Suchanfragen per REST-API über den Parameter \texttt{refine\_query} das Umschreiben deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
 Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche das Umschreiben von Suchanfrage deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigkeit den Qualitätsverlust rechtfertigt.
 
 \subsection{Erklärung von Performance-Unterschieden}
@@ -715,10 +717,9 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
 \justifying
 %TC:endignore
 
-Die linke Ausgabe in Abbildung \ref{fig:metadata_vergleich} wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
+In Abbildung \ref{fig:metadata_vergleich} wurde die linke Ausgabe durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
 
-Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabetexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}.
-In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass das Sprachmodell ausschließlich ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
+Da Sprachmodelle dazu tendieren Vermutungen über die Bedeutung des Eingabetexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}, sorgt in diesem Fall die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass das Sprachmodell ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
 Das gezeigte Lemma ist Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs. Dort wird es allerdings nur als Hilfsfunktion verwendet und steht nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang.
 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
@@ -882,10 +883,9 @@ Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt 
 
 Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z. B. DeepSeek-R1) oder proprietären Modellen (z. B. Gemini 2.5 Pro) evaluieren, da diese laut des GPQA-Benchmarks besser abschneiden und eventuell auch Theoreme besser informalisieren oder Suchanfragen effektiver umschreiben.
 
-Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden.
-Dieses Feedback könnte genutzt werden, um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
+Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden, was dazu genutzt werden könnte, um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu verbessern und (2) eine noch realistischere Evaluation der Suchmaschine zu ermöglichen.
 
-Außerdem könnte in Zukunft die semantische KI-Suchmaschine direkt in die Suchmaschine des Archive of Formal Proofs integriert werden und für eine Suchanfrage automatisch auch relevante KI-Suchergebnisse laden.
+%In Zukunft könnte die semantische Suchmaschine direkt in die Suchmaschine des Archive of Formal Proofs integriert werden und für eine Suchanfrage automatisch auch relevante KI-Suchergebnisse laden.
 
 %Zudem hat Abschnitt \ref{sec:einfluss_metadate_informalisierung} gezeigt, dass das Sprachmodell bei vagen, mehrdeutigen oder falsch formulierten Suchanfragen fehlerhafte Formulierungen erzeugen kann.
 
