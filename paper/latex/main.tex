@@ -134,10 +134,9 @@ Auf der anderen Seite stellen transformerbasierte Sprachmodelle eine vielverspre
 
 \subsection{Zielsetzung \& Forschungsfragen}
 Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren.
-Diese Arbeit vergleicht verschiedene Suchstrategien, wie das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen sowie die Integration von Metadaten.
-Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks sowie eine Analyse des erzielten Ergebnisses statt.
+Außerdem sollen verschiedene Suchstrategien, z. B. das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen oder die Integration von Metadaten, geprüft werden, woraufhin eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks sowie eine Analyse des erzielten Ergebnisses stattfindet.
 
-Im Rahmen der Bachelorarbeit sollen folgende Forschungsfragen beantwortet werden:
+Die folgenden Forschungsfragen werden in dieser Bachelorarbeit beantwortet:
 \begin{enumerate}
   \item \textit{Wie wirkt sich die Informalisierung formaler Theoreme oder das Optimieren von Suchanfragen durch Sprachmodelle auf deren Auffindbarkeit durch Nutzereingaben aus?}
 
@@ -720,14 +719,13 @@ Die linke Ausgabe in Abbildung \ref{fig:metadata_vergleich} wurde durch eine Pro
 
 Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabetexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}.
 In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass das Sprachmodell ausschließlich ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
-Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
+Das gezeigte Lemma ist Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs. Dort wird es allerdings nur als Hilfsfunktion verwendet und steht nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang.
 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
 
 Ebenfalls auffällig ist, dass Anfragen der Kategorien ``Titel-Anfragen`` und ``Natürliche Sprache`` für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen.
-Beispielsweise beträgt die Metrik Hit@10 für die Titel-Anfrage 0,835 und für die Anfrage in natürlicher Sprache 0,824, was einem Genauigkeitsunterschied von nur 1,1\% entspricht.
-Die Hypothese hierbei ist, dass das Umschreiben der Suchanfrage, egal ob als Titel eines Theorems oder in natürlicher Sprache formuliert, als eine Art Normalisierungsschritt dient.
-Veranschaulichen lässt sich dies an folgendem Beispiel, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
+Hit@10 ist zum Beispiel für die Titel-Anfrage 0,835. Für die Anfrage in natürlicher Sprache beträgt die Metrik hingegen 0,824, was einem Verlust von nur 1,1\% entspricht.
+Die Annahme ist, dass das Umschreiben der Suchanfrage, unabhängig davon ob sie als Titel eines Theorems oder in natürlicher Sprache formuliert wird, als eine Art Normalisierungsschritt wirkt, was sich gut an folgendem Beispiel visualisieren lässt, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
 
 %TC:ignore
 \centering
