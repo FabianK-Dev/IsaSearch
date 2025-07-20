@@ -664,13 +664,13 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 %TC:endignore
 
 Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist.
-Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprünglichen Suchanfrage einzeln gesucht wird.
+Dies deutet darauf hin, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprüngliche Suchanfrage einzeln gesucht wird.
 Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
 Suchanfragen, welche durch das Sprachmodell umschrieben werden, sind jedoch mit einer durchschnittlichen Suchdauer von etwa 1,5 Sekunden pro Anfrage verbunden, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
 Auf der anderen Seite bietet die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
 Bei Suchanfragen per REST-API ist es daher möglich über den Parameter \texttt{refine\_query} das Umschreiben zu deaktivieren, was die Suchzeit auf Kosten der Suchgenauigkeit reduziert.
-Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche das Umschreiben von Suchanfrage deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigket den Qualitätsverlust rechtfertigt.
+Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suche das Umschreiben von Suchanfrage deaktivieren, müssen dabei aber abwägen, ob die erhöhte Suchgeschwindigkeit den Qualitätsverlust rechtfertigt.
 
 \subsection{Erklärung von Performance-Unterschieden}
 
@@ -680,7 +680,7 @@ Nutzer können zudem auf der Web-Benutzeroberfläche für die semantische KI-Suc
 Intuitiv könnte man annehmen, dass das Anfügen von Metadaten, wie Titel und Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, zur Prompt dem Sprachmodell beim Umschreiben des Dokument-Quelltextes zusätzliche Kontextinformationen liefert und damit die Suchqualität verbessert.
 Die Benchmark-Ergebnisse zeigen jedoch, dass dies nicht der Fall ist und stattdessen zu einer Verschlechterung der Ergebnisse führt.
 Beispielsweise sinkt Hit@10 bei verrauschten Suchanfragen von 0,659 auf 0,494 wenn Dokumente mit Metadaten informalisiert werden.
-Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbinden der Metadaten sich zu sehr auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht.
+Grund dafür ist, dass das Sprachmodell beim Informalisieren aufgrund des Einbindens der Metadaten sich zu sehr auf diese, statt auf den tatsächlichen Inhalt des Theorems, bezieht.
 Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal ohne Metadaten an das Sprachmodell übergeben und beide Ausgaben verglichen werden.
 
 %TC:ignore
@@ -719,7 +719,7 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
 Die linke Ausgabe in Abbildung \ref{fig:metadata_vergleich} wurde durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
 
 Sprachmodelle tendieren dazu Vermutungen über die Bedeutung des Eingabetexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}.
-In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass dieses ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
+In diesem Fall sorgt die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass das Sprachmodell ausschließlich ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
 Zwar ist das gezeigte Lemma Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs, dient dort jedoch nur als Hilfsfunktion, die nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang steht.
 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
@@ -773,7 +773,7 @@ Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trai
 \subsubsection{Kompensation von Fehlumschreibungen durch Präfix-Konkatenation}
 \label{sec:kompensation_fehlumschreibungen}
 
-Wie zu erwarten, nimmt die Suchqualität signifikant ab wenn das Sprachmodell die Suchanfrage falsch umschreibt.
+Wie zu erwarten, nimmt die Suchqualität signifikant ab, wenn das Sprachmodell die Suchanfrage falsch umschreibt.
 Das Konkatenieren der ursprünglichen Suchanfrage an eine fehlerhafte umschriebene Suchanfrage hingegen verbessert das Suchergebnis etwas und kompensiert damit teilweise die Fehlinterpretation durch das Sprachmodell, da die ursprüngliche Suchanfrage unter Umständen trotzdem noch semantische Hinweise beinhaltet.
 Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchanfrage_falsch_umschrieben}:
 
@@ -859,33 +859,33 @@ Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_
 Obwohl die semantische KI-Suche vielversprechende Benchmark-Ergebnisse aufweist, unterliegt das Suchsystem trotzdem einigen Einschränkungen, die bei der Interpretation, Anwendung und für zukünftige Verbesserungen beachtet werden sollten.
 
 Zum einen war die Entwicklung der Suchmaschine und das Benchmarking hardwaretechnisch beschränkt, da die verwendete Grafikkarte, eine NVIDIA GeForce RTX 4070, nur über 12 GB VRAM verfügt.
-Dadurch konnten leisstungstärkere Sprachmodelle mit einer höheren Parameterzahl (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
+Dadurch konnten leistungsstärkere Sprachmodelle mit einer höheren Parameterzahl (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
 
 Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen sowie das Umschreiben von Suchanfragen erheblich länger dauert.
-Es ist daher nicht empfehlenswert die semantische Suchmaschine ohne eine verfügbare Grafikkarte produktiv einzusetzen.
+Es ist daher nicht empfehlenswert, die semantische Suchmaschine ohne eine verfügbare Grafikkarte produktiv einzusetzen.
 
-Ein weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und annotiert wurde.
+Eine weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und annotiert wurde.
 Dies erhöht das Risiko von Voreingenommenheit oder Fehlern, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
 
-Darüber hinaus, beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
+Darüber hinaus beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
 Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur sind, abschneidet.
 
 Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorems und (2) der Umschreibung der Suchanfrage durch das Sprachmodell.
 Wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, kann es passieren, dass Sprachmodelle Inhalte eines Textes halluzinieren oder falsch interpretieren.
-Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze wenig detaillierte Suchanfragen formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
+Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze, wenig detaillierte Suchanfrage formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
 
 Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
 
 \section{Zusammenfassung \& Ausblick}
 
-In dieser Bachelorarbeit wurde eine semantische Theoremsuchmaschine für Isabelle und das Archive of Formal Proofs sowie ein Benchmark zum Evaluierien der Suchqualtität entwickelt.
-Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und eine Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
+In dieser Bachelorarbeit wurde eine semantische Theoremsuchmaschine für Isabelle und das Archive of Formal Proofs sowie ein Benchmark zum Evaluieren der Suchqualität entwickelt.
+Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und einer Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
 Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt und mit der originalen Suchanfrage konkateniert, jedoch keine Metadaten einschließt, da diese die Informalisierung verschlechtern, indem sie das Sprachmodell vom eigentlichen Theoreminhalt ``ablenken``.
 
 Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z. B. DeepSeek-R1) oder proprietären Modellen (z. B. Gemini 2.5 Pro) evaluieren, da diese laut des GPQA-Benchmarks besser abschneiden und eventuell auch Theoreme besser informalisieren oder Suchanfragen effektiver umschreiben.
 
 Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden.
-Dieses Feedback könnte genutzt werden um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
+Dieses Feedback könnte genutzt werden, um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu optimieren und (2) eine noch bessere Evaluation der Suchmaschine zu ermöglichen.
 
 Außerdem könnte in Zukunft die semantische KI-Suchmaschine direkt in die Suchmaschine des Archive of Formal Proofs integriert werden und für eine Suchanfrage automatisch auch relevante KI-Suchergebnisse laden.
 
