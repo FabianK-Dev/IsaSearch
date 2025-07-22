@@ -25,12 +25,17 @@ def get_entry_metadata(entry, config):
         return cached_metadata[entry]
 
     if os.path.isfile(entry_toml):
-        with open(entry_toml, "rb") as f:
-            toml = tomllib.load(f)
-            cached_metadata[entry] = {
-                "title": toml.get("title", ""),
-                "abstract": toml.get("abstract", ""),
-            }
+        try:
+            with open(entry_toml, "rb") as f:
+                toml = tomllib.load(f)
+                cached_metadata[entry] = {
+                    "title": toml.get("title", ""),
+                    "abstract": toml.get("abstract", ""),
+                }
+                return cached_metadata[entry]
+        except Exception:
+            print("Failed loading file " + entry_toml + ".")
+            cached_metadata[entry] = {"title": "", "abstract": ""}
             return cached_metadata[entry]
     else:
         print(f"No metadata file exists at path {entry_toml} for entry {entry}.")
@@ -64,7 +69,7 @@ def fetch_all_docs(solr, config):
         result_filtered = relevant_doc_keys(result, config)
         document_index[result["id"]] = result_filtered
 
-    pages = math.ceil(max_docs / docs_per_page)
+    pages = math.ceil(max_docs / docs_per_page) if docs_per_page > 0 else 1
     for i in range(1, pages):
         print(f"Fetching page {i + 1} of {pages} pages...")
         results = solr.search(
