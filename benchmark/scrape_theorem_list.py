@@ -21,7 +21,7 @@ with open(CACHE_FILE, "r") as file:
 scrape_statistics = {
     "unique_sessions": [],
     "unknown_sessions": 0,
-    "unknwon_session_urls": [],
+    "unknown_session_urls": [],
 }
 
 with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
@@ -59,10 +59,10 @@ with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as file:
         else:
             session = "?"
 
-            if href not in scrape_statistics["unknwon_session_urls"]:
+            if href not in scrape_statistics["unknown_session_urls"]:
                 scrape_statistics["unknown_sessions"] += 1
-                scrape_statistics["unknwon_session_urls"] = scrape_statistics[
-                    "unknwon_session_urls"
+                scrape_statistics["unknown_session_urls"] = scrape_statistics[
+                    "unknown_session_urls"
                 ] + [href]
 
         writer.writerow(
