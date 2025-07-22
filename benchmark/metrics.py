@@ -118,10 +118,14 @@ def calculate_mean_metrics(benchmark_results):
     # Calculate the average
     for query_type in metrics:
         for metric in metrics[query_type]:
-            metrics[query_type][metric]["average"] = (
-                metrics[query_type][metric]["total"]
-                / metrics[query_type][metric]["sample_size"]
-            )
+            # Avoid division by 0
+            if metrics[query_type][metric]["sample_size"] > 0:
+                metrics[query_type][metric]["average"] = (
+                    metrics[query_type][metric]["total"]
+                    / metrics[query_type][metric]["sample_size"]
+                )
+            else:
+                metrics[query_type][metric]["average"] = 0
             del metrics[query_type][metric]["total"]
 
     return metrics
