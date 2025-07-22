@@ -1,4 +1,4 @@
-ID,Title,Target Identifier,Theorem,Link,Session,Title query,Natural language query,Natual language query source,Skip,Annotation
+ID,Title,Target Identifier,Theorem,Link,Session,Title query,Natural language query,Natural language query source,Skip,Annotation
 square-root-of-2-is-irrational,Square Root of 2 is Irrational,"[ {""entity_kname"":""Sqrt.sqrt_prime_irrational|thm""}, {""entity_kname"": ""Sqrt.sqrt_2_not_rat|thm""}, {""entity_kname"": ""Quadratic_Irrationals.quadratic_irrational_sqrt|thm""}, {""entity_kname"": ""Quadratic_Irrationals.irrat_sqrt_nonsquare|thm""}, {""entity_kname"": ""Pell.irrat_sqrt_nonsquare|thm""}, {""entity_kname"": ""Sqrt_Script.prime_sqrt_irrational|thm""} ]","theorem sqrt_prime_irrational: ""prime p ⟹ sqrt (real p) ∉ ℚ""
 
 corollary sqrt_2_not_rat: ""sqrt 2 ∉ ℚ""
