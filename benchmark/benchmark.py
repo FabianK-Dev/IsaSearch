@@ -90,6 +90,8 @@ query_columns = [
 ]
 benchmark_results = {}
 
+random.seed(129869)
+
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     target_identifier = row["Target Identifier"]
 
@@ -169,7 +171,6 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     for query_type in query_columns:
         if query_type == "Noisy natural language query":
             query = row["Natural language query"]
-            random.seed(129869)
 
             query = query.replace("[...]", " ")
             query = re.sub(r"[\[\]\.\,\:]", " ", query)
