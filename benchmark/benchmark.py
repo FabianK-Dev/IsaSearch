@@ -219,17 +219,18 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 doc_description = result.get("llm_description")
                 doc_entity_kname = result.get("entity_kname")
 
-                res = {
-                    "rank": i + 1,
-                    "distance": distance,
-                    "id": doc_id,
-                    "entity_kname": doc_entity_kname,
-                    "embedding_string": doc_description.strip()
-                    + "\n\n"
-                    + doc_src.strip(),
-                }
+                if config["benchmark_add_top_results"]:
+                    res = {
+                        "rank": i + 1,
+                        "distance": distance,
+                        "id": doc_id,
+                        "entity_kname": doc_entity_kname,
+                        "embedding_string": doc_description.strip()
+                        + "\n\n"
+                        + doc_src.strip(),
+                    }
 
-                top_results.append(res)
+                    top_results.append(res)
 
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "metrics": {

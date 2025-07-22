@@ -24,6 +24,7 @@
         "max_tokens": 256,
         "stop": ["<END>"]
     },
+    "benchmark_add_top_results": false,
     "add_metadata": false,
     "add_user_query": true,
     "benchmark_search_refine": true,
