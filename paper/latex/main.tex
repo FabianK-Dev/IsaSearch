@@ -191,7 +191,7 @@ Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satzes, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird.
 Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind \citep[S. 2]{colangelo_comparative_2025}.
 
-Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1} \footnote{\url{https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1}}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
+Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}\footnote{\url{https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1}}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells \citep{devlin_bert_2019}, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
 Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert \citep[S. 8]{mallick_analyzing_2023}, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde \citep[S. 1]{sanh_distilbert_2020}.
 Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten \citep[S. 1]{reimers_sentence-bert_2019}.
@@ -212,7 +212,7 @@ Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachtei
 
 Diese Bachelorarbeit nutzt einen ähnlichen Ansatz, wie in der Arbeit von \citet{gao_semantic_2025} beschrieben.
 Die Autoren erstellen und evaluieren eine semantische Suchmaschine für Mathlib4, eine Bibliothek für den Theorembeweiser Lean 4, welche Sprachmodelle zum Informalisieren und Sentence-Transformer-Modelle zum Einbetten und Suchen von Theoremen in einer Vektordatenbank nutzt.
-Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beispielsweise zum Einbetten oder Informalisieren von Theoremen, wie in Abschnitt \ref{sec:informalisierung} beschrieben, gestellt werden, basieren auf Prompt-Beispielen des Repositorys \footnote{\url{https://github.com/frenzymath/LeanSearch}} der Arbeit von \citet{gao_semantic_2025}, welches unter der Apache License 2.0 lizenziert ist und aufgrund ihrer Effektivität, teilweise angepasst und übernommen wurden.
+Einige Prompt-Vorlagen, die im Rahmen dieser Bachelorarbeit Sprachmodellen, beispielsweise zum Einbetten oder Informalisieren von Theoremen, wie in Abschnitt \ref{sec:informalisierung} beschrieben, gestellt werden, basieren auf Prompt-Beispielen des Repositorys\footnote{\url{https://github.com/frenzymath/LeanSearch}} der Arbeit von \citet{gao_semantic_2025}, welches unter der Apache License 2.0 lizenziert ist und aufgrund ihrer Effektivität, teilweise angepasst und übernommen wurden.
 
 % - ein entscheidendes Problem ist, dass diese Suchmechanismen jedoch keine semantische Suche anbieten, was einige Probleme mit sich bringt:
 % - Bestehende Suchmechanismen sind beispielsweise (1) das Archive of Formal Proofs selber mit einer integrierten lexikalischen Suche, (2) FindFacts, ein Suchsystem, das auf hierarchische Suchmethoden im Archive of Formal Proofs setzt, (3) Befehle wie \texttt{find\_theorems}, die direkt in Isabelle integriert sind und (4) Unix-Kommandos wie \texttt{grep}, die zum Beispiel das Suchen mithilfe von RegEx ermöglichen.
@@ -265,7 +265,7 @@ Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theo
 Kleinere Kontextfenster bedeuten, dass mehr Prompts gleichzeitig durch das Sprachmodell verarbeitet werden können.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
-Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente \footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
+Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente\footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
 % Info: installation.py lädt automatisch die gewünschte Version herunter
@@ -283,14 +283,14 @@ Für jedes Theorem wird eine informelle Beschreibung benötigt.
 Diese sollen nur neu generiert werden, falls sich der Quelltext eines Theorems ändert oder noch keine Beschreibung existiert.
 Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokumentindex (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
 Dies wird umgesetzt indem anhand des Quelltextes jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus \citep[S. 7]{maxino_effectiveness_2009} berechnet wird.
-Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist \citep[S. 2]{maxino_effectiveness_2009}, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek \footnote{\url{https://docs.python.org/3/library/zlib.html}} implementiert ist.
+Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist \citep[S. 2]{maxino_effectiveness_2009}, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek\footnote{\url{https://docs.python.org/3/library/zlib.html}} implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
 
 Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird die Prompt, die in Abbildung \ref{fig:prompt_vorlage} gezeigt ist, bestehend aus Anweisungen an das Sprachmodell sowie dem eigentlich Quelltext des Dokuments erstellt.
 Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen dieser Metadaten die Suchqualität verbessert.
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet.
-Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM \footnote{\url{https://pypi.org/project/vllm/}} genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht \citep[S. 7]{guo_gllm_2025}.
+Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM\footnote{\url{https://pypi.org/project/vllm/}} genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht \citep[S. 7]{guo_gllm_2025}.
 Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Prompt höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
 % TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 % Vorgesehen, dass artifakte committet werden
@@ -335,14 +335,14 @@ is, \(\deg(p \cdot q) = \deg(p) + \deg(q)\).
 \subsection{Wahl des Sprachmodells}
 Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokumente und zum Umschreiben von Suchanfragen, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, genutzt wird, basiert auf dem GPQA-Benchmark, einem Datensatz mit 448 Multiple-Choice-Fragen höchster Schwierigkeit, welcher von Expertinnen und Experten in Bereichen der Biologie, Physik und Chemie erstellt wurde \citep{rein_gpqa_2023}.
 % SOURCE: https://arxiv.org/abs/2311.12022
-Zudem bietet das Open-Source-Projekt ``LLM Leaderboard`` \footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
+Zudem bietet das Open-Source-Projekt ``LLM Leaderboard``\footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
 
 Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z. B. Gemini, ChatGPT, Claude, etc.) aus.
 Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
 Zudem wurden lizenzbeschränkte Modelle (z. B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
-Beispielsweise verlangt das ``Llama 3.1 Community License Agreement`` \footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist, nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
+Beispielsweise verlangt das ``Llama 3.1 Community License Agreement``\footnote{\url{https://www.llama.com/llama3_1/license/}}, dass eine Nutzung nur möglich ist, nachdem persönliche Daten an Meta übermittelt wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
-Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct} \footnote{\url{https://huggingface.co/microsoft/Phi-3.5-mini-instruct}} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
+Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct}\footnote{\url{https://huggingface.co/microsoft/Phi-3.5-mini-instruct}} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
 % TODO: Instruct vs. Base
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
@@ -351,7 +351,7 @@ Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im
 \label{sec:einbettung_semantische_suche}
 % TODO: Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
-Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern, wird ChromaDB \footnote{\url{https://www.trychroma.com/}}, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, verwendet.
+Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern, wird ChromaDB\footnote{\url{https://www.trychroma.com/}}, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, verwendet.
 %In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
 
 Die informalisierten Dokumente werden in Form von Satzeinbettungen in einer ChromaDB-Sammlung eingebettet.
@@ -363,7 +363,7 @@ Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 %\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
-Anschließend wird mithilfe des Pakets ``Flask`` \footnote{\url{https://pypi.org/project/Flask/}} eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
+Anschließend wird mithilfe des Pakets ``Flask``\footnote{\url{https://pypi.org/project/Flask/}} eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
 Ein Problem, welches sich hierbei ergibt, ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
 Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze wenig detaillierte Suchanfragen, z. B. aus Effizienzgründen zu formulieren oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
@@ -373,7 +373,7 @@ Ebenfalls erhält das Sprachmodell in der Anweisung die Information, dass es sic
 % , Lemmas oder Korollars
 % Nutzer können das Umschreiben deaktivieren
 
-Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf} \footnote{\url{https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf}} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
+Hierfür wurde das quantisierte Sprachmodell \texttt{Phi-3-mini-4k-instruct.Q4\_0.gguf}\footnote{\url{https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf}} verwendet, da es sich aufgrund eines geringeren Ressourcenverbrauchs für eine dauerhaft im Hintergrund laufende API-Anwendung, die konstant GPU-Speicher beansprucht, eignet.
 Das Quantisieren von KI-Modellen ist eine Technik, die es erlaubt diese zu komprimieren, indem die Präzision der Modellparameter reduziert wird (z. B. 4-Bit-Integer statt 32-Bit-Float), was den Festplatten- und GPU-Speicher auf Kosten von Genauigkeitsverlust reduziert \citep{dettmers_llmint8_2022}.
 Da derzeit noch keine quantisierte Variante des Modells \texttt{Phi-3.5-mini-instruct}, das zur Informalisierung (siehe Abschnitt \ref{sec:informalisierung}) verwendet wird, von Microsoft bereitgestellt wird, muss auf das ältere Sprachmodell \texttt{Phi-3-mini-4k-instruct} zurückgegriffen werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Umschreiben der Suchanfrage durch ein Sprachmodell die Suchqualität verbessert.
@@ -400,10 +400,10 @@ Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbet
 \subsection{Aufbau des Benchmarks}
 \label{sec:aufbau_des_benchmarks}
 
-Um objektiv die Leistung der semantischen Suchmaschine zu messen, wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems`` \footnote{\url{https://www.cs.ru.nl/~freek/100/}} von Freek Wiedijk basiert.
+Um objektiv die Leistung der semantischen Suchmaschine zu messen, wurde ein Benchmark entwickelt, welches auf dem Projekt ``Formalizing 100 Theorems``\footnote{\url{https://www.cs.ru.nl/~freek/100/}} von Freek Wiedijk basiert.
 Dieses Projekt beinhaltet eine arbiträr zusammengestellte Liste von 100 Theoremen und verfolgt, wie viele davon in Beweisassistenten wie Isabelle, HOL Light oder Lean formalisiert wurden.
 Ich habe mich für diese Liste als Grundlage für das Benchmark zum Testen der Suchmaschine entschieden, da es bisher kein Benchmark speziell für Suchmaschinen für Isabelle oder das Archive of Formal Proofs gibt.
-Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks, wie beispielsweise CoqGym für Coq \footnote{\url{https://github.com/princeton-vl/CoqGym}} oder das Flyspeck-Projekt \footnote{\url{https://github.com/flyspeck/flyspeck}} für HOL Light, jedoch beinhalten diese keine annotierten Suchanfragen und eignen sich daher nicht als Benchmark für diese Bachelorarbeit.
+Für andere Theorembeweissysteme wie Coq oder HOL Light gibt es zwar Benchmarks, wie beispielsweise CoqGym für Coq\footnote{\url{https://github.com/princeton-vl/CoqGym}} oder das Flyspeck-Projekt\footnote{\url{https://github.com/flyspeck/flyspeck}} für HOL Light, jedoch beinhalten diese keine annotierten Suchanfragen und eignen sich daher nicht als Benchmark für diese Bachelorarbeit.
 Außerdem wird Freek Wiedijks ``Formalizing 100 Theorems`` in der Literatur häufig zitiert \citep{koepke_formalizing_nodate, kornilowicz_all_2017} und dient oft als Standardreferenz für die Auswahl grundlegender Theoreme, die z. B. als Benchmark verwendet werden können.
 Zudem beinhaltet die Liste ein breites Spektrum der Mathematik, wie beispielsweise Mengenlehre, Logik, Algebra oder Analysis und deckt zudem viele verschiedene Theorien des Archive of Formal Proofs ab.
 
@@ -725,7 +725,7 @@ Das folgende Beispiel demonstriert dies, indem die Eingabe einmal mit und einmal
 In Abbildung \ref{fig:metadata_vergleich} wurde die linke Ausgabe durch eine Prompt mit Titel und Zusammenfassung des Eintrags im Archive of Formal Proofs generiert, während diese bei der Prompt im rechten Beispiel weggelassen wurden.
 
 Da Sprachmodelle dazu tendieren Vermutungen über die Bedeutung des Eingabetexts zu halluzinieren, wenn zusätzlicher Kontext mit angegeben wird \citep[S. 1]{bang_hallulens_2025}, sorgt in diesem Fall die Kombination aus der Anweisung an das Sprachmodell ``[...] Please utilize the provided theorem's session metadata [...]`` und den angegebenen Metadaten dafür, dass das Sprachmodell ausschließlich die Pellsche Gleichung formuliert, weswegen Suchanfragen im Benchmark nicht das gewünschte Lemma finden.
-Das gezeigte Lemma ist Teil des Eintrags ``Pell's Equation`` \footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs. Dort wird es allerdings nur als Hilfsfunktion verwendet und steht nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang.
+Das gezeigte Lemma ist Teil des Eintrags ``Pell's Equation``\footnote{\url{https://www.isa-afp.org/entries/Pell.html}} im Archive of Formal Proofs. Dort wird es allerdings nur als Hilfsfunktion verwendet und steht nur indirekt mit dem eigentlichen Beweis der Gleichung in Zusammenhang.
 
 \subsubsection{Normalisierungseffekt durch Umschreiben der Suchanfrage}
 
