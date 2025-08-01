@@ -882,6 +882,7 @@ Wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, kann es passieren,
 Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze, wenig detaillierte Suchanfrage formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
 
 Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
+Um solche Lemmata mit einzubeziehen, könnte z. B. die Methode \texttt{Syntax.string\_of\_term} \citep[S. 100-101]{wenzel_isabelleisar_implementation} in Isabelle/ML, die Programmiersprache, in der Isabelle/HOL geschrieben wurde \citep{wenzel_isabelleisar_implementation}, innerhalb eines Beweiskontexts eines automatisch generierten Lemmas genutzt werden, um den String eines \texttt{term}-Objekts zu erhalten.
 
 \section{Zusammenfassung \& Ausblick}
 
