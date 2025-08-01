@@ -278,7 +278,7 @@ Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des 
 Ein Dokument zu informalisieren bedeutet, dass das entsprechende Theorem anhand dessen Quelltextes mithilfe eines großen Sprachmodells in eine informale Beschreibung umschrieben wird.
 %, Lemma oder Korollar
 Durch diese Beschreibungen wird die semantische Suche nach Theoremen effektiver, da Suchanfragen von Nutzern normalerweise in Alltagssprachen formuliert werden und selten den exakten formalen Syntax oder Quelltext des gesuchten Theorems beinhalten.
-Die Suche wird effektiver, da durch das semantisch äquivalente Umschreiben eines Theorems die lexikalische Überlappung zwischen der umschriebenen informalen Beschreibung und der Suchanfrage höher ist als zwischen dem Quelltext und der Suchanfrage. \citep[S. 1]{jagerman_query_2023}
+Die Suche wird effektiver, da durch das semantisch äquivalente Umschreiben eines Theorems die lexikalische Überlappung zwischen der umschriebenen informalen Beschreibung und der Suchanfrage höher ist als zwischen dem Quelltext und der Suchanfrage \citep[S. 1]{jagerman_query_2023}.
 % evtl Beispiel?
 
 Für jedes Theorem wird eine informelle Beschreibung benötigt.
@@ -361,7 +361,7 @@ Eine ChromaDB-Sammlung ist eine gruppierte Menge an Einbettungen und ist verglei
 Hierfür wird für jedes Dokument ein String bestehend aus einer Prompt, der informalen Beschreibung sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 Die vorangestellte Prompt fordert das Sentence-Transformer-Sprachmodell dazu auf, eine Repräsentation aus natürlicher Sprache und formaler Isabelle/HOL-Syntax zu erzeugen, um semantisch ähnliche Aussagen auffinden zu können.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
-Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen verbessert \citep{su_one_nodate}, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
+Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen, also für ein Sprachmodell unbekannte Situationen, die nicht explizit Teil von dessen Training waren \citep[S. 1]{wang_zero_shot_2019}, verbessert \citep{su_one_nodate}, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 %\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
