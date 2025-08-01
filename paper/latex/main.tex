@@ -125,7 +125,7 @@ Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, w
 \begin{enumerate}
   \item Beispielsweise finden die genannten Suchwerkzeuge nicht das gewünschte Theorem, wenn die Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem zugehörigen Eintrag im Archive of Formal Proofs formuliert sind. %Beispiel
 
-  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d.h. relevantere Suchergebnisse sind nicht als relevanter erkennbar als irrelevantere.
+  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d. h. relevantere Suchergebnisse sind nicht als relevanter erkennbar als irrelevantere.
 
   \item Nutzer empfinden es außerdem als schwierig herauszufinden, ob ein Theorem, das sie suchen, bereits im Archive of Formal Proofs vorhanden ist \citep[S. 6]{mackenzie_evaluation_2021}.
 \end{enumerate}
@@ -208,7 +208,7 @@ Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionswe
   \item \textbf{FindFacts:} FindFacts ist eine externe webbasierte Suchmaschine mit Drilldown-Funktionalität für formale Inhalte in Isabelle-Theorien, die Apache Solr\footnote{\url{https://solr.apache.org/}} nutzt. Bei Suchanfragen durchsucht es einen zuvor erstellten Suchindex, der eine Auswahl an Isabelle-Theorien, z. B. alle Theorien aus dem Archive of Formal Proofs, beinhalten kann. Anders als \texttt{find\_theorems} erfordert es nicht, dass alle Theorieinhalte gleichzeitig in den Arbeitsspeicher geladen werden und ist dadurch skalierbarer \citep{huch_findfacts_2022}.
 \end{itemize}
 
-Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachteile: (1) Die Suchmaschinen basieren rein auf lexikalischer Übereinstimmung, was bedeutet, dass für eine Suchanfrage Einträge nur als Suchergebnis eingeschlossen werden, wenn der eingegebene Suchbegriff exakt vorkommt. Synonyme, Tippfehler oder kleinste Abweichungen der Suchbegriffe sorgen dafür, dass ein Eintrag nicht als Suchergebnis aufgefunden wird. (2) Es findet zudem kein semantisches Verständnis der Suchbegriffe oder der Einträge statt, d.h. Wörter werden nur einzelnen betrachtet ohne Beachtung ihres Kontexts, also beispielsweise ihrer Nachbarwörter. % Brauch ich hierfür eine Quelle?
+Alle drei genannten Suchmechanismen haben zusätzlich zwei entscheidende Nachteile: (1) Die Suchmaschinen basieren rein auf lexikalischer Übereinstimmung, was bedeutet, dass für eine Suchanfrage Einträge nur als Suchergebnis eingeschlossen werden, wenn der eingegebene Suchbegriff exakt vorkommt. Synonyme, Tippfehler oder kleinste Abweichungen der Suchbegriffe sorgen dafür, dass ein Eintrag nicht als Suchergebnis aufgefunden wird. (2) Es findet zudem kein semantisches Verständnis der Suchbegriffe oder der Einträge statt, d. h. Wörter werden nur einzelnen betrachtet ohne Beachtung ihres Kontexts, also beispielsweise ihrer Nachbarwörter. % Brauch ich hierfür eine Quelle?
 
 Diese Bachelorarbeit nutzt einen ähnlichen Ansatz, wie in der Arbeit von \citet{gao_semantic_2025} beschrieben.
 Die Autoren erstellen und evaluieren eine semantische Suchmaschine für Mathlib4, eine Bibliothek für den Theorembeweiser Lean 4, welche Sprachmodelle zum Informalisieren und Sentence-Transformer-Modelle zum Einbetten und Suchen von Theoremen in einer Vektordatenbank nutzt.
@@ -262,7 +262,7 @@ Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüf
 Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
 
 Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theoremquelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
-Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theoremquelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er die maximal notwendige Anzahl an Tokens für eine Prompt speichert, d.h. es wird beim Informalisieren keine Prompt geben, die mehr Tokens als dieser berechnete Wert benötigt.
+Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theoremquelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er die maximal notwendige Anzahl an Tokens für eine Prompt speichert, d. h. es wird beim Informalisieren keine Prompt geben, die mehr Tokens als dieser berechnete Wert benötigt.
 Das Kontextfenster, also die Anzahl an Tokens, die eine Prompt maximal lang sein darf, muss vor dem Generieren der Antworten durch das Sprachmodell festgelegt werden.
 Je kleiner dieses Kontextfenster ist, desto mehr Prompts können gleichzeitig durch das Sprachmodell verarbeitet werden.
 
