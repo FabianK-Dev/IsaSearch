@@ -583,7 +583,7 @@ $$IDCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
 wobei $R^*$ die Menge aller relevanter Suchergebnisse für eine Suchanfrage ist und $r_i \in \{0, 1\}$ wiederum angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist.
 Der Normalized Discounted Cumulative Gain wird nun als
 $$NDCG = \frac{DCG}{IDCG}$$
-berechnet \citep[S. 6]{gao_semantic_2025} \citep[S. 6]{brama_evaluation_2023}. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim reziproken Rang werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
+berechnet \citep[S. 6]{gao_semantic_2025} \citep[S. 6]{brama_evaluation_2023}. Durch das Normalisieren des Discounted Cumulative Gain wird sichergestellt, dass der berechnete Wert zwischen 0 und 1 liegt und verschiedene Suchanfragen mit einer unterschiedlichen Menge an relevanten Ergebnissen vergleichbar sind. Ähnlich wie beim Reciprocal Rank werden relevante Suchergebnisse mit einem hohen Rang belohnt. Relevante Suchergebnisse mit einem niedrigeren Rang fallen aufgrund der logarithmischen Berechnung $log_2(i+1)$ weniger ins Gewicht.
 
 Neben den genannten Metriken werden zusätzlich auch der Rang des ersten relevanten Suchergebnisses sowie die Suchdauer für jede Suchanfrage gespeichert.
 Der Rang alleine ist jedoch nicht aussagekräftig, weil er nicht die Relevanz der übrigen Suchergebnisse beachtet und nicht robust gegenüber Ausreißern ist, sondern dient daher lediglich der Veranschaulichung.
@@ -672,7 +672,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 \end{table}
 %TC:endignore
 
-Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist, wass suggeriert, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprüngliche Suchanfrage einzeln gesucht wird.
+Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist, was suggeriert, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprüngliche Suchanfrage einzeln gesucht wird.
 Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
 
 Suchanfragen, welche durch das Sprachmodell umschrieben werden, dauern jedoch durchschnittlich etwa 1,5 Sekunden pro Anfrage, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
