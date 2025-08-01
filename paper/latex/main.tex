@@ -203,7 +203,7 @@ Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionswe
 \begin{itemize}
   \item \textbf{Suchmaschine des Archive of Formal Proofs:} Die offizielle Webseite des Archive of Formal Proofs bietet eine Volltextsuche auf Client-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Autoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statisch gehostet werden und erfordert keine serverseitige REST-API. Nachteilhaft ist hierbei, dass ausschließlich die Metadaten eines Eintrags, nicht aber die im Eintrag beinhalteten Theoreme oder dessen Quelltext durchsucht werden \citep[S. 3-5]{mackenzie_re-imagining_2022}.
 
-  \item \textbf{\texttt{find\_theorems}-Kommando:} Das in Isabelle eingebaute Kommando \texttt{find\_theorems} durchsucht formale Inhalte wie Theoreme, Lemmata oder Konstanten, jedoch nur in Theorien, die durch das Kommando \texttt{imports} in die aktuelle Theorie importiert wurden. \texttt{find\_theorems} wird hierbei verwendet, indem nach Namen, Typ oder einem gewissen Termmuster eines Theorems, gefiltert werden kann. Um auf diese Weise jedoch das gesamte Archive of Formal Proofs zu durchsuchen, müsste dieses komplett in die aktuelle Theorie geladen werden, was mit einem großen Arbeitsspeicherverbrauch verbunden wäre und damit in der Praxis zum Durchsuchen des gesamten Archive of Formal Proofs unbrauchbar ist \citep[S. 68]{wenzel_isabelleisar_nodate}.
+  \item \textbf{\texttt{find\_theorems}-Kommando:} Das in Isabelle eingebaute Kommando \texttt{find\_theorems} durchsucht formale Inhalte wie Theoreme, Lemmata oder Konstanten, jedoch nur in Theorien, die durch das Kommando \texttt{imports} in die aktuelle Session importiert wurden. \texttt{find\_theorems} wird hierbei verwendet, indem nach Namen, Typ oder einem gewissen Termmuster eines Theorems, gefiltert werden kann. Um auf diese Weise jedoch das gesamte Archive of Formal Proofs zu durchsuchen, müsste dieses komplett in die aktuelle Session geladen werden, was mit einem großen Arbeitsspeicherverbrauch verbunden wäre und damit in der Praxis zum Durchsuchen des gesamten Archive of Formal Proofs unbrauchbar ist \citep[S. 68]{wenzel_isabelleisar_nodate}.
 
   \item \textbf{FindFacts:} FindFacts ist eine externe webbasierte Suchmaschine mit Drilldown-Funktionalität für formale Inhalte in Isabelle-Theorien, die Apache Solr \citep{solr} nutzt. Bei Suchanfragen durchsucht es einen zuvor erstellten Suchindex, der eine Auswahl an Isabelle-Theorien, z. B. alle Theorien aus dem Archive of Formal Proofs, beinhalten kann. Anders als \texttt{find\_theorems} erfordert es nicht, dass alle Theorieinhalte gleichzeitig in den Arbeitsspeicher geladen werden und ist dadurch skalierbarer \citep{huch_findfacts_2022}.
 \end{itemize}
@@ -228,10 +228,13 @@ Das Programm stellt eine REST-API bereit, welche Suchanfragen akzeptiert.
 Ein Sprachmodell umschreibt eingehende Suchanfragen, die in Form eines Vektors eingebettet werden.
 Mithilfe der euklidischen Distanz können dann die semantisch ähnlichsten Theoreme zur Suchanfrage gesucht und zurückgegeben werden.
 
+Abbildung \ref{fig:systemarchitektur_uml} verdeutlicht den beschriebenen Aufbau der Anwendung in einem UML-Diagram, welches die genannten Komponenten und deren Beziehungen miteinander zeigt.
+
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=\textwidth]{plant_uml.jpg}
   \caption{Systemarchitektur der semantischen Suchmaschine}
+  \label{fig:systemarchitektur_uml}
 \end{figure}
 
 \subsection{Programmaufbau}
