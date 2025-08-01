@@ -260,9 +260,11 @@ Nach erfolgreichem Erstellen des Suchindexes wird dieser standardmäßig im Verz
 Beim Programmstart wird zunächst die Konfiguration aus der Datei \texttt{config.json} geladen, die Parameter wie z. B. KI-Modellnamen oder die URL zur laufenden Solr-Instanz beinhaltet.
 Mithilfe dieser URL verbindet sich das Programm mit der Solr-Datenbank und prüft, ob diese vollständig und erfolgreich gestartet wurde.
 Außerdem werden alle Prompts, die als Vorlage im Ordner \texttt{prompts} gespeichert sind und später für Eingaben an das Sprachmodell verwendet werden, geladen.
+
 Um die größtmögliche Anzahl benötigter Tokens für eine Prompt an das Sprachmodell berechnen zu können, wird das in der Konfiguration spezifizierte Transformer-Modell als Tokenisierer geladen, für jede Kombination aus Prompt und Theoremquelltext die Anzahl benötigter Tokens berechnet und der größte Wert gespeichert.
-Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theoremquelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er das größtmögliche Kontextfenster pro Prompt festlegt.
-Kleinere Kontextfenster bedeuten, dass mehr Prompts gleichzeitig durch das Sprachmodell verarbeitet werden können.
+Dieser Wert dient der effizienten Parallelisierung beim Informalisieren der Theoremquelltexte, was in Abschnitt \ref{sec:informalisierung} beschrieben wird, da er die maximal notwendige Anzahl an Tokens für eine Prompt speichert, d.h. es wird beim Informalisieren keine Prompt geben, die mehr Tokens als dieser berechnete Wert benötigt.
+Das Kontextfenster, also die Anzahl an Tokens, die eine Prompt maximal lang sein darf, muss vor dem Generieren der Antworten durch das Sprachmodell festgelegt werden.
+Je kleiner dieses Kontextfenster ist, desto mehr Prompts können gleichzeitig durch das Sprachmodell verarbeitet werden.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
 Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente\footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
