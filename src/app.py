@@ -4,7 +4,7 @@ app.py: This module initializes all required components, i.e. Solr, tokenizer, p
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
 - Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
-- document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma or corollary) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
+- document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
 - document_descriptions: Loads or generates an informal description for each document using vLLM to allow more effective search with informal user queries
 - ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
 - LLM: Loads the configured LLM to refine user queries

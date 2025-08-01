@@ -59,7 +59,7 @@ def fetch_all_docs(solr, config):
 
     docs_per_page = 10000
     results = solr.search(
-        "command:theorem OR command:lemma OR command:corollary",
+        "command:theorem OR command:lemma OR command:corollary OR command:proposition",
         start=0,
         rows=docs_per_page,
     )
@@ -73,7 +73,7 @@ def fetch_all_docs(solr, config):
     for i in range(1, pages):
         print(f"Fetching page {i + 1} of {pages} pages...")
         results = solr.search(
-            "command:theorem OR command:lemma OR command:corollary",
+            "command:theorem OR command:lemma OR command:corollary OR command:proposition",
             start=i * docs_per_page,
             rows=docs_per_page,
         )
