@@ -449,7 +449,7 @@ Diese Liste legt fest, welche Suchergebnisse für eine Suchanfrage als korrekt g
 Theoreme können zudem im Benchmark deaktiviert oder übersprungen werden, indem in der Spalte ``Skip`` für die entsprechende Zeile ``true`` eingetragen wird.
 In diesem Fall wird das Theorem im Benchmark-Durchlauf ausgelassen und, falls in der Spalte ``Annotation`` ein Grund angegeben ist, dieser auf der Konsole ausgegeben.
 
-Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems weder \texttt{theorem}, \texttt{lemma} noch \texttt{corollary} lautet und damit nicht in den Dokumentindex aufgenommen wurde.
+Insgesamt prüft das Benchmark auf 93 Theoreme, mit jeweils drei verschiedenen Suchanfragen. Acht dieser Theoreme müssen jedoch übersprungen werden, da diese entweder nicht mehr im Archive of Formal Proofs existieren, beispielsweise, weil sie entfernt oder überarbeitet wurden oder weil der verwendete Beweiskommando-Typ des Zieltheorems weder \texttt{theorem}, \texttt{lemma}, \texttt{corollary} noch \texttt{proposition} lautet und damit nicht in den Dokumentindex aufgenommen wurde.
 
 \begin{table}[H]
 \centering
@@ -570,7 +570,7 @@ Zum Beispiel wird für Hit@10 ein erster relevanter Treffer auf Platz 11 genauso
 Aus diesem Grund werden zusätzliche Metriken, wie der \textit{Reciprocal Rank} (RR) und der \textit{Normalized Discounted Cumulative Gain} (NDCG) verwendet, da diese auch die genaue Position und Reihenfolge relevanter Ergebnisse in der Ergebnisliste beachten.
 Der Reciprocal Rank sei definiert als:
 $$RR = \frac{1}{r^*}$$
-wobei $r^*$ das erste relevante Suchergebnis und $R$ eine Liste an Suchergebnissen für eine Suchanfrage sind \citep[S. 6]{brama_evaluation_2023}.
+wobei $r^*$ das erste relevante Suchergebnis für eine Suchanfrage ist \citep[S. 6]{brama_evaluation_2023}.
 Der Reciprocal Rank bewertet Suchanfragen, die ein relevantes Dokument weit vorne in der Liste der Suchergebnisse platzieren, positiv.
 Unterschiede zwischen Treffern auf niedrigeren Rängen fallen hingegen weniger ins Gewicht.
 Dabei gilt jedoch außerdem, dass der Reciprocal Rank nur den Rang des ersten Treffers und die Positionen späterer Treffer unberücksichtigt bleiben.
