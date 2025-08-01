@@ -889,6 +889,9 @@ In dieser Bachelorarbeit wurde eine semantische Theoremsuchmaschine für Isabell
 Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und einer Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
 Die besten Suchergebnisse erzielt die Strategie, die die Suchanfrage umschreibt und mit der originalen Suchanfrage konkateniert, jedoch keine Metadaten einschließt, da diese die Informalisierung verschlechtern, indem sie das Sprachmodell vom eigentlichen Theoreminhalt ``ablenken``.
 
+Insgesamt ist die Suchmaschine sehr effektiv bei klar formulierten Suchanfragen wie Titel-Suchanfragen (vgl. $\text{Hit@10}=0,835$) oder Suchanfragen in natürlicher Sprache (vgl. $\text{Hit@10}=0,824$) ohne Tippfehler.
+Die Suchmaschine ist relativ robust gegenüber verrauschten Suchanfragen (vgl. $\text{Hit@10}=0,659$), muss jedoch leichte Qualitätseinbußen der Suchergebnisse hinnehmen.
+
 Zukünftige Arbeiten sollten die genannten Hardwareeinschränkungen überwinden und das Suchsystem mit größeren und leistungsstärkeren Sprachmodellen (z. B. DeepSeek-R1) oder proprietären Modellen (z. B. Gemini 2.5 Pro) evaluieren, da diese laut des GPQA-Benchmarks besser abschneiden und eventuell auch Theoreme besser informalisieren oder Suchanfragen effektiver umschreiben.
 
 Ebenfalls könnte die Web-Benutzeroberfläche der Suchmaschine erweitert werden, indem Nutzer bei Suchanfragen gezielt nach Feedback zur Qualität der Suchergebnisse gefragt werden, was dazu genutzt werden könnte, um (1) das Sentence-Transformer-Modell durch Fine-Tuning weiter zu verbessern und (2) eine noch realistischere Evaluation der Suchmaschine zu ermöglichen.
