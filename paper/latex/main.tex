@@ -397,6 +397,19 @@ Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbet
 % FRAGE: Soll ich Embedding oder Einbettung sagen?
 % - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
 
+\subsection{Web-Benutzeroberfläche \& REST-API}
+
+Neben der REST-API, welche bereits in Abschnitt \ref{sec:programmaufbau} beschrieben wurde, habe ich zudem eine Web-Benutzeroberfläche erstellt.
+Nutzer können dort beliebige Suchanfragen nach Theoremen, beispielsweise in Form von Umschreibungen oder Formeln suchen.
+Um die Suchgeschwindigkeit zu erhöhen, können Nutzer das Umschreiben von Suchanfragen deaktivieren, was jedoch, wie in Abschnitt \ref{sec:ergebnis_und_analyse} gezeigt, zu einem Qualitätsverlust der Suchergebnisse führt.
+Zwar werden Theoreme durch das Sprachmodell in Englisch informalisiert, wenn jedoch das Umschreiben von Suchanfragen aktiviert ist, können Suchen auch effektiv in anderen Sprachen als Englisch formuliert werden, da das Sprachmodell die Suchanfragen wiederum auf Englisch umschreibt.
+
+Nutzer bekommen zudem die Umschreibung ihrer Suchanfrage, sofern dies aktiviert ist, sowie die Informalisierung jedes Theorems in den Suchergebnissen angezeigt, was zudem dabei helfen kann die Bedeutung eines Theorems schneller zu verstehen.
+Da die Umschreibung der Suchanfrage und die Informalisierung jedoch KI-generiert sind und Sprachmodelle Fehler machen können, bekommen Nutzer bei der ersten Suchanfrage immer eine entsprechende Warnung angezeigt.
+
+Als Framework wurde das Open-Source CSS-Framework Bootstrap\footnote{\url{https://getbootstrap.com/}} gewählt, da dieses bereits viele vorgefertigte Stylesheets (z. B. für Navigationsleisten, Schaltflächen, Formulare, etc.) enthält.
+In Abschnitt \ref{sec:screenshot_webseite} des Appendix sind Screenshots der Web-Benutzeroberfläche zu finden.
+
 \section{Benchmark}
 
 \subsection{Aufbau des Benchmarks}
