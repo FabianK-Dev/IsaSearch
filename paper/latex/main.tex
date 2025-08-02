@@ -407,6 +407,12 @@ Zwar werden Theoreme durch das Sprachmodell in Englisch informalisiert, wenn jed
 Nutzer bekommen zudem die Umschreibung ihrer Suchanfrage, sofern dies aktiviert ist, sowie die Informalisierung jedes Theorems in den Suchergebnissen angezeigt, was zudem dabei helfen kann die Bedeutung eines Theorems schneller zu verstehen.
 Da die Umschreibung der Suchanfrage und die Informalisierung jedoch KI-generiert sind und Sprachmodelle Fehler machen können, bekommen Nutzer bei der ersten Suchanfrage immer eine entsprechende Warnung angezeigt.
 
+Die REST-API kann unter folgendem Endpoint erreicht werden:
+\begin{verbatim}
+GET /search?query={suchanfrage}&refine_query={true/false}
+\end{verbatim}
+wobei \texttt{\{suchanfrage\}} die Suchanfrage ist und mithilfe des Parameters \texttt{refine\_query} das Umschreiben von Suchanfragen aktiviert oder deaktiviert werden kann.
+
 Als Framework wurde das Open-Source CSS-Framework Bootstrap\footnote{\url{https://getbootstrap.com/}} gewählt, da dieses bereits viele vorgefertigte Stylesheets (z. B. für Navigationsleisten, Schaltflächen, Formulare, etc.) enthält.
 In Abschnitt \ref{sec:screenshot_webseite} des Appendix ist ein Screenshot der Web-Benutzeroberfläche zu finden.
 
