@@ -9,8 +9,6 @@ Let people know what your project can do specifically. Provide context and add a
 
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
-
-**If you want to run this application using Docker (recommended):**
 - [Docker](https://docs.docker.com/engine/install/)
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
@@ -18,15 +16,13 @@ Let people know what your project can do specifically. Provide context and add a
 - a NVIDIA GPU that supports CUDA
 - [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
 
-**If you want to run this application locally without Docker:**
-- Java Runtime Environment version 17 or higher
-- Apache Solr version 9.8.1 or higher
-
 ## Setup
 
-### Quickstart (pulling and running the Docker image)
+This installation guide requires the usage of Docker because it ensures containerization and reproducibility. Additionally, it doesn't require having Solr and Java installed and provides more security, because the Solr database and ChromaDB collections are only accessible inside the Docker container. You can either directly pull and run the Docker image or build and run the Docker image locally.
 
-The advantage of pulling and running the Docker image is that all requirements (inside the Docker image) such as Solr, Python, etc. will automatically be met and all modules, such as ChromaDB collections will be included.
+### Pulling and running the Docker image
+
+The advantage of pulling and running the Docker image is that all requirements (inside the Docker image) such as Solr, Python, etc. will automatically be met and all modules, such as ChromaDB collections will be included. Personally, I recommend this method.
 
 > ⚠️ **Warning:** The docker image is very large (33.9 GB) because it already contains pre-generated LLM informalizations of all ~310,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
 
@@ -50,8 +46,6 @@ This command will redirect port 5000 inside the Docker container onto your compu
 When the application finished starting up, you can open the website at http://localhost:5000/.
 
 > ⚠️ **Warning:** If the NVIDIA Container Toolkit has not been installed correctly, a GPU that does not support CUDA is used or a NVIDIA driver with an incompatible CUDA version has been installed, the application will automatically fallback to using the CPU, instead. As a result, search queries will take much longer (~20 seconds on an Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz) to process due to slow LLM text generation.
-
-### Standalone installation (without Docker)
 
 ### Building and running the Docker image locally
 
