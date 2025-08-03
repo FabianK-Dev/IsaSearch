@@ -26,6 +26,8 @@ Let people know what your project can do specifically. Provide context and add a
 
 ### Quickstart (pulling and running the Docker image)
 
+The advantage of pulling and running the Docker image is that all requirements (inside the Docker image) such as Solr, Python, etc. will automatically be met and all modules, such as ChromaDB collections will be included.
+
 > ⚠️ **Warning:** The docker image is very large (33.9 GB) because it already contains pre-generated LLM informalizations of all ~310,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
 
 In order to pull the Docker image from https://gitlab.lrz.de, you have to authenticate Docker first, if you haven't already. If you can't authenticate with GitLab, please refer to [Building the Docker image locally](#building-the-docker-image-locally):
@@ -41,16 +43,29 @@ Next, to pull and run the latest Docker image, simply run:
 ```bash
 docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
-
 Alternatively, you can also find this command in `docker_run.sh`.
 
 This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image.
 
 When the application finished starting up, you can open the website at http://localhost:5000/.
 
+> ⚠️ **Warning:** If the NVIDIA Container Toolkit has not been installed correctly, a GPU that does not support CUDA is used or a NVIDIA driver with an incompatible CUDA version has been installed, the application will automatically fallback to using the CPU, instead. As a result, search queries will take much longer (~20 seconds on an Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz) to process due to slow LLM text generation.
+
 ### Standalone installation (without Docker)
 
-### Building the Docker image locally
+### Building and running the Docker image locally
+
+Building and running the Docker image locally can be easily done by running:
+
+```bash
+cp .gitignore .dockerignore
+echo "" >> .dockerignore
+echo "Dockerfile" >> .dockerignore
+
+docker build -t gitlab.lrz.de:5005/kadlez/afp-ai-search .
+docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
+```
+Alternatively, you can also find these commands in `docker_build.sh` and `docker_run.sh`.
 
 ## Output
 
