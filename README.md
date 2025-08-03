@@ -26,9 +26,23 @@ Let people know what your project can do specifically. Provide context and add a
 
 ### Quickstart (pulling and running the Docker image)
 
+In order to pull the Docker image from https://gitlab.lrz.de, you have to authenticate Docker first, if you haven't already. If you can't authenticate with GitLab, please refer to [Building the Docker image locally](#building-the-docker-image-locally):
+
+```bash
+docker login gitlab.lrz.de:5005
+```
+
+Please enter the same username and password that you also you to log in at https://gitlab.lrz.de.
+
+Next, to pull and run the latest Docker image, simply run:
+
 ```bash
 docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
+
+Alternatively, you can also find this command in `docker_run.sh`.
+
+This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image.
 
 ### Standalone installation (without Docker)
 
