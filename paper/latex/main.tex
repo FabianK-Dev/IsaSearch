@@ -133,7 +133,7 @@ Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, w
 Auf der anderen Seite stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können \citep{jain_llm_2024}.
 
 \subsection{Zielsetzung \& Forschungsfragen}
-Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata und Korollaren im Archive of Formal Proofs zu entwickeln und zu evaluieren.
+Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata, Korollaren und Propositionen im Archive of Formal Proofs zu entwickeln und zu evaluieren.
 Außerdem sollen verschiedene Suchstrategien, z. B. das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen oder die Integration von Metadaten, geprüft werden, woraufhin eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks sowie eine Analyse des erzielten Ergebnisses stattfindet.
 
 Die folgenden Forschungsfragen werden in dieser Bachelorarbeit beantwortet:
@@ -267,7 +267,7 @@ Das Kontextfenster, also die Anzahl an Tokens, die eine Prompt maximal lang sein
 Je kleiner dieses Kontextfenster ist, desto mehr Prompts können gleichzeitig durch das Sprachmodell verarbeitet werden.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
-Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente\footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata und Korollaren (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
+Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente\footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata, Korollaren und Propositionen (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
 % Info: installation.py lädt automatisch die gewünschte Version herunter
