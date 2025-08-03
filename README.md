@@ -2,19 +2,37 @@
 
 >An AI-assisted semantic theorem finder for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs.
 
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
 ## Description
 Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+
+## Requirements
+
+- [Python](https://www.python.org/downloads/) 3.11.2 or higher
+- [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
+
+**If you want to run this application using Docker (recommended):**
+- [Docker](https://docs.docker.com/engine/install/)
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+
+**If you want to run this application using the GPU (highly recommended):**
+- a NVIDIA GPU that supports CUDA
+- [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
+
+**If you want to run this application locally without Docker:**
+- Java Runtime Environment version 17 or higher
+- Apache Solr version 9.8.1 or higher
+
+## Setup
+
+### Quickstart (pulling and running the Docker image)
+
+```bash
+docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
+```
+
+### Standalone installation (without Docker)
+
+### Building the Docker image locally
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
