@@ -886,19 +886,18 @@ Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_
 Obwohl die semantische KI-Suche vielversprechende Benchmark-Ergebnisse aufweist, unterliegt das Suchsystem trotzdem einigen Einschränkungen, die bei der Interpretation, Anwendung und für zukünftige Verbesserungen beachtet werden sollten.
 
 Zum einen war die Entwicklung der Suchmaschine und das Benchmarking hardwaretechnisch beschränkt, da die verwendete Grafikkarte, eine NVIDIA GeForce RTX 4070, nur über 12 GB VRAM verfügt.
-Dadurch konnten leistungsstärkere Sprachmodelle mit einer höheren Parameterzahl (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.), die mehr VRAM benötigten, nicht verwendet und getestet werden.
+So war es nicht möglich, leistungsstärkere Sprachmodelle mit einer höheren Parameterzahl (wie DeepSeek-R1, Llama 4, Qwen3 usw.), die mehr VRAM benötigten, zu verwenden und zu testen.
 
-Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen sowie das Umschreiben von Suchanfragen erheblich länger dauert.
-Ich empfehle daher, die semantische Suchmaschine nicht ohne eine verfügbare Grafikkarte produktiv einzusetzen.
+Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen sowie das Umschreiben von Suchanfragen erheblich länger dauert, weswegen die semantische Suchmaschine nicht ohne eine Grafikkarte produktiv eingesetzt werden sollte.
 
-Eine weitere Limitation ist, dass das Benchmark nur von einer Person erstellt und annotiert wurde.
+Eine weitere Einschränkung besteht darin, dass das Benchmark nur von einer einzelnen Person erstellt und annotiert wurde.
 Dies erhöht das Risiko von Voreingenommenheit oder Fehlern, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
 
 Darüber hinaus beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
 Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur sind, abschneidet.
 
 Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorems und (2) der Umschreibung der Suchanfrage durch das Sprachmodell.
-Wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, kann es passieren, dass Sprachmodelle Inhalte eines Textes halluzinieren oder falsch interpretieren.
+Es kann zudem passieren, dass Sprachmodelle, wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, Inhalte eines Textes halluzinieren oder falsch interpretieren.
 Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze, wenig detaillierte Suchanfrage formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
 
 Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
