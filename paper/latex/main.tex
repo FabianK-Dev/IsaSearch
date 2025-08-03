@@ -694,7 +694,7 @@ Verrauschte natürliche Sprache & 0,565 & 0,390 & 0,363 & 31,459 & 0,000 \\
 %TC:endignore
 
 Das Benchmark zeigt, dass die Suchstrategie, die durch das Sprachmodell umschriebene Suchanfragen und ursprüngliche Nutzereingaben konkateniert, jedoch Dokumente ohne Metadaten informalisiert, die besten Suchergebnisse aufweist, was suggeriert, dass das Umschreiben der Suchanfrage durch das Sprachmodell korrekt dessen semantische Bedeutung widergibt und bessere Suchergebnisse liefert als wenn nur die ursprüngliche Suchanfrage einzeln gesucht wird.
-Durch das Konkatenieren mit der originalen Nutzereingabe wird sichergestellt, dass spezifische Wörter, beispielsweise Funktionsnamen, beibehalten werden, was die Suchqualität wiederum verbessert.
+Durch das Einfügen der Nutzereingabe vor die Sprachmodellumschreibung werden semantisch aussagekräftige Begriffe der Nutzeranfrage, beispielsweise Theoremnamen, die einen direkten Hinweis auf das gesuchte Theorem enhalten können, in die Suche mit eingeschlossen, was die Suchqualität wiederum verbessert.
 
 Suchanfragen, welche durch das Sprachmodell umschrieben werden, dauern jedoch durchschnittlich etwa 1,5 Sekunden pro Anfrage, da das Umschreiben, welches diese Latenz erzeugt, zur Laufzeit erfolgt.
 Die Strategie, welche nur die ursprüngliche Nutzereingabe verwendet und diese nicht durch ein Sprachmodell umschreibt, bietet auf der anderen Seite eine erheblich schnellere durchschnittliche Suchzeit von unter 0,001 Sekunden und erzielt mit einem NDCG von 0,459 trotzdem eine akzeptable Leistung.
