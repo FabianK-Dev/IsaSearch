@@ -191,7 +191,7 @@ Sentence-Transformer sind Transformer-Modelle, bei denen ganze Sätze oder Texte
 In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satzes, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird.
 Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantische Bedeutung, auch wenn sie anders formuliert sind \citep[S. 2]{colangelo_comparative_2025}.
 
-Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos-v1}\footnote{\url{https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1}}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähnlichkeitssuchen optimiert wurde.
+Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos\-v1}\footnote{\url{https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1}}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähn\-lich\-keits\-su\-chen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells \citep{devlin_bert_2019}, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
 Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert \citep[S. 8]{mallick_analyzing_2023}, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde \citep[S. 1]{sanh_distilbert_2020}.
 Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten \citep[S. 1]{reimers_sentence-bert_2019}.
@@ -267,7 +267,7 @@ Das Kontextfenster, also die Anzahl an Tokens, die eine Prompt maximal lang sein
 Je kleiner dieses Kontextfenster ist, desto mehr Prompts können gleichzeitig durch das Sprachmodell verarbeitet werden.
 
 Als nächstes wird geprüft, ob sich im Wurzelverzeichnis eine zuvor gespeicherte Sammlung an Theoremen in Form von Solr-Dokumenten, hier als Dokumentindex bezeichnet, im Verzeichnis \texttt{.cache} befindet.
-Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente\footnote{\url{https://solr.apache.org/guide/solr/latest/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata, Korollaren und Propositionen (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
+Falls kein solcher Cache vorhanden ist, werden alle relevanten Solr-Dokumente\footnote{\url{https://solr.apache.org/guide/solr/9_9/getting-started/documents-fields-schema-design.html}} mit Theoremen, Lemmata, Korollaren und Propositionen (fortan als ``Dokumente`` abgekürzt) aus der Solr-Datenbank geladen und in einem neuen Dokumentindex gespeichert.
 In diesem Schritt werden ebenfalls für jedes Dokument die Metadaten wie Titel und Zusammenfassung des Eintrags, in dem das Dokument im Archive of Formal Proofs vorkommt, extrahiert.
 Voraussetzung hierfür ist, dass eine lokale Kopie der gewünschten Version des Repositorys des Archive of Formals Proofs bereits vorab heruntergeladen wurde und sich im Ordner befindet, welcher in der Konfiguration festgelegt wurde.
 % Info: installation.py lädt automatisch die gewünschte Version herunter
@@ -794,7 +794,6 @@ Die Annahme ist, dass das Umschreiben der Suchanfrage, unabhängig davon ob sie 
 \justifying
 %TC:endignore
 
-Es ist erkennbar, dass beide Umschreibungen semantisch sehr ähnlich sind, obwohl die Formulierungen der Suchanfragen unterschiedlich sind.
 Obwohl die Formulierungen der Suchanfragen unterschiedlich sind, ist erkennbar, dass beide Umschreibungen hingegen semantisch sehr ähnlich sind.
 Dieser Normalisierungseffekt wirkt am stärksten für Theoreme mit hoher Bekanntheit (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, Fundamentalsatz der Analysis, etc.), die oft in der Literatur erwähnt werden. %Quelle?
 Grund dafür ist, dass diese Theoreme mit hoher Wahrscheinlichkeit Teil der Trainingsdaten des Sprachmodells \citep[S. 1]{abdin_phi-3_2024} sind, was es diesem erleichtert Umschreibungen dieser in natürlicher Sprache zu erkennen und zuzuordnen.
