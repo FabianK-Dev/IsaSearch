@@ -20,13 +20,17 @@ Let people know what your project can do specifically. Provide context and add a
 
 This installation guide requires the usage of Docker because it ensures containerization and reproducibility. Additionally, it doesn't require having Solr and Java installed and provides more security, because the Solr database and ChromaDB collections are only accessible inside the Docker container. You can either directly pull and run the Docker image or build and run the Docker image locally.
 
+Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. This is why I decided to provide tar.gz files of them in the `artifacts/` and `assets/` folder.
+
+In theory, the application only requires a pre-built FindFacts index as a Solr database and the application will start the informalization and embedding process of all necessary theorems. You can confirm/test this by deleting or renaming the `chroma_storages` and the `assets` folder in the running Docker container.
+
 ### Pulling and running the Docker image
 
 The advantage of pulling and running the Docker image is that all requirements (inside the Docker image) such as Solr, Python, etc. will automatically be met and all modules, such as ChromaDB collections will be included. Personally, I recommend this method.
 
-> ⚠️ **Warning:** The docker image is very large (33.9 GB) because it already contains pre-generated LLM informalizations of all ~310,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
+> ⚠️ **Warning:** The docker image is unfortunately very large (33.9 GB) because it already contains pre-generated LLM informalizations of all ~310,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
 
-In order to pull the Docker image from https://gitlab.lrz.de, you have to authenticate Docker first, if you haven't already. If you can't authenticate with GitLab, please refer to [Building the Docker image locally](#building-the-docker-image-locally):
+In order to pull the Docker image from https://gitlab.lrz.de, you have to authenticate Docker first, if you haven't already. If you can't authenticate with GitLab, please refer to [Building the Docker image locally](#building-and-running-the-docker-image-locally):
 
 ```bash
 docker login gitlab.lrz.de:5005
@@ -61,6 +65,8 @@ docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
 Alternatively, you can also find these commands in `docker_build.sh` and `docker_run.sh`.
 
+When the application finished starting up, you can open the website at http://localhost:5000/.
+
 ## Output
 
 If everything works correctly, the output should look like this:
@@ -68,6 +74,8 @@ If everything works correctly, the output should look like this:
 ```bash
 
 ```
+
+You can access the website at http://localhost:5000/.
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
