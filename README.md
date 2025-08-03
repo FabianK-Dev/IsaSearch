@@ -66,6 +66,10 @@ Tell people where they can go to for help. It can be any combination of an issue
 ## Roadmap
 If you have ideas for releases in the future, it is a good idea to list them in the README.
 
+## Pre-Commit
+
+pre-commit install
+
 ## Contributing
 State if you are open to contributions and what your requirements are for accepting them.
 
