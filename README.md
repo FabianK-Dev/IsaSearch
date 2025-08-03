@@ -26,6 +26,8 @@ Let people know what your project can do specifically. Provide context and add a
 
 ### Quickstart (pulling and running the Docker image)
 
+> ⚠️ **Warning:** The docker image is very large (33.9 GB) because it already contains pre-generated LLM informalizations of all ~310,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
+
 In order to pull the Docker image from https://gitlab.lrz.de, you have to authenticate Docker first, if you haven't already. If you can't authenticate with GitLab, please refer to [Building the Docker image locally](#building-the-docker-image-locally):
 
 ```bash
@@ -44,9 +46,19 @@ Alternatively, you can also find this command in `docker_run.sh`.
 
 This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image.
 
+When the application finished starting up, you can open the website at http://localhost:5000/.
+
 ### Standalone installation (without Docker)
 
 ### Building the Docker image locally
+
+## Output
+
+If everything works correctly, the output should look like this:
+
+```bash
+
+```
 
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
