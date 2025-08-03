@@ -23,14 +23,12 @@ ENV PATH="$SOLR_HOME/bin:$PATH"
 
 # Copy assets to the app directory
 COPY ./assets /app/assets/
-
-RUN tar -xf assets/afp-2025-branch-default.tar.gz && \
-    tar -xf assets/chroma_storages.tar.gz && \
-    tar -xf assets/find_facts.tar.gz
-
-RUN mv find_facts/solr/* /opt/solr/server/solr/ && \
+RUN tar -xf /app/assets/afp-2025-branch-default.tar.gz && \
+    tar -xf /app/assets/chroma_storages.tar.gz && \
+    tar -xf /app/assets/find_facts.tar.gz && \
+    mv find_facts/solr/* /opt/solr/server/solr/ && \
     rm -rf find_facts/ && \
-    rm -rf assets
+    rm -rf /app/assets
 
 COPY artifacts /app/artifacts
 COPY benchmark /app/benchmark
