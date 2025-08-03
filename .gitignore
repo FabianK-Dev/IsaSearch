@@ -6,7 +6,8 @@ chroma_storages/*
 
 # Downloaded
 afp-*
-Isabelle*
+!afp-*.tar.gz
+./Isabelle*
 
 # Files
 .directory
