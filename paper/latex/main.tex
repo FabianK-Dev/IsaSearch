@@ -118,7 +118,7 @@ Ablieferungstermin: \date{\today} \\
 \subsection{Motivation \& Problemstellung}
 Die formale Verifizierung spielt eine entscheidende Rolle, um die Korrektheit von Hard- und Software zu beweisen.
 Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Logik höherer Stufe \citep[S. 1]{blanchette_isabelle_nodate}, ermöglicht die Entwicklung und Verifikation von formalen Theoremen \citep[S. 3, S. 9]{nipkow_isabellehol_2002}.
-Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen \citep[S. 3]{blanchette_mining_2015}.
+Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen \citep[S. 2-3]{blanchette_mining_2015}.
 Obwohl die Wiederverwendung bestehender Theoreme essentiell ist, um Duplikate zu vermeiden, findet sie in der Praxis jedoch zu wenig statt \citep[S. 13]{blanchette_mining_2015}.
 Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine \citep[S. 3]{mackenzie_re-imagining_2022}, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien \citep{huch_findfacts_2022}, (3) Befehle wie \texttt{find\_theorems} \citep[S. 68]{wenzel_isabelleisar_nodate}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweises Filtern von Dateien.
 Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, was folgende Probleme mit sich bringt:
@@ -166,7 +166,7 @@ Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werd
 % SOURCE
 Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 % "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
-Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben dieselbe Bedeutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen \citep[S. 63]{lund_teaching_2024}.
+Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theorem} und \texttt{corollary} in Isabelle hingegen haben dieselbe Bedeutung und sind austauschbar, da sie denselben logischen Effekt bewirken und ausschließlich der dokumentarischen Kennzeichnung dienen \citep[S. 13]{nipkow_isabellehol_2002} \citep[S. 63]{lund_teaching_2024}.
 Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
 
 Das Archive of Formal Proofs ist eine peer-reviewte Datenbank von Beweisbibliotheken, die in Isabelle verifiziert wurden \citep[S. 1]{blanchette_mining_2015} \citep[S. 1]{mackenzie_re-imagining_2022}.
@@ -194,7 +194,7 @@ Je näher zwei Vektoren im Vektorraum liegen, desto ähnlicher ist ihre semantis
 
 Diese Bachelorarbeit nutzt das Sentence-Transformer-Modell \texttt{multi-qa-distilbert-cos\-v1}\footnote{\url{https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1}}, welches auf dem vortrainierten DistilBERT-Modell basiert und für semantische Ähn\-lich\-keits\-su\-chen optimiert wurde.
 DistilBERT ist eine komprimierte Variante des BERT-Modells \citep{devlin_bert_2019}, einem Encoder-Transformer-Sprachmodell, das mithilfe von selbstüberwachtem Lernen Text in Vektorrepräsentationen umwandelt.
-Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, Yahoo Answers, etc. trainiert \citep[S. 8]{mallick_analyzing_2023}, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde \citep[S. 1]{sanh_distilbert_2020}.
+Das Modell \texttt{multi-qa-distilbert-cos-v1} wurde auf ca. 215 Millionen Paaren aus Frage und Antwort aus verschiedenen Datensätzen wie WikiAnswers, Stack Exchange, etc. trainiert \citep[S. 8]{mallick_analyzing_2023}, wobei während des Trainings die Kosinus-Ähnlichkeit als Verlustfunktion eingesetzt wurde \citep[S. 1]{sanh_distilbert_2020}.
 Dadurch lernt das Sprachmodell relevante Paare im Vektorraum nah zusammen und irrelevante weiter auseinander einzubetten \citep[S. 1]{reimers_sentence-bert_2019}.
 \section{Verwandte Arbeiten}
 
@@ -879,7 +879,7 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
 %TC:endignore
 
 Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel.
-Diese Suchanfrage wird vom Sprachmodell jedoch als ``Euler's Polynomial Formula for Summation`` erkannt, was nicht korrekt ist, weil die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 2]{mircea_merca_alternative_2015}.
+Diese Suchanfrage wird vom Sprachmodell jedoch als ``Euler's Polynomial Formula for Summation`` erkannt, was nicht korrekt ist, weil die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 1]{mircea_merca_alternative_2015}.
 % \citep{hale}
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
