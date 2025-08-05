@@ -66,6 +66,10 @@ This command will redirect port 5000 inside the Docker container onto your compu
 
 When the application finished starting up, you can open the website at http://localhost:5000/.
 
+### Running the Python application locally
+
+
+
 ## Output
 
 If everything works correctly, the output should look like this:
