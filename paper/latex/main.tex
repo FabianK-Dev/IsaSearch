@@ -120,7 +120,7 @@ Die formale Verifizierung spielt eine entscheidende Rolle, um die Korrektheit vo
 Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Logik höherer Stufe \citep[S. 1]{blanchette_isabelle_nodate}, ermöglicht die Entwicklung und Verifikation von formalen Theoremen \citep[S. 3, S. 9]{nipkow_isabellehol_2002}.
 Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen \citep[S. 2-3]{blanchette_mining_2015}.
 Obwohl die Wiederverwendung bestehender Theoreme essentiell ist, um Duplikate zu vermeiden, findet sie in der Praxis jedoch zu wenig statt \citep[S. 13]{blanchette_mining_2015}.
-Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine \citep[S. 3]{mackenzie_re-imagining_2022}, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien \citep{huch_findfacts_2022}, (3) Befehle wie \texttt{find\_theorems} \citep[S. 68]{wenzel_isabelleisar_nodate}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweises Filtern von Dateien.
+Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine \citep[S. 3]{mackenzie_re-imagining_2022}, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien \citep{huch_findfacts_2022}, (3) Befehle wie \texttt{find\_theorems} \citep[S. 68]{wenzel_isabelleisar_nodate}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweisen Filtern von Dateien.
 Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, was folgende Probleme mit sich bringt:
 \begin{enumerate}
   \item Beispielsweise finden die genannten Suchwerkzeuge nicht das gewünschte Theorem, wenn die Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem zugehörigen Eintrag im Archive of Formal Proofs formuliert sind. %Beispiel
@@ -170,7 +170,7 @@ Die entsprechenden Kommandos \texttt{proposition}, \texttt{lemma}, \texttt{theor
 Aus diesem Grund wird im Rahmen dieser Bachelorarbeit der Begriff ``Theorem`` stellvertretend für alle vier Begriffe verwendet.
 
 Das Archive of Formal Proofs ist eine peer-reviewte Datenbank von Beweisbibliotheken, die in Isabelle verifiziert wurden \citep[S. 1]{blanchette_mining_2015} \citep[S. 1]{mackenzie_re-imagining_2022}.
-Jeder Eintrag im Archive of Formal Proofs beinhaltet eine Sammlung von Theorien in Form von \texttt{.thy}-Dateien, bestehend aus Definitionen, Theoremen, und Beweisen .
+Jeder Eintrag im Archive of Formal Proofs beinhaltet eine Sammlung von Theorien in Form von \texttt{.thy}-Dateien, bestehend aus Definitionen, Theoremen, und Beweisen.
 Zusätzlich beinhaltet jeder Eintrag ein Nachweisdokument im PDF-Format, welches einen Titel, eine Zusammenfassung des Eintrags, Schlüsselwörter, Autoren, Kategorien und optional weitere Erklärungen oder zusätzlichen Kontext für die ausgewählten Theoreme oder Definitionen bereitstellt \citep[S. 1]{blanchette_mining_2015}.
 Neben der online zugänglichen Stable- und Development-Version kann das Archive of Formal Proofs auch lokal geklont werden, da das gesamte Repository zusätzlich auch auf Heptapod, einem Fork von GitLab für Mercurial, bereitgestellt wird.
 
