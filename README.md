@@ -198,9 +198,14 @@ Below you can find a screenshot of the web UI:
 
 ![Screenshot of the web UI](paper/latex/website_screenshot.jpg)
 
-## Pre-Commit
+## Pre-Commit hooks
 
+This project uses [ruff](https://pypi.org/project/ruff/) and other pre-commit hooks from the [pre-commit/pre-commit-hooks](https://github.com/pre-commit/pre-commit-hooks) (licensed under the MIT License) repository, which are configured in the `.pre-commit-config.yaml` to follow formatting and linting standards and best practices.
+
+When continuing development, I suggest installing `pre-commits` first:
+```bash
 pre-commit install
+```
 
 ## Acknowledgment
 Show your appreciation to those who have contributed to the project.
