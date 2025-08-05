@@ -3,9 +3,10 @@
 .venv
 .vscode
 chroma_storages/*
+assets_extracted/
 
 # Downloaded
-afp-*
+/afp-*
 !afp-*.tar.gz
 ./Isabelle*
 
