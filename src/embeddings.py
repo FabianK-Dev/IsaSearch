@@ -9,6 +9,7 @@ from src.solr import docs_by_ids
 from src.llm import save_llm_output_cache
 
 
+# This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
 def get_chromadb_collection(config, prompts, document_index):
     print("Loading ChromaDB embedding function...")
     embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -41,6 +42,7 @@ def get_chromadb_collection(config, prompts, document_index):
     filtered_index = [doc_id for doc_id in document_index if doc_id not in existing]
     print(f"{len(filtered_index)} documents are still missing in ChromaDB collection.")
 
+    # Documents will be embedded in batches of 5000 documents each.
     for i in range(0, len(filtered_index), 5000):
         doc_ids = filtered_index[i : i + 5000]
         print(f"Processing documents {i} to {i + len(doc_ids)}...")
@@ -50,6 +52,7 @@ def get_chromadb_collection(config, prompts, document_index):
 
         for doc_id in doc_ids:
             doc = document_index[doc_id]
+            # Append an instruction before the document string, which improves the search quality in zero-shot situations.
             doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
             embedding_str = prompts["embed"].format(doc_src=doc_src)
 
@@ -61,6 +64,11 @@ def get_chromadb_collection(config, prompts, document_index):
     return collection
 
 
+# This search(...) method does the following:
+# 1. If enabled, refine the search query using a LLM. If config["enable_llm_output_cache"] is enabled, it will use cached responses for cached search queries.
+# 2. Combine the original search query and LLM-refined search query to search the ChromaDB collection for the top 100 closest documents.
+# 3. Finally, the top 100 search results with its LLM descriptions, the search duration and the refined query will be returned.
+# Note, that in this step we only return result IDs with its LLM description. In search_results_to_docs() we will query Solr to retrieve the document source code, etc. for each result ID.
 def search(
     search_query,
     collection,
@@ -77,8 +85,10 @@ def search(
     refined_query = None
 
     if refine_query:
+        # Load the prompt that will be used as an instruction to the LLM to refine the search query
         llm_prompt = prompts["search_refine"].format(search_query=search_query)
 
+        # Check if a cached response for the search query and prompt already exists
         if (
             llm_output_cache is not None
             and config["vllm_name"] in llm_output_cache
@@ -86,10 +96,13 @@ def search(
         ):
             print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
             refined_query = llm_output_cache[config["vllm_name"]][llm_prompt]["output"]
+            # If using a cached response, also use a cached duration (i.e. the original response generation duration).
+            # Otherwise the duration would be very short for consecutive benchmark runs and would falsify the benchmark result.
             cached_duration = llm_output_cache[config["vllm_name"]][llm_prompt][
                 "output_duration"
             ]
         else:
+            # If config["enable_llm_output_cache"] is False, the method parameter llm_output_cache will be None. In that case reset it to an empty dictionary {} so we can write into it.
             llm_output_cache = llm_output_cache if llm_output_cache is not None else {}
             with model.chat_session():
                 refined_query = model.generate(
@@ -134,11 +147,13 @@ def search(
     else:
         query_text = prompts["retrieve"].format(search_query=search_query)
 
+    # Query the ChromaDB collection with the given query_text
     query_result = collection.query(
         query_texts=[query_text], n_results=docs_to_retrieve
     )
     results = {}
 
+    # For each document retrieved, also add its LLM description and its ID
     for metadata, distance in zip(
         query_result["metadatas"][0], query_result["distances"][0]
     ):
@@ -162,6 +177,8 @@ def search(
     }
 
 
+# Given a list of search results with IDs, retrieve the documents from Solr.
+# Additionaly this method adds a link to the original .thy-file in the repository at configured config["afp_remote_thys_folder_url"]
 def search_results_to_docs(search_results, solr, config):
     ids = [_id for _id in search_results["results"]]
 
