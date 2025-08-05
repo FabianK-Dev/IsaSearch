@@ -37,7 +37,7 @@ def top_k_accuracy(results, target_identifier):
 
 
 # Calculates a relevance scale of the retrieved documents
-# The reelvance value is reduced logarithmically depending on the result position
+# The relevance value is reduced logarithmically depending on the result position
 def normalized_discounted_cumulative_gain(results, target_identifier):
     dcg = 0
 
