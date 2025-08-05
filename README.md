@@ -25,7 +25,7 @@ In theory, the application only requires a pre-built FindFacts index as a Solr d
 
 The advantage of pulling and running the Docker image is that all requirements (inside the Docker image) such as Solr, Python, etc. will automatically be met and all modules, such as ChromaDB collections will be included. Personally, I recommend this method.
 
-> ⚠️ **Warning:** The docker image is unfortunately very large (33.9 GB) because it already contains pre-generated LLM informalizations of all ~310,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
+> ⚠️ **Warning:** The docker image is unfortunately very large (25.6 GB) because it already contains pre-generated LLM informalizations of all ~303,000 theorems, a FindFacts Solr database, a copy of the Archive of Formal Proofs, pre-installed Python packages and ChromaDB collections with all embeddings.
 
 In order to pull the Docker image from https://gitlab.lrz.de, you have to authenticate Docker first, if you haven't already. If you can't authenticate with GitLab, please refer to [Building the Docker image locally](#building-and-running-the-docker-image-locally):
 
@@ -203,3 +203,7 @@ When continuing development, I suggest installing `pre-commits` first:
 ```bash
 pre-commit install
 ```
+
+## Acknowledgment
+
+I would like to take this opportunity to thank everyone who supported me in creating this thesis. First, I would like to thank Prof. Dr. Jasmin Blanchette for evaluating my thesis and for the insightful advice and constructive criticism I received at the beginning of this thesis and during my first presentation. I would also like to express my sincere gratitude to Balazs Toth, my mentor, who provided me with valuable feedback and support throughout the development of the program and the entire writing process. I would also like to thank Fabian Huch, the developer of FindFacts, for his help and advice. Also, I would like to thank my family and my girlfriend for their motivation and support with proofreading.
