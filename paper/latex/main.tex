@@ -180,9 +180,9 @@ Transformer sind eine Architektur von neuronalen Netzwerken, die anders als reku
 Dadurch können Transformer-Modelle Tokens innerhalb eines vordefinierten Kontextfenster unabhängig von ihrer Position betrachten.
 Zum Beispiel hat das Sprachmodell \texttt{Phi-3.5-mini-\allowbreak instruct} von Microsoft, welches in dieser Bachelorarbeit verwendet wird, ein Kontextfenster von 128.000 Tokens.
 Ein Token ist die kleinste bedeutungstragende Einheit einer Zeichenkette, z. B. ein Wort, Zeichen oder Teil eines Wortes.
-Beispielsweise zerlegt das Sprachmodell GPT-4o die Zeichensequenz \texttt{"\textbackslash forall x \textbackslash in X\_y:"} in die Token:
+Beispielsweise zerlegt das Sprachmodell GPT-4o\footnote{\url{https://platform.openai.com/tokenizer}} die Zeichensequenz \texttt{"\textbackslash forall x \textbackslash in X\_y:"} in die Token:
 \begin{verbatim}
-"\", "forall", " x", " in", " X", "_y", ":"
+"\", "forall", " x", " \", "in", " X", "_y", ":"
 \end{verbatim}
 
 Der Aufmerksamkeitsmechanismus hat den Vorteil, dass Abhängigkeiten zwischen weit auseinanderliegenden Tokens in einer Zeichensequenz, z. B. zwischen einer Definition und ihrer Anwendung in einem langen Text, semantisch besser erfasst werden können.
@@ -602,7 +602,7 @@ Wird kein relevantes Suchergebnis gefunden gilt $RR = 0$.
 
 Anders als der Reciprocal Rank beachtet der Normalized Discounted Cumulative Gain zusätzlich die Reihenfolge mehrerer relevanter Suchergebnisse.
 Hierbei berechnet man zunächst die Metriken \textit{Discounted Cumulative Gain} (DCG) und \textit{Ideal Discounted Cumulative Gain} (IDCG):
-$$DCG = \sum_{i=1}^{|R|} \frac{r_i}{log_2(i+1)}$$
+$$DCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
 $$IDCG = \sum_{i=1}^{|R^*|} \frac{r_i}{log_2(i+1)}$$
 wobei $R^*$ die Menge aller relevanter Suchergebnisse für eine Suchanfrage ist und $r_i \in \{0, 1\}$ wiederum angibt, ob das Ergebnis an Position $i$ relevant, definiert als $r_i = 1$, ist.
 Der Normalized Discounted Cumulative Gain wird nun als
