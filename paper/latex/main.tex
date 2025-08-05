@@ -121,20 +121,21 @@ Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf L
 Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen \citep[S. 3]{blanchette_mining_2015}.
 Obwohl die Wiederverwendung bestehender Theoreme essentiell ist, um Duplikate zu vermeiden, findet sie in der Praxis jedoch zu wenig statt \citep[S. 13]{blanchette_mining_2015}.
 Bestehende Suchmechanismen sind beispielsweise (1) die im Archive of Formal Proofs direkt integrierte Suchmaschine \citep[S. 3]{mackenzie_re-imagining_2022}, (2) FindFacts, eine Suchmaschine mit Drilldown-Funktionalität zum Suchen formaler Inhalte in Isabelle-Theorien \citep{huch_findfacts_2022}, (3) Befehle wie \texttt{find\_theorems} \citep[S. 68]{wenzel_isabelleisar_nodate}, die direkt in Isabelle eingebaut sind oder (4) Unix-Kommandos wie \texttt{grep} zum zeilenweises Filtern von Dateien.
-Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, was einige Probleme mit sich bringt:
+Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, was folgende Probleme mit sich bringt:
 \begin{enumerate}
   \item Beispielsweise finden die genannten Suchwerkzeuge nicht das gewünschte Theorem, wenn die Suchbegriffe zwar semantisch passend, jedoch wörtlich anders im Theorem oder dem zugehörigen Eintrag im Archive of Formal Proofs formuliert sind. %Beispiel
 
-  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d. h. relevantere Suchergebnisse sind nicht als relevanter erkennbar als irrelevantere.
+  \item Zudem gibt es keine Ähnlichkeitserkennung oder ein intelligentes Ranking, d. h. relevantere Suchergebnisse sind nicht als solche erkennbar, im Vergleich zu irrelevanteren.
 
   \item Nutzer empfinden es außerdem als schwierig herauszufinden, ob ein Theorem, das sie suchen, bereits im Archive of Formal Proofs vorhanden ist \citep[S. 6]{mackenzie_evaluation_2021}.
 \end{enumerate}
 
-Auf der anderen Seite stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt nur lexikalische Übereinstimmungen erfassen können \citep{jain_llm_2024}.
+Im Gegensatz dazu stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt reiner lexikalischer Übereinstimmung miterfassen können \citep{jain_llm_2024}.
 
 \subsection{Zielsetzung \& Forschungsfragen}
 Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata, Korollaren und Propositionen im Archive of Formal Proofs zu entwickeln und zu evaluieren.
-Außerdem sollen verschiedene Suchstrategien, z. B. das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen oder die Integration von Metadaten, geprüft werden, woraufhin eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks sowie eine Analyse des erzielten Ergebnisses stattfindet.
+Außerdem sollen verschiedene Suchstrategien, z. B. das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen und die Integration von Metadaten, geprüft werden.
+Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks sowie eine Analyse des erzielten Ergebnisses statt.
 
 Die folgenden Forschungsfragen werden in dieser Bachelorarbeit beantwortet:
 \begin{enumerate}
@@ -161,7 +162,7 @@ Isabelle ist ein generischer und interaktiver Beweisassistent zur Formalisierung
 % "Each theory T must reside in a theory file named T.thy" [Nipkow, T., Paulson, L. C., & Wenzel, M. (2002). Isabelle/HOL].
 Isabelle organisiert Beweise in Theorien (\texttt{.thy}-Dateien), die aus Typen, Funktionen und Theoremen bestehen, wobei jede Theorie Teil eines größeren Abhängigkeitsgraphen ist, was modulare Entwicklung und Wiederverwendung von bestehenden Theorien ermöglicht \citep[S. 4]{nipkow_isabellehol_2002}.
 % SOURCE
-Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und können mit dem Kommando \texttt{theorem} definiert werden \citep[S. 7]{nipkow_isabellehol_2002}.
+Theoreme sind logische Aussagen, die innerhalb von Isabelle formal bewiesen werden und dadurch ihre Korrektheit garantieren und mit dem Kommando \texttt{theorem} definiert werden können \citep[S. 7]{nipkow_isabellehol_2002}.
 % SOURCE
 Die Begriffe ``Proposition``, ``Lemma``, ``Theorem`` und ``Korollar`` haben in der Mathematik verschiedene semantische Bedeutungen.
 % "There are several synonyms to 'proposition', like 'lemma', 'theorem', and 'corollary'. After the 'proposition' comes the formula which we want to prove" [Lund & Villadsen, S. 63].
@@ -201,7 +202,7 @@ Es existieren bereits einige Suchmaschinen und Werkzeuge, die zur Suche nach The
 Dieses Unterkapitel erläutert drei etablierte Suchmechanismen, ihre Funktionsweise und geht auf ihre Einschränkungen in Bezug auf semantisches Suchen ein.
 
 \begin{itemize}
-  \item \textbf{Suchmaschine des Archive of Formal Proofs:} Die offizielle Webseite des Archive of Formal Proofs bietet eine Volltextsuche auf Client-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Autoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statisch gehostet werden und erfordert keine serverseitige REST-API. Nachteilhaft ist hierbei, dass ausschließlich die Metadaten eines Eintrags, nicht aber die im Eintrag beinhalteten Theoreme oder dessen Quelltext durchsucht werden \citep[S. 3-5]{mackenzie_re-imagining_2022}.
+  \item \textbf{Suchmaschine des Archive of Formal Proofs:} Die offizielle Webseite des Archive of Formal Proofs bietet eine Volltextsuche auf Client-Seite mithilfe der Bibliothek ``FlexSearch.js``. Diese baut mithilfe der Metadaten der Einträge, also Titel, Zusammenfassung, Schlüsselwörter, Autoren und Kategorien, mehrere Suchindizes, die bei Suchanfragen des Nutzers durchsucht werden. Indem die Indizes lokal und nicht auf Seiten des Servers generiert werden, kann die Webseite rein statisch gehostet werden und erfordert keine serverseitige REST-API. Nachteilig ist hierbei, dass ausschließlich die Metadaten eines Eintrags, nicht aber die im Eintrag beinhalteten Theoreme oder dessen Quelltext durchsucht werden \citep[S. 3-5]{mackenzie_re-imagining_2022}.
 
   \item \textbf{\texttt{find\_theorems}-Kommando:} Das in Isabelle eingebaute Kommando \texttt{find\_theorems} durchsucht formale Inhalte wie Theoreme, Lemmata oder Konstanten, jedoch nur in Theorien, die durch das Kommando \texttt{imports} in die aktuelle Session importiert wurden. \texttt{find\_theorems} wird hierbei verwendet, indem nach Namen, Typ oder einem gewissen Termmuster eines Theorems, gefiltert werden kann. Um auf diese Weise jedoch das gesamte Archive of Formal Proofs zu durchsuchen, müsste dieses komplett in die aktuelle Session geladen werden, was mit einem großen Arbeitsspeicherverbrauch verbunden wäre und damit in der Praxis zum Durchsuchen des gesamten Archive of Formal Proofs unbrauchbar ist \citep[S. 68]{wenzel_isabelleisar_nodate}.
 
@@ -283,13 +284,13 @@ Die Suche wird effektiver, da durch das semantisch äquivalente Umschreiben eine
 
 Für jedes Theorem wird eine informelle Beschreibung benötigt.
 Diese sollen nur neu generiert werden, falls sich der Quelltext eines Theorems ändert oder noch keine Beschreibung existiert.
-Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokumentindex (wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben) für jedes Dokument nach einer bereits gespeicherten informalen Beschreibung.
-Dies wird umgesetzt indem anhand des Quelltextes jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus \citep[S. 7]{maxino_effectiveness_2009} berechnet wird.
+Um dies zu erreichen überprüft die Anwendung nach erfolgreichem vollständigen Bauen des Dokumentindex, wie im vorherigen Abschnitt \ref{sec:programmaufbau} beschrieben, ob für jedes Dokument bereits eine gespeicherte informale Beschreibung existiert.
+Dies wird umgesetzt, indem anhand des Quelltextes jedes Dokuments eine eindeutige Prüfsumme mithilfe des Adler-32-Algorithmus \citep[S. 7]{maxino_effectiveness_2009} berechnet wird.
 Ich habe mich hierbei für die Verwendung des Adler-32-Algorithmus entschlossen, weil dieser (1) schnell ist \citep[S. 2]{maxino_effectiveness_2009}, (2) für das Erkennen von Änderungen in einem Quelltext, bei der keine kryptografische Sicherheit notwendig ist, bereits ausreicht und (3) vollständig in Python in der zlib-Bibliothek\footnote{\url{https://docs.python.org/3/library/zlib.html}} implementiert ist.
 Das Abgleichen der Prüfsummen der Quelltexte stellt sicher, dass die informale Beschreibung für ein Dokument neu generiert wird, falls sich der Quelltext für dieses Dokument ändert.
 
 Für jedes Dokument, für das noch keine gespeicherte informale Beschreibung im Ordner \texttt{artifacts} existiert oder dessen Quelltext verändert wurde, wird die Prompt, die in Abbildung \ref{fig:prompt_vorlage} gezeigt ist, bestehend aus Anweisungen an das Sprachmodell sowie dem eigentlich Quelltext des Dokuments erstellt.
-Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich noch der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
+Falls per Boolean-Parameter '\texttt{add\_metadata}' in der Konfiguration aktiviert, kann in diesem Schritt der Anweisung und dem Quelltext zusätzlich der Titel und die Zusammenfassung des entsprechenden Eintrags im Archive of Formal Proofs, welche in Abschnitt \ref{sec:programmaufbau} bereits extrahiert wurden, angefügt werden.
 In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen dieser Metadaten die Suchqualität verbessert.
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet.
 Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM\footnote{\url{https://pypi.org/project/vllm/}} genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht \citep[S. 7]{guo_gllm_2025}.
@@ -340,7 +341,7 @@ Die Wahl des verwendeten Sprachmodells, welches zum Informalisieren der Dokument
 Zudem bietet das Open-Source-Projekt ``LLM Leaderboard``\footnote{\url{https://github.com/JonathanChavezTamales/llm-leaderboard}} eine Web-Benutzeroberfläche zum Vergleichen der Modelle anhand ihrer erzielten Genauigkeit im GPQA-Benchmark.
 
 Um hohen Kosten durch externe API-Anfragen zu vermeiden, beschränkte ich mich bei der Wahl nur auf selbst hostbare, offene KI-Modelle und schloss proprietäre Modelle (z. B. Gemini, ChatGPT, Claude, etc.) aus.
-Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkt hat, da große Modelle mit vielen Parametern (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar.
+Zum Testen der Anwendung stand eine NVIDIA GeForce RTX 4070 mit 12 GB VRAM zur Verfügung, was ebenfalls die Wahl der Sprachmodelle hardwaretechnisch beschränkte, da große Modelle mit vielen Parametern (z. B. DeepSeek-R1, Llama 4, Qwen3, etc.) mehr VRAM benötigten, als verfügbar war.
 Zudem wurden lizenzbeschränkte Modelle (z. B. Llama 3.2, Gemma 3, etc.) wegen restriktiven Lizenzen ausgeschlossen.
 Zum Beispiel erfordet das ``Llama 3.1 Community License Agreement``\footnote{\url{https://www.llama.com/llama3_1/license/}}, dass Llama-Sprachmodelle nur verwendet werden können, nachdem persönliche Daten an Meta übertragen wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
@@ -361,13 +362,14 @@ Eine ChromaDB-Sammlung ist eine gruppierte Menge an Einbettungen und ist verglei
 Hierfür wird für jedes Dokument ein String bestehend aus einer Prompt, der informalen Beschreibung sowie dem eigentlichen Quelltext des Theorems erzeugt, für den mithilfe des vortrainierten Sentence-Transformer-Modells \texttt{multi-qa-distilbert-cos-v1} eine Einbettung berechnet wird.
 Die vorangestellte Prompt fordert das Sentence-Transformer-Sprachmodell dazu auf, eine Repräsentation aus natürlicher Sprache und formaler Isabelle/HOL-Syntax zu erzeugen, um semantisch ähnliche Aussagen auffinden zu können.
 % muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.)?
-Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen, also für ein Sprachmodell unbekannte Situationen, die nicht explizit Teil von dessen Training waren \citep[S. 1]{wang_zero_shot_2019}, verbessert \citep{su_one_nodate}, da die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
+Es hat sich erwiesen, dass das Voranstellen einer Prompt vor den Textinhalt, der eingebettet werden soll, die Suchqualität von Einbettungen in Zero-Shot-Situationen, also für ein Sprachmodell unbekannte Situationen, die nicht explizit Teil von dessen Training waren \citep[S. 1]{wang_zero_shot_2019}, verbessert \citep{su_one_nodate}.
+Der Grund dafür ist, dass die Prompt den Kontext der Anfrage besser definiert, wodurch das Sprachmodell besser die semantische Bedeutung des einzubettenden Textes erkennt.
 Dieser Prozess findet nur für Dokumente statt, die nicht bereits in der Sammlung gespeichert sind und muss bei erneuten Programmaufrufen nicht wiederholt werden.
 %\todo[inline]{Frage: muss ich hier den Prozess der Einbettungsberechnung genau erklären (z. B. Tokenisierung, Schichten des Transformer-Modells, Extrahieren der Token-Embeddings, [CLS]-Token, etc.) ? Die Methodik hat bereits 12 Tsd Zeichen und ich befürchte, dass das sehr viel Text nur für Transformer werden könnte.}
 
 Anschließend wird mithilfe des Pakets ``Flask``\footnote{\url{https://pypi.org/project/Flask/}} eine REST-API bereitgestellt, über die Nutzer Suchanfragen in Form von JSON-Requests stellen können, die beispielsweise über die Webanwendung initiert werden.
 Ein Problem, welches sich hierbei ergibt, ist, dass Nutzer dazu tendieren können ungenaue Suchanfragen zu formulieren, die zu wenig Übereinstimmung mit dem Quelltext des gesuchten Dokuments oder dessen informaler Beschreibung haben.
-Außerdem kann es sein, dass Nutzer es bevorzugen möglichst kurze wenig detaillierte Suchanfragen, z. B. weil sie effizienter zu formulieren sind oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
+Außerdem kann es sein, dass Nutzer es bevorzugen, möglichst kurze wenig detaillierte Suchanfragen zu schreiben, z. B. weil sie effizienter zu formulieren sind oder weil sie den genauen Quelltext des gesuchten Theorems nicht kennen.
 %\todo[inline]{Frage: Darf ich das schreiben oder ist das zu ungenau/vage? Brauche ich eine Quelle für die Behauptung, dass Nutzer zu ungenaue Suchanfragen stellen?}
 Aus diesem Grund wird bei Suchanfragen die Nutzereingabe verbessert, indem einem großen KI-Sprachmodell eine Prompt in Kombination mit der Nutzereingabe gestellt wird \citep{jagerman_query_2023}.
 Außerdem wird das Sprachmodell angewiesen, aus einer Suchanfrage eines Nutzers (1) eine präzise Theorem-Beschreibung sowie (2) einen passenden Titel zu erstellen, wobei es zusätzlich die Information erhält, dass es sich (1) bei der Nutzereingabe in Form einer Suchanfrage um ein Theorem handelt, (2) das Umschreiben der Suchanfrage die Intention hat bei einer Suchmaschine eine bessere Genauigkeit der Suchergebnisse zu erzielen und (3) das Sprachmodell die Aufgabe hat sich auf Themengebiete zu fokussieren, die für das Archive of Formal Proofs relevant sind.
@@ -756,7 +758,7 @@ Das gezeigte Lemma ist Teil des Eintrags ``Pell's Equation``\footnote{\url{https
 
 Ebenfalls auffällig ist, dass Titel-Anfragen und Anfragen in natürlicher Sprache für die beste Suchstrategie eine sehr ähnliche Suchqualität aufweisen.
 Hit@10 ist zum Beispiel für die Titel-Anfrage 0,835. Für die Anfrage in natürlicher Sprache beträgt die Metrik hingegen 0,824, was einem Verlust von nur 1,1\% entspricht.
-Die Annahme ist, dass das Umschreiben der Suchanfrage, unabhängig davon ob sie als Titel eines Theorems oder in natürlicher Sprache formuliert wird, als eine Art Normalisierungsschritt wirkt, was sich gut an folgendem Beispiel visualisieren lässt, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
+Die Annahme ist, dass das Umschreiben der Suchanfrage, unabhängig davon, ob sie als Titel eines Theorems oder in natürlicher Sprache formuliert wird, als eine Art Normalisierungsschritt wirkt, was sich gut an folgendem Beispiel visualisieren lässt, welches zwei verschiedene Anfragen, eine als Titel-Anfrage und eine als Anfrage in natürlicher Sprache, mit demselben Zieltheorem demonstriert.
 
 %TC:ignore
 \centering
@@ -877,7 +879,7 @@ Demonstrieren lässt sich dies anhand des Beispiels in Abbildung \ref{fig:suchan
 %TC:endignore
 
 Die Suchanfrage in natürlicher Sprache beschreibt die Faulhabersche Formel.
-Diese Suchanfrage wird vom Sprachmodell jedoch als ``Euler's Polynomial Formula for Summation``, was nicht korrekt ist, weil die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 2]{mircea_merca_alternative_2015}.
+Diese Suchanfrage wird vom Sprachmodell jedoch als ``Euler's Polynomial Formula for Summation`` erkannt, was nicht korrekt ist, weil die Suchanfrage ein direktes Zitat der Definition der Faulhaber-Formel ist \citep[S. 2]{mircea_merca_alternative_2015}.
 % \citep{hale}
 % https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 % direktes Zitat: An Alternative to Faulhaber’s Formula.pdf
@@ -885,15 +887,14 @@ Der Vergleich zwischen Tabelle \ref{tab:suchanfrage_falsch_umschrieben_ergebnis_
 
 \section{Limitationen}
 
-Obwohl die semantische KI-Suche vielversprechende Benchmark-Ergebnisse aufweist, unterliegt das Suchsystem trotzdem einigen Einschränkungen, die bei der Interpretation, Anwendung und für zukünftige Verbesserungen beachtet werden sollten.
+Die Benchmark-Ergebnisse der semantischen KI-Suche sind vielversprechend. Trotzdem unterliegt das Suchsystem einigen Einschränkungen, die zukünftig bei der Interpretation, Anwendung und zukünftigen Verbesserungen beachtet werden sollten.
 
 Zum einen war die Entwicklung der Suchmaschine und das Benchmarking hardwaretechnisch beschränkt, da die verwendete Grafikkarte, eine NVIDIA GeForce RTX 4070, nur über 12 GB VRAM verfügt.
-So war es nicht möglich, leistungsstärkere Sprachmodelle mit einer höheren Parameterzahl (wie DeepSeek-R1, Llama 4, Qwen3 usw.), die mehr VRAM benötigten, zu verwenden und zu testen.
+Dadurch war das Testen oder Nutzen von leistungsstärkeren Sprachmodellen mit einer höheren Parameterzahl (wie DeepSeek-R1, Llama 4, Qwen3 usw.), die mehr VRAM benötigten, nicht möglich.
 
 Zwar kann die Anwendung auch ohne eine Grafikkarte genutzt werden, da diese automatisch auf die CPU zurückfällt, allerdings führt dies dazu, dass das Informalisieren von Theoremen sowie das Umschreiben von Suchanfragen erheblich länger dauert, weswegen die semantische Suchmaschine nicht ohne eine Grafikkarte produktiv eingesetzt werden sollte.
 
-Eine weitere Einschränkung besteht darin, dass das Benchmark nur von einer einzelnen Person erstellt und annotiert wurde.
-Dies erhöht das Risiko von Voreingenommenheit oder Fehlern, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
+Das Benchmark wurde nur von einer einzelnen Person erstellt und annotiert, was eine weitere Limitation darstellt, da dadurch das Risiko von Voreingenommenheit oder Fehlern steigt, da beispielsweise Theoreme falsch interpretiert worden sein könnten.
 
 Darüber hinaus beinhaltet das Benchmark, das auf ``Formalizing 100 Theorems`` von Freek Wiedijk basiert, ausschließlich besonders bekannte Theoreme (z. B. Fundamentalsatz der Algebra, Satz des Pythagoras, etc.), die in der Literatur häufig vorkommen.
 Dadurch wird zwar ein breites Spektrum der Mathematik abgebildet, jedoch bleibt unklar, wie das Suchsystem bei weniger bekannten ``namenlosen`` Theoremen, die nicht im Fokus der Fachliteratur sind, abschneidet.
