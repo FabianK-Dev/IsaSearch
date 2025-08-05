@@ -1,3 +1,7 @@
+"""
+scrape_theorem_list.py: This file scrapes the top 100 theorems list website from Freek Wiedijk, extracts the data, and saves it as CSV. It also saves a JSON dictionary with scrape statistics, e.g. which sessions are included in the extracted theorems.
+"""
+
 from bs4 import BeautifulSoup
 
 import os
