@@ -1,3 +1,7 @@
+"""
+documents.py: This file provides methods that can be used to generate natural language summaries for theorems using an LLM and cached metadata.
+"""
+
 import gc
 import json
 import os

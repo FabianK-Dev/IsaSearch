@@ -1,3 +1,7 @@
+"""
+llm.py: This file handles prompt loading, LLM initialization, and caching of generated outputs.
+"""
+
 import glob
 import json
 import os

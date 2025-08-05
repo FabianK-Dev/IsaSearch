@@ -1,3 +1,7 @@
+"""
+embeddings.py: This file manages ChromaDB embeddings and semantic search with LLM-based query refinement and a caching mechanism.
+"""
+
 import os
 import time
 import torch
