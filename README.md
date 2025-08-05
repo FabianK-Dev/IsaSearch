@@ -206,6 +206,3 @@ When continuing development, I suggest installing `pre-commits` first:
 ```bash
 pre-commit install
 ```
-
-## Acknowledgment
-Show your appreciation to those who have contributed to the project.
