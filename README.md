@@ -17,7 +17,7 @@
 
 There are multiple ways to set up the application, of which I recommend the usage of Docker because it ensures containerization and reproducibility. Additionally, it doesn't require having Solr and Java installed and provides more security, because the Solr database and ChromaDB collections are only accessible inside the Docker container. You can either directly pull and run the Docker image or build and run the Docker image locally.
 
-Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. This is why I decided to provide prepared tar.gz files of them in the `artifacts/` and `assets/` folder.
+Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. This is why I decided to provide prepared tar.gz files of them in the `artifacts` and `assets` folder.
 
 In theory, the application only requires a pre-built FindFacts index as a Solr database and the application will start the informalization and embedding process of all necessary theorems. You can confirm/test this by deleting or renaming the `chroma_storages` and the `assets` folder in the running Docker container.
 
@@ -50,7 +50,7 @@ When the application finished starting up, you can open the website at http://lo
 
 ### Building and running the Docker image locally
 
-Building the Docker image locally can be done by running `docker_build.sh`. This script makes sure, that only files that are not ignored by the `.gitignore` are copied to the image. Additionally, it extracts the tar.gz files from the `assets/` folder into the `assets_extracted/` folder before copying them into the Docker image to save Docker image size.
+Building the Docker image locally can be done by running `docker_build.sh`. This script makes sure, that only files that are not ignored by the `.gitignore` are copied to the image. Additionally, it extracts the tar.gz files from the `assets` folder into the `assets_extracted` folder before copying them into the Docker image to save Docker image size.
 
 To run the Docker image, simply run:
 
@@ -67,7 +67,7 @@ When the application finished starting up, you can open the website at http://lo
 
 To run the Python application locally, you will have to set up all required components, such as a FindFacts index, etc. manually. To do this, follow this process:
 
-1. Create a FindFacts index using the command `isabelle find_facts_index` as explained in my Bachelor thesis. Alternatively you can extract the `find_facts.tar.gz` within the `assets/` folder.
+1. Create a FindFacts index using the command `isabelle find_facts_index` as explained in my Bachelor thesis. Alternatively you can extract the `find_facts.tar.gz` within the `assets` folder.
 2. [Install Apache Solr](https://solr.apache.org/guide/solr/latest/deployment-guide/installing-solr.html).
 3. Start Solr and specify the path to the FindFacts Solr core:
 ```bash
