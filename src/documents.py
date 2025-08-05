@@ -17,6 +17,9 @@ from nltk.corpus import stopwords
 cached_metadata = {}
 
 
+# This method returns the metadata (i.e. title, abstract, authors, keywords, etc.) for a given entry
+# from a local copy of the Archive of Formal Proofs (configured in config["afp_folder"]).
+# Additionally this method caches loaded entires in the 'cached_metadata' dict.
 def get_entry_metadata(entry, config):
     metadata_folder = config["afp_folder"] + "/metadata/"
     entry_toml = metadata_folder + "entries/" + entry + ".toml"
@@ -43,6 +46,7 @@ def get_entry_metadata(entry, config):
         return cached_metadata[entry]
 
 
+# This method only returns the ID, source code, entity_kname and the metadata for a given Solr document.
 def relevant_doc_keys(solr_document, config):
     return {
         "id": solr_document["id"],
@@ -54,6 +58,8 @@ def relevant_doc_keys(solr_document, config):
     }
 
 
+# This method fetches all documents, i.e. is any theorems, lemmas, corollaries and propositions
+# from Solr in batches of 10000 documents per request.
 def fetch_all_docs(solr, config):
     document_index = {}
 
@@ -85,6 +91,9 @@ def fetch_all_docs(solr, config):
     return document_index
 
 
+# This method returns only relevant information from a given entry metadata (i.e. title, abstract, etc.).
+# It removes newlines, short words, non-alphabetic characters, multiple or trailing whitespaces and stop words.
+# This is done to decrease the amount of tokens required per informalized theorem.
 def prepare_metadata(metadata, stop_words_set):
     # Replace newlines through spaces
     plain_text = metadata.lower().replace("\n", " ")
@@ -105,6 +114,11 @@ def prepare_metadata(metadata, stop_words_set):
     return plain_text
 
 
+# This document generates document descriptions. That means that a LLM summaries each theorem into natural language.
+# This process is only done for theorems that haven't been summarized or whose source code has changed.
+# Source code changes are detected by calculating, saving and comparing the Adler32 checksum for a theorem's source code.
+# To generate as many document summaries as quickly as possible, the package vllm is used which allows parallel LLM prompting.
+# Generated document descriptions will be saved to the artifacts folder, configured at config["artifacts_folder"].
 def generate_document_descriptions(
     config, document_index, prompts, tokenizer, save_every=1000
 ):
@@ -274,6 +288,8 @@ def generate_document_descriptions(
     return document_descriptions
 
 
+# This method loads already generated document descriptions from the artifacts folder, configured at config["artifacts_folder"].
+# It then extracts the content within the <BEGIN> and <END> parts.
 def get_document_descriptions(config, document_index, prompts, tokenizer):
     document_descriptions = generate_document_descriptions(
         config, document_index, prompts, tokenizer
@@ -302,6 +318,8 @@ def get_document_descriptions(config, document_index, prompts, tokenizer):
     return document_index
 
 
+# Building the document index means, saving all loaded documents with its loaded entry metadata.
+# This is done to avoid having to refetch all documents from Solr on every program start.
 def build_document_index(config, solr):
     CACHE_FOLDER = config["cache_folder"]
     DOCUMENT_INDEX_CACHE = f"{CACHE_FOLDER}/document_index.json"

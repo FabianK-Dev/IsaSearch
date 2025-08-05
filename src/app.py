@@ -10,7 +10,8 @@ app.py: This module initializes all required components, i.e. Solr, tokenizer, p
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
 
-Finally, Flask and package 'waitress' is used to serve both the REST API and static files (e.g. HTML, images, etc.)
+Finally, Flask and package 'waitress' is used to serve both the REST API and static files (e.g. HTML, images, etc.).
+Note: To simplify matters, from now on "theorem" will be used representatively for theorems, lemmas, corollaries and propositions in comment and docstrings.
 """
 
 import json
