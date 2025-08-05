@@ -24,7 +24,7 @@ ENV PATH="$SOLR_HOME/bin:$PATH"
 # Copy assets to the app directory
 COPY ./assets_extracted/afp-2025-branch-default /app/
 COPY ./assets_extracted/chroma_storages /app/
-COPY ./assets_extracted/find_facts/solr /opt/solr/server/
+COPY ./assets_extracted/find_facts/solr /opt/solr/server/solr/
 
 COPY artifacts /app/artifacts
 COPY benchmark /app/benchmark
