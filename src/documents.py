@@ -69,6 +69,8 @@ def fetch_all_docs(solr, config):
         start=0,
         rows=docs_per_page,
     )
+    # Because the first response contains the total number of documents, that we need to determine the amount of pages that will be loaded,
+    # solr.search() has to be called once before the for loop, and then within the for loop for each following page.
     max_docs = results.raw_response["response"]["numFound"]
 
     for result in results:
@@ -140,6 +142,8 @@ def generate_document_descriptions(
     print("Finding documents that need to be described by the LLM...")
 
     filtered_docs = []
+    # For each document in the document_index, calculate its Adler32 checksum, to determine whether it was changed.
+    # All documents that need to be described by the LLM will be appended to filtered_docs.
     for doc_id in tqdm(document_index):
         doc = document_index[doc_id]
         checksum = zlib.adler32(doc["src"].encode("utf-8"))
@@ -169,19 +173,21 @@ def generate_document_descriptions(
     )
 
     if len(filtered_docs) >= 1:
-        # Only update NLTK resources if any documents need to be described and if adding metadata is enabled, to avoid unnecessary downloads
+        # Only update NLTK resources if any documents need to be described, to avoid unnecessary downloads
         print("Downloading/Updating NLTK resources (punkt and stopwords)...")
         nltk.download("punkt")
         nltk.download("stopwords")
         stop_words_set = set(stopwords.words("english"))
 
         doc_strings = []
+        # Create all doc_strings, i.e. all prompts that contain the theorems and metadata, if enabled, along with the instructions for the LLM
         for doc in tqdm(filtered_docs):
             # Remove the proof part of the theorem source code, truncate to max length and strip trailing whitespaces
             theorem_content = (
                 doc["src"].split("proof")[0][: config["theorem_max_length"]].strip()
             )
 
+            # If enabled, add the metadata to the prompt, otherwise only provive the theorem content.
             if config["add_metadata"]:
                 title = prepare_metadata(
                     doc["metadata"].get("title", ""), stop_words_set
@@ -239,6 +245,7 @@ def generate_document_descriptions(
             stop=config["sampling_parameters"]["stop"],
         )
 
+        # Generate document descriptions for all filtered_docs
         for i in tqdm(range(0, len(filtered_docs), save_every)):
             print(
                 "Document descriptions from index "
@@ -258,6 +265,7 @@ def generate_document_descriptions(
                 doc_src = filtered_docs[i + j]["src"]
                 raw_llm_description = output.outputs[0].text.strip()
 
+                # For debugging purposes, only print the first the generated document descriptions
                 if j < 3:
                     print(
                         f"Raw LLM output for doc_id {doc_id}: '{raw_llm_description}'"
@@ -289,7 +297,7 @@ def generate_document_descriptions(
 
 
 # This method loads already generated document descriptions from the artifacts folder, configured at config["artifacts_folder"].
-# It then extracts the content within the <BEGIN> and <END> parts.
+# It then extracts the content within the <BEGIN> and <END> parts. If extracting the content fails, we simply take the entire LLM output as is.
 def get_document_descriptions(config, document_index, prompts, tokenizer):
     document_descriptions = generate_document_descriptions(
         config, document_index, prompts, tokenizer
