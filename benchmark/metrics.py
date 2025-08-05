@@ -1,6 +1,12 @@
+"""
+metrics.py: This file provides helper functions that calculate metrics, e.g. Hit@10, NDCG, RR and a search result's rank.
+"""
+
 import math
 
 
+# This method returns True if a search result for a given search query exists in the target identifier list of the respective entry in the benchmark file.
+# That means, this method checks if a given search result is the desired search result for a search query.
 def is_correct_target(result_doc, target_identifier):
     for identifier in target_identifier:
         correct_identifiers = 0
@@ -23,6 +29,8 @@ def is_correct_target(result_doc, target_identifier):
 top_k = 10
 
 
+# Calculates Hit@k for a given search results list. Note, that I originally called this metrics top-k accuracy but later renamed it to Hit@k in my paper.
+# However, top-k accuracy is a valid synonym and thus I still call this method top_k_accuracy here.
 def top_k_accuracy(results, target_identifier):
     for i, result in enumerate(results):
         if (
@@ -36,8 +44,8 @@ def top_k_accuracy(results, target_identifier):
     return 0
 
 
-# Calculates a relevance scale of the retrieved documents
-# The relevance value is reduced logarithmically depending on the result position
+# Calculates a relevance scale of the retrieved documents using the NDCG.
+# The relevance value is reduced logarithmically depending on the result position.
 def normalized_discounted_cumulative_gain(results, target_identifier):
     dcg = 0
 
@@ -66,6 +74,7 @@ def reciprocal_rank(results, target_identifier):
     return 0
 
 
+# Rank is simply the position of the first valid search result of a search query.
 def rank(results, target_identifier):
     for i, result in enumerate(results):
         if is_correct_target(result, target_identifier):
@@ -74,6 +83,7 @@ def rank(results, target_identifier):
     return len(results)
 
 
+# Given the benchmark result, calculate the mean metrics of all metrics for each query type and for all query types in total.
 def calculate_mean_metrics(benchmark_results):
     metrics = {"all_queries": {}}
 
