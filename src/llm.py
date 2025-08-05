@@ -12,6 +12,7 @@ import torch
 from gpt4all import GPT4All
 
 
+# Load the prompts that will be used for the LLM and ChromaDB from the folder configured at config["prompts_folder"].
 def load_prompts(config):
     prompts_folder = config["prompts_folder"]
     prompts = {}
@@ -26,6 +27,7 @@ def load_prompts(config):
     return prompts
 
 
+# Saves LLM output to the cache folder, configured at config["cache_folder"].
 def save_llm_output_cache(llm_output_cache, config):
     print("Saving LLM output cache...")
 
@@ -36,6 +38,7 @@ def save_llm_output_cache(llm_output_cache, config):
         json.dump(llm_output_cache, file, indent=4)
 
 
+# Load the LLM used for search query refinement using GPT4All.
 def get_llm(config):
     model = GPT4All(
         config["llm_name"],
@@ -45,6 +48,7 @@ def get_llm(config):
     return model
 
 
+# Load the LLM output from the cache folder, configured at config["cache_folder"].
 def get_llm_output_cache(config):
     llm_output_cache = None
     if config["enable_llm_output_cache"]:
