@@ -33,7 +33,7 @@ In order to pull the Docker image from https://gitlab.lrz.de, you have to authen
 docker login gitlab.lrz.de:5005
 ```
 
-Please enter the same username and password that you also you to log in at https://gitlab.lrz.de.
+Please enter the same username and password that you also use to log in at https://gitlab.lrz.de.
 
 Next, to pull and run the latest Docker image, simply run:
 
@@ -68,7 +68,7 @@ When the application finished starting up, you can open the website at http://lo
 To run the Python application locally, you will have to set up all required components, such as a FindFacts index, etc. manually. To do this, follow this process:
 
 1. Create a FindFacts index using the command `isabelle find_facts_index` as explained in my Bachelor thesis. Alternatively you can extract the `find_facts.tar.gz` within the `assets/` folder.
-2. Install Apache Solr: You can either [download a binary](https://solr.apache.org/guide/solr/latest/deployment-guide/installing-solr.html) or pull the [solr docker image](https://hub.docker.com/_/solr/).
+2. [Install Apache Solr](https://solr.apache.org/guide/solr/latest/deployment-guide/installing-solr.html).
 3. Start Solr and specify the path to the FindFacts Solr core:
 ```bash
 solr start --force -p 8983 -s /path/to/findfacts/solr/local
