@@ -1,3 +1,18 @@
+"""
+benchmark.py: This file initializes all required components, i.e. Solr, tokenizer, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and runs the benchmark based on the configuration and the benchmark.csv file. The beginning of the file is similar to app.py.
+
+- Solr: connects to a running Solr database reachable at config["solr_core_url"]
+- Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
+- Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
+- document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
+- document_descriptions: Loads or generates an informal description for each document using vLLM to allow more effective search with informal user queries
+- ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
+- LLM: Loads the configured LLM to refine user queries
+- LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
+
+Finally, for each metric the average will be calculated. All benchmark results will be saved to the results/ folder.
+"""
+
 from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
@@ -31,6 +46,7 @@ with open("config.json", "r") as file:
 print("Loading Solr...")
 solr = connect_solr(config)
 
+# Depending on the strategy that will be investigated, the benchmark result file suffix will change to distinguish the results.
 results_suffix = ""
 if config["add_metadata"]:
     results_suffix = results_suffix + "M"
@@ -93,11 +109,14 @@ benchmark_results = {}
 random.seed(129869)
 
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
+    # This is a list of dictionaries with potential valid theorems
+    # That means, if a theorem in the search results matches the conditions of any dictionary in the list "target_identifier", the search result will be consider successful and metrics will be calculated accordingly in metrics.py.
     target_identifier = row["Target Identifier"]
 
     if row["ID"] not in benchmark_results:
         benchmark_results[row["ID"]] = {"metadata": {}, "queries": {}}
 
+    # Skip the benchmark row, if the entry's cell at column "Skip" is set to "true"
     if row["Skip"] == "true":
         print(
             "Warning: Entry at row index "
@@ -114,6 +133,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         )
         continue
 
+    # If a target identifier is missing in the row in the benchmark.csv, we cannot confirm if any search result is a valid search result and thus have to skip this entry.
     if pd.isna(target_identifier):
         print(
             "Warning: Target identifier JSON for row index "
@@ -128,6 +148,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         )
         continue
 
+    # If the target identifier JSON string cannot be parsed, we cannot confirm if any search result is a valid search result and thus have to skip this entry.
     try:
         target_identifier = json.loads(row["Target Identifier"])
     except json.JSONDecodeError:
@@ -149,6 +170,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     # Remove duplicates from target_identifier (list of dicts)
     target_identifier = [dict(t) for t in {tuple(d.items()) for d in target_identifier}]
 
+    # Check if a theorem identified by a target identifier exists in the document index.
     target_exists = False
     print("Searching document identified by '" + row["Target Identifier"] + "'...")
     for doc_id in document_index:
@@ -156,6 +178,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             target_exists = True
             break
 
+    # If no valid target exists, then no search result will be considered valid and the search will always result in a negative result.
     if not target_exists:
         print(
             "Warning: No target document identified by '"
@@ -168,7 +191,9 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         )
         continue
 
+    # Do a search for each query type
     for query_type in query_columns:
+        # If the query type is "Noisy natural language query", generate the noisy query based on the "Natural language query"
         if query_type == "Noisy natural language query":
             query = row["Natural language query"]
 
@@ -212,6 +237,8 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
             )
             results_list = search_results_to_docs(results_dict, solr, config)["results"]
 
+            # Add the top 10 results for a search to the benchmark results to allow examining the search results.
+            # This is useful because in my paper I showcase different examples for search results to explain performance differences.
             top_results = []
             for i, result in enumerate(results_list[:10]):
                 distance = result.get("distance")
@@ -233,6 +260,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
                     top_results.append(res)
 
+            # Calculate metrics using the methods from metrics.py
             benchmark_results[row["ID"]]["queries"][query_type] = {
                 "metrics": {
                     "top_k_accuracy": top_k_accuracy(results_list, target_identifier),
@@ -250,6 +278,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                 "top_results": top_results,
             }
 
+# Calculate the mean of all metrics and save the benchmark result.
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 benchmark_llm_name = (
     results_suffix
