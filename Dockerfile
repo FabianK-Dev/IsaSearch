@@ -22,8 +22,8 @@ ENV SOLR_HOME=/opt/solr
 ENV PATH="$SOLR_HOME/bin:$PATH"
 
 # Copy assets to the app directory
-COPY ./assets_extracted/afp-2025-branch-default /app/
-COPY ./assets_extracted/chroma_storages /app/
+COPY ./assets_extracted/afp-2025-branch-default /app/afp-2025-branch-default
+COPY ./assets_extracted/chroma_storages /app/chroma_storages
 COPY ./assets_extracted/find_facts/solr /opt/solr/server/solr/
 
 COPY artifacts /app/artifacts
