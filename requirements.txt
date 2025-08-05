@@ -15,6 +15,7 @@ cachetools==5.5.2
 cbor2==5.6.5
 certifi==2025.8.3
 cffi==1.17.1
+cfgv==3.4.0
 charset-normalizer==3.4.2
 chromadb==1.0.15
 click==8.2.1
@@ -25,6 +26,7 @@ cupy-cuda12x==13.5.1
 depyf==0.19.0
 dill==0.4.0
 diskcache==5.6.3
+distlib==0.4.0
 distro==1.9.0
 dnspython==2.7.0
 durationpy==0.10
@@ -51,6 +53,7 @@ httptools==0.6.4
 httpx==0.28.1
 huggingface-hub==0.34.3
 humanfriendly==10.0
+identify==2.6.12
 idna==3.10
 importlib_metadata==8.7.0
 importlib_resources==6.5.2
@@ -78,6 +81,7 @@ multidict==6.6.3
 networkx==3.5
 ninja==1.11.1.4
 nltk==3.9.1
+nodeenv==1.9.1
 numba==0.61.2
 numpy==2.2.6
 nvidia-cublas-cu11==11.11.3.6
@@ -113,7 +117,9 @@ packaging==25.0
 pandas==2.3.1
 partial-json-parser==0.2.1.1.post6
 pillow==11.3.0
+platformdirs==4.3.8
 posthog==5.4.0
+pre_commit==4.2.0
 prometheus-fastapi-instrumentator==7.1.0
 prometheus_client==0.22.1
 propcache==0.3.2
@@ -180,6 +186,7 @@ tzdata==2025.2
 urllib3==2.5.0
 uvicorn==0.35.0
 uvloop==0.21.0
+virtualenv==20.33.0
 vllm==0.10.0
 waitress==3.0.2
 watchfiles==1.1.0

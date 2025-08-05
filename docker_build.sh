@@ -16,3 +16,5 @@ tar --keep-newer-files -xf ./assets/find_facts.tar.gz -C assets_extracted/
 docker build -t gitlab.lrz.de:5005/kadlez/afp-ai-search .
 docker images gitlab.lrz.de:5005/kadlez/afp-ai-search
 docker history gitlab.lrz.de:5005/kadlez/afp-ai-search
+
+echo "Docker build finished successfully!"
