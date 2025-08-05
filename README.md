@@ -13,7 +13,7 @@ Let people know what your project can do specifically. Provide context and add a
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 **If you want to run this application using the GPU (highly recommended):**
-- a NVIDIA GPU that supports CUDA
+- a NVIDIA GPU with at least 12 GB VRAM that supports CUDA (e.g. a NVIDIA GeForce RTX 4070)
 - [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
 
 ## Setup
