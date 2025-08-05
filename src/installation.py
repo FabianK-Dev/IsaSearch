@@ -1,3 +1,7 @@
+"""
+installation.py: This file automatically downloads a copy of the Archive of Formal Proofs from URL configured at config["afp_remote_url"] and extracts it into a folder name configured by config["afp_folder"], if it does not already exist.
+"""
+
 import os
 import tarfile
 import urllib.request
