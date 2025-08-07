@@ -115,7 +115,7 @@ Ablieferungstermin: \date{\today} \\
 
 \section{Einleitung}
 
-\subsection{Motivation \& Problemstellung}
+\subsection{Motivation und Problemstellung}
 Die formale Verifizierung spielt eine entscheidende Rolle, um die Korrektheit von Hard- und Software zu beweisen.
 Isabelle, ein generischer und interaktiver Theorembeweiser mit Schwerpunkt auf Logik höherer Stufe \citep[S. 1]{blanchette_isabelle_nodate}, ermöglicht die Entwicklung und Verifikation von formalen Theoremen \citep[S. 3, S. 9]{nipkow_isabellehol_2002}.
 Das Archive of Formal Proofs ist eine Datenbank von Beweisbibliotheken mit einer stetig wachsenden Zahl an Einträgen \citep[S. 2-3]{blanchette_mining_2015}.
@@ -132,7 +132,7 @@ Diese bieten alle jedoch nur eine lexikalische und keine semantische Suche an, w
 
 Im Gegensatz dazu stellen transformerbasierte Sprachmodelle eine vielversprechende Technologie für semantische Suchmaschinen dar, da sie Wortbedeutungen statt reiner lexikalischer Übereinstimmung miterfassen können \citep{jain_llm_2024}.
 
-\subsection{Zielsetzung \& Forschungsfragen}
+\subsection{Zielsetzung und Forschungsfragen}
 Ziel dieser Bachelorarbeit ist es, eine KI-gestützte semantische Suchmaschine zum Auffinden von Theoremen, Lemmata, Korollaren und Propositionen im Archive of Formal Proofs zu entwickeln und zu evaluieren.
 Außerdem sollen verschiedene Suchstrategien, z. B. das Umschreiben von Suchanfragen mit Sprachmodellen, die Informalisierung von Theoremen und die Integration von Metadaten, geprüft werden.
 Anschließend findet eine Evaluation der Suchmaschine mithilfe eines manuell erstellten Benchmarks sowie eine Analyse des erzielten Ergebnisses statt.
@@ -148,7 +148,7 @@ Die folgenden Forschungsfragen werden in dieser Bachelorarbeit beantwortet:
 
 \section{Hintergrund}
 
-\subsection{Isabelle \& das Archive of Formal Proofs}
+\subsection{Isabelle und das Archive of Formal Proofs}
 
 %Teaching Higher-Order Logic Using Isabelle (Lund, Simon Tobias; Villadsen, Jørgen)
 %Isabelle/HOL: A Proof Assistant for Higher-Order Logic (Tobias Nipkow, Lawrence C. Paulson, Markus Wenzel)
@@ -399,7 +399,7 @@ Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbet
 % - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
 
 \hypertarget{rest_api}{
-\subsection{Web-Benutzeroberfläche \& REST-API}
+\subsection{Web-Benutzeroberfläche und REST-API}
 }
 
 Neben der REST-API, welche bereits in Abschnitt \ref{sec:programmaufbau} beschrieben wurde, habe ich zudem eine Web-Benutzeroberfläche erstellt.
@@ -409,8 +409,14 @@ Zwar werden Theoreme durch das Sprachmodell in Englisch informalisiert, wenn jed
 
 Nutzer bekommen zudem die Umschreibung ihrer Suchanfrage, sofern dies aktiviert ist, sowie die Informalisierung jedes Theorems in den Suchergebnissen angezeigt, was dabei helfen kann die Bedeutung eines Theorems schneller zu verstehen.
 Da die Umschreibung der Suchanfrage und die Informalisierung jedoch KI-generiert sind und Sprachmodelle Fehler machen können, bekommen Nutzer bei der ersten Suchanfrage immer eine entsprechende Warnung angezeigt.
+\todo{
+- TODO: Distanz Suchergebnis-Einbettung / Suchanfrage-Einbettung
 
-Die REST-API kann unter folgendem Endpoint erreicht werden:
+- TODO: Link zur Datei im GitLab Repo
+
+- TODO: Link zum AFP}
+
+Die REST-API, die von der Web-Benutzeroberfläche angesteuert wird, kann unter folgendem Endpoint erreicht werden:
 \begin{verbatim}
 GET /search?query={suchanfrage}&refine_query={true/false}
 \end{verbatim}
@@ -617,7 +623,7 @@ Die Suchdauer ist zudem von der verwendeten Hardware abhängig, weswegen die abs
 Hit@k ist eine intuitiv verständliche Bewertung, während der Reciprocal Rank die Position des ersten relevanten Treffers bewertet.
 Der Normalized Discounted Cumulative Gain hingegen bewertet zusätzlich die Reihenfolge und Verteilung aller relevanter Ergebnisse und ist damit am aussagekräftigsten.
 
-\section{Ergebnis \& Analyse}
+\section{Ergebnis und Analyse}
 \label{sec:ergebnis_und_analyse}
 
 \subsection{Vergleich der Suchstrategien}
@@ -905,8 +911,11 @@ Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Bei
 
 Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
 Um solche Lemmata mit einzubeziehen, könnte z. B. die Methode \texttt{Syntax.string\_of\_term} \citep[S. 100-101]{wenzel_isabelleisar_implementation} in Isabelle/ML, die Programmiersprache, in der Isabelle/HOL geschrieben wurde \citep{wenzel_isabelleisar_implementation}, innerhalb eines Beweiskontexts eines automatisch generierten Lemmas genutzt werden, um den String eines \texttt{term}-Objekts zu erhalten.
+- TODO: Erweiterung für FindFacts
+- TODO: nur NVIDIA
 
-\section{Zusammenfassung \& Ausblick}
+\section{Zusammenfassung und Ausblick}
+- TODO: wie schwer statt NVIDIA
 
 In dieser Bachelorarbeit wurde eine semantische Theoremsuchmaschine für Isabelle und das Archive of Formal Proofs sowie ein Benchmark zum Evaluieren der Suchqualität entwickelt.
 Das Benchmark-Ergebnis zeigt, dass die Kombination aus Umschreiben der Suchanfrage, Informalisieren der Theoreme und einer Vektorsuche mit ChromaDB die Auffindbarkeit von Theoremen deutlich verbessert.
