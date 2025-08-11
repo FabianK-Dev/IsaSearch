@@ -4,7 +4,7 @@
     "isabelle_version": "Isabelle2025",
     "afp_remote_url": "https://foss.heptapod.net/isa-afp/afp-2025/-/archive/branch/default/afp-2025-branch-default.tar.gz",
     "afp_folder": "afp-2025-branch-default",
-    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025/-/tree/branch/default/thys",
+    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/65d00171ce3057668da99bcc12ebf98b38c6dae3/thys",
     "solr_core_url": "http://localhost:8983/solr/local",
     "cache_folder": ".cache",
     "artifacts_folder": "artifacts/microsoft/Phi-3.5-mini-instruct",
