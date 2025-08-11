@@ -83,11 +83,11 @@ solr start --force -p 8983 -s /path/to/findfacts/solr/local
 > ⚠️ **Warning:** If the path to the FindFacts index is not correct, Solr will automatically create a new empty core. Please make sure that you provide the exact path to the Solr folder (e.g. falsely using `/path/to/findfacts/solr` instead of `/path/to/findfacts/solr/local` will result in Solr not finding the Solr core).
 4. If necessary, edit the path to the Solr URL in the `config.json#solr_core_url` variable.
 5. Extract `afp-2025-branch-default.tar.gz` and `chroma_storages.tar.gz` and edit both paths in the configuration at `config.json#afp_folder` and `config.json#chroma_db_path`.
-6. Start the application using Python: `python -m src.app`
+6. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
 
 #### Benchmark
 
-To run the Benchmark, use `python -m benchmark.benchmark`. If you want to run a full benchmark that compares different strategies that I also compared in my Bachelor thesis, run `run_full_benchmark.sh`.
+To run the Benchmark, use `python -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies that I also compared in my Bachelor thesis, run `run_full_benchmark.sh`.
 
 ## Output
 
