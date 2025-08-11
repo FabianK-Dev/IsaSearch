@@ -19,7 +19,7 @@ Link zum Repo, Anmerkung, dass hier artifacts und assets fehlen. # TODO
 
 There are multiple ways to set up the application, of which I recommend the usage of Docker because it ensures containerization and reproducibility. Additionally, it doesn't require having Solr and Java installed and provides more security, because the Solr database and ChromaDB collections are only accessible inside the Docker container. You can either directly pull and run the Docker image or build and run the Docker image locally.
 
-Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. This is why I decided to provide prepared tar.gz files of them in the `artifacts` and `assets` folder (for the version that is specified in file). # TODO
+Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. This is why I decided to provide prepared tar.gz files of them in the `artifacts` and `assets` folder. I used the development branches for both Isabelle and the Archive of Formal Proofs to create the assets. You can find the respective commit hashes in the file `assets/version`.
 
 In theory, the application only requires a pre-built FindFacts index as a Solr database and the application will start the informalization and embedding process of all necessary theorems. You can confirm/test this by deleting or renaming the `chroma_storages` and the `assets` folder in the running Docker container.
 
