@@ -7,8 +7,6 @@ import json
 import os
 
 from pathlib import Path
-
-import torch
 from gpt4all import GPT4All
 
 
@@ -42,7 +40,7 @@ def save_llm_output_cache(llm_output_cache, config):
 def get_llm(config):
     model = GPT4All(
         config["llm_name"],
-        device="cuda" if torch.cuda.is_available() else "cpu",
+        device="gpu",
         n_ctx=1024,
     )
     return model
