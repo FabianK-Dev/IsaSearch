@@ -9,11 +9,16 @@ Link zum Repo, Anmerkung, dass hier artifacts und assets fehlen. # TODO
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
 - [Docker](https://docs.docker.com/engine/install/)
-- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 **If you want to run this application using the GPU (highly recommended):**
-- a NVIDIA GPU with at least 12 GB VRAM that supports CUDA (e.g. a NVIDIA GeForce RTX 4070)
+- a GPU with at least 12 GB VRAM (NVIDIA, AMD and Intel GPUs are supported)
+
+**If you want to run the Docker image:**
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
+- a NVIDIA GPU with at least 12 GB VRAM that supports CUDA (e.g. a NVIDIA GeForce RTX 4070)
+
+> ℹ️ **Note:** The application should be compatible with NVIDIA, AMD and Intel GPUs or only the CPU, however I was only able to test it (1) using a NVIDIA GPU and (2) using the CPU only. The Docker image provided uses the base image **nvidia/cuda:12.8.0-base-ubuntu24.04** and thus requires a NVIDIA GPU that supports CUDA, NVIDIA drivers and the NVIDIA Container Toolkit.
 
 ## Setup
 
