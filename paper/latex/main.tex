@@ -97,7 +97,7 @@ Ablieferungstermin: \date{\today} \\
 
 \vspace{1,5cm}
 \input{pages/disclaimer}
-\input{pages/acknowledgements} % TODO: if you don't have anyone to thank for or don't wish to publish it, comment this line out.
+\input{pages/acknowledgements} % if you don't have anyone to thank for or don't wish to publish it, comment this line out.
 \input{pages/abstract}
 
 \newpage
@@ -295,7 +295,7 @@ In Abschnitt \ref{sec:ergebnis_und_analyse} wird untersucht, ob das Anhängen di
 Bevor das Sprachmodell ausgeführt wird, wird wiederum, ähnlich wie in Abschnitt \ref{sec:programmaufbau} beschrieben, die höchstmögliche Anzahl an benötigten Tokens, für eine Prompt berechnet.
 Zum Generieren der Sprachmodellausgaben anhand der Anweisungen wird das Paket vLLM\footnote{\url{https://pypi.org/project/vllm/}} genutzt, welches für parallele Inferenz großer Sprachmodelle optimiert ist und paralleles Generieren mehrerer Ausgaben ermöglicht \citep[S. 7]{guo_gllm_2025}.
 Indem zuvor bereits kalkuliert wurde, wie viele Tokens für eine einzelne Prompt höchstens benötigt werden, kann hier der gesamte verfügbaren GPU-Speicher so effizient wie möglich genutzt werden.
-% TODO: Quelltext des Dokuments wird auf vor 'proof' beschränkt?
+% Quelltext des Dokuments wird auf vor 'proof' beschränkt?
 % Vorgesehen, dass artifakte committet werden
 
 \scriptsize
@@ -346,13 +346,13 @@ Zudem wurden lizenzbeschränkte Modelle (z. B. Llama 3.2, Gemma 3, etc.) wegen r
 Zum Beispiel erfordet das ``Llama 3.1 Community License Agreement``\footnote{\url{https://www.llama.com/llama3_1/license/}}, dass Llama-Sprachmodelle nur verwendet werden können, nachdem persönliche Daten an Meta übertragen wurden, was datenschutzrechtliche Bedenken aufwerfen kann.
 
 Das Modell, das alle Kriterien erfüllt hat und die höchstmögliche Position im Ranking hält, ist das Modell \texttt{Phi-3.5-mini-instruct}\footnote{\url{https://huggingface.co/microsoft/Phi-3.5-mini-instruct}} von Microsoft \citep{abdin_phi-3_2024}, welches unter der MIT-Lizenz lizenziert ist und im GPQA-Benchmark eine 30,4\%-Genauigkeit erzielt.
-% TODO: Instruct vs. Base
+% Instruct vs. Base
 % https://www.llama.com/llama3_1/license/
 % SOURCE: (https://llm-stats.com/, https://github.com/JonathanChavezTamales/llm-leaderboard), https://huggingface.co/microsoft/Phi-3.5-mini-instruct
 
 \subsection{Einbettung und semantische Ähnlichkeitssuche}
 \label{sec:einbettung_semantische_suche}
-% TODO: Evtl. neues Unterkapitel
+% Evtl. neues Unterkapitel
 % SOURCE: https://arxiv.org/pdf/2411.06493
 Um die geladenen informalisierten Dokumente (siehe Abschnitt \ref{sec:informalisierung}) effizient für die semantische Suche abzuspeichern, wird ChromaDB\footnote{\url{https://www.trychroma.com/}}, eine Open-Source-Vektordatenbank zum Speichern hochdimensionaler Einbettungen \citep[S. 2]{sheng_lprotector_2024}, verwendet.
 %In der natürlichen Sprachverarbeitung handelt es sich bei einer Satzeinbettung um eine Repräsentation eines Satz, welcher einem Vektor $v$ mit $v \in \mathbb{R}^n$ in einem hochdimensionalen Vektorraum zugeordnet wird, sodass andere Satzeinbettungen, welche sich nahe $v$ befinden eine ähnliche Bedeutung haben.
@@ -394,7 +394,7 @@ Das bedeutet, eine Einbettung $e_k \in E$ ist genau dann die relevanteste Einbet
 %\todo[inline]{Frage: Soll/Darf ich ``Denglisch`` nutzen und z. B. Prompt, Embedding statt Prompt, Einbettung schreiben?}
 % Info, dass KI sich an Format halten soll
 % Limitation: KI ignoriert manchmal Forderung nach Format
-% TODO: prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
+% prompt von https://aclanthology.org/2024.findings-emnlp.470.pdf übernommen
 % FRAGE: Soll ich Embedding oder Einbettung sagen?
 % - Für eine gegebene Suchanfrage wird nun zuerst ein Embedding für die Suchanfrage mithilfe desselben Transformer-Modells erstellt.\\
 
@@ -444,7 +444,7 @@ Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiede
   \item \textbf{Titel des Theorems als Suchanfrage:}
   Hierbei wird der Wert aus der ``Title``-Spalte, welche dem Titel des Theorems, so wie er aus der Liste übernommen wurde, entspricht, als Suchanfrage gestellt.
   Der Vollständigkeit halber wurde diese Suchanfrage erneut in der Spalte ``Title query`` der Datei \texttt{benchmark.csv} gespeichert.
-% TODO: Beispiel
+% Beispiel
   \item \textbf{Natürliche Sprache als Suchanfrage:}
   Ziel hierbei ist es eine realistische Suchanfrage in natürlicher Sprache für das jeweilige Theorem zu formulieren.
   Ein Problem besteht jedoch darin, dass das manuelle Formulieren einer Suchanfrage für jedes gegebene Theorem fehleranfällig ist, da bei der Erstellung potenziell Missverständnisse hinsichtlich der Bedeutung auftreten können oder das Risiko von Voreingenommenheit besteht.
@@ -454,7 +454,7 @@ Jede Zeile entspricht hierbei einem Theorem für welches jeweils drei verschiede
   Zusätzlich wurde für jedes Zitat dessen Quelle in Form eines Links zur Webadresse des Wikipedia-Artikels in der Spalte ``Natural language query source`` gespeichert.
   Die Suchanfragen sind, inklusive Ellipsen und Zeichensetzung, durchschnittlich 97 Zeichen lang.
   Die kürzeste Suchanfrage ist 23 Zeichen und die längste 205 Zeichen lang.
-% TODO: Beispie
+% Beispie
 %- wurde reduziert oben genannte Risiken und simuliert ``echte`` Suchanfragen
   \item \textbf{Verrauschte natürliche Sprache als Suchanfrage:}
   Die in der vorherigen Methode verwendeten Suchanfragen haben den Nachteil, dass diese oft unrealistisch präzise sind.
@@ -916,6 +916,8 @@ Die FindFacts-Komponente, die direkt in Isabelle integriert ist, ist in Scala ge
 Um FindFacts nun zu erweitern, sodass es auch automatisch generierte Theoreme mit einbezieht, eignet es sich daher die Scala-Bibliothek \texttt{scala-isabelle}\footnote{\url{https://dominique-unruh.github.io/scala-isabelle/}} in FindFacts zu integrieren, welche es ermöglicht mit Isabelle zu interagieren, Theoreme zu laden und Isabelle/ML-Quelltext auszuführen.
 Dabei würde FindFacts auf eine installierte Instanz von Isabelle zugreifen, eine Theorie mit Theoremen laden und die zuvor genannten Methoden ausführen, um auf den automatisch generierten Beweisterm zuzugreifen.
 
+- TODO: nur NVIDIA
+
 \section{Zusammenfassung und Ausblick}
 - TODO: wie schwer statt NVIDIA
 
@@ -938,7 +940,7 @@ In Zukunft könnte außerdem die semantische Suchmaschine direkt in die Suchmasc
 %TC:ignore
 \pagebreak
 
-% TODO: appendix chapter
+% appendix chapter
 \input{pages/appendix}
 
 \pagebreak
