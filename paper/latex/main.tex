@@ -909,10 +909,12 @@ Die Suchqualität ist stark abhängig von (1) der Informalisierung eines Theorem
 Es kann zudem passieren, dass Sprachmodelle, wie in \ref{sec:einfluss_metadate_informalisierung} erwähnt, Inhalte eines Textes halluzinieren oder falsch interpretieren.
 Dadurch kann zwar fehlender Kontext vom Sprachmodell ``erraten`` werden, zum Beispiel wenn der Nutzer bewusst aus Effizienzgründen eine kurze, wenig detaillierte Suchanfrage formuliert hat, jedoch besteht auch das Risiko, dass falsche Suchergebnisse gefunden werden.
 
-Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Lemmata nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
-Um solche Lemmata mit einzubeziehen, könnte z. B. die Methode \texttt{Syntax.string\_of\_term} \citep[S. 100-101]{wenzel_isabelleisar_implementation} in Isabelle/ML, die Programmiersprache, in der Isabelle/HOL geschrieben wurde \citep{wenzel_isabelleisar_implementation}, innerhalb eines Beweiskontexts eines automatisch generierten Lemmas genutzt werden, um den String eines \texttt{term}-Objekts zu erhalten.
-- TODO: Erweiterung für FindFacts
-- TODO: nur NVIDIA
+Eine andere Limitation des Suchsystems ist, dass dieses automatisch generierte Theoreme nicht berücksichtigt, da das Indizieren der Daten auf FindFacts beruht, was lediglich Quelltext aus \texttt{.thy}-Dateien extrahiert.
+Um solche Theoreme mit einzubeziehen, kann z. B. die Methode \texttt{Thm.proof\_body\_of} \citep[S. 94]{wenzel_isabelleisar_implementation} in Isabelle/ML, der Programmiersprache, in der Isabelle/HOL geschrieben ist \citep{wenzel_isabelleisar_implementation}, verwendet werden.
+\texttt{Thm.proof\_body\_of} akzeptiert ein Theorem als Parameter und gibt eine Variable vom Typ \texttt{proof\_body} zurück, die eine ``verschachtelte Beweisinformation eines benannten Theorems repräsentiert`` \citep[S. 94]{wenzel_isabelleisar_implementation} und liefert damit zusätzliche Informationen über den automatisch generierten Beweisterm eines Theorems.
+Die FindFacts-Komponente, die direkt in Isabelle integriert ist, ist in Scala geschrieben\footnote{\url{https://isabelle.in.tum.de/repos/isabelle/file/tip/src/Tools/Find_Facts/src}}.
+Um FindFacts nun zu erweitern, sodass es auch automatisch generierte Theoreme mit einbezieht, eignet es sich daher die Scala-Bibliothek \texttt{scala-isabelle}\footnote{\url{https://dominique-unruh.github.io/scala-isabelle/}} in FindFacts zu integrieren, welche es ermöglicht mit Isabelle zu interagieren, Theoreme zu laden und Isabelle/ML-Quelltext auszuführen.
+Dabei würde FindFacts auf eine installierte Instanz von Isabelle zugreifen, eine Theorie mit Theoremen laden und die zuvor genannten Methoden ausführen, um auf den automatisch generierten Beweisterm zuzugreifen.
 
 \section{Zusammenfassung und Ausblick}
 - TODO: wie schwer statt NVIDIA
