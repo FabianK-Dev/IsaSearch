@@ -18,7 +18,7 @@ Link zum Repo, Anmerkung, dass hier artifacts und assets fehlen. # TODO
 - [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
 - a NVIDIA GPU with at least 12 GB VRAM that supports CUDA (e.g. a NVIDIA GeForce RTX 4070)
 
-> ℹ️ **Note:** The application should be compatible with NVIDIA, AMD and Intel GPUs or only the CPU, however I was only able to test it (1) using a NVIDIA GPU and (2) using the CPU only. The Docker image provided uses the base image **nvidia/cuda:12.8.0-base-ubuntu24.04** and thus requires a NVIDIA GPU that supports CUDA, NVIDIA drivers and the NVIDIA Container Toolkit.
+> ℹ️ **Note:** The application should be compatible with NVIDIA, AMD and Intel GPUs or the CPU only, however I was only able to test it (1) using a NVIDIA GPU and (2) using the CPU only. The Docker image provided uses the base image **nvidia/cuda:12.8.0-base-ubuntu24.04** and thus requires a NVIDIA GPU that supports CUDA, NVIDIA drivers and the NVIDIA Container Toolkit.
 
 ## Setup
 
