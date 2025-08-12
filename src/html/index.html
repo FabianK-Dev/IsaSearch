@@ -56,7 +56,7 @@ bijections have inverses, bubblesort, ..."></textarea>
                 <input type="checkbox" class="form-check-input" id="disableRefineCheck">
                 <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but may decrease search accuracy.">Disable query refinement</a></label>
             </div>
-            <button type="button" class="btn btn-primary" onclick="search();">Search</button>
+            <button type="button" class="btn btn-primary" onclick="search();" id="searchButton">Search</button>
         </form>
 
         <div class="my-3"></div>
@@ -118,6 +118,9 @@ bijections have inverses, bubblesort, ..."></textarea>
             if (!input)
                 return;
 
+            const searchButton = document.getElementById("searchButton");
+            searchButton.innerText = "Searching...";
+
             fetch("/search?query=" + encodeURIComponent(input) + "&refine_query=" + refineQuery)
             .then(response => {
                 if (!response.ok) {
@@ -126,6 +129,7 @@ bijections have inverses, bubblesort, ..."></textarea>
                     });
                 } else {
                     response.json().then(res => {
+                        searchButton.innerText = "Search";
                         resultList.innerHTML = "";
                         llmRefinedQuery.innerHTML = "";
 
