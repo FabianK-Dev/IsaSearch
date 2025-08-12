@@ -1,17 +1,17 @@
-# AFP AI Search
+# AI-assisted theorem search in Isabelle: A transformer-based approach
 
->An AI-assisted semantic theorem finder for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs.
+This repository provides an AI-assisted semantic theorem finder for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs. Additionally it contains benchmark results as well as my bachelor’s thesis in both LaTeX source and PDF format.
 
 ## Requirements
 
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
-- [Docker](https://docs.docker.com/engine/install/)
 
 **If you want to run this application using the GPU (highly recommended):**
 - a GPU with at least 12 GB VRAM (NVIDIA, AMD and Intel GPUs are supported)
 
 **If you want to run the Docker image:**
+- [Docker](https://docs.docker.com/engine/install/)
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
 - a NVIDIA GPU with at least 12 GB VRAM that supports CUDA (e.g. a NVIDIA GeForce RTX 4070)
