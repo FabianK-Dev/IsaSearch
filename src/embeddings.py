@@ -191,18 +191,41 @@ def search_results_to_docs(search_results, solr, config):
         # Merge search_results with Solr documents
         search_results["results"][doc_id] = {**search_results["results"][doc_id], **doc}
 
-        # Add direct link to file in remote repository
-        sub_path = search_results["results"][doc_id]["file"].split("/thys/")
-        if len(sub_path) > 1:
-            search_results["results"][doc_id]["remote_url"] = (
-                config["afp_remote_thys_folder_url"]
-                + "/"
-                + sub_path[1]
-                + "#L"
-                + str(search_results["results"][doc_id]["start_line"])
-            )
+        # Set default URLs to '#' which indicates the URL is not available
+        search_results["results"][doc_id]["remote_url"] = "#"
+        search_results["results"][doc_id]["entry_url"] = "#"
+        search_results["results"][doc_id]["theory_url"] = "#"
+
+        # Add direct link to the file in the remote repository and the entry URL
+        # If the "ID" key starts with "USER_HOME", it's an entry from the AFP.
+        # Otherwise, if it starts with "ISABELLE_HOME", it's a built-in theory file.
+        # Then we can only add the link to the remote theory file (e.g. hosted on https://isabelle.in.tum.de/library/)
+        if search_results["results"][doc_id]["id"].startswith("USER_HOME"):
+            sub_path = search_results["results"][doc_id]["file"].split("/thys/")
+            # If the file path does not contain /thys/ it means that the file does not exist in the repository
+            if len(sub_path) > 1:
+                # Add the line where the theorem code starts using #L... so that GitLab automatically jumps to the desired line when opening it in the browser
+                search_results["results"][doc_id]["remote_url"] = (
+                    config["afp_remote_thys_folder_url"]
+                    + "/"
+                    + sub_path[1]
+                    + "#L"
+                    + str(search_results["results"][doc_id]["start_line"])
+                )
+
+            # Extract the sub path for isa-afp.org
+            sub_path = search_results["results"][doc_id]["url_path"].split("/")
+            if len(sub_path) > 1:
+                # We need the second last element from the URL path separated by /
+                search_results["results"][doc_id]["entry_url"] = (
+                    config["afp_remote_entry_url"] + "/" + sub_path[-2] + ".html"
+                )
         else:
-            search_results["results"][doc_id]["remote_url"] = "#"
+            # If it's a built-in theory file, we cannot add a remote or entry link, but we can add the link to the theory file (e.g. hosted on https://isabelle.in.tum.de/library/)
+            sub_path = search_results["results"][doc_id]["url_path"]
+            search_results["results"][doc_id]["theory_url"] = (
+                config["isabelle_remote_theory_url"] + "/" + sub_path
+            )
 
         # Remove HTML and XML from API response to lower response size and network usage
         del search_results["results"][doc_id]["html"]
