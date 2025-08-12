@@ -30,7 +30,9 @@ from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from nltk.corpus import stopwords
+from vllm.distributed.parallel_state import destroy_model_parallel
 
+import gc
 import json
 import pandas as pd
 import os
@@ -78,8 +80,11 @@ document_index = build_document_index(config, solr)
 print("Getting document descriptions...")
 document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
 
-print("Clean up tokenizer to free up memory")
+print("Deleting tokenizer object and freeing GPU memory...")
+destroy_model_parallel()
 del tokenizer
+gc.collect()
+print("Finished deleting tokenizer object and freeing GPU memory.")
 
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, document_index)

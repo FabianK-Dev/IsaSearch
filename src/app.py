@@ -14,8 +14,10 @@ Finally, Flask and package 'waitress' is used to serve both the REST API and sta
 Note: To simplify matters, from now on "theorem" will be used representatively for theorems, lemmas, corollaries and propositions in comment and docstrings.
 """
 
+import gc
 import json
 
+from vllm.distributed.parallel_state import destroy_model_parallel
 from transformers import AutoTokenizer
 from flask import Flask, request, send_from_directory
 
@@ -45,8 +47,11 @@ document_index = build_document_index(config, solr)
 print("Getting document descriptions...")
 document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
 
-print("Clean up tokenizer to free up memory")
+print("Deleting tokenizer object and freeing GPU memory...")
+destroy_model_parallel()
 del tokenizer
+gc.collect()
+print("Finished deleting tokenizer object and freeing GPU memory.")
 
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, document_index)
