@@ -161,6 +161,14 @@ bijections have inverses, bubblesort, ..."></textarea>
                                 node.querySelector("#theoremMetadata").innerHTML = '<a href="' + el.remote_url + '" target="_blank" rel="noopener">Open file</a> | ' + node.querySelector("#theoremMetadata").innerHTML;
                             }
 
+                            if (el.entry_url !== "#") {
+                                node.querySelector("#theoremMetadata").innerHTML = '<a href="' + el.entry_url + '" target="_blank" rel="noopener">Show entry</a> | ' + node.querySelector("#theoremMetadata").innerHTML;
+                            }
+
+                            if (el.theory_url !== "#") {
+                                node.querySelector("#theoremMetadata").innerHTML = '<a href="' + el.theory_url + '" target="_blank" rel="noopener">Open theory</a> | ' + node.querySelector("#theoremMetadata").innerHTML;
+                            }
+
                             if (node.src_code.split("\n").length > 5) {
                                 node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n")
                                 node.querySelector("#theoremCode").innerHTML = node.querySelector("#theoremCode").innerHTML + "<br><b>... (collapsed)</b>";
