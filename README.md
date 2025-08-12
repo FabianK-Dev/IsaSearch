@@ -1,7 +1,5 @@
 # AFP AI Search
 
-Link zum Repo, Anmerkung, dass hier artifacts und assets fehlen. # TODO
-
 >An AI-assisted semantic theorem finder for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs.
 
 ## Requirements
