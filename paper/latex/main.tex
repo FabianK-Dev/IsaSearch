@@ -414,7 +414,9 @@ Falls es sich um ein Suchergebnis eines Theorems im Archive of Formal Proofs han
 Handelt es sich hingegen um ein Theorem, das direkt in Isabelle integriert ist und nicht im Archive of Formal Proofs verfügbar ist (z. B. Theoreme der Theorie \texttt{HOL/HOL-Examples/Sqrt.thy}\footnote{\url{https://isabelle.in.tum.de/library/HOL/HOL-Examples/Sqrt.html}}), wird ein Link zu dessen Theorie-Datei, die online auf der Webseite \url{https://isabelle.in.tum.de/library/} bereitgestellt wird, beigefügt.
 Die Standard-URLs für direkte Links für das Archive of Formal Proofs, das Repository und online bereitgestellte Theorie-Dateien können in der Konfiguration mit den Parametern \texttt{afp\_remote\_entry\_url}, \texttt{afp\_remote\_thys\_folder\_url} und \texttt{isabelle\_remote\_theory\_url} festgelegt werden.
 
-\todo[inline]{- TODO: Distanz Suchergebnis-Einbettung / Suchanfrage-Einbettung}
+Zusätzlich zeigt jedes Suchergebnis die euklidische Distanz der Einbettung des Suchergebnisses zur Einbettung der Suchanfrage, wie in Abschnitt \ref{sec:einbettung_semantische_suche} beschrieben, auf vier Nachkommastellen gerundet an, wodurch Nutzer ein Gefühl dafür bekommen, wie relevant ein Suchergebnis ist.
+Die Suchergebnisse sind aufsteigend nach Distanz sortiert, wobei niedrigere Distanzen für höhere Relevanz stehen.
+Wenn beispielsweise die Distanz eines Suchergebnisses deutlich größer ist als die Distanz vorheriger Ergebnisse, könnten Nutzer dies als signifikanten Abfall der Suchrelevanz interpretieren.
 
 Die REST-API, die von der Web-Benutzeroberfläche angesteuert wird, kann unter folgendem Endpoint erreicht werden:
 \begin{verbatim}
