@@ -40,7 +40,7 @@ def save_llm_output_cache(llm_output_cache, config):
 def get_llm(config):
     model = GPT4All(
         config["llm_name"],
-        device="gpu",
+        device="cuda",
         n_ctx=1024,
     )
     return model
