@@ -2,6 +2,8 @@
 
 This repository provides an AI-assisted semantic theorem finder for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs. Additionally it contains benchmark results as well as my bachelor’s thesis in both LaTeX source and PDF format.
 
+You can find the repository online at https://gitlab.lrz.de/Kadlez/afp-ai-search.
+
 ## Requirements
 
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
