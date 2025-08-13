@@ -47,7 +47,7 @@ docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
 Alternatively, you can also find this command in `docker_run.sh`.
 
-This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image.
+This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image. If you don't want to or can't use a NVIDIA GPU, please omit the `--gpus all` parameter. The application will then fallback to the CPU.
 
 When the application finished starting up, you can open the website at http://localhost:5000/.
 
@@ -64,7 +64,7 @@ docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
 Alternatively, you can also find this command in `docker_run.sh`.
 
-This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image.
+This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image. If you don't want to or can't use a NVIDIA GPU, please omit the `--gpus all` parameter. The application will then fallback to the CPU.
 
 When the application finished starting up, you can open the website at http://localhost:5000/.
 
@@ -81,7 +81,8 @@ solr start --force -p 8983 -s /path/to/findfacts/solr/local
 > ⚠️ **Warning:** If the path to the FindFacts index is not correct, Solr will automatically create a new empty core. Please make sure that you provide the exact path to the Solr folder (e.g. falsely using `/path/to/findfacts/solr` instead of `/path/to/findfacts/solr/local` will result in Solr not finding the Solr core).
 4. If necessary, edit the path to the Solr URL in the `config.json#solr_core_url` variable.
 5. Extract `afp-2025-branch-default.tar.gz` and `chroma_storages.tar.gz` and edit both paths in the configuration at `config.json#afp_folder` and `config.json#chroma_db_path`.
-6. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
+6. Install the requirements: `pip install transformers tqdm nltk bs4 requests pandas flask waitress vllm torch chromadb pysolr gpt4all gpt4all[cuda]`. If this command does not work, please install the requirements from the `requirements.txt`: `pip install -r requirements.txt`
+7. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
 
 #### Benchmark
 
@@ -208,6 +209,18 @@ When continuing development, I suggest installing `pre-commits` first:
 ```bash
 pre-commit install
 ```
+
+## Troubleshooting / Known issues
+
+### Receiving errors when trying to run `docker` without root
+
+> "The docker user group exists but contains no users, which is why you’re required to use sudo to run Docker commands. Continue to Linux postinstall to allow non-privileged users to run Docker commands and for other optional configuration steps." (from ["Install Docker Engine on Debian"](https://docs.docker.com/engine/install/debian/#install-using-the-repository))
+
+If you encounter this kind of problem, please refer to [Linux post-installation steps for Docker Engine](https://docs.docker.com/engine/install/linux-postinstall/).
+
+### The Docker container can't connect to the internet
+
+If the running Docker container can't connect to the internet, e.g. to download models from [Hugging Face](https://huggingface.co/), the application won't work. I encountered this issue when testing the Docker image on a Windows computer. The solution in this case was to simply restart "Docker Desktop", remove the docker container and run the image again.
 
 ## Acknowledgment
 
