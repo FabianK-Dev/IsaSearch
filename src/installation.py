@@ -55,37 +55,66 @@ def download_and_extract(remote_url, target_path):
 
 def build_index(config):
     """
-    1. Checks if the index (solr/local) already exists. If yes, stops.
-    2. Backs up the existing 'find_facts' directory using tarfile if it has changed.
-    3. Runs the Isabelle 'find_facts_index' command.
+    1. Checks if index exists AND if the session list matches the last build.
+    2. If sessions changed or index is missing:
+       a. Backs up existing 'find_facts' (including old index).
+       b. Deletes old index (to ensure clean build).
+       c. Runs Isabelle 'find_facts_index'.
+       d. Saves the new session list to 'indexed_sessions.json'.
     """
     isabelle_bin = config["isabelle_binary_file"]
     afp_folder = str(Path(config["afp_folder"]).absolute())
     isabelle_version = config["isabelle_version"]
 
-    # Path: ~/.isabelle/Isabelle2025-2
+    # Paths
     isabelle_home = Path.home() / ".isabelle" / isabelle_version
     find_facts_dir = isabelle_home / "find_facts"
     solr_index_dir = find_facts_dir / "solr" / "local"
+    state_file = find_facts_dir / "indexed_sessions.json"
 
-    # 1. Stop if index already exists and is not empty
-    if solr_index_dir.exists() and any(solr_index_dir.iterdir()):
+    # 0. Get current sessions from config
+    current_sessions = config.get(
+        "isabelle_sessions", ["HOL-ex", "Laws_of_Large_Numbers"]
+    )
+
+    # 1. Check logic: Index exists? Sessions changed?
+    index_exists = solr_index_dir.exists() and any(solr_index_dir.iterdir())
+    sessions_changed = True
+
+    if state_file.exists():
+        try:
+            with open(state_file, "r") as f:
+                previous_sessions = json.load(f)
+            # Compare sorted lists to ignore order differences
+            if sorted(previous_sessions) == sorted(current_sessions):
+                sessions_changed = False
+        except (json.JSONDecodeError, OSError):
+            print("Warning: Could not read previous session state. Assuming changed.")
+
+    # EXIT CONDITION: Index is there and nothing changed
+    if index_exists and not sessions_changed:
         print(
-            f"Index already exists in {solr_index_dir} and is not empty. Skipping build."
+            f"Index exists and session list unchanged ({len(current_sessions)} sessions). Skipping build."
         )
         return
 
-    # 2. Backup existing find_facts directory (if it exists)
+    print(
+        f"Build trigger: Index missing? {not index_exists} | Sessions changed? {sessions_changed}"
+    )
+
+    # 2. Backup existing find_facts directory
     if find_facts_dir.exists():
         backup_pattern = str(isabelle_home / "find_facts_backup_*.tar.gz")
         existing_backups = sorted(glob.glob(backup_pattern))
-
         should_backup = True
 
-        # Check if the folder is actually newer than the last backup
         if existing_backups:
             last_backup = Path(existing_backups[-1])
-            if find_facts_dir.stat().st_mtime < last_backup.stat().st_mtime:
+            # Skip if folder is older than last backup (unless sessions changed, then force backup!)
+            if (
+                not sessions_changed
+                and find_facts_dir.stat().st_mtime < last_backup.stat().st_mtime
+            ):
                 print(
                     f"Skipping backup: {find_facts_dir.name} has not changed since last backup."
                 )
@@ -96,22 +125,22 @@ def build_index(config):
             backup_file = isabelle_home / f"find_facts_backup_{timestamp}.tar.gz"
             print(f"Creating backup: {backup_file.name}...")
 
-            # Use Python's built-in tarfile module
             with tarfile.open(backup_file, "w:gz") as tar:
-                # arcname="find_facts" ensures the folder is at the root of the archive
-                # avoiding full absolute paths inside the tar
                 tar.add(find_facts_dir, arcname="find_facts")
 
-    # 3. Build the index
-    print("Building FindFacts index...")
-    sessions = config.get(
-        "isabelle_sessions", ["HOL-ex", "Laws_of_Large_Numbers"]
-    )  # Example sessions to test if indexing works
-
-    cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"] + sessions
+    # 4. Build the index
+    print(f"Building FindFacts index for sessions: {current_sessions}...")
+    cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"] + current_sessions
 
     try:
         subprocess.run(cmd, check=True)
         print("Indexing completed successfully.")
+
+        # 5. Save the state (list of sessions) after success
+        # Make sure directory exists (it should after build)
+        find_facts_dir.mkdir(parents=True, exist_ok=True)
+        with open(state_file, "w") as f:
+            json.dump(current_sessions, f, indent=4)
+
     except subprocess.CalledProcessError as e:
         print(f"Error building index: {e}")
