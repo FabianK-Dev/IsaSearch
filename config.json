@@ -8,6 +8,7 @@
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
     "solr_core_url": "http://localhost:8983/solr/local",
+    "solr_query": "command:theorem OR command:lemma OR command:corollary OR command:proposition",
     "cache_folder": ".cache",
     "artifacts_folder": "artifacts/microsoft/Phi-3.5-mini-instruct",
     "prompts_folder": "prompts/microsoft-Phi",
