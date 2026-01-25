@@ -8,7 +8,7 @@ assets_extracted/
 # Downloaded
 /afp-*
 !afp-*.tar.gz
-./Isabelle*
+Isabelle*/
 
 # Files
 .directory
