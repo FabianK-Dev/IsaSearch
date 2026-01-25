@@ -12,7 +12,6 @@ with open("config.json", "r") as file:
     config = json.loads(data)
 
 TMP_ARCHIVE = ".tmp_archive.tar.gz"
-afp_url, afp_folder = config["afp_remote_url"], config["afp_folder"]
 
 
 def download_and_extract(remote_url, target_path):
@@ -47,6 +46,3 @@ def download_and_extract(remote_url, target_path):
         print(
             f"Skipping downloading because the target path {target_path} does already exist."
         )
-
-
-download_and_extract(afp_url, afp_folder)

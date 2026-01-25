@@ -25,12 +25,17 @@ from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
 from src.llm import load_prompts, get_llm, get_llm_output_cache
+from src.installation import download_and_extract
 
 
 print("Loading config...")
 with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
+
+print("Checking and downloading AFP if required...")
+download_and_extract(config["afp_remote_url"], config["afp_folder"])
+download_and_extract(config["isabelle_remote_url"], config["isabelle_binary_file"])
 
 print("Loading Solr...")
 solr = connect_solr(config)
