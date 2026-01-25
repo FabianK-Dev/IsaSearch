@@ -105,7 +105,7 @@ def build_index(config):
     # 3. Build the index
     print("Building FindFacts index...")
     sessions = config.get(
-        "isabelle_sessions", ["HOL", "Laws_of_Large_Numbers"]
+        "isabelle_sessions", ["HOL-ex", "Laws_of_Large_Numbers"]
     )  # Example sessions to test if indexing works
 
     cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"] + sessions
