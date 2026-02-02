@@ -50,7 +50,7 @@ def start_local_solr(config):
     isabelle_version = config.get("isabelle_version")
 
     if isabelle_version is None:
-        print("Error: 'isabelle_version' not defined in config.")
+        print("Error: 'isabelle_version' is unknown.")
         return False
 
     # The local path where Isabelle stores the data

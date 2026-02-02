@@ -16,12 +16,12 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-TMP_ARCHIVE = ".tmp_archive.tar.gz"
+TMP_ARCHIVE = f".tmp_archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.tar.gz"
 
 
 def download_and_extract(remote_url, target_path):
     if not os.path.exists(target_path):
-        print(f"Downloading {remote_url} to file .tmp_archive.tar.gz...")
+        print(f"Downloading {remote_url} to file {TMP_ARCHIVE}...")
         urllib.request.urlretrieve(remote_url, TMP_ARCHIVE)
 
         if not tarfile.is_tarfile(TMP_ARCHIVE):
@@ -32,7 +32,7 @@ def download_and_extract(remote_url, target_path):
 
         try:
             file = tarfile.open(TMP_ARCHIVE)
-            file.extractall()
+            file.extractall(path=target_path)
             file.close()
         except Exception as err:
             os.remove(TMP_ARCHIVE)
@@ -53,6 +53,32 @@ def download_and_extract(remote_url, target_path):
         )
 
 
+def get_isabelle_version():
+    isabelle_bin = os.path.join(config["isabelle_folder"], "bin", "isabelle")
+
+    if not os.path.exists(isabelle_bin):
+        raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
+
+    try:
+        result = subprocess.run(
+            [isabelle_bin, "getenv", "ISABELLE_IDENTIFIER"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        for line in result.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("ISABELLE_IDENTIFIER="):
+                # Return everything after the first "="
+                return line.split("=", 1)[1]
+
+        raise ValueError("Could not find ISABELLE_IDENTIFIER in output.")
+
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Error executing Isabelle getenv: {e.stderr}")
+
+
 def build_index(config):
     """
     1. Checks if index exists AND if the session list matches the last build.
@@ -62,7 +88,7 @@ def build_index(config):
        c. Runs Isabelle 'find_facts_index'.
        d. Saves the new session list to 'indexed_sessions.json'.
     """
-    isabelle_bin = config["isabelle_binary_file"]
+    isabelle_bin = os.path.join(config["isabelle_folder"], "bin", "isabelle")
     afp_folder = str(Path(config["afp_folder"]).absolute())
     isabelle_version = config["isabelle_version"]
 

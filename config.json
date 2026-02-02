@@ -1,9 +1,8 @@
 {
     "isabelle_remote_url": "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz",
-    "isabelle_binary_file": "Isabelle2025-2/bin/isabelle",
-    "isabelle_version": "Isabelle2025-2",
+    "isabelle_folder": "Isabelle",
     "afp_remote_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/archive/branch/default/afp-devel-branch-default.tar.gz?ref_type=b14e648fb192a9ae9b47fa34d87a00932175406e",
-    "afp_folder": "afp-devel-branch-default",
+    "afp_folder": "afp",
     "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/b14e648fb192a9ae9b47fa34d87a00932175406e/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
