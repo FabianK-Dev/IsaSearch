@@ -6,8 +6,7 @@ chroma_storages/*
 assets_extracted/
 
 # Downloaded
-/afp-*
-!afp-*.tar.gz
+afp-*/
 Isabelle*/
 
 # Files
