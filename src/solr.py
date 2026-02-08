@@ -8,6 +8,7 @@ import subprocess
 import atexit
 import os
 import pysolr
+import logging
 from requests.exceptions import RequestException
 
 # Global reference to the Solr Docker process
@@ -69,8 +70,6 @@ def start_local_solr(config):
         "run",
         "--rm",
         "-d",
-        "--name",
-        "local-solr",
         "-p",
         "8983:8983",
         "-v",
@@ -115,6 +114,9 @@ def start_local_solr(config):
 
 def connect_solr(config):
     url = config["solr_core_url"]
+
+    logging.getLogger("pysolr").setLevel(logging.CRITICAL)
+    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 
     try:
         print(f"Connecting to Solr at {url}...")
