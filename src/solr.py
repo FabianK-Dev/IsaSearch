@@ -76,11 +76,7 @@ def start_local_solr(config):
         "--rm",
         "-d",
         "-p",
-        "127.0.0.1:8983:8983",
-        "-e",
-        "SOLR_AUTH_TYPE=basic",
-        "-e",
-        f"SOLR_AUTHENTICATION_OPTS=-Dbasicauth=solr:{SOLR_PASSWORD}",
+        "8983:8983",
         "-v",
         f"{local_mount_path}:/opt/solr/server/solr/local",
         "solr:latest",
@@ -101,9 +97,7 @@ def start_local_solr(config):
         for i in range(30):
             try:
                 # Simple ping on the admin endpoint or core
-                pysolr.Solr(
-                    config["solr_core_url"], timeout=1, auth=("solr", SOLR_PASSWORD)
-                )
+                pysolr.Solr(config["solr_core_url"], timeout=1)
                 print("Solr is up and running!")
                 return True
             except Exception:
@@ -130,7 +124,7 @@ def connect_solr(config):
 
     try:
         print(f"Connecting to Solr at {url}...")
-        solr = pysolr.Solr(url, always_commit=True, timeout=10, auth=SOLR_PASSWORD)
+        solr = pysolr.Solr(url, always_commit=True, timeout=10)
         print("Ping Solr for health check...")
 
         solr.ping()
@@ -149,6 +143,7 @@ def connect_solr(config):
             )
             if choice in ["y", "yes", ""]:
                 success = start_local_solr(config)
+                time.sleep(10)
                 if success:
                     return pysolr.Solr(url, always_commit=True, timeout=10)
                 else:

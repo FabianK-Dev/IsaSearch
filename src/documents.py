@@ -25,7 +25,7 @@ cached_metadata = {}
 # from a local copy of the Archive of Formal Proofs (configured in config["afp_folder"]).
 # Additionally this method caches loaded entires in the 'cached_metadata' dict.
 def get_entry_metadata(entry, config):
-    metadata_folder = config["afp_folder"] + "/metadata/"
+    metadata_folder = config["components"]["afp"]["local_folder"] + "/metadata/"
     entry_toml = metadata_folder + "entries/" + entry + ".toml"
 
     if entry in cached_metadata:
