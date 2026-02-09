@@ -61,7 +61,7 @@ def start_local_solr(config):
 
     # The local path where Isabelle stores the data
     local_mount_path = os.path.join(
-        user_home, ".isabelle", isabelle_version, "find_facts", "solr", "local"
+        user_home, ".isabelle", "find_facts", "solr", "local"
     )
 
     # Ensure the directory exists, otherwise Docker will complain
@@ -101,8 +101,9 @@ def start_local_solr(config):
         for i in range(30):
             try:
                 # Simple ping on the admin endpoint or core
-                solr = pysolr.Solr(config["solr_core_url"], timeout=1)
-                solr.ping()
+                pysolr.Solr(
+                    config["solr_core_url"], timeout=1, auth=("solr", SOLR_PASSWORD)
+                )
                 print("Solr is up and running!")
                 return True
             except Exception:

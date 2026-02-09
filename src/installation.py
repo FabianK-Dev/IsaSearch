@@ -93,19 +93,17 @@ def get_isabelle_version():
 
     try:
         result = subprocess.run(
-            [isabelle_bin, "getenv", "ISABELLE_IDENTIFIER"],
+            [isabelle_bin, "version"],
             capture_output=True,
             text=True,
             check=True,
         )
+        # Return the first line of output as the version string
+        version_line = result.stdout.strip().splitlines()[0]
+        if version_line:
+            return version_line
 
-        for line in result.stdout.splitlines():
-            line = line.strip()
-            if line.startswith("ISABELLE_IDENTIFIER="):
-                # Return everything after the first "="
-                return line.split("=", 1)[1]
-
-        raise ValueError("Could not find ISABELLE_IDENTIFIER in output.")
+        raise ValueError("Could not find isabelle version in output.")
 
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Error executing Isabelle getenv: {e.stderr}")
@@ -124,10 +122,9 @@ def build_index(config):
         config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
     )
     afp_folder = str(Path(config["components"]["afp"]["local_folder"]).absolute())
-    isabelle_version = config["isabelle_version"]
 
     # Paths
-    isabelle_home = Path.home() / ".isabelle" / isabelle_version
+    isabelle_home = Path.home() / ".isabelle"
     find_facts_dir = isabelle_home / "find_facts"
     solr_index_dir = find_facts_dir / "solr" / "local"
     state_file = find_facts_dir / "indexed_sessions.json"

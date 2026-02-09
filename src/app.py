@@ -29,6 +29,7 @@ from src.installation import (
     check_and_update,
     build_index,
     setup_isabelle_components,
+    get_isabelle_version,
 )
 
 
@@ -46,7 +47,7 @@ if config.get("check_for_updates", True):
 
 print("Setting up Isabelle components if required...")
 setup_isabelle_components()
-config["isabelle_version"] = "Isabelle"
+config["isabelle_version"] = get_isabelle_version()
 
 print("Building Isabelle FindFacts index if required...")
 build_index(config)
