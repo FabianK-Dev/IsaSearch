@@ -24,13 +24,13 @@ pip install -r requirements.txt
 python3 -m src.app
 ```
 
-Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. As a result, for testing purposes we have only enabled two sessions (`"HOL-ex", "Laws_of_Large_Numbers"`) to be indexed.
+Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. As a result, for testing purposes we have only enabled two sessions (`"Ramsey-Infinite", "Ordinals_and_Cardinals"`) to be indexed.
 
 ### Benchmark
 
 To run the Benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies that are also compared in our paper, run `run_full_benchmark.sh`.
 
-Please keep in mind that the results will be different from the ones in the paper, as we have only enabled two sessions (`"HOL-ex", "Laws_of_Large_Numbers"`) to be indexed for testing purposes, while in the paper we have indexed all sessions of the Archive of Formal Proofs.
+Please keep in mind that the results will be different from the ones in the paper, as we have only enabled two sessions (`"Ramsey-Infinite", "Ordinals_and_Cardinals"`) to be indexed for testing purposes, while in the paper we have indexed all sessions of the Archive of Formal Proofs.
 
 ## Output
 

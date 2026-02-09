@@ -12,7 +12,7 @@
             "target_branch": "master"
         }
     },
-    "isabelle_sessions": ["HOL-ex", "Laws_of_Large_Numbers"],
+    "isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"],
     "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
