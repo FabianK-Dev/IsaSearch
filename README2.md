@@ -1,6 +1,6 @@
 # IsaSearch
 
-This repository provides an AI-assisted semantic theorem finder for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs. Additionally, it contains our benchmark data and results.
+This repository provides an AI-assisted semantic theorem search for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs. Additionally, it contains our benchmark data and results.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ This repository provides an AI-assisted semantic theorem finder for the Archive 
 
 ### Quickstart
 
-> ⚠️ **Warning:** Please run the following commands **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly):
+> ⚠️ **Warning:** Please run the following commands **inside the root folder of the repository** (this is necessary to ensure files like `config.json` are loaded correctly):
 
 ```bash
 python3 -m venv .venv  # If this command does not work, please install the `venv` module for Python: `pip install venv`
@@ -26,9 +26,11 @@ python3 -m src.app
 
 Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. As a result, for testing purposes we have only enabled two sessions (`"HOL-ex", "Laws_of_Large_Numbers"`) to be indexed.
 
-#### Benchmark
+### Benchmark
 
-To run the Benchmark, use `python -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies that I also compared in my Bachelor thesis, run `run_full_benchmark.sh`.
+To run the Benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies that are also compared in our paper, run `run_full_benchmark.sh`.
+
+Please keep in mind that the results will be different from the ones in the paper, as we have only enabled two sessions (`"HOL-ex", "Laws_of_Large_Numbers"`) to be indexed for testing purposes, while in the paper we have indexed all sessions of the Archive of Formal Proofs.
 
 ## Output
 
