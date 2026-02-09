@@ -4,7 +4,6 @@ installation.py: This file automatically downloads a copy of the Archive of Form
 
 import os
 import tarfile
-import urllib.request
 import json
 import subprocess
 import glob
@@ -16,45 +15,78 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-TMP_ARCHIVE = f".tmp_archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.tar.gz"
 
+def check_and_update(name, comp_config):
+    local_path = comp_config["local_folder"]
+    remote_url = comp_config["remote_url"]
+    target_branch = comp_config["target_branch"]
 
-def download_and_extract(remote_url, target_path):
-    if not os.path.exists(target_path):
-        print(f"Downloading {remote_url} to file {TMP_ARCHIVE}...")
-        urllib.request.urlretrieve(remote_url, TMP_ARCHIVE)
-
-        if not tarfile.is_tarfile(TMP_ARCHIVE):
-            os.remove(TMP_ARCHIVE)
-            raise ValueError(
-                f"Remote URL {remote_url} does not lead to a tar file. Only extracting tar files is supported."
-            )
-
+    if os.path.exists(local_path) and os.path.isdir(os.path.join(local_path, ".git")):
+        print(f"Updating {name} in {local_path}...")
         try:
-            file = tarfile.open(TMP_ARCHIVE)
-            file.extractall(path=target_path)
-            file.close()
-        except Exception as err:
-            os.remove(TMP_ARCHIVE)
-            raise Exception(f"Unexpected error occured: {err}")
-
-        # Delete temporary archive after extracting
-        os.remove(TMP_ARCHIVE)
-
-        print("Verifying download...")
-
-        if not os.path.exists(target_path):
-            raise ValueError(
-                f"Downloading from remote URL {remote_url} failed because target path {target_path} could not be found after installing. Something went wrong."
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    local_path,
+                    "pull",
+                    "origin",
+                    target_branch,
+                    "--depth",
+                    "1",
+                ],
+                check=True,
             )
+        except subprocess.CalledProcessError as e:
+            print(f"Error updating {name}: {e}")
     else:
-        print(
-            f"Skipping downloading because the target path {target_path} does already exist."
+        print(f"Cloning {name} into folder '{local_path}'...")
+        try:
+            subprocess.run(
+                [
+                    "git",
+                    "clone",
+                    "--depth",
+                    "1",
+                    "-b",
+                    target_branch,
+                    remote_url,
+                    local_path,
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error cloning {name}: {e}")
+
+
+# Install Isabelle components
+def setup_isabelle_components():
+    isabelle_bin = os.path.join(
+        config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
+    )
+
+    if not os.path.exists(isabelle_bin):
+        raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
+
+    print("Setting up Isabelle components...")
+    try:
+        subprocess.run([isabelle_bin, "components", "-I"], check=True)
+        subprocess.run([isabelle_bin, "components", "-a"], check=True)
+        subprocess.run(
+            [isabelle_bin],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
+        print("Isabelle components setup completed.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error setting up Isabelle components: {e}")
 
 
 def get_isabelle_version():
-    isabelle_bin = os.path.join(config["isabelle_folder"], "bin", "isabelle")
+    isabelle_bin = os.path.join(
+        config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
+    )
 
     if not os.path.exists(isabelle_bin):
         raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
@@ -88,8 +120,10 @@ def build_index(config):
        c. Runs Isabelle 'find_facts_index'.
        d. Saves the new session list to 'indexed_sessions.json'.
     """
-    isabelle_bin = os.path.join(config["isabelle_folder"], "bin", "isabelle")
-    afp_folder = str(Path(config["afp_folder"]).absolute())
+    isabelle_bin = os.path.join(
+        config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
+    )
+    afp_folder = str(Path(config["components"]["afp"]["local_folder"]).absolute())
     isabelle_version = config["isabelle_version"]
 
     # Paths
@@ -98,10 +132,16 @@ def build_index(config):
     solr_index_dir = find_facts_dir / "solr" / "local"
     state_file = find_facts_dir / "indexed_sessions.json"
 
-    # 0. Get current sessions from config
-    current_sessions = config.get(
-        "isabelle_sessions", ["HOL-ex", "Laws_of_Large_Numbers"]
-    )
+    current_sessions = config.get("isabelle_sessions", ["all"])
+
+    # Handle "all" sessions by reading from ROOTS file
+    if current_sessions == "all" or current_sessions == ["all"]:
+        roots_file = Path(afp_folder) / "thys" / "ROOTS"
+        if roots_file.exists():
+            with open(roots_file, "r") as f:
+                current_sessions = [line.strip() for line in f if line.strip()]
+        else:
+            raise FileNotFoundError(f"ROOTS file not found at: {roots_file}")
 
     # 1. Check logic: Index exists? Sessions changed?
     index_exists = solr_index_dir.exists() and any(solr_index_dir.iterdir())

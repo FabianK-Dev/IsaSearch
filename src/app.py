@@ -25,8 +25,12 @@ from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
 from src.llm import load_prompts, get_llm, get_llm_output_cache
-from src.installation import download_and_extract, get_isabelle_version
-from src.installation import build_index
+from src.installation import (
+    check_and_update,
+    get_isabelle_version,
+    build_index,
+    setup_isabelle_components,
+)
 
 
 print("Loading config...")
@@ -34,12 +38,18 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-print("Checking and downloading AFP if required...")
-download_and_extract(config["afp_remote_url"], config["afp_folder"])
-download_and_extract(config["isabelle_remote_url"], config["isabelle_folder"])
+print("Checking, downloading or updating AFP if required...")
+if config.get("check_for_updates", True):
+    components = config.get("components", {})
+
+    for key, comp_config in components.items():
+        check_and_update(key, comp_config)
+
+print("Setting up Isabelle components if required...")
+setup_isabelle_components()
 
 print("Determining Isabelle version...")
-config["isabelle_version"] = get_isabelle_version(config["isabelle_folder"])
+config["isabelle_version"] = get_isabelle_version()
 print(f"Determined Isabelle version: {config['isabelle_version']}")
 
 print("Building Isabelle FindFacts index if required...")

@@ -1,9 +1,19 @@
 {
-    "isabelle_remote_url": "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz",
-    "isabelle_folder": "Isabelle",
-    "afp_remote_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/archive/branch/default/afp-devel-branch-default.tar.gz?ref_type=b14e648fb192a9ae9b47fa34d87a00932175406e",
-    "afp_folder": "afp",
-    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/b14e648fb192a9ae9b47fa34d87a00932175406e/thys",
+    "check_for_updates": true,
+    "components": {
+        "isabelle": {
+            "remote_url": "https://github.com/isabelle-prover/mirror-isabelle.git",
+            "local_folder": "Isabelle",
+            "target_branch": "master"
+        },
+        "afp": {
+            "remote_url": "https://github.com/isabelle-prover/mirror-afp-devel.git",
+            "local_folder": "afp",
+            "target_branch": "master"
+        }
+    },
+    "isabelle_sessions": ["HOL-ex", "Laws_of_Large_Numbers"],
+    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
     "solr_core_url": "http://localhost:8983/solr/local",
