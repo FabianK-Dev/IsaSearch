@@ -27,7 +27,6 @@ from src.embeddings import search, search_results_to_docs, get_chromadb_collecti
 from src.llm import load_prompts, get_llm, get_llm_output_cache
 from src.installation import (
     check_and_update,
-    get_isabelle_version,
     build_index,
     setup_isabelle_components,
 )
@@ -47,10 +46,7 @@ if config.get("check_for_updates", True):
 
 print("Setting up Isabelle components if required...")
 setup_isabelle_components()
-
-print("Determining Isabelle version...")
-config["isabelle_version"] = get_isabelle_version()
-print(f"Determined Isabelle version: {config['isabelle_version']}")
+config["isabelle_version"] = "Isabelle"
 
 print("Building Isabelle FindFacts index if required...")
 build_index(config)
