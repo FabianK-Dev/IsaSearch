@@ -2,6 +2,8 @@
 solr.py: This file connects to Solr and retrieves documents by their IDs.
 """
 
+import secrets
+import string
 import sys
 import time
 import subprocess
@@ -13,6 +15,9 @@ from requests.exceptions import RequestException
 
 # Global reference to the Solr Docker process
 solr_process = None
+SOLR_PASSWORD = "".join(
+    secrets.choice(string.ascii_letters + string.digits) for _ in range(64)
+)
 
 
 def cleanup_solr():
@@ -71,7 +76,11 @@ def start_local_solr(config):
         "--rm",
         "-d",
         "-p",
-        "8983:8983",
+        "127.0.0.1:8983:8983",
+        "-e",
+        "SOLR_AUTH_TYPE=basic",
+        "-e",
+        f"SOLR_AUTHENTICATION_OPTS=-Dbasicauth=solr:{SOLR_PASSWORD}",
         "-v",
         f"{local_mount_path}:/opt/solr/server/solr/local",
         "solr:latest",
@@ -120,7 +129,7 @@ def connect_solr(config):
 
     try:
         print(f"Connecting to Solr at {url}...")
-        solr = pysolr.Solr(url, always_commit=True, timeout=10)
+        solr = pysolr.Solr(url, always_commit=True, timeout=10, auth=SOLR_PASSWORD)
         print("Ping Solr for health check...")
 
         solr.ping()
