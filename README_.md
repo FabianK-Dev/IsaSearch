@@ -8,7 +8,7 @@ You can find the repository online at https://gitlab.lrz.de/Kadlez/afp-ai-search
 
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
-- [Ollama](https://ollama.com/download) with the configured models pulled locally
+- [Ollama](https://ollama.com/download)
 
 **If you want to run the Docker image:**
 - [Docker](https://docs.docker.com/engine/install/)
@@ -75,8 +75,9 @@ solr start --force -p 8983 -s /path/to/findfacts/solr/local
 4. If necessary, edit the path to the Solr URL in the `config.json#solr_core_url` variable.
 5. Extract `afp-2025-branch-default.tar.gz` and `chroma_storages.tar.gz` and edit both paths in the configuration at `config.json#afp_folder` and `config.json#chroma_db_path`.
 6. Install the requirements: `pip install -r requirements.txt`
-7. Pull the configured Ollama models: `ollama pull phi3.5` and `ollama pull phi3:mini`
-8. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
+7. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
+
+The application starts Ollama automatically and pulls the configured models if they are missing.
 
 #### Benchmark
 

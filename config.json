@@ -42,5 +42,5 @@
     "add_user_query": true,
     "benchmark_search_refine": true,
     "enable_llm_output_cache": true,
-    "api_port": 5000
+    "api_port": 5001
 }

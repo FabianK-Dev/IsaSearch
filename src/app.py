@@ -22,7 +22,7 @@ from flask import Flask, request, send_from_directory
 from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
-from src.llm import load_prompts, get_llm, get_llm_output_cache
+from src.llm import load_prompts, get_llm, get_llm_output_cache, ensure_ollama
 from src.installation import (
     check_and_update,
     build_index,
@@ -35,6 +35,9 @@ print("Loading config...")
 with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
+
+print("Checking Ollama and pulling configured models if required...")
+ensure_ollama(config)
 
 print("Checking, downloading or updating AFP if required...")
 if config.get("check_for_updates", True):
