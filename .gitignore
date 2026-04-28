@@ -6,8 +6,8 @@ chroma_storages/*
 assets_extracted/
 
 # Downloaded
-afp-*/
 Isabelle*/
+afp*/
 
 # Files
 .directory
