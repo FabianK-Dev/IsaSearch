@@ -5,7 +5,7 @@ benchmark.py: This file initializes all required components, i.e. Solr, tokenize
 - Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
 - document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
-- document_descriptions: Loads or generates an informal description for each document using vLLM to allow more effective search with informal user queries
+- document_descriptions: Loads or generates an informal description for each document using Ollama to allow more effective search with informal user queries
 - ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
@@ -30,9 +30,7 @@ from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from nltk.corpus import stopwords
-from vllm.distributed.parallel_state import destroy_model_parallel
 
-import gc
 import json
 import pandas as pd
 import os
@@ -69,7 +67,7 @@ print("Using config for benchmark:")
 pprint(config)
 
 print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(config["vllm_name"])
+tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
 
 print("Loading prompts...")
 prompts = load_prompts(config)
@@ -80,11 +78,9 @@ document_index = build_document_index(config, solr)
 print("Getting document descriptions...")
 document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
 
-print("Deleting tokenizer object and freeing GPU memory...")
-destroy_model_parallel()
+print("Deleting tokenizer object...")
 del tokenizer
-gc.collect()
-print("Finished deleting tokenizer object and freeing GPU memory.")
+print("Finished deleting tokenizer object.")
 
 print("Loading ChromaDB collection...")
 collection = get_chromadb_collection(config, prompts, document_index)
@@ -285,16 +281,16 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
 # Calculate the mean of all metrics and save the benchmark result.
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
-benchmark_llm_name = (
+benchmark_model_name = (
     results_suffix
     + "_"
-    + config["vllm_name"].replace("/", "-")
+    + config["ollama_document_model"].replace("/", "-")
     + "_"
-    + config["llm_name"].replace("/", "-")
+    + config["ollama_query_model"].replace("/", "-")
 )
 
 if not os.path.exists("./benchmark/results/"):
     os.makedirs("./benchmark/results/")
 
-with open("./benchmark/results/" + benchmark_llm_name + ".json", "w") as outfile:
+with open("./benchmark/results/" + benchmark_model_name + ".json", "w") as outfile:
     json.dump(benchmark_results, outfile, indent=4)

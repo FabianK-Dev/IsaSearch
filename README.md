@@ -8,9 +8,7 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
 - [git](https://git-scm.com/downloads) 2.47.3 or higher
 - [Docker](https://www.docker.com/get-started) 29.2.1 or higher
-
-**If you want to run this application using the GPU (optional but recommended):**
-- a GPU with at least 12 GB VRAM (NVIDIA, AMD and Intel GPUs are supported)
+- [Ollama](https://ollama.com/download) with the configured models pulled locally
 
 ## Setup
 
@@ -22,6 +20,8 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 python3 -m venv .venv  # If this command does not work, please install the `venv` module for Python: `pip install venv`
 source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
 pip install -r requirements.txt
+ollama pull phi3.5
+ollama pull phi3:mini
 python3 -m src.app
 ```
 

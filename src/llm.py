@@ -7,7 +7,7 @@ import json
 import os
 
 from pathlib import Path
-from gpt4all import GPT4All
+import requests
 
 
 # Load the prompts that will be used for the LLM and ChromaDB from the folder configured at config["prompts_folder"].
@@ -36,14 +36,51 @@ def save_llm_output_cache(llm_output_cache, config):
         json.dump(llm_output_cache, file, indent=4)
 
 
-# Load the LLM used for search query refinement using GPT4All.
+def ollama_options(config):
+    sampling_parameters = config["sampling_parameters"]
+    options = {
+        "temperature": sampling_parameters["temperature"],
+        "top_p": sampling_parameters["top_p"],
+        "min_p": sampling_parameters["min_p"],
+        "num_predict": sampling_parameters["max_tokens"],
+    }
+
+    if sampling_parameters["top_k"] >= 0:
+        options["top_k"] = sampling_parameters["top_k"]
+
+    if sampling_parameters.get("stop"):
+        options["stop"] = sampling_parameters["stop"]
+
+    return options
+
+
+class OllamaLLM:
+    def __init__(self, base_url, model_name, options):
+        self.base_url = base_url.rstrip("/")
+        self.model_name = model_name
+        self.options = options
+
+    def generate(self, prompt):
+        response = requests.post(
+            self.base_url + "/api/generate",
+            json={
+                "model": self.model_name,
+                "prompt": prompt,
+                "stream": False,
+                "options": self.options,
+            },
+            timeout=None,
+        )
+        response.raise_for_status()
+        return response.json()["response"]
+
+
 def get_llm(config):
-    model = GPT4All(
-        config["llm_name"],
-        device="cuda",
-        n_ctx=1024,
+    return OllamaLLM(
+        config["ollama_base_url"],
+        config["ollama_query_model"],
+        ollama_options(config),
     )
-    return model
 
 
 # Load the LLM output from the cache folder, configured at config["cache_folder"].
