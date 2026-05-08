@@ -25,25 +25,34 @@ python3 -m src.app
 
 The application starts Ollama automatically and pulls the configured models if they are missing.
 
-Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. As a result, for testing purposes we have only enabled two sessions (`"Ramsey-Infinite", "Ordinals_and_Cardinals"`) to be indexed.
+**Note on Indexing Time:**
+Building the full FindFacts index for the entire Archive of Formal Proofs takes about 24 hours, informalizing all theorems ~25 hours, and embedding them into ChromaDB ~2 hours.
+
+**Default Test Configuration:**
+> ⚠️ **Warning:** To allow for immediate testing, the default `config.json` is restricted to only two sessions:
+
+```json
+"isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"]
+```
+
+If you want to search the entire AFP, you need to update the `isabelle_sessions` list in `config.json` to include all desired sessions (or use `["all"]` if supported by your setup), but be prepared for the significant processing time mentioned above.
 
 ### Benchmark
 
-To run the Benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies that are also compared in our paper, run `run_full_benchmark.sh`.
+To run the Benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies (as discussed in our paper), run `run_full_benchmark.sh`.
 
-Please keep in mind that the results will be different from the ones in the paper, as we have only enabled two sessions (`"Ramsey-Infinite", "Ordinals_and_Cardinals"`) to be indexed for testing purposes, while in the paper we have indexed all sessions of the Archive of Formal Proofs.
+**Important:** The results generated with the default configuration will differ from the paper. This is because the test setup only indexes the two sessions mentioned above (`"Ramsey-Infinite"`, `"Ordinals_and_Cardinals"`), whereas the paper results are based on the complete Archive of Formal Proofs.
 
 ## Screenshot
 
 Below you can find a screenshot of the web UI:
 
-![Screenshot of the web UI](paper/latex/website_screenshot.jpg)
-
 ## Pre-Commit hooks
 
-This project uses [ruff](https://pypi.org/project/ruff/) and other pre-commit hooks from the [pre-commit/pre-commit-hooks](https://github.com/pre-commit/pre-commit-hooks) (licensed under the MIT License) repository, which are configured in the `.pre-commit-config.yaml` to follow formatting and linting standards and best practices.
+This project uses [ruff](https://pypi.org/project/ruff/) and other pre-commit hooks to maintain code quality.
 
-When continuing development, I suggest installing `pre-commits` first:
+When continuing development, please install the hooks:
+
 ```bash
 pre-commit install
 ```
