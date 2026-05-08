@@ -8,9 +8,7 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
 - [git](https://git-scm.com/downloads) 2.47.3 or higher
 - [Docker](https://www.docker.com/get-started) 29.2.1 or higher
-
-**If you want to run this application using the GPU (optional but recommended):**
-- a GPU with at least 12 GB VRAM (NVIDIA, AMD and Intel GPUs are supported)
+- [Ollama](https://ollama.com/download)
 
 ## Setup
 
@@ -24,6 +22,8 @@ source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
 pip install -r requirements.txt
 python3 -m src.app
 ```
+
+The application starts Ollama automatically and pulls the configured models if they are missing.
 
 Embedding all theorems into the ChromaDB collection takes about 2 hours, building the FindFacts index with all sessions of the Archive of Formal proofs about 24 hours and informalizing all theorems about 25 hours. As a result, for testing purposes we have only enabled two sessions (`"Ramsey-Infinite", "Ordinals_and_Cardinals"`) to be indexed.
 

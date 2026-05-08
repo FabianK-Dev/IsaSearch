@@ -16,9 +16,15 @@ from src.llm import save_llm_output_cache
 # This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
 def get_chromadb_collection(config, prompts, document_index):
     print("Loading ChromaDB embedding function...")
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        embedding_device = "mps"
+    elif torch.cuda.is_available():
+        embedding_device = "cuda"
+    else:
+        embedding_device = "cpu"
     embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
         model_name=config["chroma_db_embedder"],
-        device="cuda" if torch.cuda.is_available() else "cpu",
+        device=embedding_device,
     )
 
     # ChromaDB path
@@ -95,36 +101,30 @@ def search(
         # Check if a cached response for the search query and prompt already exists
         if (
             llm_output_cache is not None
-            and config["vllm_name"] in llm_output_cache
-            and llm_prompt in llm_output_cache[config["vllm_name"]]
+            and config["ollama_query_model"] in llm_output_cache
+            and llm_prompt in llm_output_cache[config["ollama_query_model"]]
         ):
             print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
-            refined_query = llm_output_cache[config["vllm_name"]][llm_prompt]["output"]
+            refined_query = llm_output_cache[config["ollama_query_model"]][llm_prompt][
+                "output"
+            ]
             # If using a cached response, also use a cached duration (i.e. the original response generation duration).
             # Otherwise the duration would be very short for consecutive benchmark runs and would falsify the benchmark result.
-            cached_duration = llm_output_cache[config["vllm_name"]][llm_prompt][
-                "output_duration"
-            ]
+            cached_duration = llm_output_cache[config["ollama_query_model"]][
+                llm_prompt
+            ]["output_duration"]
         else:
             # If config["enable_llm_output_cache"] is False, the method parameter llm_output_cache will be None. In that case reset it to an empty dictionary {} so we can write into it.
             llm_output_cache = llm_output_cache if llm_output_cache is not None else {}
-            with model.chat_session():
-                refined_query = model.generate(
-                    llm_prompt,
-                    max_tokens=config["sampling_parameters"]["max_tokens"],
-                    temp=config["sampling_parameters"]["temperature"],
-                    top_p=config["sampling_parameters"]["top_p"],
-                    top_k=config["sampling_parameters"]["top_k"],
-                    min_p=config["sampling_parameters"]["min_p"],
-                )
+            refined_query = model.generate(llm_prompt)
 
             end = time.time()
             output_duration = end - start
 
-            if config["vllm_name"] not in llm_output_cache:
-                llm_output_cache[config["vllm_name"]] = {}
+            if config["ollama_query_model"] not in llm_output_cache:
+                llm_output_cache[config["ollama_query_model"]] = {}
 
-            llm_output_cache[config["vllm_name"]][llm_prompt] = {
+            llm_output_cache[config["ollama_query_model"]][llm_prompt] = {
                 "output": refined_query,
                 "output_duration": output_duration,
             }

@@ -8,17 +8,10 @@ You can find the repository online at https://gitlab.lrz.de/Kadlez/afp-ai-search
 
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
-
-**If you want to run this application using the GPU (highly recommended):**
-- a GPU with at least 12 GB VRAM (NVIDIA, AMD and Intel GPUs are supported)
+- [Ollama](https://ollama.com/download)
 
 **If you want to run the Docker image:**
 - [Docker](https://docs.docker.com/engine/install/)
-- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
-- [NVIDIA drivers](https://www.nvidia.com/en-us/drivers/) that are compatible with CUDA version 12.8 (e.g. NVIDIA driver version 570.153.02)
-- a NVIDIA GPU with at least 12 GB VRAM that supports CUDA (e.g. a NVIDIA GeForce RTX 4070)
-
-> ℹ️ **Note:** The application should be compatible with NVIDIA, AMD and Intel GPUs or the CPU only, however I was only able to test it (1) using a NVIDIA GPU and (2) using the CPU only. The Docker image provided uses the base image **nvidia/cuda:12.8.0-base-ubuntu24.04** and thus requires a NVIDIA GPU that supports CUDA, NVIDIA drivers and the NVIDIA Container Toolkit.
 
 ## Setup
 
@@ -45,15 +38,13 @@ Please enter the same username and password that you also use to log in at https
 Next, to pull and run the latest Docker image, simply run:
 
 ```bash
-docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
+docker run -p 5000:5000 -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
 Alternatively, you can also find this command in `docker_run.sh`.
 
-This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image. If you don't want to or can't use a NVIDIA GPU, please omit the `--gpus all` parameter. The application will then fallback to the CPU.
+This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `-it` (interactive, tty) opens a Shell inside the container after running the image.
 
 When the application finished starting up, you can open the website at http://localhost:5000/.
-
-> ⚠️ **Warning:** If the NVIDIA Container Toolkit has not been installed correctly, a GPU that does not support CUDA is used or a NVIDIA driver with an incompatible CUDA version has been installed, the application will automatically fallback to using the CPU, instead. As a result, search queries will take much longer (~20 seconds on an Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz) to process due to slow LLM text generation.
 
 ### Building and running the Docker image locally
 
@@ -62,11 +53,11 @@ Building the Docker image locally can be done by running `docker_build.sh`. This
 To run the Docker image, simply run:
 
 ```bash
-docker run -p 5000:5000 --gpus all -it gitlab.lrz.de:5005/kadlez/afp-ai-search
+docker run -p 5000:5000 -it gitlab.lrz.de:5005/kadlez/afp-ai-search
 ```
 Alternatively, you can also find this command in `docker_run.sh`.
 
-This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `--gpus all` will only work if the NVIDIA Container Toolkit has been installed and allows Docker to access your GPU. `-it` (interactive, tty) opens a Shell inside the container after running the image. If you don't want to or can't use a NVIDIA GPU, please omit the `--gpus all` parameter. The application will then fallback to the CPU.
+This command will redirect port 5000 inside the Docker container onto your computer, i.e. accessing port 5000 on your computer will be redirected to port 5000 inside the Docker container. `-it` (interactive, tty) opens a Shell inside the container after running the image.
 
 When the application finished starting up, you can open the website at http://localhost:5000/.
 
@@ -83,8 +74,10 @@ solr start --force -p 8983 -s /path/to/findfacts/solr/local
 > ⚠️ **Warning:** If the path to the FindFacts index is not correct, Solr will automatically create a new empty core. Please make sure that you provide the exact path to the Solr folder (e.g. falsely using `/path/to/findfacts/solr` instead of `/path/to/findfacts/solr/local` will result in Solr not finding the Solr core).
 4. If necessary, edit the path to the Solr URL in the `config.json#solr_core_url` variable.
 5. Extract `afp-2025-branch-default.tar.gz` and `chroma_storages.tar.gz` and edit both paths in the configuration at `config.json#afp_folder` and `config.json#chroma_db_path`.
-6. Install the requirements: `pip install transformers tqdm nltk bs4 requests pandas flask waitress vllm torch chromadb pysolr gpt4all gpt4all[cuda]`. If this command does not work, please install the requirements from the `requirements.txt`: `pip install -r requirements.txt`
+6. Install the requirements: `pip install -r requirements.txt`
 7. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
+
+The application starts Ollama automatically and pulls the configured models if they are missing.
 
 #### Benchmark
 
@@ -103,7 +96,7 @@ NOTE: Please install lsof as this script needs it to determine if Solr is listen
 
 Started Solr server on port 8983 (pid=59). Happy searching!
 
-INFO 08-05 16:42:20 [__init__.py:235] Automatically detected platform cuda.
+INFO 08-05 16:42:20 [__init__.py:235] Automatically detected platform cpu.
 Loading config...
 Loading Solr...
 Connect to Solr at http://localhost:8983/solr/local...

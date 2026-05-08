@@ -23,11 +23,12 @@
     "prompts_folder": "prompts/microsoft-Phi",
     "chroma_db_path": "chroma_storages/microsoft/Phi-3.5-mini-instruct",
     "chroma_db_embedder": "sentence-transformers/multi-qa-distilbert-cos-v1",
-    "vllm_name": "microsoft/Phi-3.5-mini-instruct",
-    "llm_name": "Phi-3-mini-4k-instruct.Q4_0.gguf",
+    "ollama_base_url": "http://localhost:11434",
+    "ollama_document_model": "phi3.5",
+    "ollama_query_model": "phi3:mini",
+    "tokenizer_name": "microsoft/Phi-3.5-mini-instruct",
     "theorem_max_length": 1000,
     "metadata_max_length": 300,
-    "gpu_memory_utilization": 0.85,
     "sampling_parameters": {
         "temperature": 0,
         "top_p": 1,
@@ -41,5 +42,5 @@
     "add_user_query": true,
     "benchmark_search_refine": true,
     "enable_llm_output_cache": true,
-    "api_port": 5000
+    "api_port": 5001
 }
