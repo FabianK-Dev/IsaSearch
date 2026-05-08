@@ -16,10 +16,12 @@ from src.llm import save_llm_output_cache
 # This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
 def get_chromadb_collection(config, prompts, document_index):
     print("Loading ChromaDB embedding function...")
-    mps_is_available = (
-        hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
-    )
-    embedding_device = "mps" if mps_is_available else "cpu"
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        embedding_device = "mps"
+    elif torch.cuda.is_available():
+        embedding_device = "cuda"
+    else:
+        embedding_device = "cpu"
     embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
         model_name=config["chroma_db_embedder"],
         device=embedding_device,
