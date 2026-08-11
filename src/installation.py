@@ -109,6 +109,35 @@ def get_isabelle_version():
         raise RuntimeError(f"Error executing Isabelle getenv: {e.stderr}")
 
 
+# Number of FindFacts backups that are kept, overridable through config["find_facts_backup_keep"].
+# A backup holds a full copy of the Solr index, which is several gigabytes once the whole AFP is
+# indexed, and one is written on every rebuild. Without a limit they accumulate for as long as the
+# server is updated, so only the most recent ones are kept.
+DEFAULT_BACKUP_KEEP = 2
+
+
+# Delete all but the newest config["find_facts_backup_keep"] backups.
+# The file names carry a zero padded timestamp, thus sorting them by name orders them by age.
+def prune_backups(isabelle_home, config):
+    keep = config.get("find_facts_backup_keep", DEFAULT_BACKUP_KEEP)
+
+    if keep is None or keep < 0:
+        return
+
+    backups = sorted(glob.glob(str(isabelle_home / "find_facts_backup_*.tar.gz")))
+    outdated = backups[: max(len(backups) - keep, 0)]
+
+    for path in outdated:
+        print(f"Removing outdated backup: {Path(path).name}...")
+
+        try:
+            os.remove(path)
+        # Housekeeping must never take an indexing run down, e.g. because a backup is on a read-only
+        # mount or was removed by hand in the meantime.
+        except OSError as error:
+            print(f"Warning: could not remove {path}: {error}")
+
+
 def build_index(config):
     """
     1. Checks if index exists AND if the session list matches the last build.
@@ -190,6 +219,8 @@ def build_index(config):
 
             with tarfile.open(backup_file, "w:gz") as tar:
                 tar.add(find_facts_dir, arcname="find_facts")
+
+            prune_backups(isabelle_home, config)
 
     # 4. Build the index
     print(f"Building FindFacts index for sessions: {current_sessions}...")

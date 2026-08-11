@@ -65,5 +65,7 @@
     "dedup_llm_judge": true,
     "dedup_max_judged_per_item": 3,
     "dedup_report_folder": "reports",
+    "dedup_llm_cache": "llm_output_cache_dedup.json",
+    "find_facts_backup_keep": 2,
     "api_port": 5001
 }

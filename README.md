@@ -161,6 +161,46 @@ If `prompts/<folder>/retrieve_definitions.txt` and `search_refine_definitions.tx
 
 Please keep in mind that semantic similarity is not logical duplication: the tiers are a triage aid for a human reviewer, not a verdict. The same holds for the LLM verdicts, which is why the report always contains the model's justification. Also note that meaningful results require an index of the whole AFP — with only the two sessions that are enabled for testing, almost nothing can be found.
 
+### Running on a server
+
+On a deployed server the web application and the duplicate detection are meant to run at the same time, sharing one Solr index, one set of informalisations and one ChromaDB storage. That is safe as long as every artifact has exactly one writer, which is what the build/serve split below enforces.
+
+**1. Build once, with nothing else running.** This is the only step that writes. It updates the AFP, builds the FindFacts index, informalizes every theorem and definition and embeds them. Expect it to take days for the whole AFP; it is resumable, so an interrupted run continues where it stopped.
+
+```bash
+python3 -m src.duplicates --build-corpus-only
+```
+
+**2. Serve, any number of processes.** Both entry points below run strictly read-only: nothing is cloned, indexed, fetched, informalized, embedded or pruned. A missing corpus is reported instead of being built, so a serving process can never start a multi-hour job by accident.
+
+```bash
+python3 -m src.app
+```
+
+```bash
+python3 -m src.duplicates --serve --newest 10
+```
+
+Two things to keep in mind while both run:
+
+- They compete for the same LLM and embedding servers. Start `llama-server` with `--parallel 2` (raising `-c`, which is divided across the slots) so a long analysis cannot block the website. Adding `--no-llm-judge` to the analysis removes its LLM load entirely; only the `likely` tier is lost.
+- Each process holds the corpora it uses in memory, so plan for roughly `(theorems + definitions) × 15 KB` per process with a 2560-dimensional embedding model. The analysis only loads the corpora it actually queries, i.e. `--kinds definitions` never loads the theorems.
+
+### Updating to a newer AFP version
+
+Serving processes never write, so an update is a maintenance window:
+
+1. Stop the web application and any running analysis.
+2. Run the build of step 1 above. It pulls the AFP, re-indexes the changed sessions with FindFacts and then brings all three artifacts back in line automatically:
+   - the document index is refetched from Solr, because its fingerprint (`.cache/*.fingerprint.json`) no longer matches the corpus,
+   - only new and changed documents are informalized, since descriptions are keyed by a checksum of the source code,
+   - the ChromaDB collections lose the documents that the AFP removed, re-embed the ones whose source code changed and embed the new ones.
+3. Start the web application again. It reads the corpus once at start-up, so it will not pick up a rebuilt corpus without a restart.
+
+If a rebuild would remove more than half of a collection, it aborts instead: that is not an AFP update but a sign that the document index does not belong to the collection (usually a wrong `solr_query` or `chroma_db_path`). Delete the collection by hand if the corpus really did shrink that much.
+
+Two things are not automatic. After an Isabelle version bump the heap images of the previous version stay in `~/.isabelle/heaps/polyml-*` and can be deleted by hand, which matters because they run to tens of gigabytes for the whole AFP. FindFacts backups in `~/.isabelle/` are pruned to the newest `find_facts_backup_keep` (2 by default; set it to a negative number to keep all of them).
+
 ### Tests
 
 The tests use only the Python standard library's `unittest`, so they need no additional packages. Run them inside the root folder of the repository:
@@ -169,7 +209,7 @@ The tests use only the Python standard library's `unittest`, so they need no add
 python3 -m unittest discover -s tests -t .
 ```
 
-`tests/test_openai_backends.py` runs offline against a stub server and needs neither a network nor a GPU machine. `tests/test_server_availability.py` talks to the servers configured in `config.json`: it checks that both are reachable, that the configured models answer, and that the embedding server accepts a document of `openai_embedding_max_characters` as well as a full batch of `openai_embedding_batch_size` — which is what catches a physical batch size that is too small. It needs the API key exported and is skipped automatically when the backends are not set to `openai`. To run it alone:
+`tests/test_openai_backends.py` and `tests/test_serve_and_update.py` run offline against a stub server and need neither a network, nor Solr, nor a GPU machine. The latter covers what a deployment depends on: that a serving process never writes, and that an AFP update invalidates the document index cache, deletes documents the AFP removed and re-embeds the ones whose source code changed. `tests/test_server_availability.py` talks to the servers configured in `config.json`: it checks that both are reachable, that the configured models answer, and that the embedding server accepts a document of `openai_embedding_max_characters` as well as a full batch of `openai_embedding_batch_size` — which is what catches a physical batch size that is too small. It needs the API key exported and is skipped automatically when the backends are not set to `openai`. To run it alone:
 
 ```bash
 python3 -m unittest tests.test_server_availability -v

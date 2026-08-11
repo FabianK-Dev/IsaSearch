@@ -14,13 +14,12 @@ ensure_embedding_backend) instead.
 
 import os
 import time
-import torch
+import zlib
 import chromadb
 import requests
 
 from tqdm import tqdm
 from chromadb.api.types import EmbeddingFunction
-from chromadb.utils import embedding_functions
 
 
 from src.solr import docs_by_ids
@@ -234,6 +233,17 @@ class OpenAIEmbeddingFunction(EmbeddingFunction):
         return embeddings
 
 
+# The name of the model that produces the embeddings, whichever backend is configured. Reports and
+# benchmarks record this, so that a result can be traced back to the embedding space it was measured
+# in. Reading config["chroma_db_embedder"] directly would name the local model even when everything
+# is embedded remotely.
+def embedding_model_name(config):
+    if embedding_backend(config) == OPENAI_EMBEDDING_BACKEND:
+        return config["openai_embedding_model"]
+
+    return config["chroma_db_embedder"]
+
+
 # Returns the ChromaDB embedding function of the configured embedding backend. Note that the local
 # sentence-transformers model is only loaded if that backend is actually configured.
 def get_embedding_function(config):
@@ -252,6 +262,12 @@ def get_embedding_function(config):
             ),
             openai_api_key(config),
         )
+
+    # PyTorch and sentence-transformers are imported here and not at the top of the file, because
+    # they are only needed by this backend. Importing PyTorch costs a few hundred megabytes of
+    # resident memory, which is worth avoiding in every process that embeds through a remote server.
+    import torch
+    from chromadb.utils import embedding_functions
 
     print("Loading ChromaDB embedding function...")
     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
@@ -310,13 +326,96 @@ def document_embedding_string(doc, prompts):
     return prompts["embed"].format(doc_src=doc_src)
 
 
+# The checksum of the source code a document was embedded from. It is stored next to every embedding,
+# so that a later run can tell whether the text behind an embedding still is the current one. This is
+# deliberately the same checksum that decides whether a document has to be informalized again (see
+# generate_document_descriptions), because the embedded text is built from the description and the
+# source code, and the description is regenerated exactly when the source code changes.
+def source_checksum(doc):
+    return zlib.adler32(doc["src"].encode("utf-8"))
+
+
+# Refuse to delete more than this fraction of a collection in one run. Deleting a large part of the
+# corpus is never a normal AFP update; it means that the document index is empty or belongs to a
+# different corpus (e.g. a wrong config), and re-embedding everything afterwards would cost hours.
+MAX_PRUNE_FRACTION = 0.5
+
+
+# Bring the collection back in line with the document index by deleting everything that must not stay
+# in it, and return the remaining {document id: checksum} entries so that the caller can embed what
+# is missing afterwards.
+#
+# Two things are deleted:
+# - documents that are no longer part of the corpus, i.e. theorems the AFP removed or moved. Nothing
+#   ever removed them before, so they accumulated with every update and stayed searchable forever.
+# - documents whose source code changed since they were embedded. Their description is regenerated
+#   by the informalization step, but the embedding kept the text of the old version.
+def reconcile_collection(collection, document_index, existing, collection_name):
+    stale = [doc_id for doc_id in existing if doc_id not in document_index]
+
+    outdated = [
+        doc_id
+        for doc_id, checksum in existing.items()
+        if doc_id in document_index
+        # A missing checksum means the document was embedded before checksums were stored, thus
+        # whether it is outdated cannot be decided and it is left alone.
+        and checksum is not None
+        and checksum != source_checksum(document_index[doc_id])
+    ]
+
+    removable = stale + outdated
+
+    if len(removable) == 0:
+        print(
+            f"ChromaDB collection '{collection_name}' is up to date, nothing to prune."
+        )
+        return existing
+
+    # Only the documents that left the corpus are guarded against, because those are the ones that
+    # are really lost. An outdated document is deleted and embedded again right afterwards, and a
+    # corpus in which every source changed at once is a legitimate outcome of e.g. an Isabelle
+    # release that reformats sources.
+    if len(existing) > 0 and len(stale) > len(existing) * MAX_PRUNE_FRACTION:
+        raise RuntimeError(
+            f"Refusing to remove {len(stale)} of {len(existing)} documents from the ChromaDB "
+            f"collection '{collection_name}'. Removing that much is not an AFP update, it means "
+            "the document index does not belong to this collection. Check config['solr_query'], "
+            "config['chroma_db_path'] and the document index cache. Delete the collection by hand "
+            "if the corpus really did shrink that much."
+        )
+
+    print(
+        f"Removing {len(stale)} documents that are no longer part of the corpus and "
+        f"{len(outdated)} documents whose source code changed from ChromaDB collection "
+        f"'{collection_name}'..."
+    )
+
+    # ChromaDB builds one statement per delete, so the ids are deleted in batches to keep a large
+    # update from sending a single enormous request.
+    for i in range(0, len(removable), 5000):
+        collection.delete(ids=removable[i : i + 5000])
+
+    return {
+        doc_id: checksum
+        for doc_id, checksum in existing.items()
+        if doc_id not in set(removable)
+    }
+
+
 # This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
 # 'collection_name' selects the collection inside the ChromaDB storage, so that different kinds of
 # documents (e.g. theorems and definitions) can live in separate collections of the same storage.
 # With 'add_missing' disabled the collection is only opened and nothing is embedded. The web
 # application uses this to attach to an already built collection without doing any expensive work.
+# With 'prune' enabled the collection is additionally brought in line with the document index, i.e.
+# removed documents are deleted and changed documents are embedded again (see reconcile_collection).
 def get_chromadb_collection(
-    config, prompts, document_index, collection_name="afp_docs", add_missing=True
+    config,
+    prompts,
+    document_index,
+    collection_name="afp_docs",
+    add_missing=True,
+    prune=True,
 ):
     embedder = get_embedding_function(config)
 
@@ -348,15 +447,26 @@ def get_chromadb_collection(
         )
         return collection
 
-    # Get set of all already existing document IDs (saved at the source key)
-    existing = set()
+    # Get all already existing document IDs (saved at the source key) with the checksum of the source
+    # code they were embedded from. Collections that were built before checksums were stored have
+    # None here, which is treated as "cannot tell" and never triggers a re-embedding, so upgrading
+    # does not silently start a full re-embedding run.
+    existing = {}
     metadata_response = collection.get(include=["metadatas"])
 
     if "metadatas" in metadata_response and metadata_response["metadatas"] is not None:
         for item in metadata_response["metadatas"]:
-            existing.add(item["source"])
+            existing[item["source"]] = item.get("checksum")
 
     print("Preparing documents before adding to ChromaDB collection...")
+
+    if prune:
+        # Deletes everything that is gone or outdated and returns what is left, so that the documents
+        # whose source code changed are embedded again by the very same loop that embeds new ones.
+        existing = reconcile_collection(
+            collection, document_index, existing, collection_name
+        )
+
     filtered_index = [doc_id for doc_id in document_index if doc_id not in existing]
     print(f"{len(filtered_index)} documents are still missing in ChromaDB collection.")
 
@@ -373,7 +483,7 @@ def get_chromadb_collection(
             embedding_str = document_embedding_string(doc, prompts)
 
             doc_embeddings.append(embedding_str)
-            metadatas.append({"source": doc["id"]})
+            metadatas.append({"source": doc["id"], "checksum": source_checksum(doc)})
 
         collection.add(documents=doc_embeddings, ids=doc_ids, metadatas=metadatas)
 

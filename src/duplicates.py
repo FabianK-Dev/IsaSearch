@@ -36,9 +36,18 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from src.bootstrap import load_config, boot_components, DEFINITIONS_BUILD
+from src.bootstrap import (
+    load_config,
+    boot_components,
+    DEFINITIONS_BUILD,
+    DEFINITIONS_LOAD,
+)
 from src.documents import strip_proof
-from src.embeddings import document_embedding_string, add_doc_urls
+from src.embeddings import (
+    document_embedding_string,
+    add_doc_urls,
+    embedding_model_name,
+)
 from src.llm import save_llm_output_cache, query_model_name
 from src.solr import docs_by_ids
 
@@ -51,6 +60,17 @@ ENTRY_PATH_MARKER = "/thys/"
 KIND_DEFINITIONS = "definitions"
 KIND_THEOREMS = "theorems"
 KINDS = [KIND_DEFINITIONS, KIND_THEOREMS]
+
+# The LLM output cache of the duplicate detection, overridable through config["dedup_llm_cache"].
+# It is deliberately not the cache of the web application: both rewrite their cache as a whole, so
+# one shared file would lose everything the other one cached since it started. The two never share
+# an entry anyway, because the judge prompt differs from every prompt the application uses.
+DEDUP_LLM_CACHE = "llm_output_cache_dedup.json"
+
+
+def dedup_llm_cache_name(config):
+    return config.get("dedup_llm_cache", DEDUP_LLM_CACHE)
+
 
 VERDICTS = ["DUPLICATE", "VARIANT", "RELATED", "DIFFERENT"]
 UNKNOWN_VERDICT = "UNKNOWN"
@@ -453,7 +473,7 @@ def judge_candidates(
             # Writing the whole cache after every single judgement would dominate the runtime, so it
             # is written in batches instead.
             if config["enable_llm_output_cache"] and unsaved >= save_every:
-                save_llm_output_cache(cache, config)
+                save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
                 unsaved = 0
 
         verdict, justification = parse_verdict(raw_output)
@@ -461,7 +481,7 @@ def judge_candidates(
         candidate["justification"] = justification
 
     if config["enable_llm_output_cache"] and unsaved > 0:
-        save_llm_output_cache(cache, config)
+        save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
 
 
 # Decide how strong the evidence for a candidate being a duplicate is, or return None if the
@@ -1179,6 +1199,15 @@ def parse_args(argv=None):
         help="only build the corpora (including the LLM descriptions) and exit",
     )
     parser.add_argument(
+        "--serve",
+        action="store_true",
+        help=(
+            "run strictly read-only against corpora that were already built, so that this run can "
+            "happen while the web application is up. Nothing is fetched, described, embedded or "
+            "pruned; use it for every analysis on a deployed server."
+        ),
+    )
+    parser.add_argument(
         "--no-llm-judge",
         action="store_true",
         help="do not let the LLM judge the closest candidates, overrides config['dedup_llm_judge']",
@@ -1208,6 +1237,12 @@ def parse_args(argv=None):
     if args.newest < 1:
         parser.error("--newest has to be at least 1")
 
+    if args.serve and args.build_corpus_only:
+        parser.error(
+            "--serve and --build-corpus-only contradict each other, because building the corpora "
+            "is exactly what --serve forbids"
+        )
+
     return args
 
 
@@ -1215,13 +1250,38 @@ def main(argv=None):
     args = parse_args(argv)
     config = load_config()
 
-    # The tokenizer is only needed while the corpora are built, which happens inside boot_components.
-    # Cross-kind matching queries the definitions corpus even when only theorems are analysed.
-    needs_definitions = KIND_DEFINITIONS in args.kinds or args.cross
+    # Cross-kind matching queries the other corpus as well, so both are needed for it. Loading a
+    # corpus that is never queried would cost gigabytes of memory on the full AFP, thus each one is
+    # only loaded when this run actually reaches it.
+    #
+    # --build-corpus-only is the exception: it is the build step of a deployment and therefore has to
+    # produce everything the web application later serves, not only the corpus of the analysed kind.
+    needs_definitions = (
+        KIND_DEFINITIONS in args.kinds or args.cross or args.build_corpus_only
+    )
+    needs_theorems = KIND_THEOREMS in args.kinds or args.cross or args.build_corpus_only
+
+    if needs_definitions:
+        definitions = DEFINITIONS_LOAD if args.serve else DEFINITIONS_BUILD
+    else:
+        definitions = None
+
     components = boot_components(
         config,
-        definitions=DEFINITIONS_BUILD if needs_definitions else None,
+        serve=args.serve,
+        theorems=needs_theorems,
+        definitions=definitions,
+        # The web application rewrites its own cache as a whole, so sharing one file with it would
+        # make whichever process saves last drop the other's entries.
+        llm_cache_name=dedup_llm_cache_name(config),
     )
+
+    if needs_definitions and components["definition_index"] is None:
+        print(
+            "The definitions corpus is not available. Build it with "
+            "'python3 -m src.duplicates --build-corpus-only' first."
+        )
+        return 1
 
     if args.build_corpus_only:
         print("Finished building the corpora.")
@@ -1296,7 +1356,7 @@ def main(argv=None):
         "all_candidates": args.all_candidates,
         "cross": args.cross,
         "query_model": query_model_name(config),
-        "embedder": config["chroma_db_embedder"],
+        "embedder": embedding_model_name(config),
         "thresholds": {
             "top_k": config["dedup_top_k"],
             "distance": config["dedup_distance_threshold"],

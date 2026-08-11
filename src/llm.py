@@ -17,6 +17,7 @@ import json
 import os
 import atexit
 import subprocess
+import tempfile
 import time
 
 from pathlib import Path
@@ -30,6 +31,12 @@ LLAMACPP_BACKEND = "llamacpp"
 OPENAI_BACKEND = "openai"
 
 SUPPORTED_BACKENDS = [OLLAMA_BACKEND, LLAMACPP_BACKEND, OPENAI_BACKEND]
+
+# The LLM output cache of the web application. The duplicate detection uses its own file (see
+# config["dedup_llm_cache"]), because both are meant to run at the same time and the cache is
+# rewritten as a whole: sharing one file would make the process that saves last silently drop
+# everything the other one cached since it started.
+DEFAULT_LLM_OUTPUT_CACHE = "llm_output_cache.json"
 
 # All servers that were started by this application and thus need to be stopped on exit.
 managed_processes = []
@@ -50,15 +57,44 @@ def load_prompts(config):
     return prompts
 
 
+# Returns the path of an LLM output cache. 'cache_name' selects the cache file, so that entry points
+# which run next to each other (the web application and the duplicate detection) can each own their
+# own file. Two processes must never share one, because the cache is rewritten as a whole below.
+def llm_output_cache_path(config, cache_name=DEFAULT_LLM_OUTPUT_CACHE):
+    return f"{config['cache_folder']}/{cache_name}"
+
+
 # Saves LLM output to the cache folder, configured at config["cache_folder"].
-def save_llm_output_cache(llm_output_cache, config):
+#
+# The file is written to a temporary file next to it first and then moved into place, because
+# os.replace() is atomic within a folder. A crash (or a full disk) during the write therefore leaves
+# the previous cache intact instead of a truncated file that fails to parse on the next start.
+def save_llm_output_cache(
+    llm_output_cache, config, cache_name=DEFAULT_LLM_OUTPUT_CACHE
+):
     print("Saving LLM output cache...")
 
-    CACHE_FOLDER = config["cache_folder"]
-    LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
+    cache_path = llm_output_cache_path(config, cache_name)
+    os.makedirs(os.path.dirname(cache_path) or ".", exist_ok=True)
 
-    with open(LLM_OUTPUT_CACHE, "w") as file:
-        json.dump(llm_output_cache, file, indent=4)
+    # The temporary file has to live in the same folder as the cache, because os.replace() is only
+    # atomic within a single file system.
+    descriptor, temporary_path = tempfile.mkstemp(
+        dir=os.path.dirname(cache_path) or ".", suffix=".tmp"
+    )
+
+    try:
+        with os.fdopen(descriptor, "w") as file:
+            json.dump(llm_output_cache, file, indent=4)
+
+        os.replace(temporary_path, cache_path)
+    except BaseException:
+        # Leaving a stray temporary file behind would accumulate over time, so it is removed on
+        # every failure, including a KeyboardInterrupt during a long informalization run.
+        if os.path.exists(temporary_path):
+            os.remove(temporary_path)
+
+        raise
 
 
 def ollama_options(config):
@@ -604,11 +640,10 @@ def get_document_llm(config):
 
 
 # Load the LLM output from the cache folder, configured at config["cache_folder"].
-def get_llm_output_cache(config):
+def get_llm_output_cache(config, cache_name=DEFAULT_LLM_OUTPUT_CACHE):
     llm_output_cache = None
     if config["enable_llm_output_cache"]:
-        CACHE_FOLDER = config["cache_folder"]
-        LLM_OUTPUT_CACHE = f"{CACHE_FOLDER}/llm_output_cache.json"
+        LLM_OUTPUT_CACHE = llm_output_cache_path(config, cache_name)
 
         if not os.path.exists(LLM_OUTPUT_CACHE):
             print(
@@ -618,7 +653,7 @@ def get_llm_output_cache(config):
             )
             llm_output_cache = {}
         else:
-            print("Loading LLM output cache...")
+            print(f"Loading LLM output cache from {LLM_OUTPUT_CACHE}...")
             with open(LLM_OUTPUT_CACHE, "r") as file:
                 data = file.read()
                 llm_output_cache = json.loads(data)

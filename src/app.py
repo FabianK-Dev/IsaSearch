@@ -21,10 +21,14 @@ from src.embeddings import search, search_results_to_docs
 
 
 config = load_config()
+# 'serve' keeps this process strictly read-only, so that it can run next to the duplicate detection
+# without the two writing the same files. Everything it reads has to be built beforehand with
+# 'python3 -m src.duplicates --build-corpus-only'.
+#
 # The definitions corpus is only attached, never built: building it informalizes every definition
 # with the LLM, which takes hours and is done separately with 'python3 -m src.duplicates
 # --build-corpus-only'. If it does not exist, definition search is simply not offered.
-components = boot_components(config, definitions=DEFINITIONS_LOAD)
+components = boot_components(config, serve=True, definitions=DEFINITIONS_LOAD)
 
 solr = components["solr"]
 prompts = components["prompts"]

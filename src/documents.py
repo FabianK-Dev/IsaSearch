@@ -15,6 +15,7 @@ from tqdm import tqdm
 from nltk.corpus import stopwords
 
 from src.llm import get_document_llm, document_model_name
+from src.solr import count_docs
 
 
 cached_metadata = {}
@@ -126,6 +127,51 @@ def fetch_all_docs(solr, config, solr_query=None, keys_fn=relevant_doc_keys):
             document_index[result["id"]] = result_filtered
 
     return document_index
+
+
+# The fingerprint of the corpus a cached document index was built from. It is stored next to the
+# cache and compared on every start, because the cache itself cannot tell whether Solr still contains
+# the same documents. Without it a cached index would hide every AFP entry that was added after it
+# was written, since the cache is loaded unconditionally whenever the file exists.
+#
+# The number of matching documents in Solr is the cheap and reliable part: the AFP only ever grows
+# over an update, so a changed corpus practically always changes the count. The query and the
+# session list are included as well, because changing either of them changes what belongs to the
+# corpus without necessarily changing its size.
+def corpus_fingerprint(config, solr, solr_query):
+    return {
+        "solr_query": solr_query,
+        "document_count": count_docs(solr, solr_query),
+        "isabelle_sessions": sorted(config.get("isabelle_sessions", ["all"])),
+    }
+
+
+def index_fingerprint_path(config, cache_name):
+    return (
+        f"{config['cache_folder']}/{cache_name.removesuffix('.json')}.fingerprint.json"
+    )
+
+
+def read_index_fingerprint(config, cache_name):
+    path = index_fingerprint_path(config, cache_name)
+
+    if not os.path.isfile(path):
+        return None
+
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+    # A truncated or corrupted fingerprint must not take the application down. It only means that
+    # the cache cannot be trusted, which is handled exactly like a missing fingerprint.
+    except (ValueError, OSError):
+        return None
+
+
+def write_index_fingerprint(config, cache_name, fingerprint):
+    os.makedirs(config["cache_folder"], exist_ok=True)
+
+    with open(index_fingerprint_path(config, cache_name), "w") as file:
+        json.dump(fingerprint, file, indent=4)
 
 
 # This method returns only relevant information from a given entry metadata (i.e. title, abstract, etc.).
@@ -409,37 +455,102 @@ def get_document_descriptions(
 
 # Building the document index means, saving all loaded documents with its loaded entry metadata.
 # This is done to avoid having to refetch all documents from Solr on every program start.
+#
+# The cache is only reused while it still matches the corpus in Solr (see corpus_fingerprint). After
+# an AFP update Solr contains documents the cache does not know about, so it is refetched instead of
+# silently serving the previous state of the Archive.
+#
+# With 'read_only' enabled nothing is ever fetched or written. A serving process uses this: it must
+# not spend the first minutes of its start-up scanning Solr, and above all it must not write files
+# that the build process owns. A stale cache is reported and used as-is there, because serving
+# slightly outdated documents is better than refusing to start.
 def build_document_index(
     config,
     solr,
     solr_query=None,
     cache_name="document_index.json",
     keys_fn=relevant_doc_keys,
+    read_only=False,
 ):
     CACHE_FOLDER = config["cache_folder"]
     DOCUMENT_INDEX_CACHE = f"{CACHE_FOLDER}/{cache_name}"
+    effective_query = solr_query if solr_query is not None else config["solr_query"]
 
     if os.path.isfile(DOCUMENT_INDEX_CACHE):
-        print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
+        cached_fingerprint = read_index_fingerprint(config, cache_name)
 
-        with open(DOCUMENT_INDEX_CACHE, "r") as file:
-            data = file.read()
+        if read_only:
+            # The fingerprint of a serving process is only compared, never acted upon, thus Solr is
+            # not asked for a count when there is nothing to compare against.
+            if cached_fingerprint is not None:
+                current_fingerprint = corpus_fingerprint(config, solr, effective_query)
 
-        document_index = json.loads(data)
-        print(f"Finished loading {DOCUMENT_INDEX_CACHE}")
+                if cached_fingerprint != current_fingerprint:
+                    print(
+                        f"Warning: {DOCUMENT_INDEX_CACHE} was built from a different corpus "
+                        f"(cached: {cached_fingerprint}, current: {current_fingerprint}). It is "
+                        "used as-is, because a serving process never rebuilds it. Rebuild the "
+                        "corpus with 'python3 -m src.duplicates --build-corpus-only'."
+                    )
+
+            print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
+
+            with open(DOCUMENT_INDEX_CACHE, "r") as file:
+                return json.loads(file.read())
+
+        current_fingerprint = corpus_fingerprint(config, solr, effective_query)
+
+        if cached_fingerprint == current_fingerprint:
+            print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
+
+            with open(DOCUMENT_INDEX_CACHE, "r") as file:
+                data = file.read()
+
+            document_index = json.loads(data)
+            print(f"Finished loading {DOCUMENT_INDEX_CACHE}")
+
+            return document_index
+
+        if cached_fingerprint is None:
+            # Caches written before fingerprints existed (and the prebuilt ones that are shipped)
+            # have no fingerprint. Refetching them once is cheap compared to the alternative of
+            # never noticing that they are outdated.
+            print(
+                f"{DOCUMENT_INDEX_CACHE} has no fingerprint and can therefore not be checked "
+                "against Solr. Refetching all documents once..."
+            )
+        else:
+            print(
+                f"{DOCUMENT_INDEX_CACHE} was built from a different corpus "
+                f"(cached: {cached_fingerprint}, current: {current_fingerprint}). "
+                "Refetching all documents..."
+            )
+    elif read_only:
+        raise RuntimeError(
+            f"'{DOCUMENT_INDEX_CACHE}' does not exist, but this process may not build it. "
+            "Build the corpus with 'python3 -m src.duplicates --build-corpus-only' first."
+        )
     else:
         print(
             f"{DOCUMENT_INDEX_CACHE} does not already exist. Fetching all documents..."
         )
-        document_index = fetch_all_docs(
-            solr, config, solr_query=solr_query, keys_fn=keys_fn
-        )
 
-        # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
-        if not os.path.exists(CACHE_FOLDER):
-            os.makedirs(CACHE_FOLDER)
+    document_index = fetch_all_docs(
+        solr, config, solr_query=solr_query, keys_fn=keys_fn
+    )
 
-        with open(DOCUMENT_INDEX_CACHE, "w") as file:
-            json.dump(document_index, file)
+    # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
+    if not os.path.exists(CACHE_FOLDER):
+        os.makedirs(CACHE_FOLDER)
+
+    with open(DOCUMENT_INDEX_CACHE, "w") as file:
+        json.dump(document_index, file)
+
+    # The fingerprint is written after the index, so that an interrupted write leaves an index
+    # without a fingerprint (which is refetched next time) instead of a fingerprint that claims a
+    # partial index is complete.
+    write_index_fingerprint(
+        config, cache_name, corpus_fingerprint(config, solr, effective_query)
+    )
 
     return document_index
