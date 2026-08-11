@@ -88,6 +88,20 @@ export ISASEARCH_API_KEY=<your-api-key>
 
 The key is sent as an `Authorization: Bearer` header to the LLM server as well as to the embedding server. Setting `"openai_api_key"` directly in `config.json` works too, but keeps the credential within the repository; it is redacted whenever the configuration is printed. Leave both keys out for servers without authentication.
 
+### Tests
+
+The tests use only the Python standard library's `unittest`, so they need no additional packages. Run them inside the root folder of the repository:
+
+```bash
+python3 -m unittest discover -s tests -t .
+```
+
+`tests/test_openai_backends.py` runs offline against a stub server and needs neither a network nor a GPU machine. `tests/test_server_availability.py` talks to the servers configured in `config.json`: it checks that both are reachable, that the configured models answer, and that the embedding server accepts a document of `openai_embedding_max_characters` as well as a full batch of `openai_embedding_batch_size` — which is what catches a physical batch size that is too small. It needs the API key exported and is skipped automatically when the backends are not set to `openai`. To run it alone:
+
+```bash
+python3 -m unittest tests.test_server_availability -v
+```
+
 ### Benchmark
 
 To run the Benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies (as discussed in our paper), run `run_full_benchmark.sh`.
