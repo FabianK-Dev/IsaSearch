@@ -12,14 +12,17 @@ components are initialized only has to be maintained in a single place.
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
 
-If 'include_definitions' is enabled, a second corpus is built for definitional commands
-(definition, fun, datatype, ...). It uses its own document index cache, its own descriptions
-artifact and its own ChromaDB collection, so the theorem corpus stays untouched.
+The 'definitions' parameter adds a second corpus for definitional commands (definition, fun,
+datatype, ...). It uses its own document index cache, its own descriptions artifact and its own
+ChromaDB collection, so the theorem corpus stays untouched. It is either built (DEFINITIONS_BUILD,
+used by the duplicate detection) or only attached to (DEFINITIONS_LOAD, used by the web application,
+which must never start the multi hour informalization run).
 
 Note: src/installation.py reads config.json independently at import time. That is left as-is here.
 """
 
 import json
+import os
 
 from transformers import AutoTokenizer
 
@@ -46,6 +49,14 @@ DEFINITION_INDEX_CACHE = "definition_index.json"
 DEFINITION_DESCRIPTIONS = "definition_descriptions.json"
 DEFINITION_COLLECTION = "afp_definitions"
 DEFINITION_DESCRIBE_PROMPT = "describe_definition"
+
+# How boot_components treats the definitions corpus.
+# - DEFINITIONS_BUILD fetches, informalizes and embeds whatever is missing. Only the duplicate
+#   detection uses this, because informalizing all definitions takes hours.
+# - DEFINITIONS_LOAD attaches to an already built corpus and never generates anything. If the corpus
+#   does not exist, both the index and the collection are None and the caller has to cope with it.
+DEFINITIONS_BUILD = "build"
+DEFINITIONS_LOAD = "load"
 
 
 # Load the configuration file, which is the only source of configuration in this project.
@@ -102,19 +113,112 @@ def build_definition_corpus(config, solr, prompts, tokenizer):
     return definition_index, definition_collection
 
 
+# Attach to an already built definitions corpus without generating or embedding anything.
+# Returns (None, None) if the corpus does not exist or is empty, so that a caller can simply offer
+# no definition search instead of failing.
+#
+# There are exactly three ways this could start expensive work, and all three are closed here: the
+# document index is read from its cache file directly (so no Solr fetch can happen), the descriptions
+# are attached with generate_missing disabled (so no LLM call can happen) and the collection is
+# opened with add_missing disabled (so nothing can be embedded).
+def load_definition_corpus(config, prompts):
+    index_cache = f"{config['cache_folder']}/{DEFINITION_INDEX_CACHE}"
+    descriptions = f"{config['artifacts_folder']}/{DEFINITION_DESCRIPTIONS}"
+
+    for path in [index_cache, descriptions]:
+        if not os.path.isfile(path):
+            print(
+                f"Definition search is disabled, because '{path}' does not exist. Build the "
+                "definitions corpus with 'python3 -m src.duplicates --build-corpus-only' first."
+            )
+            return None, None
+
+    # A build that was interrupted while writing one of these files leaves it truncated. That must
+    # disable definition search instead of taking the whole application down with it, because the
+    # theorem search does not depend on the definitions corpus at all.
+    try:
+        print(f"Loading definition index from {index_cache}...")
+        with open(index_cache, "r") as file:
+            definition_index = json.load(file)
+
+        print("Getting definition descriptions...")
+        definition_index = get_document_descriptions(
+            config,
+            definition_index,
+            prompts,
+            None,
+            artifact_name=DEFINITION_DESCRIPTIONS,
+            describe_prompt_key=DEFINITION_DESCRIBE_PROMPT,
+            generate_missing=False,
+        )
+    # ValueError also covers json.JSONDecodeError and UnicodeDecodeError, i.e. a file that is
+    # truncated as well as one that is corrupted.
+    except (ValueError, OSError) as error:
+        print(
+            f"Definition search is disabled, because the definitions corpus could not be read: "
+            f"{error}. Rebuild it with 'python3 -m src.duplicates --build-corpus-only'."
+        )
+        return None, None
+
+    # Documents without a description were never embedded and therefore cannot be searched, so a
+    # partially built corpus is served without them instead of failing. Documents whose description
+    # is outdated are kept: their embedding was built from that same outdated description, so they
+    # are still found consistently.
+    described_index = {
+        doc_id: doc
+        for doc_id, doc in definition_index.items()
+        if "llm_description" in doc
+    }
+
+    if len(described_index) < len(definition_index):
+        print(
+            f"Warning: {len(definition_index) - len(described_index)} definitions have no "
+            "description and are therefore not searchable."
+        )
+
+    if len(described_index) == 0:
+        print("Definition search is disabled, because no definition has a description.")
+        return None, None
+
+    print("Loading ChromaDB collection for definitions...")
+    definition_collection = get_chromadb_collection(
+        config,
+        prompts,
+        described_index,
+        collection_name=DEFINITION_COLLECTION,
+        add_missing=False,
+    )
+
+    if definition_collection.count() == 0:
+        print(
+            "Definition search is disabled, because the ChromaDB collection "
+            f"'{DEFINITION_COLLECTION}' is empty. Build it with "
+            "'python3 -m src.duplicates --build-corpus-only' first."
+        )
+        return None, None
+
+    return described_index, definition_collection
+
+
 # Run the start-up sequence and return every component that the entry points need.
 #
 # - check_updates: clone or update the configured components (Isabelle and the AFP)
 # - build_find_facts: set up the Isabelle components and build the FindFacts index if required
-# - include_definitions: additionally build the definitions corpus (see build_definition_corpus)
+# - definitions: None, DEFINITIONS_BUILD or DEFINITIONS_LOAD, see the constants above
 # - keep_tokenizer: return the tokenizer instead of dropping it after the descriptions were generated
 def boot_components(
     config,
     check_updates=True,
     build_find_facts=True,
-    include_definitions=False,
+    definitions=None,
     keep_tokenizer=False,
 ):
+    if definitions not in [None, DEFINITIONS_BUILD, DEFINITIONS_LOAD]:
+        raise ValueError(
+            f"Unknown definitions mode '{definitions}', expected None, "
+            f"'{DEFINITIONS_BUILD}' or '{DEFINITIONS_LOAD}'."
+        )
+
     print("Checking LLM backend and preparing configured models if required...")
     ensure_llm_backend(config)
 
@@ -157,9 +261,13 @@ def boot_components(
     definition_index = None
     definition_collection = None
 
-    if include_definitions:
+    if definitions == DEFINITIONS_BUILD:
         definition_index, definition_collection = build_definition_corpus(
             config, solr, prompts, tokenizer
+        )
+    elif definitions == DEFINITIONS_LOAD:
+        definition_index, definition_collection = load_definition_corpus(
+            config, prompts
         )
 
     if not keep_tokenizer:

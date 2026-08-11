@@ -1,0 +1,2 @@
+Retrieve Isabelle/HOL definitions that introduce the concept described in natural language below:
+{search_query}

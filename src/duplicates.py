@@ -36,7 +36,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from src.bootstrap import load_config, boot_components
+from src.bootstrap import load_config, boot_components, DEFINITIONS_BUILD
 from src.documents import strip_proof
 from src.embeddings import document_embedding_string, add_doc_urls
 from src.llm import save_llm_output_cache, query_model_name
@@ -218,72 +218,115 @@ def entries_in_index(index):
     return entries
 
 
-# Query the collection with every given document and return, per document, the rank at which it
+# Query every target with every given document and return, per document, the rank at which it
 # retrieved itself (positive control) and the best candidates outside of the excluded entry.
-def find_candidates(
-    collection, prompts, query_docs, exclude_entry, corpus_index, config
-):
+#
+# 'targets' is a list of (kind, collection, corpus_index) tuples. With a single target this behaves
+# exactly like searching one corpus. With both targets a document is matched against definitions and
+# theorems at once, which is sound because both collections are filled by get_chromadb_collection
+# with the same embedder and the same 'embed' prompt (see document_embedding_string) into the same
+# cosine space, so their distances are directly comparable and can be merged into one ranking.
+#
+# 'home_kind' names the target the query documents themselves live in. The positive control is taken
+# from that target's own ranking only: on the merged ranking a cross kind near twin could outrank the
+# document itself, which would look like a broken embedding space although nothing is wrong.
+def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, config):
     top_k = config["dedup_top_k"]
-    collection_size = collection.count()
+    sizes = {}
+    n_results = {}
 
-    if collection_size == 0:
-        raise RuntimeError(
-            "The ChromaDB collection is empty. Build the corpus first "
-            "(python3 -m src.duplicates --build-corpus-only)."
+    for kind, collection, corpus_index in targets:
+        sizes[kind] = collection.count()
+
+        if sizes[kind] == 0:
+            raise RuntimeError(
+                f"The ChromaDB collection for {kind} is empty. Build the corpus first "
+                "(python3 -m src.duplicates --build-corpus-only)."
+            )
+
+        # Every document of the analysed entry may rank above the first candidate of another entry,
+        # so enough results have to be requested to still have 'top_k' candidates left after the
+        # exclusion. How many that is depends on how many documents the entry has in *this* corpus,
+        # which is not the number of query documents: when a definition is matched against the
+        # theorems corpus, the theorems of the same entry are excluded as well and there are usually
+        # far more of them. The number of requested results is capped, so that the size of a single
+        # response stays bounded.
+        entry_size = len(entry_docs(corpus_index, exclude_entry))
+        n_results[kind] = min(
+            sizes[kind], top_k + min(entry_size, MAX_EXTRA_RESULTS) + 1
         )
 
-    # Every document of the analysed entry may rank above the first candidate of another entry, so
-    # enough results have to be requested to still have 'top_k' candidates left after the exclusion.
-    # The number of requested results is capped, so that the size of a single response stays bounded.
-    n_results = min(
-        collection_size, top_k + min(len(query_docs), MAX_EXTRA_RESULTS) + 1
-    )
-    capped = len(query_docs) > MAX_EXTRA_RESULTS
-    chunk_size = max(1, min(100, MAX_RESPONSE_VALUES // n_results))
+    chunk_size = max(1, min(100, MAX_RESPONSE_VALUES // sum(n_results.values())))
 
     analyses = []
-    incomplete = 0
+    # Per corpus, the number of documents for which the requested results were completely used up by
+    # the documents of the analysed entry, so that duplicates ranked below them could not be seen.
+    truncated = {kind: 0 for kind in n_results}
     stale = 0
 
     for i in tqdm(range(0, len(query_docs), chunk_size)):
         batch = query_docs[i : i + chunk_size]
         query_texts = [document_embedding_string(doc, prompts) for doc in batch]
-        response = collection.query(query_texts=query_texts, n_results=n_results)
+        responses = {
+            kind: collection.query(query_texts=query_texts, n_results=n_results[kind])
+            for kind, collection, _ in targets
+        }
 
         for j, doc in enumerate(batch):
             self_rank = None
             self_distance = None
-            candidates = []
+            hits = []
 
-            for position, (metadata, distance) in enumerate(
-                zip(response["metadatas"][j], response["distances"][j]), start=1
-            ):
-                candidate_id = metadata["source"]
+            for kind, _, corpus_index in targets:
+                response = responses[kind]
+                returned = 0
+                survived = 0
 
-                # The document itself is the positive control and never a candidate.
-                if candidate_id == doc["id"]:
-                    self_rank = position
-                    self_distance = distance
-                    continue
-
-                if (
-                    exclude_entry is not None
-                    and entry_of_id(candidate_id) == exclude_entry
+                for position, (metadata, distance) in enumerate(
+                    zip(response["metadatas"][j], response["distances"][j]), start=1
                 ):
-                    continue
+                    returned += 1
+                    candidate_id = metadata["source"]
 
-                # A collection is only ever added to, so it can still contain documents of an older
-                # version of the corpus. Those cannot be reported, because neither their source code
-                # nor their metadata is available anymore.
-                if candidate_id not in corpus_index:
-                    stale += 1
-                    continue
+                    # The document itself is the positive control and never a candidate.
+                    if candidate_id == doc["id"]:
+                        if kind == home_kind:
+                            self_rank = position
+                            self_distance = distance
+                        continue
 
-                if len(candidates) < top_k:
-                    candidates.append({"id": candidate_id, "distance": distance})
+                    if (
+                        exclude_entry is not None
+                        and entry_of_id(candidate_id) == exclude_entry
+                    ):
+                        continue
 
-            if len(candidates) < top_k and capped:
-                incomplete += 1
+                    # A collection is only ever added to, so it can still contain documents of an
+                    # older version of the corpus. Those cannot be reported, because neither their
+                    # source code nor their metadata is available anymore.
+                    if candidate_id not in corpus_index:
+                        stale += 1
+                        continue
+
+                    survived += 1
+                    hits.append(
+                        {"id": candidate_id, "distance": distance, "kind": kind}
+                    )
+
+                # If this corpus returned everything that was asked of it and still did not yield
+                # 'top_k' usable candidates, the requested window was too small and duplicates that
+                # rank below the documents of the entry itself were not seen. If the window covers
+                # the whole collection there is nothing below it, so nothing was missed.
+                if (
+                    survived < top_k
+                    and returned >= n_results[kind]
+                    and n_results[kind] < sizes[kind]
+                ):
+                    truncated[kind] += 1
+
+            # Merging the targets by ascending distance keeps the ranking of a single target intact.
+            hits.sort(key=lambda hit: hit["distance"])
+            candidates = hits[:top_k]
 
             analyses.append(
                 {
@@ -302,13 +345,15 @@ def find_candidates(
             "Delete the ChromaDB collection to get rid of them."
         )
 
-    if incomplete > 0:
-        print(
-            f"Warning: {incomplete} documents got fewer than {top_k} candidates, because this entry "
-            f"has more than {MAX_EXTRA_RESULTS} documents and only the closest "
-            f"{n_results} results per document are retrieved. Duplicates that rank below the "
-            "documents of the entry itself can be missed."
-        )
+    for kind, count in truncated.items():
+        if count > 0:
+            print(
+                f"Warning: for {count} documents the closest {n_results[kind]} results of the "
+                f"{kind} corpus did not contain {top_k} usable candidates, because they were used "
+                "up by the documents of the analysed entry itself. Duplicates that rank below "
+                f"those can be missed. This happens when the entry has more than "
+                f"{MAX_EXTRA_RESULTS} documents in that corpus."
+            )
 
     return analyses
 
@@ -597,19 +642,19 @@ def resolve_urls(doc_ids, corpus_index, solr, config):
     return urls
 
 
-# Analyse a single entry against the corpus of the given kind.
-def analyse_entry(entry, corpus_index, collection, prompts, config):
-    query_docs = entry_docs(corpus_index, entry)
+# Analyse a single entry, i.e. match every document of the entry that is of the home kind against
+# every target corpus. 'home_index' is the corpus the query documents are taken from and
+# 'lookup_index' resolves candidates of any target.
+def analyse_entry(entry, home_index, lookup_index, targets, home_kind, prompts, config):
+    query_docs = entry_docs(home_index, entry)
 
     if len(query_docs) == 0:
         print(f"Warning: entry {entry} has no documents in this corpus, thus skipping.")
         return None
 
     print(f"Analysing {len(query_docs)} documents of entry {entry}...")
-    analyses = find_candidates(
-        collection, prompts, query_docs, entry, corpus_index, config
-    )
-    add_syntactic_similarity(analyses, corpus_index)
+    analyses = find_candidates(targets, prompts, query_docs, entry, home_kind, config)
+    add_syntactic_similarity(analyses, lookup_index)
 
     return analyses
 
@@ -666,6 +711,7 @@ def aggregate(analyses, config):
     tier_counts["none"] = 0
     verdict_counts = {verdict: 0 for verdict in VERDICTS}
     verdict_counts[UNKNOWN_VERDICT] = 0
+    candidate_kind_counts = {kind: 0 for kind in KINDS}
     overlapping_entries = {}
 
     for analysis in analyses:
@@ -689,6 +735,7 @@ def aggregate(analyses, config):
                 verdict_counts[candidate["verdict"]] += 1
 
             if candidate["tier"] is not None:
+                candidate_kind_counts[candidate["kind"]] += 1
                 candidate_entry = entry_of_id(candidate["id"])
 
                 if candidate_entry is not None:
@@ -703,6 +750,7 @@ def aggregate(analyses, config):
         "documents_with_near_exact_or_likely_duplicate": flagged,
         "tier_counts": tier_counts,
         "verdict_counts": verdict_counts,
+        "candidate_kind_counts": candidate_kind_counts,
         "top_1_distance_histogram": histogram,
         "overlapping_entries": dict(
             sorted(overlapping_entries.items(), key=lambda item: -item[1])[:20]
@@ -751,6 +799,7 @@ def analyses_to_report(
                 {
                     "id": candidate["id"],
                     "entry": entry_of_id(candidate["id"]),
+                    "kind": candidate["kind"],
                     "entity_kname": candidate_doc.get("entity_kname"),
                     "command": candidate_doc.get("command"),
                     "tier": candidate["tier"],
@@ -818,6 +867,16 @@ def render_markdown(report):
         lines.append(
             "The LLM adjudication was switched off for this run, so the tiers are based on the "
             f"distance and the syntactic similarity only and no candidate reaches `{TIER_LIKELY}`."
+        )
+        lines.append("")
+
+    if report.get("cross"):
+        lines.append(
+            "Cross-kind matching is enabled, so every analysed document was matched against the "
+            "definitions *and* the theorems of the AFP. The kind of each candidate is given in "
+            "parentheses. Note that the synthetic ground truth below only contains definitions, "
+            "while candidates of both kinds compete for the reported places, so its recall is not "
+            "comparable to a run without cross-kind matching."
         )
         lines.append("")
 
@@ -898,6 +957,7 @@ def render_markdown(report):
                     candidate_title = candidate["entity_kname"] or candidate["id"]
                     lines.append(
                         f"- **{candidate['tier'] or 'no tier'}** "
+                        f"({candidate['command'] or candidate['kind']}) "
                         f"{markdown_link(candidate_title, candidate['remote_url'])} "
                         f"in {markdown_link(candidate['entry'] or '?', candidate['entry_url'])} "
                         f"(distance {candidate['distance']:.4f}, "
@@ -943,21 +1003,54 @@ def write_report(report, report_folder):
     return json_path, markdown_path
 
 
-# Run the analysis for one kind of document (definitions or theorems) over all selected entries.
-def analyse_kind(kind, selected, components, config, use_llm_judge, report_all=False):
+# Return the (kind, collection, index) target of one kind.
+def corpus_target(kind, components):
     if kind == KIND_DEFINITIONS:
-        corpus_index = components["definition_index"]
-        collection = components["definition_collection"]
-    else:
-        corpus_index = components["document_index"]
-        collection = components["collection"]
+        return kind, components["definition_collection"], components["definition_index"]
+
+    return kind, components["collection"], components["document_index"]
+
+
+# Run the analysis for one kind of document (definitions or theorems) over all selected entries.
+# The query documents are always of the given kind. With 'cross' enabled they are matched against
+# both corpora, so a definition can also find a theorem that states the same thing and vice versa.
+def analyse_kind(
+    kind, selected, components, config, use_llm_judge, report_all=False, cross=False
+):
+    home_kind, collection, home_index = corpus_target(kind, components)
+    targets = [(home_kind, collection, home_index)]
+
+    if cross:
+        other_kind = KIND_THEOREMS if kind == KIND_DEFINITIONS else KIND_DEFINITIONS
+        targets.append(corpus_target(other_kind, components))
+
+    # Candidates can come from any target, so they are resolved against all of them. Merging the
+    # indexes is safe because config["solr_query"] and config["solr_query_definitions"] select
+    # disjoint Isabelle commands, so no document can be part of both corpora.
+    lookup_index = dict(home_index)
+
+    for _, _, index in targets[1:]:
+        overlap = len(lookup_index) + len(index)
+        lookup_index.update(index)
+
+        if len(lookup_index) != overlap:
+            print(
+                "Warning: the theorem and the definition corpus share documents. Check that "
+                "config['solr_query'] and config['solr_query_definitions'] do not overlap."
+            )
 
     all_analyses = []
     entry_sections = []
 
     for selection in selected:
         analyses = analyse_entry(
-            selection["entry"], corpus_index, collection, components["prompts"], config
+            selection["entry"],
+            home_index,
+            lookup_index,
+            targets,
+            home_kind,
+            components["prompts"],
+            config,
         )
 
         if analyses is None:
@@ -975,7 +1068,7 @@ def analyse_kind(kind, selected, components, config, use_llm_judge, report_all=F
             components["prompts"],
             config,
             all_analyses,
-            corpus_index,
+            lookup_index,
             components["llm_output_cache"],
         )
     else:
@@ -985,8 +1078,11 @@ def analyse_kind(kind, selected, components, config, use_llm_judge, report_all=F
 
     classify_analyses(all_analyses, config)
 
+    # The synthetic ground truth is derived from the home corpus only. It groups documents by the
+    # constants and types they define, which only the definitions corpus stores, so for theorems it
+    # is empty by construction and the report suppresses the section.
     print("Deriving a synthetic ground truth from the corpus...")
-    ground_truth, skipped_groups = synthetic_ground_truth(corpus_index)
+    ground_truth, skipped_groups = synthetic_ground_truth(home_index)
 
     # Collect every document that shows up in the report, so its links are resolved in one go.
     reported_ids = set()
@@ -1000,7 +1096,7 @@ def analyse_kind(kind, selected, components, config, use_llm_judge, report_all=F
             if is_reported_candidate(candidate, report_all):
                 reported_ids.add(candidate["id"])
 
-    urls = resolve_urls(sorted(reported_ids), corpus_index, components["solr"], config)
+    urls = resolve_urls(sorted(reported_ids), lookup_index, components["solr"], config)
 
     for selection in selected:
         analyses = selection.get("analyses")
@@ -1014,7 +1110,7 @@ def analyse_kind(kind, selected, components, config, use_llm_judge, report_all=F
                 "date": selection["date"],
                 "documents": len(analyses),
                 "items": analyses_to_report(
-                    analyses, corpus_index, urls, report_all=report_all
+                    analyses, lookup_index, urls, report_all=report_all
                 ),
             }
         )
@@ -1059,6 +1155,14 @@ def parse_args(argv=None):
         help=(
             "comma separated list of the kinds of documents to analyse, "
             f"any of {', '.join(KINDS)}, or 'all' for both (default: {KIND_DEFINITIONS})"
+        ),
+    )
+    parser.add_argument(
+        "--cross",
+        action="store_true",
+        help=(
+            "match every analysed document against the definitions and the theorems corpus, so a "
+            "definition can also find a theorem that states the same thing and vice versa"
         ),
     )
     parser.add_argument(
@@ -1112,9 +1216,11 @@ def main(argv=None):
     config = load_config()
 
     # The tokenizer is only needed while the corpora are built, which happens inside boot_components.
+    # Cross-kind matching queries the definitions corpus even when only theorems are analysed.
+    needs_definitions = KIND_DEFINITIONS in args.kinds or args.cross
     components = boot_components(
         config,
-        include_definitions=KIND_DEFINITIONS in args.kinds,
+        definitions=DEFINITIONS_BUILD if needs_definitions else None,
     )
 
     if args.build_corpus_only:
@@ -1172,6 +1278,7 @@ def main(argv=None):
             config,
             use_llm_judge,
             report_all=args.all_candidates,
+            cross=args.cross,
         )
 
         if section is not None:
@@ -1187,6 +1294,7 @@ def main(argv=None):
         "entries": [s["entry"] for s in selected],
         "llm_judge": use_llm_judge,
         "all_candidates": args.all_candidates,
+        "cross": args.cross,
         "query_model": query_model_name(config),
         "embedder": config["chroma_db_embedder"],
         "thresholds": {

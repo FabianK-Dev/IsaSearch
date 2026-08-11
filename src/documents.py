@@ -167,11 +167,15 @@ def generate_document_descriptions(
     save_every=1000,
     artifact_name="document_descriptions.json",
     describe_prompt_key="describe",
+    generate_missing=True,
 ):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + artifact_name
 
-    if describe_prompt_key not in prompts:
+    # With generate_missing disabled no LLM is called at all, so the prompt does not have to exist
+    # and no tokenizer is required. This is used by the web application, which must never start a
+    # multi hour informalization run just because a description is missing.
+    if generate_missing and describe_prompt_key not in prompts:
         raise KeyError(
             f"Prompt '{describe_prompt_key}' does not exist in the prompts folder "
             f"'{config['prompts_folder']}'. Expected a file named '{describe_prompt_key}.txt'."
@@ -221,6 +225,35 @@ def generate_document_descriptions(
         + str(len(filtered_docs))
         + " documents that need to be described by the LLM."
     )
+
+    if not generate_missing:
+        # A document that was never described has no description to attach and is therefore dropped
+        # by the caller. A document whose source code changed still has its old description, which is
+        # also the text its embedding was built from, so it stays usable but is outdated.
+        undescribed = [
+            doc for doc in filtered_docs if doc["id"] not in document_descriptions
+        ]
+        outdated = len(filtered_docs) - len(undescribed)
+
+        if len(undescribed) >= 1:
+            print(
+                f"Warning: {len(undescribed)} documents have no description at all and can "
+                "therefore not be searched."
+            )
+
+        if outdated >= 1:
+            print(
+                f"Warning: {outdated} documents have a description of an older version of their "
+                "source code and are searched with that outdated description."
+            )
+
+        if len(filtered_docs) >= 1:
+            print(
+                "Rebuild the corpus with 'python3 -m src.duplicates --build-corpus-only' to "
+                "describe them."
+            )
+
+        return document_descriptions
 
     if len(filtered_docs) >= 1:
         # Only update NLTK resources if any documents need to be described, to avoid unnecessary downloads
@@ -339,6 +372,7 @@ def get_document_descriptions(
     tokenizer,
     artifact_name="document_descriptions.json",
     describe_prompt_key="describe",
+    generate_missing=True,
 ):
     document_descriptions = generate_document_descriptions(
         config,
@@ -347,6 +381,7 @@ def get_document_descriptions(
         tokenizer,
         artifact_name=artifact_name,
         describe_prompt_key=describe_prompt_key,
+        generate_missing=generate_missing,
     )
 
     print("Parsing LLM descriptions...")

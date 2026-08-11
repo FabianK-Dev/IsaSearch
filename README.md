@@ -112,6 +112,7 @@ Useful options:
 | --- | --- |
 | `--entry NAME` | analyse this entry instead of the newest ones, may be repeated |
 | `--kinds all` | analyse definitions *and* theorems (`--kinds theorems` for theorems only) |
+| `--cross` | match every document against *both* corpora, see below |
 | `--no-llm-judge` | switch the LLM adjudication off, see below |
 | `--all-candidates` | report the closest candidates of *every* document, not only those reaching a tier |
 | `--report-dir DIR` | override the report location |
@@ -121,6 +122,16 @@ Reports are written to `reports/duplicates/experiment_<timestamp>.md` and `.json
 #### Analysing a new submission
 
 The tool analyses entries that are part of the index. For a submission that is not in the AFP mirror yet, put it into `afp/thys/<Entry>/`, add its session to `"isabelle_sessions"` in `config.json` and start the application once so that the existing FindFacts index build picks it up. Afterwards run `python3 -m src.duplicates --entry <Entry> --kinds all`. The entry's own definitions and theorems are always excluded from its own results, so only counterparts elsewhere in the AFP are reported, which you can then compare manually.
+
+#### Cross-kind matching
+
+By default definitions are matched against definitions and theorems against theorems. With `--cross` every analysed document is matched against both corpora at once, so a definition of the analysed entry can also surface a lemma elsewhere in the AFP that states the same thing, and vice versa:
+
+```bash
+python3 -m src.duplicates --newest 10 --cross
+```
+
+This is sound because both collections are filled by the same embedding function with the same `embed` prompt into the same cosine space, so their distances are directly comparable and the two result lists can be merged into one ranking. Each candidate in the report carries the Isabelle command it came from. The report sections stay keyed by the kind of the *analysed* documents, and the positive control is still taken from the corpus the analysed document itself lives in — otherwise a cross-kind near-twin could outrank the document itself and look like a broken index.
 
 #### Switching the LLM adjudication off
 
@@ -139,6 +150,14 @@ Every candidate is reported in one of three tiers, configured in `config.json`:
 Further keys are `dedup_top_k` (candidates per definition), `dedup_llm_judge` (adjudication on by default), `dedup_max_judged_per_item` (LLM calls per definition) and `dedup_report_folder`.
 
 Two controls are part of every run and are included in the report. First, before its own entry is excluded, each definition must retrieve *itself* at a distance of about 0; if more than 5 % fail to do so, the run exits with a non-zero status because the corpus and the queries are then not in the same embedding space. Second, definitions of different entries that define something of the same base name and whose sources are nearly identical are collected syntactically and used as a ground truth, which yields a recall value for the semantic search.
+
+#### Searching definitions in the web UI
+
+Once the definitions corpus exists, the web UI offers a **Search in: Theorems / Definitions** selector, and the `/search` endpoint takes a `kind` parameter (`theorems` by default, or `definitions`).
+
+The application only ever *attaches* to the definitions corpus, it never builds it: starting the web server must not kick off a multi-hour informalization run. If the corpus is missing or empty, definition search is simply not offered — the selector stays hidden, `/capabilities` reports `{"definition_search": false}` and `/search?kind=definitions` answers with a 503 explaining how to build it. A partially built corpus is served without the definitions that have no description yet, so a server can keep running while the corpus is being rebuilt.
+
+If `prompts/<folder>/retrieve_definitions.txt` and `search_refine_definitions.txt` exist, they are used for definition searches instead of the theorem-flavoured `retrieve.txt` and `search_refine.txt`; deleting them falls back to the theorem prompts. The theorem search and the benchmark are unaffected either way.
 
 Please keep in mind that semantic similarity is not logical duplication: the tiers are a triage aid for a human reviewer, not a verdict. The same holds for the LLM verdicts, which is why the report always contains the model's justification. Also note that meaningful results require an index of the whole AFP — with only the two sessions that are enabled for testing, almost nothing can be found.
 

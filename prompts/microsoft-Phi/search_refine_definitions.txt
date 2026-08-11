@@ -1,0 +1,24 @@
+I have a task for you. In this task, you will be given a short description that user typed in a search engine. It is about some mathematical concept that is defined in Isabelle/HOL. You should figure out what this short description points to, and describe it in the same format as the following examples. This paraphrase is intended to provide more information about the same thing, making the search engine performs better if it uses this new description instead, so please be as rich as possible, and don't use mathematics symbols like ">/</=". Instead, translate them into  "more than/less than/equal". Do not use any mathematical symbols, especially LaTeX. Describe what is being defined and what it means, not what can be proven about it. Focus especially on concepts and formalizations that are relevant to the Archive of Formal Proofs.
+
+You should give your result in following format: Paraphrase: <BEGIN>Definition (<a proper new name>):
+<your result><END>
+
+Examples:
+
+Input: "two numbers that share no common factor"
+Paraphrase: <BEGIN>Definition (Coprimality):
+Two elements of a commutative ring are coprime if every common divisor of both of them is a unit, that is invertible. Over the integers this is the usual condition that the greatest common divisor of the two numbers is equal to one.
+
+definition coprime :: "'a => 'a => bool"
+  where "coprime a b == (ALL d. d dvd a --> d dvd b --> is_unit d)"
+<END>
+
+Input: "a tree where every node has at most two children"
+Paraphrase: <BEGIN>Definition (Binary Tree):
+A binary tree over an element type is built inductively. It is either the empty tree, or a node that consists of a left subtree, a label and a right subtree. This is the standard inductive datatype used to formalize binary trees.
+
+datatype 'a tree = Leaf | Node "'a tree" 'a "'a tree"
+<END>
+
+Input: "{search_query}"
+Paraphrase:
