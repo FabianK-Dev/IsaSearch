@@ -18,6 +18,7 @@
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
     "solr_core_url": "http://localhost:8983/solr/local",
     "solr_query": "command:theorem OR command:lemma OR command:corollary OR command:proposition",
+    "solr_query_definitions": "command:definition OR command:fun OR command:function OR command:primrec OR command:primcorec OR command:abbreviation OR command:datatype OR command:codatatype OR command:record OR command:type_synonym OR command:typedef OR command:inductive OR command:inductive_set OR command:coinductive",
     "cache_folder": ".cache",
     "artifacts_folder": "artifacts/beaker_gemma4",
     "prompts_folder": "prompts/qwen3-gemma",
@@ -57,5 +58,12 @@
     "add_user_query": true,
     "benchmark_search_refine": true,
     "enable_llm_output_cache": true,
+    "dedup_top_k": 10,
+    "dedup_distance_threshold": 0.3,
+    "dedup_strong_distance_threshold": 0.05,
+    "dedup_syntactic_threshold": 0.9,
+    "dedup_llm_judge": true,
+    "dedup_max_judged_per_item": 3,
+    "dedup_report_folder": "reports",
     "api_port": 5001
 }

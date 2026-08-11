@@ -299,8 +299,23 @@ def ensure_embedding_backend(config):
     )
 
 
+# Build the string that represents a document in the embedding space.
+# Both the corpus side (get_chromadb_collection) and every query that is itself a document
+# (see src/duplicates.py) must use this method, otherwise identical documents would not
+# end up at the same place in the embedding space.
+def document_embedding_string(doc, prompts):
+    # Append an instruction before the document string, which improves the search quality in zero-shot situations.
+    doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
+
+    return prompts["embed"].format(doc_src=doc_src)
+
+
 # This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
-def get_chromadb_collection(config, prompts, document_index):
+# 'collection_name' selects the collection inside the ChromaDB storage, so that different kinds of
+# documents (e.g. theorems and definitions) can live in separate collections of the same storage.
+def get_chromadb_collection(
+    config, prompts, document_index, collection_name="afp_docs"
+):
     embedder = get_embedding_function(config)
 
     # ChromaDB path
@@ -321,7 +336,7 @@ def get_chromadb_collection(config, prompts, document_index):
 
     chroma_client = chromadb.PersistentClient(path=chroma_db_path)
     collection = chroma_client.get_or_create_collection(
-        "afp_docs", embedding_function=embedder, metadata=collection_metadata
+        collection_name, embedding_function=embedder, metadata=collection_metadata
     )
 
     # Get set of all already existing document IDs (saved at the source key)
@@ -346,9 +361,7 @@ def get_chromadb_collection(config, prompts, document_index):
 
         for doc_id in doc_ids:
             doc = document_index[doc_id]
-            # Append an instruction before the document string, which improves the search quality in zero-shot situations.
-            doc_src = doc["llm_description"].strip() + "\n\n" + doc["src"].strip()
-            embedding_str = prompts["embed"].format(doc_src=doc_src)
+            embedding_str = document_embedding_string(doc, prompts)
 
             doc_embeddings.append(embedding_str)
             metadatas.append({"source": doc["id"]})
@@ -465,6 +478,47 @@ def search(
     }
 
 
+# Add a link to the original .thy-file in the repository at configured config["afp_remote_thys_folder_url"],
+# a link to the entry on isa-afp.org and a link to the theory file on isabelle.in.tum.de to the given document.
+# The document is modified in place and requires the Solr keys "id", "file", "url_path" and "start_line".
+def add_doc_urls(doc, config):
+    # Set default URLs to '#' which indicates the URL is not available
+    doc["remote_url"] = "#"
+    doc["entry_url"] = "#"
+    doc["theory_url"] = "#"
+
+    # Add direct link to the file in the remote repository and the entry URL
+    # If the "ID" key starts with "USER_HOME", it's an entry from the AFP.
+    # Otherwise, if it starts with "ISABELLE_HOME", it's a built-in theory file.
+    # Then we can only add the link to the remote theory file (e.g. hosted on https://isabelle.in.tum.de/library/)
+    if doc["id"].startswith("USER_HOME"):
+        sub_path = doc["file"].split("/thys/")
+        # If the file path does not contain /thys/ it means that the file does not exist in the repository
+        if len(sub_path) > 1:
+            # Add the line where the theorem code starts using #L... so that GitLab automatically jumps to the desired line when opening it in the browser
+            doc["remote_url"] = (
+                config["afp_remote_thys_folder_url"]
+                + "/"
+                + sub_path[1]
+                + "#L"
+                + str(doc["start_line"])
+            )
+
+        # Extract the sub path for isa-afp.org
+        sub_path = doc["url_path"].split("/")
+        if len(sub_path) > 1:
+            # We need the second last element from the URL path separated by /
+            doc["entry_url"] = (
+                config["afp_remote_entry_url"] + "/" + sub_path[-2] + ".html"
+            )
+    else:
+        # If it's a built-in theory file, we cannot add a remote or entry link, but we can add the link to the theory file (e.g. hosted on https://isabelle.in.tum.de/library/)
+        sub_path = doc["url_path"]
+        doc["theory_url"] = config["isabelle_remote_theory_url"] + "/" + sub_path
+
+    return doc
+
+
 # Given a list of search results with IDs, retrieve the documents from Solr.
 # Additionaly this method adds a link to the original .thy-file in the repository at configured config["afp_remote_thys_folder_url"]
 def search_results_to_docs(search_results, solr, config):
@@ -475,41 +529,7 @@ def search_results_to_docs(search_results, solr, config):
         # Merge search_results with Solr documents
         search_results["results"][doc_id] = {**search_results["results"][doc_id], **doc}
 
-        # Set default URLs to '#' which indicates the URL is not available
-        search_results["results"][doc_id]["remote_url"] = "#"
-        search_results["results"][doc_id]["entry_url"] = "#"
-        search_results["results"][doc_id]["theory_url"] = "#"
-
-        # Add direct link to the file in the remote repository and the entry URL
-        # If the "ID" key starts with "USER_HOME", it's an entry from the AFP.
-        # Otherwise, if it starts with "ISABELLE_HOME", it's a built-in theory file.
-        # Then we can only add the link to the remote theory file (e.g. hosted on https://isabelle.in.tum.de/library/)
-        if search_results["results"][doc_id]["id"].startswith("USER_HOME"):
-            sub_path = search_results["results"][doc_id]["file"].split("/thys/")
-            # If the file path does not contain /thys/ it means that the file does not exist in the repository
-            if len(sub_path) > 1:
-                # Add the line where the theorem code starts using #L... so that GitLab automatically jumps to the desired line when opening it in the browser
-                search_results["results"][doc_id]["remote_url"] = (
-                    config["afp_remote_thys_folder_url"]
-                    + "/"
-                    + sub_path[1]
-                    + "#L"
-                    + str(search_results["results"][doc_id]["start_line"])
-                )
-
-            # Extract the sub path for isa-afp.org
-            sub_path = search_results["results"][doc_id]["url_path"].split("/")
-            if len(sub_path) > 1:
-                # We need the second last element from the URL path separated by /
-                search_results["results"][doc_id]["entry_url"] = (
-                    config["afp_remote_entry_url"] + "/" + sub_path[-2] + ".html"
-                )
-        else:
-            # If it's a built-in theory file, we cannot add a remote or entry link, but we can add the link to the theory file (e.g. hosted on https://isabelle.in.tum.de/library/)
-            sub_path = search_results["results"][doc_id]["url_path"]
-            search_results["results"][doc_id]["theory_url"] = (
-                config["isabelle_remote_theory_url"] + "/" + sub_path
-            )
+        add_doc_urls(search_results["results"][doc_id], config)
 
         # Remove HTML and XML from API response to lower response size and network usage
         del search_results["results"][doc_id]["html"]

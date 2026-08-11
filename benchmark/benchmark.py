@@ -13,19 +13,9 @@ benchmark.py: This file initializes all required components, i.e. Solr, tokenize
 Finally, for each metric the average will be calculated. All benchmark results will be saved to the results/ folder.
 """
 
-from src.solr import connect_solr
-from src.documents import build_document_index, get_document_descriptions
-from src.embeddings import (
-    search,
-    search_results_to_docs,
-    get_chromadb_collection,
-    ensure_embedding_backend,
-)
+from src.bootstrap import load_config, boot_components
+from src.embeddings import search, search_results_to_docs
 from src.llm import (
-    load_prompts,
-    get_llm,
-    get_llm_output_cache,
-    ensure_llm_backend,
     document_model_name,
     query_model_name,
 )
@@ -39,7 +29,6 @@ from benchmark.metrics import (
     is_correct_target,
 )
 
-from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from nltk.corpus import stopwords
@@ -51,19 +40,7 @@ import nltk
 import random
 import re
 
-print("Loading config...")
-with open("config.json", "r") as file:
-    data = file.read()
-    config = json.loads(data)
-
-print("Checking LLM backend and preparing configured models if required...")
-ensure_llm_backend(config)
-
-print("Checking embedding backend...")
-ensure_embedding_backend(config)
-
-print("Loading Solr...")
-solr = connect_solr(config)
+config = load_config()
 
 # Depending on the strategy that will be investigated, the benchmark result file suffix will change to distinguish the results.
 results_suffix = ""
@@ -86,30 +63,16 @@ print("Using config for benchmark:")
 # Printed without credentials, because config["openai_api_key"] can hold an API key.
 pprint(config_without_secrets(config))
 
-print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
+# The benchmark neither updates the components nor rebuilds the FindFacts index, it only runs
+# against whatever is already indexed.
+components = boot_components(config, check_updates=False, build_find_facts=False)
 
-print("Loading prompts...")
-prompts = load_prompts(config)
-
-print("Building document index...")
-document_index = build_document_index(config, solr)
-
-print("Getting document descriptions...")
-document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
-
-print("Deleting tokenizer object...")
-del tokenizer
-print("Finished deleting tokenizer object.")
-
-print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, document_index)
-
-print("Loading LLM pipeline and gerneration arguments...")
-model = get_llm(config)
-
-print("Check if loading LLM output cache is enabled via config...")
-llm_output_cache = get_llm_output_cache(config)
+solr = components["solr"]
+prompts = components["prompts"]
+document_index = components["document_index"]
+collection = components["collection"]
+model = components["model"]
+llm_output_cache = components["llm_output_cache"]
 
 print("Downloading/Updating NLTK resources (punkt and stopwords)...")
 nltk.download("punkt")

@@ -155,14 +155,28 @@ def connect_solr(config):
 
 
 # Given a list of Solr document IDs, return a list of all documents identified by the IDs.
-def docs_by_ids(solr, ids):
-    id_strings = []
+# Solr is queried in chunks, because a single request only returns 'chunk_size' documents at most.
+def docs_by_ids(solr, ids, chunk_size=100):
+    documents = []
 
-    for _id in ids:
-        id_string = "id:" + _id
-        id_strings.append(id_string)
+    for i in range(0, len(ids), chunk_size):
+        id_strings = []
 
-    id_query = " OR ".join(id_strings)
-    results = solr.search(id_query, start=0, rows=100)
+        for _id in ids[i : i + chunk_size]:
+            id_string = "id:" + _id
+            id_strings.append(id_string)
 
-    return results
+        id_query = " OR ".join(id_strings)
+        results = solr.search(id_query, start=0, rows=chunk_size)
+
+        for result in results:
+            documents.append(result)
+
+    return documents
+
+
+# Return the number of documents in Solr that match the given query, without retrieving them.
+def count_docs(solr, query):
+    results = solr.search(query, start=0, rows=0)
+
+    return results.raw_response["response"]["numFound"]

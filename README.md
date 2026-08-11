@@ -88,6 +88,60 @@ export ISASEARCH_API_KEY=<your-api-key>
 
 The key is sent as an `Authorization: Bearer` header to the LLM server as well as to the embedding server. Setting `"openai_api_key"` directly in `config.json` works too, but keeps the credential within the repository; it is redacted whenever the configuration is printed. Leave both keys out for servers without authentication.
 
+### Finding duplicated definitions
+
+`python3 -m src.duplicates` answers the question whether the material of an AFP entry already exists elsewhere in the Archive of Formal Proofs. It was built for the experiment proposed by an AFP maintainer: take the *n* newest AFP entries, search for their definitions in the AFP, and ignore the definitions of the entry itself.
+
+No re-indexing and no separate ingestion of a submission is needed. Isabelle's FindFacts indexes *every* command block of a theory, so the definitional commands are already in the Solr index; only `"solr_query"` filtered them out so far. The duplicate detection therefore adds a second corpus on top of the same Solr index, built from `"solr_query_definitions"`, with its own document index cache (`.cache/definition_index.json`), its own LLM descriptions (`artifacts/<model>/definition_descriptions.json`) and its own ChromaDB collection (`afp_definitions`). The theorem corpus is never modified.
+
+Building that corpus is the expensive part, because every definition has to be informalized by the LLM once. Do it separately, it is resumable and prints the number of definitions before the first LLM call:
+
+```bash
+python3 -m src.duplicates --build-corpus-only
+```
+
+Afterwards the experiment itself is cheap:
+
+```bash
+python3 -m src.duplicates --newest 10
+```
+
+Useful options:
+
+| Option | Effect |
+| --- | --- |
+| `--entry NAME` | analyse this entry instead of the newest ones, may be repeated |
+| `--kinds all` | analyse definitions *and* theorems (`--kinds theorems` for theorems only) |
+| `--no-llm-judge` | switch the LLM adjudication off, see below |
+| `--all-candidates` | report the closest candidates of *every* document, not only those reaching a tier |
+| `--report-dir DIR` | override the report location |
+
+Reports are written to `reports/duplicates/experiment_<timestamp>.md` and `.json`.
+
+#### Analysing a new submission
+
+The tool analyses entries that are part of the index. For a submission that is not in the AFP mirror yet, put it into `afp/thys/<Entry>/`, add its session to `"isabelle_sessions"` in `config.json` and start the application once so that the existing FindFacts index build picks it up. Afterwards run `python3 -m src.duplicates --entry <Entry> --kinds all`. The entry's own definitions and theorems are always excluded from its own results, so only counterparts elsewhere in the AFP are reported, which you can then compare manually.
+
+#### Switching the LLM adjudication off
+
+The core of the analysis is a plain loop: every definition (and, with `--kinds all`, every theorem) of the analysed entry is used as an IsaSearch query against the rest of the AFP, and the closest counterparts are reported with their distance and a syntactic similarity. The LLM adjudication is an optional layer on top that asks the configured LLM whether a pair really is a duplicate. Switch it off with `--no-llm-judge` (or `"dedup_llm_judge": false`) to get the plain, deterministic search results; no candidate then reaches the `likely` tier and the report says so. Combine it with `--all-candidates` to see the raw ranking for every document, unfiltered by any threshold.
+
+Note that the LLM is still needed to *build* the corpus, because every definition is informalized once before it is embedded.
+
+Every candidate is reported in one of three tiers, configured in `config.json`:
+
+| Tier | Meaning |
+| --- | --- |
+| `near-exact` | distance ≤ `dedup_strong_distance_threshold` or syntactic similarity ≥ `dedup_syntactic_threshold` |
+| `likely` | the LLM judged the pair to be a duplicate |
+| `possible` | distance ≤ `dedup_distance_threshold` |
+
+Further keys are `dedup_top_k` (candidates per definition), `dedup_llm_judge` (adjudication on by default), `dedup_max_judged_per_item` (LLM calls per definition) and `dedup_report_folder`.
+
+Two controls are part of every run and are included in the report. First, before its own entry is excluded, each definition must retrieve *itself* at a distance of about 0; if more than 5 % fail to do so, the run exits with a non-zero status because the corpus and the queries are then not in the same embedding space. Second, definitions of different entries that define something of the same base name and whose sources are nearly identical are collected syntactically and used as a ground truth, which yields a recall value for the semantic search.
+
+Please keep in mind that semantic similarity is not logical duplication: the tiers are a triage aid for a human reviewer, not a verdict. The same holds for the LLM verdicts, which is why the report always contains the model's justification. Also note that meaningful results require an index of the whole AFP — with only the two sessions that are enabled for testing, almost nothing can be found.
+
 ### Tests
 
 The tests use only the Python standard library's `unittest`, so they need no additional packages. Run them inside the root folder of the repository:

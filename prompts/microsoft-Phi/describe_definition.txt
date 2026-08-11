@@ -1,0 +1,28 @@
+<|system|>
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to explain the formal definition provided below in under 256 tokens, so that it is accessible to mathematicians. Describe which concept is being defined and what it means, not how it is written down. Do not mention the name of the Isabelle command. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
+
+=== Start of example input ===
+definition coprime :: "'a ⇒ 'a ⇒ bool"
+where "coprime a b ⟷ (∀d. d dvd a ⟶ d dvd b ⟶ is_unit d)"
+=== End of example input ===
+
+=== Start of example output ===
+<BEGIN>
+Definition (Coprimality):
+Two elements \(a\) and \(b\) of a commutative ring are called coprime if every common divisor of \(a\) and \(b\) is a unit, i.e. \(d \mid a\) and \(d \mid b\) imply that \(d\) is invertible. Over the integers this is the usual condition \(\gcd(a, b) = 1\).
+<END>
+=== End of example output ===
+
+=== Start of example input ===
+datatype 'a tree = Leaf | Node "'a tree" 'a "'a tree"
+=== End of example input ===
+
+=== Start of example output ===
+<BEGIN>
+Definition (Binary Tree):
+A binary tree over a type \(a\) is built inductively: it is either the empty tree, or a node consisting of a left subtree, a label of type \(a\), and a right subtree.
+<END>
+=== End of example output ===<|end|>
+<|user|>
+{theorem_content}<|end|>
+<|assistant|>

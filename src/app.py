@@ -14,80 +14,21 @@ Finally, Flask and package 'waitress' is used to serve both the REST API and sta
 Note: To simplify matters, from now on "theorem" will be used representatively for theorems, lemmas, corollaries and propositions in comment and docstrings.
 """
 
-import json
-
-from transformers import AutoTokenizer
 from flask import Flask, request, send_from_directory
 
-from src.solr import connect_solr
-from src.documents import build_document_index, get_document_descriptions
-from src.embeddings import (
-    search,
-    search_results_to_docs,
-    get_chromadb_collection,
-    ensure_embedding_backend,
-)
-from src.llm import load_prompts, get_llm, get_llm_output_cache, ensure_llm_backend
-from src.installation import (
-    check_and_update,
-    build_index,
-    setup_isabelle_components,
-    get_isabelle_version,
-)
+from src.bootstrap import load_config, boot_components
+from src.embeddings import search, search_results_to_docs
 
 
-print("Loading config...")
-with open("config.json", "r") as file:
-    data = file.read()
-    config = json.loads(data)
+config = load_config()
+components = boot_components(config)
 
-print("Checking LLM backend and preparing configured models if required...")
-ensure_llm_backend(config)
-
-print("Checking embedding backend...")
-ensure_embedding_backend(config)
-
-print("Checking, downloading or updating AFP if required...")
-if config.get("check_for_updates", True):
-    components = config.get("components", {})
-
-    for key, comp_config in components.items():
-        check_and_update(key, comp_config)
-
-print("Setting up Isabelle components if required...")
-setup_isabelle_components()
-config["isabelle_version"] = get_isabelle_version()
-
-print("Building Isabelle FindFacts index if required...")
-build_index(config)
-
-print("Loading Solr...")
-solr = connect_solr(config)
-
-print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
-
-print("Loading prompts...")
-prompts = load_prompts(config)
-
-print("Building document index...")
-document_index = build_document_index(config, solr)
-
-print("Getting document descriptions...")
-document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
-
-print("Deleting tokenizer object...")
-del tokenizer
-print("Finished deleting tokenizer object.")
-
-print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, document_index)
-
-print("Loading LLM...")
-model = get_llm(config)
-
-print("Loading LLM output cache if enabled via config...")
-llm_output_cache = get_llm_output_cache(config)
+solr = components["solr"]
+prompts = components["prompts"]
+document_index = components["document_index"]
+collection = components["collection"]
+model = components["model"]
+llm_output_cache = components["llm_output_cache"]
 
 print("Preparing Flask app...")
 app = Flask(__name__)
