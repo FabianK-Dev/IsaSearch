@@ -8,7 +8,9 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
 - [git](https://git-scm.com/downloads) 2.47.3 or higher
 - [Docker](https://www.docker.com/get-started) 29.2.1 or higher
-- [Ollama](https://ollama.com/download)
+- One of the supported LLM backends:
+  - [Ollama](https://ollama.com/download) (default), or
+  - [llama.cpp](https://github.com/ggml-org/llama.cpp) with `llama-server` available on the `PATH`
 
 ## Setup
 
@@ -36,6 +38,21 @@ Building the full FindFacts index for the entire Archive of Formal Proofs takes 
 ```
 
 If you want to search the entire AFP, you need to update the `isabelle_sessions` list in `config.json` to include all desired sessions (or use `["all"]` if supported by your setup), but be prepared for the significant processing time mentioned above.
+
+### LLM backend
+
+The LLM backend is selected with `"llm_backend"` in `config.json` and is either `"ollama"` (default) or `"llamacpp"`:
+
+| Backend | Configuration keys |
+| --- | --- |
+| `ollama` | `ollama_base_url`, `ollama_document_model`, `ollama_query_model` |
+| `llamacpp` | `llamacpp_server_binary`, `llamacpp_base_url`, `llamacpp_document_base_url`, `llamacpp_document_model`, `llamacpp_query_model` |
+
+For `llamacpp`, a model is either a path to a local GGUF file (e.g. `/models/Phi-3.5-mini-instruct-Q4_K_M.gguf`) or a Hugging Face specification of the form `hf:<repo>[:<quantization>]` (e.g. `hf:bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M`), which llama.cpp downloads automatically on first start.
+
+For localhost URLs the application starts the required `llama-server` processes automatically and stops them again on exit. A `llama-server` process serves exactly one model, so if the document and query model differ, two servers are started: the query model at `llamacpp_base_url` and the document model at `llamacpp_document_base_url`. If a server is already running at a configured URL, it is used as-is.
+
+Refined queries are cached per model name, so switching the backend regenerates them. Document descriptions are only regenerated when a theorem's source code changes, so already informalized theorems keep the descriptions of the backend that generated them.
 
 ### Benchmark
 

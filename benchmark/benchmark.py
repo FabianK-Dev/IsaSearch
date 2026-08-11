@@ -5,7 +5,7 @@ benchmark.py: This file initializes all required components, i.e. Solr, tokenize
 - Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
 - document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
-- document_descriptions: Loads or generates an informal description for each document using Ollama to allow more effective search with informal user queries
+- document_descriptions: Loads or generates an informal description for each document using the configured LLM backend to allow more effective search with informal user queries
 - ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
@@ -16,7 +16,14 @@ Finally, for each metric the average will be calculated. All benchmark results w
 from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
 from src.embeddings import search, search_results_to_docs, get_chromadb_collection
-from src.llm import load_prompts, get_llm, get_llm_output_cache, ensure_ollama
+from src.llm import (
+    load_prompts,
+    get_llm,
+    get_llm_output_cache,
+    ensure_llm_backend,
+    document_model_name,
+    query_model_name,
+)
 from benchmark.metrics import (
     top_k_accuracy,
     normalized_discounted_cumulative_gain,
@@ -43,8 +50,8 @@ with open("config.json", "r") as file:
     data = file.read()
     config = json.loads(data)
 
-print("Checking Ollama and pulling configured models if required...")
-ensure_ollama(config)
+print("Checking LLM backend and preparing configured models if required...")
+ensure_llm_backend(config)
 
 print("Loading Solr...")
 solr = connect_solr(config)
@@ -287,9 +294,9 @@ benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 benchmark_model_name = (
     results_suffix
     + "_"
-    + config["ollama_document_model"].replace("/", "-")
+    + document_model_name(config).replace("/", "-")
     + "_"
-    + config["ollama_query_model"].replace("/", "-")
+    + query_model_name(config).replace("/", "-")
 )
 
 if not os.path.exists("./benchmark/results/"):

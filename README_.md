@@ -8,7 +8,9 @@ You can find the repository online at https://gitlab.lrz.de/Kadlez/afp-ai-search
 
 - [Python](https://www.python.org/downloads/) 3.11.2 or higher
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
-- [Ollama](https://ollama.com/download)
+- One of the supported LLM backends:
+  - [Ollama](https://ollama.com/download) (default), or
+  - [llama.cpp](https://github.com/ggml-org/llama.cpp) with `llama-server` available on the `PATH`
 
 **If you want to run the Docker image:**
 - [Docker](https://docs.docker.com/engine/install/)
@@ -78,6 +80,21 @@ solr start --force -p 8983 -s /path/to/findfacts/solr/local
 7. Start the application using Python **inside the root folder of the repository** (this is necessary to ensure paths like the `config.json` are loaded correctly): `python -m src.app`
 
 The application starts Ollama automatically and pulls the configured models if they are missing.
+
+#### LLM backend
+
+The LLM backend is selected with `"llm_backend"` in `config.json` and is either `"ollama"` (default) or `"llamacpp"`:
+
+| Backend | Configuration keys |
+| --- | --- |
+| `ollama` | `ollama_base_url`, `ollama_document_model`, `ollama_query_model` |
+| `llamacpp` | `llamacpp_server_binary`, `llamacpp_base_url`, `llamacpp_document_base_url`, `llamacpp_document_model`, `llamacpp_query_model` |
+
+For `llamacpp`, a model is either a path to a local GGUF file (e.g. `/models/Phi-3.5-mini-instruct-Q4_K_M.gguf`) or a Hugging Face specification of the form `hf:<repo>[:<quantization>]` (e.g. `hf:bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M`), which llama.cpp downloads automatically on first start.
+
+For localhost URLs the application starts the required `llama-server` processes automatically and stops them again on exit. A `llama-server` process serves exactly one model, so if the document and query model differ, two servers are started: the query model at `llamacpp_base_url` and the document model at `llamacpp_document_base_url`. If a server is already running at a configured URL, it is used as-is.
+
+Refined queries are cached per model name, so switching the backend regenerates them. Document descriptions are only regenerated when a theorem's source code changes, so already informalized theorems keep the descriptions of the backend that generated them.
 
 #### Benchmark
 
