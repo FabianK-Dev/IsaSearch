@@ -15,7 +15,12 @@ Finally, for each metric the average will be calculated. All benchmark results w
 
 from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
-from src.embeddings import search, search_results_to_docs, get_chromadb_collection
+from src.embeddings import (
+    search,
+    search_results_to_docs,
+    get_chromadb_collection,
+    ensure_embedding_backend,
+)
 from src.llm import (
     load_prompts,
     get_llm,
@@ -24,6 +29,7 @@ from src.llm import (
     document_model_name,
     query_model_name,
 )
+from src.openai_api import config_without_secrets
 from benchmark.metrics import (
     top_k_accuracy,
     normalized_discounted_cumulative_gain,
@@ -53,6 +59,9 @@ with open("config.json", "r") as file:
 print("Checking LLM backend and preparing configured models if required...")
 ensure_llm_backend(config)
 
+print("Checking embedding backend...")
+ensure_embedding_backend(config)
+
 print("Loading Solr...")
 solr = connect_solr(config)
 
@@ -74,7 +83,8 @@ if results_suffix == "":
     results_suffix = "baseline"
 
 print("Using config for benchmark:")
-pprint(config)
+# Printed without credentials, because config["openai_api_key"] can hold an API key.
+pprint(config_without_secrets(config))
 
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])

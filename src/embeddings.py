@@ -1,20 +1,258 @@
 """
 embeddings.py: This file manages ChromaDB embeddings and semantic search with LLM-based query refinement and a caching mechanism.
+
+Two embedding backends are supported and selected through config["embedding_backend"]:
+- "sentence_transformers" (default): embeds locally with the sentence-transformers model
+  configured at config["chroma_db_embedder"].
+- "openai": embeds remotely through the /embeddings endpoint of any OpenAI compatible server
+  (e.g. a llama-server running an embedding model on a GPU machine).
+
+This file is the only place that knows about embedding backend specific configuration keys.
+Other modules should use the backend agnostic helpers (get_embedding_function,
+ensure_embedding_backend) instead.
 """
 
 import os
 import time
 import torch
 import chromadb
+import requests
+
+from tqdm import tqdm
+from chromadb.api.types import EmbeddingFunction
 from chromadb.utils import embedding_functions
 
 
 from src.solr import docs_by_ids
 from src.llm import save_llm_output_cache, query_model_name
+from src.openai_api import openai_api_key, openai_headers, raise_for_status_with_body
+
+SENTENCE_TRANSFORMERS_EMBEDDING_BACKEND = "sentence_transformers"
+OPENAI_EMBEDDING_BACKEND = "openai"
+
+SUPPORTED_EMBEDDING_BACKENDS = [
+    SENTENCE_TRANSFORMERS_EMBEDDING_BACKEND,
+    OPENAI_EMBEDDING_BACKEND,
+]
+
+# Number of attempts per embedding request before giving up, so that a single hiccup of the
+# embedding server does not abort an indexing run that has already taken hours.
+EMBEDDING_ATTEMPTS = 3
+
+# HTTP status codes that are worth retrying, i.e. a busy or temporarily unavailable server. Every
+# other error is permanent (e.g. an unknown model or an input that exceeds the batch size of the
+# server), thus retrying it would only delay the inevitable failure.
+RETRYABLE_STATUS_CODES = [429, 500, 502, 503, 504]
+
+# Maximum number of characters per text that is sent to the embedding server. llama.cpp rejects an
+# input that does not fit into a single physical batch instead of truncating it, and a theorem
+# including its proof easily exceeds that limit, so without truncating here a single long theorem
+# would abort every indexing run at the very same document.
+# Isabelle source code tokenizes at roughly 3 characters per token, and at only about 2 for
+# symbol-heavy theorems, thus 8000 characters can become close to 4000 tokens. The embedding server
+# therefore has to be started with a physical batch size of at least 4096 (llama-server: '-ub 4096
+# -b 4096'), which is far above its default of 512. Lower this value to embed with a smaller batch.
+DEFAULT_EMBEDDING_MAX_CHARACTERS = 8000
 
 
-# This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
-def get_chromadb_collection(config, prompts, document_index):
+# Raised for errors that are worth retrying, so that they can be told apart from permanent ones.
+class RetryableEmbeddingError(RuntimeError):
+    pass
+
+
+# Returns the configured embedding backend and validates it, so that a typo fails early instead of
+# silently falling back. Configurations without the key keep embedding locally as before.
+def embedding_backend(config):
+    backend = config.get("embedding_backend", SENTENCE_TRANSFORMERS_EMBEDDING_BACKEND)
+
+    if backend not in SUPPORTED_EMBEDDING_BACKENDS:
+        raise ValueError(
+            "Unknown embedding backend '"
+            + str(backend)
+            + "' configured at config['embedding_backend']. Supported backends are "
+            + ", ".join("'" + name + "'" for name in SUPPORTED_EMBEDDING_BACKENDS)
+            + "."
+        )
+
+    return backend
+
+
+# A ChromaDB embedding function that embeds through the /embeddings endpoint of an OpenAI compatible
+# server. It has to subclass ChromaDB's EmbeddingFunction and implement name(), get_config() and
+# build_from_config(), because get_or_create_collection() calls name() on the embedding function to
+# compare it against the one persisted next to the collection. The parameter of __call__ has to be
+# named 'input', because ChromaDB inspects its signature.
+class OpenAIEmbeddingFunction(EmbeddingFunction):
+    def __init__(
+        self,
+        base_url,
+        model_name,
+        batch_size,
+        max_characters=DEFAULT_EMBEDDING_MAX_CHARACTERS,
+        api_key=None,
+    ):
+        self.base_url = base_url.rstrip("/")
+        self.model_name = model_name
+        self.batch_size = batch_size
+        self.max_characters = max_characters
+        self.headers = openai_headers(api_key)
+
+    @staticmethod
+    def name():
+        # Must not collide with the names ChromaDB registers for its own embedding functions
+        # (e.g. "openai"), because a persisted name is looked up in that registry.
+        return "isasearch_openai"
+
+    def get_config(self):
+        # ChromaDB persists this config next to the collection, thus the API key is deliberately
+        # not part of it and is always taken from the configuration instead.
+        return {
+            "base_url": self.base_url,
+            "model_name": self.model_name,
+            "batch_size": self.batch_size,
+            "max_characters": self.max_characters,
+        }
+
+    # Only required so that ChromaDB does not treat this embedding function as a legacy one. The
+    # embedding function is always passed explicitly, so ChromaDB never rebuilds it from its config.
+    # Entries are read defensively, because ChromaDB also calls this for a config that was persisted
+    # by an older version of this class, which then did not know all of the keys above.
+    @staticmethod
+    def build_from_config(config):
+        return OpenAIEmbeddingFunction(
+            config["base_url"],
+            config["model_name"],
+            config["batch_size"],
+            config.get("max_characters", DEFAULT_EMBEDDING_MAX_CHARACTERS),
+        )
+
+    def embed_batch(self, texts):
+        last_error = None
+        # The longest input is part of every error message, because the most likely permanent error
+        # is an input that does not fit into the batch size the server was started with.
+        description = (
+            "Embedding "
+            + str(len(texts))
+            + " document(s) with up to "
+            + str(max(len(text) for text in texts) if texts else 0)
+            + " characters at "
+            + self.base_url
+        )
+
+        for attempt in range(EMBEDDING_ATTEMPTS):
+            try:
+                response = requests.post(
+                    self.base_url + "/embeddings",
+                    json={"model": self.model_name, "input": texts},
+                    headers=self.headers,
+                    timeout=600,
+                )
+
+                if response.status_code in RETRYABLE_STATUS_CODES:
+                    raise RetryableEmbeddingError(
+                        description
+                        + " failed with status code "
+                        + str(response.status_code)
+                        + ": "
+                        + response.text
+                    )
+
+                # Permanent errors are raised from here and are deliberately not retried.
+                raise_for_status_with_body(response, description)
+
+                payload = response.json()
+
+                if "data" not in payload:
+                    raise RuntimeError(
+                        description
+                        + " returned a response without a 'data' entry: "
+                        + response.text[:500]
+                    )
+
+                # The OpenAI API does not guarantee that the embeddings are returned in the order of
+                # the inputs, thus they are sorted by their index before the vectors are extracted.
+                return [
+                    entry["embedding"]
+                    for entry in sorted(
+                        payload["data"], key=lambda entry: entry["index"]
+                    )
+                ]
+            except (
+                requests.RequestException,
+                RetryableEmbeddingError,
+                # A response body that cannot be parsed as JSON usually means a truncated transfer.
+                ValueError,
+            ) as exc:
+                last_error = exc
+
+                if attempt + 1 < EMBEDDING_ATTEMPTS:
+                    # Exponential backoff, so that a server which is busy loading or swapping a
+                    # model gets some time to recover before the next attempt.
+                    backoff = 2**attempt
+                    print(
+                        "Embedding request to "
+                        + self.base_url
+                        + " failed ("
+                        + str(exc)
+                        + "). Retrying in "
+                        + str(backoff)
+                        + " second(s)..."
+                    )
+                    time.sleep(backoff)
+
+        raise RuntimeError(
+            description
+            + " failed after "
+            + str(EMBEDDING_ATTEMPTS)
+            + " attempts: "
+            + str(last_error)
+            + " If the server rejects the input as too large, either start it with a bigger physical"
+            + " batch size (llama-server: '-ub' and '-b') or lower"
+            + " config['openai_embedding_max_characters']."
+        )
+
+    def __call__(self, input):
+        embeddings = []
+
+        # A document is the LLM description together with the untruncated theorem source code, which
+        # can exceed what the server accepts within a single batch. Such an error is permanent, so a
+        # single long theorem would abort every indexing run at the same document. The local
+        # sentence-transformers backend truncates as well, just silently at the maximum sequence
+        # length of its model.
+        texts = [text[: self.max_characters] for text in input]
+
+        # ChromaDB hands over all documents of a collection.add(...) call at once (5000 below), which
+        # would exceed the batch and context limits of the embedding server, thus the texts are sent
+        # in smaller batches. The progress bar is only shown for more than a single batch, so that
+        # embedding a search query stays silent.
+        for i in tqdm(
+            range(0, len(texts), self.batch_size),
+            disable=len(texts) <= self.batch_size,
+        ):
+            embeddings.extend(self.embed_batch(texts[i : i + self.batch_size]))
+
+        return embeddings
+
+
+# Returns the ChromaDB embedding function of the configured embedding backend. Note that the local
+# sentence-transformers model is only loaded if that backend is actually configured.
+def get_embedding_function(config):
+    if embedding_backend(config) == OPENAI_EMBEDDING_BACKEND:
+        print(
+            "Using the OpenAI compatible embedding server at "
+            + config["openai_embedding_base_url"]
+            + "..."
+        )
+        return OpenAIEmbeddingFunction(
+            config["openai_embedding_base_url"],
+            config["openai_embedding_model"],
+            config.get("openai_embedding_batch_size", 32),
+            config.get(
+                "openai_embedding_max_characters", DEFAULT_EMBEDDING_MAX_CHARACTERS
+            ),
+            openai_api_key(config),
+        )
+
     print("Loading ChromaDB embedding function...")
     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         embedding_device = "mps"
@@ -22,10 +260,48 @@ def get_chromadb_collection(config, prompts, document_index):
         embedding_device = "cuda"
     else:
         embedding_device = "cpu"
-    embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
+
+    return embedding_functions.SentenceTransformerEmbeddingFunction(
         model_name=config["chroma_db_embedder"],
         device=embedding_device,
     )
+
+
+# Makes sure that the configured embedding backend is usable before any indexing starts, so that a
+# wrong URL, a missing API key or an unknown model fails on startup and not hours into a run.
+def ensure_embedding_backend(config):
+    if embedding_backend(config) != OPENAI_EMBEDDING_BACKEND:
+        return
+
+    base_url = config["openai_embedding_base_url"]
+    print("Checking OpenAI compatible embedding server at " + base_url + "...")
+
+    # A server of this backend is never started automatically, because it usually runs on a
+    # different machine. Embedding a single short text is the most reliable check, because it
+    # exercises exactly the request that is used during indexing and searching.
+    embeddings = get_embedding_function(config)(["IsaSearch embedding backend check"])
+
+    # ChromaDB normalizes the returned vectors into NumPy arrays, whose truth value is ambiguous,
+    # thus emptiness is checked through their length.
+    if len(embeddings) == 0 or len(embeddings[0]) == 0:
+        raise RuntimeError(
+            "The embedding server at "
+            + base_url
+            + " did not return an embedding for the startup check."
+        )
+
+    print(
+        "The embedding server at "
+        + base_url
+        + " is up and running and returns "
+        + str(len(embeddings[0]))
+        + " dimensional embeddings."
+    )
+
+
+# This method loads an existing or creates a new ChromaDB collection and embeds all documents that haven't been embedded, yet.
+def get_chromadb_collection(config, prompts, document_index):
+    embedder = get_embedding_function(config)
 
     # ChromaDB path
     if not os.path.exists(config["chroma_db_path"]):
@@ -35,9 +311,17 @@ def get_chromadb_collection(config, prompts, document_index):
     chroma_db_path = config["chroma_db_path"] + "/chroma_db"
     print("Loading ChromaDB collection at path '" + chroma_db_path + "'...")
 
+    # Embedding models that are served through an OpenAI compatible API (e.g. Qwen3-Embedding) are
+    # trained for cosine similarity, whereas ChromaDB defaults to squared L2. Collections that
+    # already exist keep their configured distance function, because ChromaDB ignores the metadata
+    # of get_or_create_collection for them, thus existing collections stay untouched.
+    collection_metadata = None
+    if embedding_backend(config) == OPENAI_EMBEDDING_BACKEND:
+        collection_metadata = {"hnsw:space": "cosine"}
+
     chroma_client = chromadb.PersistentClient(path=chroma_db_path)
     collection = chroma_client.get_or_create_collection(
-        "afp_docs", embedding_function=embedder
+        "afp_docs", embedding_function=embedder, metadata=collection_metadata
     )
 
     # Get set of all already existing document IDs (saved at the source key)

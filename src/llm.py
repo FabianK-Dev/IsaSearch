@@ -1,9 +1,11 @@
 """
 llm.py: This file handles prompt loading, LLM initialization, and caching of generated outputs.
 
-Two LLM backends are supported and selected through config["llm_backend"]:
+Three LLM backends are supported and selected through config["llm_backend"]:
 - "ollama": talks to a local Ollama server through its HTTP API.
 - "llamacpp": talks to one or more local llama.cpp servers (llama-server) through their HTTP API.
+- "openai": talks to any OpenAI compatible server (e.g. a remote llama-server, vLLM or LM Studio)
+  through its /chat/completions endpoint.
 
 This file is the only place that knows about backend specific configuration keys.
 Other modules should use the backend agnostic helpers (get_llm, get_document_llm,
@@ -21,8 +23,13 @@ from pathlib import Path
 from urllib.parse import urlparse
 import requests
 
+from src.openai_api import openai_api_key, openai_headers, raise_for_status_with_body
+
 OLLAMA_BACKEND = "ollama"
 LLAMACPP_BACKEND = "llamacpp"
+OPENAI_BACKEND = "openai"
+
+SUPPORTED_BACKENDS = [OLLAMA_BACKEND, LLAMACPP_BACKEND, OPENAI_BACKEND]
 
 # All servers that were started by this application and thus need to be stopped on exit.
 managed_processes = []
@@ -337,6 +344,84 @@ def ensure_llamacpp(config):
             start_llamacpp(base_url, model_spec, config)
 
 
+# The OpenAI API names the token limit "max_tokens" and expects all sampling parameters at the top
+# level of the request instead of within an "options" object.
+def openai_options(config):
+    sampling_parameters = config["sampling_parameters"]
+    options = {
+        "temperature": sampling_parameters["temperature"],
+        "top_p": sampling_parameters["top_p"],
+        # "min_p" and "top_k" are not part of the OpenAI API, but the OpenAI compatible endpoints of
+        # local inference servers such as llama.cpp, vLLM and LM Studio accept them as additional
+        # top level fields, which keeps the sampling configuration identical across all backends.
+        # Note that the hosted API at api.openai.com rejects unknown parameters with HTTP 400
+        # instead of ignoring them, so these two entries have to be removed to target it.
+        "min_p": sampling_parameters["min_p"],
+        "max_tokens": sampling_parameters["max_tokens"],
+    }
+
+    # Like llama.cpp, negative values are omitted instead of being passed through.
+    if sampling_parameters["top_k"] >= 0:
+        options["top_k"] = sampling_parameters["top_k"]
+
+    if sampling_parameters.get("stop"):
+        options["stop"] = sampling_parameters["stop"]
+
+    return options
+
+
+def ensure_openai(config):
+    base_url = config["openai_base_url"].rstrip("/")
+    headers = openai_headers(openai_api_key(config))
+
+    print("Checking OpenAI compatible LLM server at " + base_url + "...")
+
+    # Unlike Ollama and llama.cpp, a server of this backend is never started automatically, because
+    # it usually runs on a different machine. Only its reachability is checked here, so that a wrong
+    # URL or a missing API key fails on startup instead of in the middle of a run.
+    try:
+        response = requests.get(base_url + "/models", headers=headers, timeout=10)
+    except requests.RequestException as exc:
+        raise RuntimeError(
+            "The OpenAI compatible server at "
+            + base_url
+            + " is not reachable ("
+            + str(exc)
+            + "). Servers of the '"
+            + OPENAI_BACKEND
+            + "' backend are never started automatically, please make sure it is running and reachable."
+        ) from exc
+
+    raise_for_status_with_body(response, "Requesting the model list from " + base_url)
+
+    try:
+        available_models = {
+            model.get("id") for model in response.json().get("data", [])
+        }
+    except ValueError:
+        available_models = set()
+
+    # Only a warning and not an error, because some servers report an internal model name or nothing
+    # at all instead of the alias that has to be sent within a request.
+    if available_models:
+        for model_name in {
+            config["openai_document_model"],
+            config["openai_query_model"],
+        }:
+            if model_name not in available_models:
+                print(
+                    "Warning: model '"
+                    + model_name
+                    + "' is not listed at "
+                    + base_url
+                    + "/models. Available models are: "
+                    + ", ".join(sorted(str(name) for name in available_models))
+                    + "."
+                )
+
+    print("The OpenAI compatible server at " + base_url + " is up and running.")
+
+
 class OllamaLLM:
     def __init__(self, base_url, model_name, options):
         self.base_url = base_url.rstrip("/")
@@ -378,19 +463,45 @@ class LlamaCppLLM:
         return response.json()["content"]
 
 
+class OpenAILLM:
+    def __init__(self, base_url, model_name, options, api_key=None):
+        self.base_url = base_url.rstrip("/")
+        self.model_name = model_name
+        self.options = options
+        self.headers = openai_headers(api_key)
+
+    def generate(self, prompt):
+        # The prompt is sent as a single user message, because the server applies the chat template
+        # of the model itself. Prompts for this backend therefore must not contain model specific
+        # markers such as '<|user|>', which would end up as literal text within the message.
+        response = requests.post(
+            self.base_url + "/chat/completions",
+            json={
+                "model": self.model_name,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                **self.options,
+            },
+            headers=self.headers,
+            timeout=None,
+        )
+        raise_for_status_with_body(
+            response, "Generating a completion at " + self.base_url
+        )
+        return response.json()["choices"][0]["message"]["content"]
+
+
 # Returns the configured LLM backend and validates it, so that a typo fails early instead of silently falling back.
 def llm_backend(config):
     backend = config.get("llm_backend", OLLAMA_BACKEND)
 
-    if backend not in [OLLAMA_BACKEND, LLAMACPP_BACKEND]:
+    if backend not in SUPPORTED_BACKENDS:
         raise ValueError(
             "Unknown LLM backend '"
             + str(backend)
-            + "' configured at config['llm_backend']. Supported backends are '"
-            + OLLAMA_BACKEND
-            + "' and '"
-            + LLAMACPP_BACKEND
-            + "'."
+            + "' configured at config['llm_backend']. Supported backends are "
+            + ", ".join("'" + name + "'" for name in SUPPORTED_BACKENDS)
+            + "."
         )
 
     return backend
@@ -399,33 +510,57 @@ def llm_backend(config):
 # The model names are also used as cache keys and within benchmark result file names,
 # so they have to be resolved for the configured backend.
 def query_model_name(config):
-    if llm_backend(config) == LLAMACPP_BACKEND:
+    backend = llm_backend(config)
+
+    if backend == LLAMACPP_BACKEND:
         return config["llamacpp_query_model"]
+
+    if backend == OPENAI_BACKEND:
+        return config["openai_query_model"]
 
     return config["ollama_query_model"]
 
 
 def document_model_name(config):
-    if llm_backend(config) == LLAMACPP_BACKEND:
+    backend = llm_backend(config)
+
+    if backend == LLAMACPP_BACKEND:
         return config["llamacpp_document_model"]
+
+    if backend == OPENAI_BACKEND:
+        return config["openai_document_model"]
 
     return config["ollama_document_model"]
 
 
 # Starts the configured backend if required and makes sure that the configured models are available.
 def ensure_llm_backend(config):
-    if llm_backend(config) == LLAMACPP_BACKEND:
+    backend = llm_backend(config)
+
+    if backend == LLAMACPP_BACKEND:
         ensure_llamacpp(config)
+    elif backend == OPENAI_BACKEND:
+        ensure_openai(config)
     else:
         ensure_ollama(config)
 
 
 # The LLM that is used to refine search queries.
 def get_llm(config):
-    if llm_backend(config) == LLAMACPP_BACKEND:
+    backend = llm_backend(config)
+
+    if backend == LLAMACPP_BACKEND:
         return LlamaCppLLM(
             config["llamacpp_base_url"],
             llamacpp_options(config),
+        )
+
+    if backend == OPENAI_BACKEND:
+        return OpenAILLM(
+            config["openai_base_url"],
+            config["openai_query_model"],
+            openai_options(config),
+            openai_api_key(config),
         )
 
     return OllamaLLM(
@@ -437,6 +572,16 @@ def get_llm(config):
 
 # The LLM that is used to informalize (i.e. describe) documents.
 def get_document_llm(config):
+    if llm_backend(config) == OPENAI_BACKEND:
+        # A single OpenAI compatible server can serve more than one model, so unlike llama.cpp the
+        # document model only differs by its name and not by the URL it is requested at.
+        return OpenAILLM(
+            config["openai_base_url"],
+            config["openai_document_model"],
+            openai_options(config),
+            openai_api_key(config),
+        )
+
     if llm_backend(config) == LLAMACPP_BACKEND:
         # Validate the server configuration, so that a misconfiguration is reported here as well and
         # not only when the servers are started.

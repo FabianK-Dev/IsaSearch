@@ -21,7 +21,12 @@ from flask import Flask, request, send_from_directory
 
 from src.solr import connect_solr
 from src.documents import build_document_index, get_document_descriptions
-from src.embeddings import search, search_results_to_docs, get_chromadb_collection
+from src.embeddings import (
+    search,
+    search_results_to_docs,
+    get_chromadb_collection,
+    ensure_embedding_backend,
+)
 from src.llm import load_prompts, get_llm, get_llm_output_cache, ensure_llm_backend
 from src.installation import (
     check_and_update,
@@ -38,6 +43,9 @@ with open("config.json", "r") as file:
 
 print("Checking LLM backend and preparing configured models if required...")
 ensure_llm_backend(config)
+
+print("Checking embedding backend...")
+ensure_embedding_backend(config)
 
 print("Checking, downloading or updating AFP if required...")
 if config.get("check_for_updates", True):
