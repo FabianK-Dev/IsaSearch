@@ -6,6 +6,8 @@
 .dockerignore
 Dockerfile
 compose.yaml
+# Holds ISASEARCH_API_KEY; compose passes it as an environment variable, it never belongs in a layer
+.env
 
 # Local state and generated corpora
 .cache

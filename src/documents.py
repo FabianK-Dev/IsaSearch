@@ -20,6 +20,12 @@ from src.solr import count_docs
 
 cached_metadata = {}
 
+# The command that builds the corpus, named by every message that reports a missing or stale one.
+# It lives here rather than in src/corpus.py, which owns it in spirit, because importing the entry
+# point would be circular: src/corpus.py imports src/bootstrap.py, which imports this file. This is
+# the lowest module that has to report a missing corpus, and every consumer already imports it.
+BUILD_CORPUS_COMMAND = "python3 -m src.corpus"
+
 # The 'proof' keyword as a whole word, i.e. not as part of an identifier such as 'proof_system'.
 PROOF_KEYWORD = re.compile(r"(?<![A-Za-z0-9_'])proof(?![A-Za-z0-9_'])")
 
@@ -209,7 +215,6 @@ def generate_document_descriptions(
     config,
     document_index,
     prompts,
-    tokenizer,
     save_every=1000,
     artifact_name="document_descriptions.json",
     describe_prompt_key="describe",
@@ -218,9 +223,9 @@ def generate_document_descriptions(
     ARTIFACTS_FOLDER = config["artifacts_folder"]
     DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + artifact_name
 
-    # With generate_missing disabled no LLM is called at all, so the prompt does not have to exist
-    # and no tokenizer is required. This is used by the web application, which must never start a
-    # multi hour informalization run just because a description is missing.
+    # With generate_missing disabled no LLM is called at all, so the prompt does not have to exist.
+    # This is used by the web application, which must never start a multi hour informalization run
+    # just because a description is missing.
     if generate_missing and describe_prompt_key not in prompts:
         raise KeyError(
             f"Prompt '{describe_prompt_key}' does not exist in the prompts folder "
@@ -294,10 +299,7 @@ def generate_document_descriptions(
             )
 
         if len(filtered_docs) >= 1:
-            print(
-                "Rebuild the corpus with 'python3 -m src.duplicates --build-corpus-only' to "
-                "describe them."
-            )
+            print(f"Rebuild the corpus with '{BUILD_CORPUS_COMMAND}' to describe them.")
 
         return document_descriptions
 
@@ -345,20 +347,6 @@ def generate_document_descriptions(
                 )
 
             doc_strings.append(doc_string)
-
-        print(
-            "Calculating maximum number of tokens required to describe filtered documents..."
-        )
-        max_tokens = 0
-
-        for doc in tqdm(doc_strings):
-            token_ids = tokenizer.encode(doc)
-            num_tokens = len(token_ids)
-
-            if num_tokens > max_tokens:
-                max_tokens = num_tokens
-
-        print("Max tokens for prompt and document string: " + str(max_tokens))
 
         print("Loading LLM...")
         llm = get_document_llm(config)
@@ -415,7 +403,6 @@ def get_document_descriptions(
     config,
     document_index,
     prompts,
-    tokenizer,
     artifact_name="document_descriptions.json",
     describe_prompt_key="describe",
     generate_missing=True,
@@ -424,7 +411,6 @@ def get_document_descriptions(
         config,
         document_index,
         prompts,
-        tokenizer,
         artifact_name=artifact_name,
         describe_prompt_key=describe_prompt_key,
         generate_missing=generate_missing,
@@ -490,7 +476,7 @@ def build_document_index(
                         f"Warning: {DOCUMENT_INDEX_CACHE} was built from a different corpus "
                         f"(cached: {cached_fingerprint}, current: {current_fingerprint}). It is "
                         "used as-is, because a serving process never rebuilds it. Rebuild the "
-                        "corpus with 'python3 -m src.duplicates --build-corpus-only'."
+                        f"corpus with '{BUILD_CORPUS_COMMAND}'."
                     )
 
             print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
@@ -528,7 +514,7 @@ def build_document_index(
     elif read_only:
         raise RuntimeError(
             f"'{DOCUMENT_INDEX_CACHE}' does not exist, but this process may not build it. "
-            "Build the corpus with 'python3 -m src.duplicates --build-corpus-only' first."
+            f"Build the corpus with '{BUILD_CORPUS_COMMAND}' first."
         )
     else:
         print(

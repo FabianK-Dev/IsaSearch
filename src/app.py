@@ -1,8 +1,7 @@
 """
-app.py: This module initializes all required components, i.e. Solr, tokenizer, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and opens a Flask server that serves both the REST API and the web UI.
+app.py: This module initializes all required components, i.e. Solr, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and opens a Flask server that serves both the REST API and the web UI.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
-- Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
 - document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
 - document_descriptions: Loads or generates an informal description for each document using the configured LLM backend to allow more effective search with informal user queries
@@ -17,17 +16,18 @@ Note: To simplify matters, from now on "theorem" will be used representatively f
 from flask import Flask, request, send_from_directory
 
 from src.bootstrap import load_config, boot_components, DEFINITIONS_LOAD
+from src.documents import BUILD_CORPUS_COMMAND
 from src.embeddings import search, search_results_to_docs
 
 
 config = load_config()
 # 'serve' keeps this process strictly read-only, so that it can run next to the duplicate detection
 # without the two writing the same files. Everything it reads has to be built beforehand with
-# 'python3 -m src.duplicates --build-corpus-only'.
+# 'python3 -m src.corpus'.
 #
 # The definitions corpus is only attached, never built: building it informalizes every definition
-# with the LLM, which takes hours and is done separately with 'python3 -m src.duplicates
-# --build-corpus-only'. If it does not exist, definition search is simply not offered.
+# with the LLM, which takes hours and belongs to that same build run. If it does not exist,
+# definition search is simply not offered.
 components = boot_components(config, serve=True, definitions=DEFINITIONS_LOAD)
 
 solr = components["solr"]
@@ -107,7 +107,7 @@ def search_endpoint():
     if kind not in corpora:
         return {
             "error": "Definition search is not available on this server. Build the definitions "
-            "corpus with 'python3 -m src.duplicates --build-corpus-only' first."
+            f"corpus with '{BUILD_CORPUS_COMMAND}' first."
         }, 503
 
     corpus = corpora[kind]

@@ -11,11 +11,12 @@ Branch: `duplicate-detection`. **Tasks 1–5 are done** (see section 3b); tasks 
 One server, reachable as a website, running two processes at the same time:
 
 - the web application (`python -m src.app`), serving the search UI and REST API,
-- the duplicate detection (`python -m src.duplicates --serve …`), run on demand by a maintainer.
+- the duplicate detection (`python -m src.duplicates …`), run on demand by a maintainer.
 
-Both share one Solr index, one set of LLM informalisations and one ChromaDB storage. The corpus is
-built on the same machine and is rebuilt when the AFP is updated. All three roles run from the same
-container image against one state volume; see [compose.yaml](../compose.yaml).
+Both read one Solr index, one set of LLM informalisations and one ChromaDB storage, all produced by
+a third process, the corpus build (`python -m src.corpus`), which runs alone on the same machine and
+is re-run when the AFP is updated. All three roles run from the same container image against one
+state volume; see [compose.yaml](../compose.yaml).
 
 Hardware requested: **64 GB RAM, 500 GB disk.** See section 7 for what those numbers are based on
 and what still has to be measured.
@@ -57,11 +58,11 @@ Do not redo these; read them for context.
 
 | Area | What |
 |---|---|
-| Serve mode | `boot_components(serve=True)` overrides `check_updates`/`build_find_facts`, passes `generate_missing=False` and `add_missing=False`, forces `DEFINITIONS_LOAD`, and skips the tokenizer. `src/app.py` always uses it; `src/duplicates.py` has `--serve`. |
+| Serve mode | `boot_components(serve=True)` overrides `check_updates`/`build_find_facts`, passes `generate_missing=False` and `add_missing=False`, and forces `DEFINITIONS_LOAD`. `src/app.py` always uses it; `src/duplicates.py` did so through `--serve`, and unconditionally since the corpus build became `src/corpus.py`. |
 | LLM cache | The duplicate detection owns `llm_output_cache_dedup.json` (`config["dedup_llm_cache"]`). All writes are atomic (temp file + `os.replace`). |
 | Index invalidation | `build_document_index` writes a fingerprint (`solr_query`, session list, Solr document count) next to the cache and refetches when it no longer matches. Previously an AFP update stayed invisible forever. |
 | ChromaDB reconciliation | Embeddings store an Adler32 checksum of their source. A build deletes documents that left the corpus and re-embeds those whose source changed. Refuses to delete >50 % of a collection. |
-| Memory | Corpora that a run never queries are not loaded (`--kinds definitions` skips the theorem corpus). `torch` and `transformers` are imported lazily. |
+| Memory | Corpora that a run never queries are not loaded (`--kinds definitions` skips the theorem corpus). `torch` and `sentence-transformers` are imported lazily, and only by the `sentence_transformers` embedding backend. |
 | Housekeeping | FindFacts backups pruned to `config["find_facts_backup_keep"]` (default 2). Reports name the actually configured embedding model. |
 | Tests | `tests/test_serve_and_update.py`, 24 offline tests. |
 | Docs | README sections "Running on a server" and "Updating to a newer AFP version". |
@@ -77,10 +78,13 @@ Do not redo these; read them for context.
 | 5 | README rewritten for the container model, plus a new "Pinned Isabelle and AFP versions" section. |
 | — | Isabelle and the AFP pinned to 2025-2, see section 4a. |
 | — | `src/installation.py` no longer reads `config.json` at import time; `setup_isabelle_components` and `get_isabelle_version` take the config. A checkout of a different remote, or an installation of a different release, is now reported instead of being pulled into or overwritten. |
-| — | The build is split in two. `isabelle find_facts_index` writes the same Lucene index the `solr` service holds open, so it has to run with the service stopped — but everything after it needs the service up, and it is all one `boot_components` call. The part before Solr is now `prepare_corpus_sources` in `src/bootstrap.py`, reachable on its own as `python -m src.duplicates --index-only`. Without it, the documented single build command could not succeed on a fresh volume. |
+| — | The build is split in two. `isabelle find_facts_index` writes the same Lucene index the `solr` service holds open, so it has to run with the service stopped — but everything after it needs the service up, and it is all one `boot_components` call. The part before Solr is now `prepare_corpus_sources` in `src/bootstrap.py`, reachable on its own as `python -m src.corpus --index-only`. Without it, the documented single build command could not succeed on a fresh volume. |
 | — | LLM completion requests had `timeout=None` on all three backends. One wedged response would have frozen the site permanently, since `threads=1` and the process stays alive so `restart: unless-stopped` never fires. Now bounded by `config["llm_request_timeout"]` (600 s). |
 | — | `prompts/qwen3-gemma/` — the folder `config.json` actually points at — was missing `describe_definition.txt` and `duplicate_judge.txt`; only the `microsoft-Phi` folders got them when the duplicate detection was added. The build would have raised `KeyError` after days of theorem informalization and before any embedding, and every LLM-judged analysis would have crashed. Both prompts added, to the `-with-metadata` variant as well. |
 | — | A failed `isabelle find_facts_index` was caught and only printed. As a standalone step (`--index-only`) that exit status is the only signal a runbook has, so it now raises, with the "Solr is still holding the index" cause named. `setup_isabelle_components` still only warns, on purpose. |
+| — | With `--kinds all`, entries were selected on the definitions corpus alone, so an entry that has theorems but no definitions of its own was reported as "not part of the corpus" and never analysed. Selection now spans every requested kind. |
+| — | `config["tokenizer_name"]` and the tokenizer it loaded are gone. The tokenizer existed only to compute a `max_tokens` value that was printed and never used, and it named Phi-3.5 while the configured document model is a Gemma, so the number was for the wrong tokenizer family. It also made the first build in a fresh container reach huggingface.co — on a server that cannot, the build died at "Loading tokenizer..." before doing any work. |
+| — | Building the corpus was a flag on the duplicate detection (`--build-corpus-only`), so the runbook told an operator to invoke the duplicate detector in order to start the website. The corpus is shared infrastructure with two readers, so it got its own entry point, [src/corpus.py](../src/corpus.py) (`python3 -m src.corpus`, with `--index-only` for the Solr-stopped phase). `src/duplicates.py` is now the analysis only and is unconditionally read-only; its `--serve` flag is gone because there is nothing left for it to switch. The command is named by a dozen "build the corpus first" messages, so it has one owner, `BUILD_CORPUS_COMMAND` in `src/documents.py`. |
 | Tests | `tests/test_installation.py` (new) and a `SolrConnectionTest` in `tests/test_serve_and_update.py`; 72 offline tests pass. |
 
 Defects found on the way that this document did not name: `docker build` failed outright
@@ -211,15 +215,15 @@ the development machine.**
   (`$HOME/.isabelle/find_facts/solr/local`), published on 8983.
 - `app` — `python -m src.app`, depends on `solr`, publishes `api_port`.
 - `tools` — profile-gated or `run`-only, for
-  `docker compose run --rm tools python -m src.duplicates --serve --newest 10`
-  and for the build, `… python -m src.duplicates --build-corpus-only`.
+  `docker compose run --rm tools python -m src.duplicates --newest 10`
+  and for the build, `… python -m src.corpus`.
 
 All three mount one state volume. Everything mutable must be under it: `~/.isabelle` (contrib,
 heaps, Solr core), the `Isabelle/` and `afp/` checkouts, `.cache/`, `artifacts/`, `chroma_storages/`.
 Prefer one mount over six by rooting the config's relative paths inside it.
 
 **Accept.** `docker compose up solr` starts Solr against the shared volume. `docker compose run --rm
-tools python -m src.duplicates --serve --newest 1` reaches Solr and fails with the "corpus not
+tools python -m src.duplicates --newest 1` reaches Solr and fails with the "corpus not
 built" message rather than a connection error or an `EOFError`. **Not yet run — no Docker daemon.**
 Note that this check on an empty volume starts Solr before any index exists; wipe
 `~/.isabelle/find_facts/solr` on the volume before the real build so that nothing Solr created is
@@ -273,7 +277,8 @@ start the app and an analysis in parallel. While it runs, measure (see section 7
    were exercised against a devel-era Isabelle. `build_definition_corpus` fails loudly with a rebuild
    hint if definitions are missing.
 
-**Accept.** Build completes; the website answers a search; `--serve` produces a report; neither
+**Accept.** Build completes; the website answers a search; `python -m src.duplicates --newest 10`
+produces a report; neither
 process writes a file the other owns (check timestamps on `.cache/`, `artifacts/`, `chroma_storages/`
 — `llm_output_cache.json` and `llm_output_cache_dedup.json` are expected to change, one per process).
 
@@ -282,9 +287,9 @@ process writes a file the other owns (check timestamps on `.cache/`, `artifacts/
 **Do.** Set `"isabelle_sessions": ["all"]` and confirm the LLM and embedding server URLs are
 reachable from inside the container. The paths need no change: every relative path in `config.json`
 resolves under `/app`, whose state directories are symlinks onto the volume. Then run
-`--build-corpus-only` and let it run.
+`python3 -m src.corpus` and let it run.
 
-**Accept.** `python3 -m src.duplicates --serve --newest 10` produces a report whose self-retrieval
+**Accept.** `python3 -m src.duplicates --newest 10` produces a report whose self-retrieval
 control passes (the run exits non-zero if more than 5 % of documents fail to retrieve themselves).
 
 ### Task 8 — Service management and exposure (needs the server)

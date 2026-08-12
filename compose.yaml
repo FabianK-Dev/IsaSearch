@@ -1,10 +1,10 @@
 # Three roles, one image, one state volume.
 #
-#   docker compose run --rm tools python -m src.duplicates --index-only          # 1a, solr stopped
+#   docker compose run --rm tools python -m src.corpus --index-only     # 1a, with solr stopped
 #   docker compose up -d solr
-#   docker compose run --rm tools python -m src.duplicates --build-corpus-only   # 1b, solr running
-#   docker compose up -d                                                         # serve the website
-#   docker compose run --rm tools python -m src.duplicates --serve --newest 10   # duplicate report
+#   docker compose run --rm tools python -m src.corpus                  # 1b, with solr running
+#   docker compose up -d                                                # serve the website
+#   docker compose run --rm tools python -m src.duplicates --newest 10  # duplicate report
 #
 # The two build steps are separate because 'isabelle find_facts_index' writes the same Lucene index
 # that the 'solr' service holds open, so the indexing has to happen with the service stopped, while

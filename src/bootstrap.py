@@ -1,10 +1,9 @@
 """
 bootstrap.py: This file contains the start-up sequence that is shared by every entry point of this
-project (src/app.py, benchmark/benchmark.py and src/duplicates.py), so that the order in which the
-components are initialized only has to be maintained in a single place.
+project (src/corpus.py, src/app.py, src/duplicates.py and benchmark/benchmark.py), so that the order
+in which the components are initialized only has to be maintained in a single place.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
-- Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
 - document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
 - document_descriptions: Loads or generates an informal description for each document using the configured LLM backend to allow more effective search with informal user queries
@@ -15,17 +14,18 @@ components are initialized only has to be maintained in a single place.
 The 'definitions' parameter adds a second corpus for definitional commands (definition, fun,
 datatype, ...). It uses its own document index cache, its own descriptions artifact and its own
 ChromaDB collection, so the theorem corpus stays untouched. It is either built (DEFINITIONS_BUILD,
-used by the duplicate detection) or only attached to (DEFINITIONS_LOAD, used by the web application,
-which must never start the multi hour informalization run).
+used by the corpus build) or only attached to (DEFINITIONS_LOAD, used by the web application and the
+duplicate detection, neither of which may start the multi hour informalization run).
 
 The 'serve' parameter splits every entry point into two modes, which is what allows a deployed
 server to run the web application and the duplicate detection at the same time:
 
 - Build (serve=False): the one process that may write. It updates the AFP, builds the FindFacts
   index, fetches the document indexes, informalizes what is missing and embeds and prunes the
-  ChromaDB collections. Run it alone, e.g. 'python3 -m src.duplicates --build-corpus-only'.
+  ChromaDB collections. This is src/corpus.py, and it runs alone.
 - Serve (serve=True): any number of processes that only read. Every one of those steps is turned
-  off, and a corpus that was not built beforehand is reported instead of being built.
+  off, and a corpus that was not built beforehand is reported instead of being built. This is the
+  web application and the duplicate detection.
 
 Every artifact therefore has exactly one writer, so no two processes can ever write the same file.
 The one file a serving process still writes is its own LLM output cache (config["cache_folder"] plus
@@ -41,6 +41,7 @@ from src.documents import (
     build_document_index,
     get_document_descriptions,
     relevant_definition_doc_keys,
+    BUILD_CORPUS_COMMAND,
 )
 from src.embeddings import get_chromadb_collection, ensure_embedding_backend
 from src.llm import (
@@ -67,8 +68,8 @@ DEFINITION_COLLECTION = "afp_definitions"
 DEFINITION_DESCRIBE_PROMPT = "describe_definition"
 
 # How boot_components treats the definitions corpus.
-# - DEFINITIONS_BUILD fetches, informalizes and embeds whatever is missing. Only the duplicate
-#   detection uses this, because informalizing all definitions takes hours.
+# - DEFINITIONS_BUILD fetches, informalizes and embeds whatever is missing. Only the corpus build
+#   uses this, because informalizing all definitions takes hours.
 # - DEFINITIONS_LOAD attaches to an already built corpus and never generates anything. If the corpus
 #   does not exist, both the index and the collection are None and the caller has to cope with it.
 DEFINITIONS_BUILD = "build"
@@ -109,8 +110,8 @@ def load_config(config_path="config.json"):
 # stopped: 'isabelle find_facts_index' writes the same Lucene index that a serving Solr holds open,
 # and the two cannot have it at the same time. It is therefore also runnable on its own, so that a
 # deployment can index with Solr down and then start Solr for the rest of the build
-# ('python3 -m src.duplicates --index-only'). Running it twice is cheap: an index whose session list
-# is unchanged is skipped.
+# ('python3 -m src.corpus --index-only'). Running it twice is cheap: an index whose session list is
+# unchanged is skipped.
 def prepare_corpus_sources(config, check_updates=True, build_find_facts=True):
     if check_updates:
         print("Checking, downloading or updating the components if required...")
@@ -131,7 +132,7 @@ def prepare_corpus_sources(config, check_updates=True, build_find_facts=True):
 
 # Build the definitions corpus, i.e. the document index, the LLM descriptions and the ChromaDB
 # collection for all documents matching config["solr_query_definitions"].
-def build_definition_corpus(config, solr, prompts, tokenizer):
+def build_definition_corpus(config, solr, prompts):
     solr_query = config["solr_query_definitions"]
 
     print("Counting definitions in Solr...")
@@ -161,7 +162,6 @@ def build_definition_corpus(config, solr, prompts, tokenizer):
         config,
         definition_index,
         prompts,
-        tokenizer,
         artifact_name=DEFINITION_DESCRIPTIONS,
         describe_prompt_key=DEFINITION_DESCRIBE_PROMPT,
     )
@@ -190,7 +190,7 @@ def load_definition_corpus(config, prompts):
         if not os.path.isfile(path):
             print(
                 f"Definition search is disabled, because '{path}' does not exist. Build the "
-                "definitions corpus with 'python3 -m src.duplicates --build-corpus-only' first."
+                f"definitions corpus with '{BUILD_CORPUS_COMMAND}' first."
             )
             return None, None
 
@@ -207,7 +207,6 @@ def load_definition_corpus(config, prompts):
             config,
             definition_index,
             prompts,
-            None,
             artifact_name=DEFINITION_DESCRIPTIONS,
             describe_prompt_key=DEFINITION_DESCRIBE_PROMPT,
             generate_missing=False,
@@ -217,7 +216,7 @@ def load_definition_corpus(config, prompts):
     except (ValueError, OSError) as error:
         print(
             f"Definition search is disabled, because the definitions corpus could not be read: "
-            f"{error}. Rebuild it with 'python3 -m src.duplicates --build-corpus-only'."
+            f"{error}. Rebuild it with '{BUILD_CORPUS_COMMAND}'."
         )
         return None, None
 
@@ -240,7 +239,7 @@ def load_definition_corpus(config, prompts):
         print(
             "Definition search is disabled, because the ChromaDB collection "
             f"'{DEFINITION_COLLECTION}' is empty. Build it with "
-            "'python3 -m src.duplicates --build-corpus-only' first."
+            f"'{BUILD_CORPUS_COMMAND}' first."
         )
         return None, None
 
@@ -255,8 +254,10 @@ def load_definition_corpus(config, prompts):
 # - theorems: build or attach the theorem corpus. Disabling it saves loading a corpus an entry point
 #   never touches, which is a considerable amount of memory for the AFP.
 # - definitions: None, DEFINITIONS_BUILD or DEFINITIONS_LOAD, see the constants above
-# - keep_tokenizer: return the tokenizer instead of dropping it after the descriptions were generated
-# - llm_cache_name: the LLM output cache this process owns, see DEFAULT_LLM_OUTPUT_CACHE
+# - llm_cache_name: the LLM output cache this process owns, see DEFAULT_LLM_OUTPUT_CACHE. None means
+#   it owns none and no cache is loaded, which is what the corpus build passes: it informalizes
+#   through the artifacts and never queries the query LLM, so claiming a cache file that a serving
+#   process rewrites as a whole would only put a second writer on it.
 #
 # 'serve' is what makes it safe to run several processes (the web application and the duplicate
 # detection) next to each other on one machine: it turns off every path that writes. Nothing is
@@ -270,7 +271,6 @@ def boot_components(
     build_find_facts=True,
     theorems=True,
     definitions=None,
-    keep_tokenizer=False,
     llm_cache_name=DEFAULT_LLM_OUTPUT_CACHE,
 ):
     if definitions not in [None, DEFINITIONS_BUILD, DEFINITIONS_LOAD]:
@@ -283,7 +283,7 @@ def boot_components(
         raise ValueError(
             "A serving process must not build the definitions corpus. Use "
             f"'{DEFINITIONS_LOAD}' or build it beforehand with "
-            "'python3 -m src.duplicates --build-corpus-only'."
+            f"'{BUILD_CORPUS_COMMAND}'."
         )
 
     if serve:
@@ -305,17 +305,6 @@ def boot_components(
     print("Loading Solr...")
     solr = connect_solr(config)
 
-    # The tokenizer only sizes the prompts of the informalization, which never runs while serving,
-    # thus neither it nor the transformers package is loaded there. The import is local for the same
-    # reason: importing transformers alone costs a few hundred megabytes of resident memory.
-    tokenizer = None
-
-    if not serve:
-        from transformers import AutoTokenizer
-
-        print("Loading tokenizer...")
-        tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
-
     print("Loading prompts...")
     prompts = load_prompts(config)
 
@@ -328,7 +317,7 @@ def boot_components(
 
         print("Getting document descriptions...")
         document_index = get_document_descriptions(
-            config, document_index, prompts, tokenizer, generate_missing=not serve
+            config, document_index, prompts, generate_missing=not serve
         )
 
         if serve:
@@ -339,17 +328,12 @@ def boot_components(
 
     if definitions == DEFINITIONS_BUILD:
         definition_index, definition_collection = build_definition_corpus(
-            config, solr, prompts, tokenizer
+            config, solr, prompts
         )
     elif definitions == DEFINITIONS_LOAD:
         definition_index, definition_collection = load_definition_corpus(
             config, prompts
         )
-
-    if not keep_tokenizer:
-        print("Deleting tokenizer object...")
-        tokenizer = None
-        print("Finished deleting tokenizer object.")
 
     if theorems:
         print("Loading ChromaDB collection...")
@@ -360,18 +344,20 @@ def boot_components(
         if serve and collection.count() == 0:
             raise RuntimeError(
                 "The ChromaDB collection of the theorems is empty, thus nothing could be searched. "
-                "Build the corpus with 'python3 -m src.duplicates --build-corpus-only' first."
+                f"Build the corpus with '{BUILD_CORPUS_COMMAND}' first."
             )
 
     print("Loading LLM...")
     model = get_llm(config)
 
-    print("Loading LLM output cache if enabled via config...")
-    llm_output_cache = get_llm_output_cache(config, llm_cache_name)
+    llm_output_cache = None
+
+    if llm_cache_name is not None:
+        print("Loading LLM output cache if enabled via config...")
+        llm_output_cache = get_llm_output_cache(config, llm_cache_name)
 
     return {
         "solr": solr,
-        "tokenizer": tokenizer,
         "prompts": prompts,
         "document_index": document_index,
         "collection": collection,

@@ -3,9 +3,10 @@ duplicates.py: This file finds material of an AFP entry that already exists else
 of Formal Proofs. It was written for the experiment proposed by an AFP maintainer: take the n newest
 AFP entries, search for their definitions in the AFP and ignore the definitions of the entry itself.
 
-The analysis works entirely on the corpora that are already built by src/bootstrap.py, i.e. no
-re-indexing and no separate ingestion of a submission is required. For every document of an analysed
-entry the following steps are performed:
+The analysis is strictly read-only and works entirely on the corpora that were built beforehand by
+'python3 -m src.corpus', so it can run while the web application is up. An entry can only be
+analysed once it is part of the corpus; for a submission that is not in the AFP checkout yet, see
+the README. For every document of an analysed entry the following steps are performed:
 
 1. The document is turned into the very same embedding string that the corpus side uses
    (see document_embedding_string in src/embeddings.py) and queried against the ChromaDB collection.
@@ -39,11 +40,9 @@ from tqdm import tqdm
 from src.bootstrap import (
     load_config,
     boot_components,
-    prepare_corpus_sources,
-    DEFINITIONS_BUILD,
     DEFINITIONS_LOAD,
 )
-from src.documents import strip_proof
+from src.documents import strip_proof, BUILD_CORPUS_COMMAND
 from src.embeddings import (
     document_embedding_string,
     add_doc_urls,
@@ -262,7 +261,7 @@ def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, conf
         if sizes[kind] == 0:
             raise RuntimeError(
                 f"The ChromaDB collection for {kind} is empty. Build the corpus first "
-                "(python3 -m src.duplicates --build-corpus-only)."
+                f"({BUILD_CORPUS_COMMAND})."
             )
 
         # Every document of the analysed entry may rank above the first candidate of another entry,
@@ -1195,30 +1194,6 @@ def parse_args(argv=None):
         ),
     )
     parser.add_argument(
-        "--build-corpus-only",
-        action="store_true",
-        help="only build the corpora (including the LLM descriptions) and exit",
-    )
-    parser.add_argument(
-        "--index-only",
-        action="store_true",
-        help=(
-            "only install or update the components and build the FindFacts index, then exit. This "
-            "is the part of a build that requires Solr to be stopped, because the indexer writes "
-            "the same index a running Solr holds open. Run it first, then start Solr and run "
-            "--build-corpus-only for the rest."
-        ),
-    )
-    parser.add_argument(
-        "--serve",
-        action="store_true",
-        help=(
-            "run strictly read-only against corpora that were already built, so that this run can "
-            "happen while the web application is up. Nothing is fetched, described, embedded or "
-            "pruned; use it for every analysis on a deployed server."
-        ),
-    )
-    parser.add_argument(
         "--no-llm-judge",
         action="store_true",
         help="do not let the LLM judge the closest candidates, overrides config['dedup_llm_judge']",
@@ -1248,18 +1223,6 @@ def parse_args(argv=None):
     if args.newest < 1:
         parser.error("--newest has to be at least 1")
 
-    if args.serve and args.build_corpus_only:
-        parser.error(
-            "--serve and --build-corpus-only contradict each other, because building the corpora "
-            "is exactly what --serve forbids"
-        )
-
-    if args.serve and args.index_only:
-        parser.error(
-            "--serve and --index-only contradict each other, because building the FindFacts index "
-            "is exactly what --serve forbids"
-        )
-
     return args
 
 
@@ -1267,35 +1230,19 @@ def main(argv=None):
     args = parse_args(argv)
     config = load_config()
 
-    # Done before boot_components, because the FindFacts index has to be built while Solr is down
-    # and every later step needs Solr up. It also skips the LLM and embedding backend checks, which
-    # a pure indexing run has no use for.
-    if args.index_only:
-        prepare_corpus_sources(config)
-        print("Finished building the FindFacts index.")
-        return 0
-
     # Cross-kind matching queries the other corpus as well, so both are needed for it. Loading a
     # corpus that is never queried would cost gigabytes of memory on the full AFP, thus each one is
     # only loaded when this run actually reaches it.
-    #
-    # --build-corpus-only is the exception: it is the build step of a deployment and therefore has to
-    # produce everything the web application later serves, not only the corpus of the analysed kind.
-    needs_definitions = (
-        KIND_DEFINITIONS in args.kinds or args.cross or args.build_corpus_only
-    )
-    needs_theorems = KIND_THEOREMS in args.kinds or args.cross or args.build_corpus_only
-
-    if needs_definitions:
-        definitions = DEFINITIONS_LOAD if args.serve else DEFINITIONS_BUILD
-    else:
-        definitions = None
+    needs_definitions = KIND_DEFINITIONS in args.kinds or args.cross
+    needs_theorems = KIND_THEOREMS in args.kinds or args.cross
 
     components = boot_components(
         config,
-        serve=args.serve,
+        # An analysis never builds anything: the corpus is built beforehand by src/corpus.py. That
+        # is what lets it run next to the web application, which reads the same artifacts.
+        serve=True,
         theorems=needs_theorems,
-        definitions=definitions,
+        definitions=DEFINITIONS_LOAD if needs_definitions else None,
         # The web application rewrites its own cache as a whole, so sharing one file with it would
         # make whichever process saves last drop the other's entries.
         llm_cache_name=dedup_llm_cache_name(config),
@@ -1304,13 +1251,9 @@ def main(argv=None):
     if needs_definitions and components["definition_index"] is None:
         print(
             "The definitions corpus is not available. Build it with "
-            "'python3 -m src.duplicates --build-corpus-only' first."
+            f"'{BUILD_CORPUS_COMMAND}' first."
         )
         return 1
-
-    if args.build_corpus_only:
-        print("Finished building the corpora.")
-        return 0
 
     use_llm_judge = config["dedup_llm_judge"] and not args.no_llm_judge
     report_folder = (
@@ -1319,14 +1262,15 @@ def main(argv=None):
         else config["dedup_report_folder"]
     )
 
-    # The entries are selected on the corpus of the first requested kind, so that every analysed
-    # entry actually has documents of the kind the experiment is about.
-    primary_index = (
-        components["definition_index"]
-        if args.kinds[0] == KIND_DEFINITIONS
-        else components["document_index"]
-    )
-    available_entries = entries_in_index(primary_index)
+    # An entry is analysable if it has documents in *any* of the requested corpora, not only in the
+    # first one. With '--kinds all' an entry that proves things about existing definitions has
+    # theorems but no definitions of its own, and selecting on the definitions corpus alone would
+    # report it as "not part of the corpus" and analyse nothing. analyse_entry already skips an
+    # entry for the kinds it has no documents in, so the union is safe.
+    available_entries = set()
+
+    for kind in args.kinds:
+        available_entries |= entries_in_index(corpus_target(kind, components)[2])
 
     if args.entry is not None:
         selected = []

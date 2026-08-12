@@ -25,7 +25,7 @@ import zlib
 
 from requests.exceptions import RequestException
 
-from src import documents, duplicates, embeddings, installation, llm, solr
+from src import corpus, documents, duplicates, embeddings, installation, llm, solr
 from tests.stub_openai_server import StubOpenAIServer
 
 
@@ -181,7 +181,9 @@ class DocumentIndexCacheTest(TemporaryFolderTestCase):
         with self.assertRaises(RuntimeError) as raised:
             self.build(read_only=True)
 
-        self.assertIn("--build-corpus-only", str(raised.exception))
+        # Named through the single owner, so that renaming the build entry point cannot leave a
+        # dozen messages pointing at a command that no longer exists.
+        self.assertIn(documents.BUILD_CORPUS_COMMAND, str(raised.exception))
 
 
 class CollectionReconciliationTest(unittest.TestCase):
@@ -374,35 +376,104 @@ class DuplicatesEntryPointTest(unittest.TestCase):
         arguments = self.boot_arguments(["--kinds", "definitions"])
 
         self.assertFalse(arguments["theorems"])
-        self.assertEqual(arguments["definitions"], duplicates.DEFINITIONS_BUILD)
 
     def test_cross_kind_matching_loads_both_corpora(self):
         arguments = self.boot_arguments(["--kinds", "definitions", "--cross"])
 
         self.assertTrue(arguments["theorems"])
 
-    def test_building_the_corpus_builds_everything_a_deployment_serves(self):
-        # The build step of a deployment has to produce the theorem corpus as well, even though the
-        # analysed kind defaults to the definitions.
-        arguments = self.boot_arguments(["--build-corpus-only"])
-
-        self.assertTrue(arguments["theorems"])
-        self.assertEqual(arguments["definitions"], duplicates.DEFINITIONS_BUILD)
-        self.assertFalse(arguments["serve"])
-
-    def test_serving_never_builds(self):
-        arguments = self.boot_arguments(["--serve", "--kinds", "definitions"])
+    # Building is src/corpus.py's job. An analysis that could build would informalize for hours
+    # while the web application serves the same artifacts, which is exactly what the split forbids.
+    def test_the_analysis_is_always_read_only(self):
+        arguments = self.boot_arguments(["--kinds", "definitions"])
 
         self.assertTrue(arguments["serve"])
         self.assertEqual(arguments["definitions"], duplicates.DEFINITIONS_LOAD)
 
-    def test_serving_and_building_contradict_each_other(self):
-        with self.assertRaises(SystemExit):
-            duplicates.parse_args(["--serve", "--build-corpus-only"])
+    # An entry that proves things about definitions someone else made has theorems but no
+    # definitions of its own. Selecting the entries on the definitions corpus alone reported such an
+    # entry as "not part of the corpus" and analysed nothing, even though its theorems were right
+    # there. analyse_entry skips an entry per kind, so selecting across all requested kinds is safe.
+    def test_an_entry_of_only_one_kind_is_still_analysed(self):
+        analysed = []
 
-    def test_serving_and_indexing_contradict_each_other(self):
-        with self.assertRaises(SystemExit):
-            duplicates.parse_args(["--serve", "--index-only"])
+        doc_id = "afp/thys/Only_Theorems/T.thy|1"
+        components = {
+            "definition_index": {},
+            "definition_collection": object(),
+            "document_index": {doc_id: indexed_document(doc_id, "lemma a: True")},
+            "collection": object(),
+            "prompts": {},
+        }
+
+        # analyse_kind returning None makes main() report that nothing was analysed and stop, which
+        # is all this test needs: what matters is that both kinds were reached with the entry.
+        with (
+            unittest.mock.patch.object(
+                duplicates, "boot_components", lambda config, **kwargs: components
+            ),
+            unittest.mock.patch.object(
+                duplicates,
+                "load_config",
+                lambda: {"dedup_llm_judge": False, "dedup_report_folder": "reports"},
+            ),
+            unittest.mock.patch.object(duplicates, "entry_dates", lambda config: {}),
+            unittest.mock.patch.object(
+                duplicates,
+                "analyse_kind",
+                lambda kind, selected, *arguments, **keywords: analysed.append(
+                    (kind, [s["entry"] for s in selected])
+                ),
+            ),
+        ):
+            duplicates.main(["--entry", "Only_Theorems", "--kinds", "all"])
+
+        self.assertEqual(
+            sorted(analysed),
+            [("definitions", ["Only_Theorems"]), ("theorems", ["Only_Theorems"])],
+        )
+
+    def test_the_duplicate_detection_owns_its_llm_cache(self):
+        arguments = self.boot_arguments(["--kinds", "definitions"])
+
+        self.assertEqual(arguments["llm_cache_name"], duplicates.DEDUP_LLM_CACHE)
+        self.assertNotEqual(duplicates.DEDUP_LLM_CACHE, llm.DEFAULT_LLM_OUTPUT_CACHE)
+
+
+class CorpusEntryPointTest(unittest.TestCase):
+    """src/corpus.py is the one process that writes. What it asks boot_components for decides what a
+    deployment ends up being able to serve, so it is pinned down here."""
+
+    def boot_arguments(self, argv):
+        recorded = {}
+
+        def fake_boot_components(config, **kwargs):
+            recorded.update(kwargs)
+            return {}
+
+        with (
+            unittest.mock.patch.object(corpus, "boot_components", fake_boot_components),
+            unittest.mock.patch.object(corpus, "load_config", dict),
+        ):
+            self.assertEqual(corpus.main(argv), 0)
+
+        return recorded
+
+    def test_the_build_produces_everything_a_deployment_serves(self):
+        # Both corpora, not only the one a later analysis happens to be interested in: the web
+        # application serves the theorems and the definitions from the same build.
+        arguments = self.boot_arguments([])
+
+        self.assertFalse(arguments["serve"])
+        self.assertTrue(arguments["theorems"])
+        self.assertEqual(arguments["definitions"], corpus.DEFINITIONS_BUILD)
+
+    def test_the_build_owns_no_llm_output_cache(self):
+        # The cache files belong to the processes that serve; a build that claimed one would put a
+        # second writer on a file that is rewritten as a whole.
+        arguments = self.boot_arguments([])
+
+        self.assertIsNone(arguments["llm_cache_name"])
 
     # The FindFacts indexer writes the index a running Solr holds open, so indexing has to be
     # runnable on its own, before Solr is started and before anything contacts it.
@@ -411,16 +482,14 @@ class DuplicatesEntryPointTest(unittest.TestCase):
 
         with (
             unittest.mock.patch.object(
-                duplicates,
+                corpus,
                 "prepare_corpus_sources",
                 lambda config: prepared.append(config),
             ),
-            unittest.mock.patch.object(
-                duplicates, "boot_components", self.fail_on_boot
-            ),
-            unittest.mock.patch.object(duplicates, "load_config", dict),
+            unittest.mock.patch.object(corpus, "boot_components", self.fail_on_boot),
+            unittest.mock.patch.object(corpus, "load_config", dict),
         ):
-            self.assertEqual(duplicates.main(["--index-only"]), 0)
+            self.assertEqual(corpus.main(["--index-only"]), 0)
 
         self.assertEqual(len(prepared), 1)
 
@@ -435,17 +504,11 @@ class DuplicatesEntryPointTest(unittest.TestCase):
             raise RuntimeError("Building the FindFacts index failed")
 
         with (
-            unittest.mock.patch.object(duplicates, "prepare_corpus_sources", failing),
-            unittest.mock.patch.object(duplicates, "load_config", dict),
+            unittest.mock.patch.object(corpus, "prepare_corpus_sources", failing),
+            unittest.mock.patch.object(corpus, "load_config", dict),
             self.assertRaises(RuntimeError),
         ):
-            duplicates.main(["--index-only"])
-
-    def test_the_duplicate_detection_owns_its_llm_cache(self):
-        arguments = self.boot_arguments(["--kinds", "definitions"])
-
-        self.assertEqual(arguments["llm_cache_name"], duplicates.DEDUP_LLM_CACHE)
-        self.assertNotEqual(duplicates.DEDUP_LLM_CACHE, llm.DEFAULT_LLM_OUTPUT_CACHE)
+            corpus.main(["--index-only"])
 
 
 class BackupRetentionTest(TemporaryFolderTestCase):

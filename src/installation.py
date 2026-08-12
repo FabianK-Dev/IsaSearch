@@ -383,7 +383,8 @@ def build_index(config):
             json.dump(current_sessions, f, indent=4)
 
     # A failed index build must not be reported as success: every later step reads the index, and a
-    # caller that only sees the exit status - the standalone '--index-only' step of a deployment -
+    # caller that only sees the exit status - 'python3 -m src.corpus --index-only', the standalone
+    # indexing step of a deployment -
     # would otherwise go on to build a corpus from the previous, stale index.
     except subprocess.CalledProcessError as e:
         raise RuntimeError(

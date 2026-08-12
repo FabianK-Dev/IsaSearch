@@ -1,8 +1,7 @@
 """
-benchmark.py: This file initializes all required components, i.e. Solr, tokenizer, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and runs the benchmark based on the configuration and the benchmark.csv file. The beginning of the file is similar to app.py.
+benchmark.py: This file initializes all required components, i.e. Solr, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and runs the benchmark based on the configuration and the benchmark.csv file. The beginning of the file is similar to app.py.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
-- Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
 - document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
 - document_descriptions: Loads or generates an informal description for each document using the configured LLM backend to allow more effective search with informal user queries

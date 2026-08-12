@@ -5,6 +5,9 @@
 chroma_storages/*
 assets_extracted/
 
+# The deployment reads ISASEARCH_API_KEY from a .env file next to compose.yaml
+.env
+
 # Downloaded
 Isabelle*/
 afp*/

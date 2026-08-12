@@ -9,7 +9,8 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 - [git](https://git-scm.com/downloads) 2.47.3 or higher
 - [Docker](https://www.docker.com/get-started) 29.2.1 or higher
 - One of the supported LLM backends:
-  - [Ollama](https://ollama.com/download) (default), or
+  - an OpenAI-compatible server (what the checked-in `config.json` is configured for, see below), or
+  - [Ollama](https://ollama.com/download), which the application starts itself, or
   - [llama.cpp](https://github.com/ggml-org/llama.cpp) with `llama-server` available on the `PATH`
 
 ## Setup
@@ -22,10 +23,16 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 python3 -m venv .venv  # If this command does not work, please install the `venv` module for Python: `pip install venv`
 source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
 pip install -r requirements.txt
+python3 -m src.corpus  # builds everything the application serves, see below
 python3 -m src.app
 ```
 
-The application starts Ollama automatically and pulls the configured models if they are missing.
+There are two commands because there are two roles, and the split is what lets the website and the duplicate detection run side by side:
+
+- **`python3 -m src.corpus` builds.** It installs Isabelle and the AFP, builds the Isabelle FindFacts index, fetches the documents from Solr, has the LLM informalize each of them once and embeds the result into ChromaDB. It is the only process that writes, so it runs alone. It is resumable and skips everything that is already up to date, so re-running it after an AFP update only processes what changed.
+- **`python3 -m src.app` and `python3 -m src.duplicates` read.** Both attach to what the build produced and never generate anything. A corpus that was not built is reported rather than built, so starting the website can never kick off a multi-hour informalization run.
+
+> ⚠️ **Before the first command works, point it at an LLM.** The checked-in `config.json` sets `"llm_backend": "openai"` and `"embedding_backend": "openai"` against the servers of our group, which are on a private network, and it reads the key from `ISASEARCH_API_KEY`. Both backends are contacted at start-up, so an unreachable one fails immediately rather than at the first query. Either export the key and use URLs you can reach, or run everything locally by setting `"llm_backend": "ollama"` and `"embedding_backend": "sentence_transformers"` — then the application starts Ollama itself and pulls the configured models if they are missing, and the embeddings are computed in-process. (There is no `"ollama"` embedding backend.) See "LLM backend" and "Embedding backend" below.
 
 **Note on Indexing Time:**
 Building the full FindFacts index for the entire Archive of Formal Proofs takes about 24 hours, informalizing all theorems ~25 hours, and embedding them into ChromaDB ~2 hours.
@@ -92,15 +99,28 @@ The key is sent as an `Authorization: Bearer` header to the LLM server as well a
 
 `python3 -m src.duplicates` answers the question whether the material of an AFP entry already exists elsewhere in the Archive of Formal Proofs. It was built for the experiment proposed by an AFP maintainer: take the *n* newest AFP entries, search for their definitions in the AFP, and ignore the definitions of the entry itself.
 
-No re-indexing and no separate ingestion of a submission is needed. Isabelle's FindFacts indexes *every* command block of a theory, so the definitional commands are already in the Solr index; only `"solr_query"` filtered them out so far. The duplicate detection therefore adds a second corpus on top of the same Solr index, built from `"solr_query_definitions"`, with its own document index cache (`.cache/definition_index.json`), its own LLM descriptions (`artifacts/<model>/definition_descriptions.json`) and its own ChromaDB collection (`afp_definitions`). The theorem corpus is never modified.
+It works on the same Solr index as the theorem search. Isabelle's FindFacts indexes *every* command block of a theory, so the definitional commands were in the index all along; only `"solr_query"` filtered them out. The corpus build therefore produces a second corpus from `"solr_query_definitions"`, with its own document index cache (`.cache/definition_index.json`), its own LLM descriptions (`artifacts/<model>/definition_descriptions.json`) and its own ChromaDB collection (`afp_definitions`). The theorem corpus is never modified.
 
-Building that corpus is the expensive part, because every definition has to be informalized by the LLM once. Do it separately, it is resumable and prints the number of definitions before the first LLM call:
+The analysis itself is read-only and cheap — it embeds nothing and only queries what is already there — so it can run while the website is up. Everything expensive happens once, in `python3 -m src.corpus`.
+
+#### What one run does
+
+For every document of the analysed entry, in this order:
+
+1. The document is turned into the very same embedding string the corpus side used for it, so query and corpus live in one space.
+2. It is queried against the ChromaDB collection, and the rank and distance at which it retrieves *itself* are recorded. That is a positive control needing no ground truth: a document must find itself at a distance of about 0.
+3. All candidates belonging to the analysed entry are dropped — this is the "ignore the entry's own definitions" part.
+4. Each remaining candidate gets a syntactic similarity score and, unless switched off, a verdict from the LLM. Distance, similarity and verdict together decide the tier it is reported in.
+
+The result is `reports/duplicates/experiment_<timestamp>.md` for reading and `.json` for the raw numbers.
+
+#### Case 1: an entry that is already in the corpus
+
+This is the common case and takes minutes. Name the entry, or let it pick the newest ones:
 
 ```bash
-python3 -m src.duplicates --build-corpus-only
+python3 -m src.duplicates --entry Ramsey-Infinite --kinds all
 ```
-
-Afterwards the experiment itself is cheap:
 
 ```bash
 python3 -m src.duplicates --newest 10
@@ -117,11 +137,31 @@ Useful options:
 | `--all-candidates` | report the closest candidates of *every* document, not only those reaching a tier |
 | `--report-dir DIR` | override the report location |
 
-Reports are written to `reports/duplicates/experiment_<timestamp>.md` and `.json`.
+Only entries that are part of the corpus can be analysed. An entry that is not is skipped with a warning naming it, and `--newest` warns about newer entries it had to pass over because they are not indexed.
 
-#### Analysing a new submission
+#### Case 2: a submission that is not in the AFP yet
 
-The tool analyses entries that are part of the index. For a submission that is not in the AFP mirror yet, put it into `afp/thys/<Entry>/`, add its session to `"isabelle_sessions"` in `config.json` and start the application once so that the existing FindFacts index build picks it up. Afterwards run `python3 -m src.duplicates --entry <Entry> --kinds all`. The entry's own definitions and theorems are always excluded from its own results, so only counterparts elsewhere in the AFP are reported, which you can then compare manually.
+A new submission has to be built into the corpus before it can be analysed — its documents have to be indexed, informalized and embedded like every other. That is a corpus build, so it is the expensive path:
+
+1. **Put the submission into the AFP checkout.** The sources go to `afp/thys/<Entry>/` and the metadata to `afp/metadata/entries/<Entry>.toml`. The metadata file carries the submission date; `--entry` works without it, `--newest` needs it to rank the entry.
+2. **Make the session part of the corpus.** If `"isabelle_sessions"` is not `["all"]`, add the entry's session name to it in `config.json`.
+3. **Rebuild the corpus.** With Solr stopped, then started:
+
+   ```bash
+   python3 -m src.corpus --index-only
+   python3 -m src.corpus
+   ```
+
+   Only the new documents are informalized and embedded, because descriptions and embeddings are keyed by a checksum of their source code. Changing the session list does make Isabelle index again, which is the slow part.
+4. **Analyse it.**
+
+   ```bash
+   python3 -m src.duplicates --entry <Entry> --kinds all
+   ```
+
+Two things to watch out for while a submission under review sits in the working tree. `"check_for_updates": true` makes every build `git pull` the AFP checkout, so set it to `false` unless you want the archive moving underneath the review. And the entry has to build under the pinned Isabelle release — a submission written against a newer Isabelle will fail during indexing, not during the analysis.
+
+In both cases the entry's own definitions and theorems are excluded from its own results, so what the report contains is counterparts *elsewhere* in the AFP, for you to compare by hand.
 
 #### Cross-kind matching
 
@@ -194,15 +234,17 @@ This is the only step that writes, and it comes in two parts, because the FindFa
 **1a. Index, with Solr stopped.** This installs Isabelle and the AFP and runs `isabelle find_facts_index`. The first run downloads the pinned Isabelle distribution (~1.2 GB, contrib and a JDK included) and clones the AFP; indexing the whole AFP then takes about a day.
 
 ```bash
-docker compose run --rm tools python -m src.duplicates --index-only
+docker compose run --rm tools python -m src.corpus --index-only
 ```
 
-**1b. Build the corpora, with Solr running.** This fetches the documents from Solr, informalizes every theorem and definition and embeds them. Expect days for the whole AFP; it is resumable, so an interrupted run continues where it stopped. It re-checks the index first, which is a no-op as long as `isabelle_sessions` has not changed since step 1a — so this command is safe to repeat.
+**1b. Build the corpora, with Solr running.** This fetches the documents from Solr, informalizes every theorem and definition and embeds them. Expect days for the whole AFP; it is resumable, so an interrupted run continues where it stopped.
 
 ```bash
 docker compose up -d solr
-docker compose run --rm tools python -m src.duplicates --build-corpus-only
+docker compose run --rm tools python -m src.corpus
 ```
+
+1b starts by re-checking the index, which is a no-op as long as the session list has not changed since 1a — so repeating it is normally free. It is not free if the list *has* changed: 1b pulls the AFP first, and with `"isabelle_sessions": ["all"]` the session list is read from the AFP's `thys/ROOTS`, so a pull that brings in new entries makes it want to index again while Solr holds the index open. It then aborts with an error naming that as the cause. That is not damage — nothing was written — but the remedy is to stop Solr, run 1a again and then 1b. Set `"check_for_updates": false` to keep the AFP still across a build.
 
 #### 2. Serve
 
@@ -214,10 +256,10 @@ docker compose up -d
 
 `waitress` is configured with `threads=1`, and the LLM output cache the website writes (`.cache/llm_output_cache.json`) has no locking, so **exactly one `app` container may run.** That file also grows for as long as the site is up; set `"enable_llm_output_cache": false` if that is not wanted, at the cost of repeating every query refinement after a restart.
 
-An analysis runs alongside it, also read-only, and writes only its own cache and report:
+An analysis runs alongside it. It is read-only too and writes only its own LLM cache and its report:
 
 ```bash
-docker compose run --rm tools python -m src.duplicates --serve --newest 10
+docker compose run --rm tools python -m src.duplicates --newest 10
 ```
 
 Two things to keep in mind while both run:
