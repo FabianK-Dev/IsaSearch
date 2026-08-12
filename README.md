@@ -286,7 +286,9 @@ Two things to keep in mind while both run:
 }
 ```
 
-Isabelle is installed from its release archive rather than from git, because the Isabelle git mirror only carries the development branch and has no release branches or tags. `version` is checked against `etc/ISABELLE_IDENTIFIER` in the installed tree, so an already installed release is never downloaded twice. If the canonical download URL is unreachable — it redirects to plain HTTP, which some networks drop — use `https://dist.isabelle.cit.tum.de/dist/Isabelle2025-2_linux.tar.gz?token=Isabelle` instead.
+Isabelle is installed from its release archive rather than from git, because the Isabelle git mirror only carries the development branch and has no release branches or tags. `version` is checked against `etc/ISABELLE_IDENTIFIER` in the installed tree, so an already installed release is never downloaded twice.
+
+`archive_url` is the canonical download from isabelle.in.tum.de, which 301-redirects to a mirror over plain HTTP; the downloader follows that. If a network blocks the redirect, `archive_url` is an ordinary config key, so any mirror that serves the same `Isabelle<version>_linux.tar.gz` can be put there instead — the installed tree is checked against `version` either way, so a wrong archive is reported rather than installed.
 
 The AFP is a shallow clone of the release mirror for the matching year. The release mirrors are separate repositories, each with a single `master` branch, so a version bump changes `remote_url`, not `target_branch`. `afp_remote_thys_folder_url` links search results to the sources and has to be moved to the same release.
 

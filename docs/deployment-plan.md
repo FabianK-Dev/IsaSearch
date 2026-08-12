@@ -128,11 +128,14 @@ separate 10–15 GB contrib download. The installed tree identifies itself throu
 `etc/ISABELLE_IDENTIFIER`, which is compared against the configured `version`, so a release is
 downloaded exactly once and a differing installation is reported rather than replaced.
 
-Caveat: that URL 301-redirects to **plain HTTP** on `dist.isabelle.cit.tum.de`, which some networks
-drop — it was unreachable from the development machine, while the same path over HTTPS worked.
-`archive_url` is a config key, so the fallback is a one-line edit; the README names it. **Verify the
-download from the server before task 6** — it is the first thing the build does and the cheapest
-thing to get wrong.
+Caveat: that URL 301-redirects to **plain HTTP** on `dist.isabelle.cit.tum.de`, and the downloader
+follows the redirect. Neither hop was reachable from the development machine, so the download could
+never be exercised here — earlier versions of this document suggested the HTTPS mirror as a
+fallback, which turned out not to work either. Treat the canonical URL as the one to use and
+`archive_url` as the knob if a network blocks it: it is an ordinary config key, and whatever it
+points at is checked against `version` after extraction, so a wrong archive is reported rather than
+installed. **Verify the download from the server before task 6** — it is the first thing the build
+does and the cheapest thing to get wrong.
 
 Both components must move together: an AFP release checkout does not build against a devel Isabelle,
 so pinning one and not the other is worse than pinning neither.
@@ -264,7 +267,8 @@ start the app and an analysis in parallel. While it runs, measure (see section 7
 **Also verify here — these could not be checked without the server:**
 
 1. **The Isabelle download.** `https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz`
-   redirects to plain HTTP; use the HTTPS mirror in the README if the redirect is dropped.
+   redirects to plain HTTP and was never reachable from the development machine, so this is the
+   first thing to try on the server. `curl -fL -o /dev/null` on that URL before starting the build.
 2. **The Solr image version.** `compose.yaml` pins `solr:9.8.1`. Compare it against the Solr that
    the pinned Isabelle bundles (look for `Isabelle/contrib/solr-*` on the volume) and match the tag;
    a newer Solr can refuse an index written by an older Lucene.
