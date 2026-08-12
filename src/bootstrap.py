@@ -28,8 +28,9 @@ server to run the web application and the duplicate detection at the same time:
   off, and a corpus that was not built beforehand is reported instead of being built.
 
 Every artifact therefore has exactly one writer, so no two processes can ever write the same file.
-
-Note: src/installation.py reads config.json independently at import time. That is left as-is here.
+The one file a serving process still writes is its own LLM output cache (config["cache_folder"] plus
+the cache name passed as 'llm_cache_name'), which is why the web application and the duplicate
+detection use different names for it, and why only a single web application process may run.
 """
 
 import json
@@ -101,6 +102,31 @@ def load_config(config_path="config.json"):
     with open(config_path, "r") as file:
         data = file.read()
         return json.loads(data)
+
+
+# Install or update the configured components and build the FindFacts index from them. This is
+# everything a build does *before* Solr is contacted, and it is the only part that needs Solr to be
+# stopped: 'isabelle find_facts_index' writes the same Lucene index that a serving Solr holds open,
+# and the two cannot have it at the same time. It is therefore also runnable on its own, so that a
+# deployment can index with Solr down and then start Solr for the rest of the build
+# ('python3 -m src.duplicates --index-only'). Running it twice is cheap: an index whose session list
+# is unchanged is skipped.
+def prepare_corpus_sources(config, check_updates=True, build_find_facts=True):
+    if check_updates:
+        print("Checking, downloading or updating the components if required...")
+        if config.get("check_for_updates", True):
+            components = config.get("components", {})
+
+            for key, comp_config in components.items():
+                check_and_update(key, comp_config)
+
+    if build_find_facts:
+        print("Setting up Isabelle components if required...")
+        setup_isabelle_components(config)
+        config["isabelle_version"] = get_isabelle_version(config)
+
+        print("Building Isabelle FindFacts index if required...")
+        build_index(config)
 
 
 # Build the definitions corpus, i.e. the document index, the LLM descriptions and the ChromaDB
@@ -272,21 +298,9 @@ def boot_components(
     print("Checking embedding backend...")
     ensure_embedding_backend(config)
 
-    if check_updates:
-        print("Checking, downloading or updating AFP if required...")
-        if config.get("check_for_updates", True):
-            components = config.get("components", {})
-
-            for key, comp_config in components.items():
-                check_and_update(key, comp_config)
-
-    if build_find_facts:
-        print("Setting up Isabelle components if required...")
-        setup_isabelle_components()
-        config["isabelle_version"] = get_isabelle_version()
-
-        print("Building Isabelle FindFacts index if required...")
-        build_index(config)
+    prepare_corpus_sources(
+        config, check_updates=check_updates, build_find_facts=build_find_facts
+    )
 
     print("Loading Solr...")
     solr = connect_solr(config)

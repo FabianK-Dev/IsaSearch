@@ -1,7 +1,14 @@
+# The image holds the code and its Python dependencies and nothing else. Everything that is written
+# at run time - the Isabelle and AFP checkouts, ~/.isabelle with its contrib and the FindFacts Solr
+# core, the caches, the artifacts and the ChromaDB storages - lives on the /data volume. The same
+# image serves all three roles (corpus build, web application, duplicate detection); they differ
+# only in the command they are started with.
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y \
-    wget openjdk-17-jre-headless \
+# git clones and updates the AFP (src/installation.py). Isabelle is installed from its release
+# archive, which bundles both contrib and a JDK, so no wget and no JRE are needed here.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -10,24 +17,24 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN wget https://www.apache.org/dyn/closer.lua/solr/solr/9.8.1/solr-9.8.1.tgz?action=download -O solr-9.8.1.tgz \
-    && tar -xzf solr-9.8.1.tgz \
-    && mv solr-9.8.1 /opt/solr \
-    && rm solr-9.8.1.tgz
+# Every path in config.json is relative and resolved against the working directory, so the state
+# directories are symlinked out of /app instead of the config being rewritten for the container.
+# ~/.isabelle follows via HOME. The entrypoint creates the targets before the command runs.
+ENV HOME=/data/home
+RUN set -eu; \
+    for directory in .cache artifacts chroma_storages reports afp Isabelle; do \
+        ln -s "/data/$directory" "/app/$directory"; \
+    done
 
-RUN mkdir -p /opt/solr/server/solr/
-ENV SOLR_HOME=/opt/solr
-ENV PATH="$SOLR_HOME/bin:$PATH"
-
-# Copy assets to the app directory
-COPY ./assets_extracted/afp-2025-branch-default /app/afp-2025-branch-default
-COPY ./assets_extracted/chroma_storages /app/chroma_storages
-COPY ./assets_extracted/find_facts/solr /opt/solr/server/solr/
-
-COPY artifacts /app/artifacts
 COPY benchmark /app/benchmark
 COPY prompts /app/prompts
 COPY src /app/src
+COPY tests /app/tests
 COPY config.json /app/config.json
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
-CMD solr start --force -p 8983 -s /opt/solr/server/solr/local && python -m src.app
+EXPOSE 5001
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["python", "-m", "src.app"]

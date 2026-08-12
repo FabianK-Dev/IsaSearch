@@ -1,66 +1,209 @@
 """
-installation.py: This file automatically downloads a copy of the Archive of Formal Proofs from URL configured at config["afp_remote_url"] and extracts it into a folder name configured by config["afp_folder"], if it does not already exist.
+installation.py: This file installs the components configured under config["components"], i.e.
+Isabelle and the Archive of Formal Proofs, and builds the Isabelle FindFacts index from them.
+
+A component is installed in one of two ways, chosen by its configuration:
+
+- Archive (config["components"][name]["archive_url"] and ["version"]): a released distribution is
+  downloaded and unpacked. This is how Isabelle is pinned to a release, because the Isabelle git
+  mirror only carries the development branch and has no release branches or tags.
+- Git (config["components"][name]["remote_url"] and ["target_branch"]): a shallow clone that is
+  pulled on every update. This is how the AFP is tracked, whose release mirrors are separate
+  repositories with a single 'master' branch.
+
+Both refuse to overwrite a checkout that was installed from a different source. Bumping the pinned
+version is a deliberate edit of config.json, so an existing tree is reported and left alone rather
+than silently deleted.
 """
 
 import os
+import shutil
 import tarfile
 import json
 import subprocess
 import glob
+import requests
 from pathlib import Path
 from datetime import datetime
 
 
-with open("config.json", "r") as file:
-    data = file.read()
-    config = json.loads(data)
+# Size of the chunks the component archive is streamed in. The Isabelle distribution is well over a
+# gigabyte, so it is never held in memory as a whole.
+DOWNLOAD_CHUNK_SIZE = 1024 * 1024
 
 
-def check_and_update(name, comp_config):
+# The file an unpacked Isabelle distribution identifies itself with, relative to its root. Its
+# content is the release name, e.g. "Isabelle2025-2", which is what config["...]["version"] is
+# compared against to decide whether the installed tree is already the pinned one.
+VERSION_MARKER = os.path.join("etc", "ISABELLE_IDENTIFIER")
+
+
+# Read the version an installed archive component identifies itself with, or None if the folder does
+# not exist or carries no marker.
+def installed_archive_version(local_path):
+    marker = os.path.join(local_path, VERSION_MARKER)
+
+    try:
+        with open(marker, "r") as file:
+            return file.read().strip()
+    except OSError:
+        return None
+
+
+# Download and unpack a released distribution into comp_config["local_folder"].
+def install_from_archive(name, comp_config):
+    local_path = comp_config["local_folder"]
+    archive_url = comp_config["archive_url"]
+    version = comp_config["version"]
+
+    installed = installed_archive_version(local_path)
+
+    if installed == version:
+        print(f"{name} {version} is already installed in '{local_path}'.")
+        return
+
+    if os.path.exists(local_path) and os.listdir(local_path):
+        raise RuntimeError(
+            f"'{local_path}' already contains an installation of {name} "
+            f"({installed or 'of an unknown version'}), but {version} is configured. Remove the "
+            f"folder to reinstall; it is not deleted automatically because it is several gigabytes."
+        )
+
+    print(f"Downloading {name} {version} from {archive_url}...")
+
+    # The archive is unpacked next to its target and only then moved into place, so that an
+    # interrupted download or extraction never leaves a half installed component behind. The
+    # symlinks have to be resolved for that: in the container local_path is a symlink from the
+    # image layer onto the state volume, and staging on the wrong side of it would both fill the
+    # container layer and turn every move below into a multi gigabyte copy.
+    resolved = os.path.realpath(local_path)
+    parent = os.path.dirname(resolved)
+    os.makedirs(parent, exist_ok=True)
+
+    # The staging folder has a fixed name instead of a random one, so that a run that is killed
+    # outright - which no cleanup handler survives - leaves at most one of them, and the next
+    # attempt reclaims those several gigabytes instead of adding to them.
+    staging = os.path.join(parent, "." + os.path.basename(resolved) + ".download")
+    shutil.rmtree(staging, ignore_errors=True)
+    os.makedirs(staging)
+
+    try:
+        archive_path = os.path.join(staging, "component.tar.gz")
+
+        with requests.get(archive_url, stream=True, timeout=60) as response:
+            response.raise_for_status()
+
+            with open(archive_path, "wb") as file:
+                file.writelines(response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE))
+
+        print(f"Extracting {name} into '{local_path}'...")
+        extracted = os.path.join(staging, "extracted")
+
+        with tarfile.open(archive_path, "r:gz") as tar:
+            tar.extractall(extracted, filter="data")
+
+        # A distribution archive holds a single top level directory named after the release.
+        entries = os.listdir(extracted)
+
+        if len(entries) != 1:
+            raise RuntimeError(
+                f"Expected exactly one top level directory in the {name} archive, "
+                f"found {len(entries)}: {sorted(entries)}"
+            )
+
+        root = os.path.join(extracted, entries[0])
+        downloaded = installed_archive_version(root)
+
+        # Checked before anything is moved, so that a wrong URL leaves no installation behind.
+        if downloaded is not None and downloaded != version:
+            raise RuntimeError(
+                f"The archive at {archive_url} contains {downloaded}, but {version} is "
+                f"configured. Fix config['components']['{name}']."
+            )
+
+        # The content is moved into local_path rather than local_path being replaced by the
+        # extracted directory, because in the container local_path is a symlink onto the state
+        # volume and replacing it would break that link. The directory holding the version marker
+        # goes last, so that a run that is killed halfway through is recognised as incomplete
+        # instead of being reported as already installed on the next start.
+        marker_root = VERSION_MARKER.split(os.sep)[0]
+        entries = sorted(os.listdir(root), key=lambda entry: entry == marker_root)
+
+        # The resolved path, not local_path: os.makedirs(..., exist_ok=True) raises FileExistsError
+        # on a symlink whose target does not exist yet, which is what local_path is in a container
+        # whose state volume has not been populated.
+        os.makedirs(resolved, exist_ok=True)
+
+        for entry in entries:
+            shutil.move(os.path.join(root, entry), os.path.join(resolved, entry))
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+
+    print(f"{name} {version} installed in '{local_path}'.")
+
+
+# Run a git command, turning a missing git binary into an error that names the cause. check_and_update
+# is the first thing a build run does, and a container without git would otherwise fail with a bare
+# FileNotFoundError from deep inside subprocess.
+def run_git(arguments, capture=False):
+    try:
+        return subprocess.run(
+            ["git"] + arguments, check=True, capture_output=capture, text=True
+        )
+    except FileNotFoundError as error:
+        raise RuntimeError(
+            "The 'git' command is not available, but it is required to download and update the "
+            "configured components."
+        ) from error
+
+
+# Update an existing shallow clone, or create one if it does not exist yet.
+def install_from_git(name, comp_config):
     local_path = comp_config["local_folder"]
     remote_url = comp_config["remote_url"]
     target_branch = comp_config["target_branch"]
 
     if os.path.exists(local_path) and os.path.isdir(os.path.join(local_path, ".git")):
+        # Pulling a release branch into a checkout of a different repository silently produces a
+        # mixture of both, which only shows up much later as build errors. Re-pinning a component is
+        # a config edit, so an existing checkout of another remote is reported instead.
+        try:
+            origin = run_git(
+                ["-C", local_path, "remote", "get-url", "origin"], capture=True
+            ).stdout.strip()
+        except subprocess.CalledProcessError:
+            origin = None
+
+        if origin is not None and origin != remote_url:
+            raise RuntimeError(
+                f"'{local_path}' is a checkout of {origin}, but {name} is configured to track "
+                f"{remote_url}. Remove the folder so it can be cloned again."
+            )
+
         print(f"Updating {name} in {local_path}...")
         try:
-            subprocess.run(
-                [
-                    "git",
-                    "-C",
-                    local_path,
-                    "pull",
-                    "origin",
-                    target_branch,
-                    "--depth",
-                    "1",
-                ],
-                check=True,
-            )
+            run_git(["-C", local_path, "pull", "origin", target_branch, "--depth", "1"])
         except subprocess.CalledProcessError as e:
             print(f"Error updating {name}: {e}")
     else:
         print(f"Cloning {name} into folder '{local_path}'...")
         try:
-            subprocess.run(
-                [
-                    "git",
-                    "clone",
-                    "--depth",
-                    "1",
-                    "-b",
-                    target_branch,
-                    remote_url,
-                    local_path,
-                ],
-                check=True,
+            run_git(
+                ["clone", "--depth", "1", "-b", target_branch, remote_url, local_path]
             )
         except subprocess.CalledProcessError as e:
             print(f"Error cloning {name}: {e}")
 
 
+def check_and_update(name, comp_config):
+    if "archive_url" in comp_config:
+        install_from_archive(name, comp_config)
+    else:
+        install_from_git(name, comp_config)
+
+
 # Install Isabelle components
-def setup_isabelle_components():
+def setup_isabelle_components(config):
     isabelle_bin = os.path.join(
         config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
     )
@@ -79,11 +222,14 @@ def setup_isabelle_components():
             stderr=subprocess.DEVNULL,
         )
         print("Isabelle components setup completed.")
+    # Not fatal on purpose: fetching the contrib components can fail for transient reasons while the
+    # installation is still usable, and whatever actually depends on a missing component fails right
+    # afterwards in the index build, which does stop the run.
     except subprocess.CalledProcessError as e:
-        print(f"Error setting up Isabelle components: {e}")
+        print(f"Warning: error setting up Isabelle components: {e}")
 
 
-def get_isabelle_version():
+def get_isabelle_version(config):
     isabelle_bin = os.path.join(
         config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
     )
@@ -236,5 +382,11 @@ def build_index(config):
         with open(state_file, "w") as f:
             json.dump(current_sessions, f, indent=4)
 
+    # A failed index build must not be reported as success: every later step reads the index, and a
+    # caller that only sees the exit status - the standalone '--index-only' step of a deployment -
+    # would otherwise go on to build a corpus from the previous, stale index.
     except subprocess.CalledProcessError as e:
-        print(f"Error building index: {e}")
+        raise RuntimeError(
+            f"Building the FindFacts index failed: {e}. A common cause on a server is that Solr is "
+            "still running and holding the index open; stop it and run this again."
+        ) from e

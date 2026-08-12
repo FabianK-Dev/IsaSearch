@@ -2,18 +2,18 @@
     "check_for_updates": true,
     "components": {
         "isabelle": {
-            "remote_url": "https://github.com/isabelle-prover/mirror-isabelle.git",
-            "local_folder": "Isabelle",
-            "target_branch": "master"
+            "archive_url": "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz",
+            "version": "Isabelle2025-2",
+            "local_folder": "Isabelle"
         },
         "afp": {
-            "remote_url": "https://github.com/isabelle-prover/mirror-afp-devel.git",
+            "remote_url": "https://github.com/isabelle-prover/mirror-afp-2025-2.git",
             "local_folder": "afp",
             "target_branch": "master"
         }
     },
     "isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"],
-    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/branch/default/thys",
+    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
     "solr_core_url": "http://localhost:8983/solr/local",
@@ -42,6 +42,7 @@
     "openai_embedding_model": "Qwen3-Embedding-4B",
     "openai_embedding_batch_size": 32,
     "openai_embedding_max_characters": 8000,
+    "llm_request_timeout": 600,
     "tokenizer_name": "microsoft/Phi-3.5-mini-instruct",
     "theorem_max_length": 1000,
     "metadata_max_length": 300,

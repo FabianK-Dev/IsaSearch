@@ -39,6 +39,7 @@ from tqdm import tqdm
 from src.bootstrap import (
     load_config,
     boot_components,
+    prepare_corpus_sources,
     DEFINITIONS_BUILD,
     DEFINITIONS_LOAD,
 )
@@ -1199,6 +1200,16 @@ def parse_args(argv=None):
         help="only build the corpora (including the LLM descriptions) and exit",
     )
     parser.add_argument(
+        "--index-only",
+        action="store_true",
+        help=(
+            "only install or update the components and build the FindFacts index, then exit. This "
+            "is the part of a build that requires Solr to be stopped, because the indexer writes "
+            "the same index a running Solr holds open. Run it first, then start Solr and run "
+            "--build-corpus-only for the rest."
+        ),
+    )
+    parser.add_argument(
         "--serve",
         action="store_true",
         help=(
@@ -1243,12 +1254,26 @@ def parse_args(argv=None):
             "is exactly what --serve forbids"
         )
 
+    if args.serve and args.index_only:
+        parser.error(
+            "--serve and --index-only contradict each other, because building the FindFacts index "
+            "is exactly what --serve forbids"
+        )
+
     return args
 
 
 def main(argv=None):
     args = parse_args(argv)
     config = load_config()
+
+    # Done before boot_components, because the FindFacts index has to be built while Solr is down
+    # and every later step needs Solr up. It also skips the LLM and embedding backend checks, which
+    # a pure indexing run has no use for.
+    if args.index_only:
+        prepare_corpus_sources(config)
+        print("Finished building the FindFacts index.")
+        return 0
 
     # Cross-kind matching queries the other corpus as well, so both are needed for it. Loading a
     # corpus that is never queried would cost gigabytes of memory on the full AFP, thus each one is

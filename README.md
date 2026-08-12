@@ -163,22 +163,61 @@ Please keep in mind that semantic similarity is not logical duplication: the tie
 
 ### Running on a server
 
-On a deployed server the web application and the duplicate detection are meant to run at the same time, sharing one Solr index, one set of informalisations and one ChromaDB storage. That is safe as long as every artifact has exactly one writer, which is what the build/serve split below enforces.
+On a deployed server the web application and the duplicate detection are meant to run at the same time, sharing one Solr index, one set of informalisations and one ChromaDB storage. That is safe as long as every artifact has exactly one writer, which is what the build/serve split enforces.
 
-**1. Build once, with nothing else running.** This is the only step that writes. It updates the AFP, builds the FindFacts index, informalizes every theorem and definition and embeds them. Expect it to take days for the whole AFP; it is resumable, so an interrupted run continues where it stopped.
+The deployment is one image in three roles, described by [compose.yaml](compose.yaml). The image contains the code and its Python dependencies and nothing else; everything mutable — the Isabelle and AFP checkouts, `~/.isabelle` with its contrib and the FindFacts Solr core, `.cache/`, `artifacts/`, `chroma_storages/` and `reports/` — lives on a single `state` volume mounted at `/data`. Solr runs as its own service so that both serving processes can reach it.
+
+#### Preparing the server
+
+Only Docker and a checkout of this repository are needed; Isabelle and the AFP install themselves into the volume on the first build.
+
+1. Clone the repository and edit `config.json`:
+   - `"solr_core_url": "http://solr:8983/solr/local"` — the compose service name, not `localhost`.
+   - `"isabelle_sessions": ["all"]` once the dry run below has succeeded. Leave the two default sessions in place for the dry run.
+   - Confirm that `openai_base_url` and `openai_embedding_base_url` are reachable from inside a container, not just from the host.
+2. Put the API key into a `.env` file next to `compose.yaml`:
+
+   ```
+   ISASEARCH_API_KEY=...
+   ```
+
+3. Build the image:
+
+   ```bash
+   docker compose build
+   ```
+
+#### 1. Build the corpus once, with nothing else running
+
+This is the only step that writes, and it comes in two parts, because the FindFacts indexer writes the very Lucene index the `solr` service holds open — the two must never have it at the same time.
+
+**1a. Index, with Solr stopped.** This installs Isabelle and the AFP and runs `isabelle find_facts_index`. The first run downloads the pinned Isabelle distribution (~1.2 GB, contrib and a JDK included) and clones the AFP; indexing the whole AFP then takes about a day.
 
 ```bash
-python3 -m src.duplicates --build-corpus-only
+docker compose run --rm tools python -m src.duplicates --index-only
 ```
 
-**2. Serve, any number of processes.** Both entry points below run strictly read-only: nothing is cloned, indexed, fetched, informalized, embedded or pruned. A missing corpus is reported instead of being built, so a serving process can never start a multi-hour job by accident.
+**1b. Build the corpora, with Solr running.** This fetches the documents from Solr, informalizes every theorem and definition and embeds them. Expect days for the whole AFP; it is resumable, so an interrupted run continues where it stopped. It re-checks the index first, which is a no-op as long as `isabelle_sessions` has not changed since step 1a — so this command is safe to repeat.
 
 ```bash
-python3 -m src.app
+docker compose up -d solr
+docker compose run --rm tools python -m src.duplicates --build-corpus-only
 ```
 
+#### 2. Serve
+
+The website runs read-only: nothing is cloned, indexed, fetched, informalized, embedded or pruned, and a missing corpus is reported instead of being built.
+
 ```bash
-python3 -m src.duplicates --serve --newest 10
+docker compose up -d
+```
+
+`waitress` is configured with `threads=1`, and the LLM output cache the website writes (`.cache/llm_output_cache.json`) has no locking, so **exactly one `app` container may run.** That file also grows for as long as the site is up; set `"enable_llm_output_cache": false` if that is not wanted, at the cost of repeating every query refinement after a restart.
+
+An analysis runs alongside it, also read-only, and writes only its own cache and report:
+
+```bash
+docker compose run --rm tools python -m src.duplicates --serve --newest 10
 ```
 
 Two things to keep in mind while both run:
@@ -186,16 +225,43 @@ Two things to keep in mind while both run:
 - They compete for the same LLM and embedding servers. Start `llama-server` with `--parallel 2` (raising `-c`, which is divided across the slots) so a long analysis cannot block the website. Adding `--no-llm-judge` to the analysis removes its LLM load entirely; only the `likely` tier is lost.
 - Each process holds the corpora it uses in memory, so plan for roughly `(theorems + definitions) × 15 KB` per process with a 2560-dimensional embedding model. The analysis only loads the corpora it actually queries, i.e. `--kinds definitions` never loads the theorems.
 
+`api_port` (5001 by default) is published directly. Put a reverse proxy with TLS in front of it before the site is reachable from outside.
+
+### Pinned Isabelle and AFP versions
+
+`config.json` pins both components under `"components"`, and they have to move together — an AFP release checkout does not build against a development Isabelle.
+
+```json
+"isabelle": {
+    "archive_url": "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz",
+    "version": "Isabelle2025-2",
+    "local_folder": "Isabelle"
+},
+"afp": {
+    "remote_url": "https://github.com/isabelle-prover/mirror-afp-2025-2.git",
+    "local_folder": "afp",
+    "target_branch": "master"
+}
+```
+
+Isabelle is installed from its release archive rather than from git, because the Isabelle git mirror only carries the development branch and has no release branches or tags. `version` is checked against `etc/ISABELLE_IDENTIFIER` in the installed tree, so an already installed release is never downloaded twice. If the canonical download URL is unreachable — it redirects to plain HTTP, which some networks drop — use `https://dist.isabelle.cit.tum.de/dist/Isabelle2025-2_linux.tar.gz?token=Isabelle` instead.
+
+The AFP is a shallow clone of the release mirror for the matching year. The release mirrors are separate repositories, each with a single `master` branch, so a version bump changes `remote_url`, not `target_branch`. `afp_remote_thys_folder_url` links search results to the sources and has to be moved to the same release.
+
+Neither component is ever overwritten in place: if `Isabelle/` holds a different release, or `afp/` is a checkout of a different remote, the build stops and names the folder to remove. That is deliberate — a tree that is half one release and half another only shows up much later as build errors.
+
 ### Updating to a newer AFP version
 
 Serving processes never write, so an update is a maintenance window:
 
-1. Stop the web application and any running analysis.
-2. Run the build of step 1 above. It pulls the AFP, re-indexes the changed sessions with FindFacts and then brings all three artifacts back in line automatically:
+1. Stop the web application and any running analysis (`docker compose down`).
+2. Run the two build steps above. Step 1a pulls the AFP and re-indexes the changed sessions with FindFacts; step 1b then brings all three artifacts back in line automatically:
    - the document index is refetched from Solr, because its fingerprint (`.cache/*.fingerprint.json`) no longer matches the corpus,
    - only new and changed documents are informalized, since descriptions are keyed by a checksum of the source code,
    - the ChromaDB collections lose the documents that the AFP removed, re-embed the ones whose source code changed and embed the new ones.
 3. Start the web application again. It reads the corpus once at start-up, so it will not pick up a rebuilt corpus without a restart.
+
+A move to a new *release* — say from 2025-2 to 2026 — is the same maintenance window plus the version bump described above: edit both pins, remove `Isabelle/` and `afp/` from the volume when the build tells you to, and let it reinstall.
 
 If a rebuild would remove more than half of a collection, it aborts instead: that is not an AFP update but a sign that the document index does not belong to the collection (usually a wrong `solr_query` or `chroma_db_path`). Delete the collection by hand if the corpus really did shrink that much.
 
@@ -209,7 +275,7 @@ The tests use only the Python standard library's `unittest`, so they need no add
 python3 -m unittest discover -s tests -t .
 ```
 
-`tests/test_openai_backends.py` and `tests/test_serve_and_update.py` run offline against a stub server and need neither a network, nor Solr, nor a GPU machine. The latter covers what a deployment depends on: that a serving process never writes, and that an AFP update invalidates the document index cache, deletes documents the AFP removed and re-embeds the ones whose source code changed. `tests/test_server_availability.py` talks to the servers configured in `config.json`: it checks that both are reachable, that the configured models answer, and that the embedding server accepts a document of `openai_embedding_max_characters` as well as a full batch of `openai_embedding_batch_size` — which is what catches a physical batch size that is too small. It needs the API key exported and is skipped automatically when the backends are not set to `openai`. To run it alone:
+`tests/test_openai_backends.py`, `tests/test_serve_and_update.py` and `tests/test_installation.py` run offline against a stub server and need neither a network, nor Solr, nor git, nor a GPU machine. `tests/test_serve_and_update.py` covers what a deployment depends on: that a serving process never writes, that an AFP update invalidates the document index cache, deletes documents the AFP removed and re-embeds the ones whose source code changed, and that an unreachable Solr is reported by name instead of prompting a server that has no terminal. `tests/test_installation.py` covers the pinned components: that a release is installed from its archive exactly once and that a checkout of a different release or remote is reported instead of overwritten. `tests/test_server_availability.py` talks to the servers configured in `config.json`: it checks that both are reachable, that the configured models answer, and that the embedding server accepts a document of `openai_embedding_max_characters` as well as a full batch of `openai_embedding_batch_size` — which is what catches a physical batch size that is too small. It needs the API key exported and is skipped automatically when the backends are not set to `openai`. To run it alone:
 
 ```bash
 python3 -m unittest tests.test_server_availability -v

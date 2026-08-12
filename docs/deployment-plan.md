@@ -4,7 +4,7 @@ Working document for deploying IsaSearch on a university server. It is written t
 any prior conversation: it states the architecture, what is already implemented, what is left, and
 how to verify each step. Delete it once the deployment is done.
 
-Branch: `duplicate-detection`. Everything described under "Already done" is in commit `e83e410`.
+Branch: `duplicate-detection`. **Tasks 1–5 are done** (see section 3b); tasks 6–8 need the server.
 
 ## 1. Target deployment
 
@@ -14,7 +14,8 @@ One server, reachable as a website, running two processes at the same time:
 - the duplicate detection (`python -m src.duplicates --serve …`), run on demand by a maintainer.
 
 Both share one Solr index, one set of LLM informalisations and one ChromaDB storage. The corpus is
-built on the same machine and is rebuilt when the AFP is updated.
+built on the same machine and is rebuilt when the AFP is updated. All three roles run from the same
+container image against one state volume; see [compose.yaml](../compose.yaml).
 
 Hardware requested: **64 GB RAM, 500 GB disk.** See section 7 for what those numbers are based on
 and what still has to be measured.
@@ -28,19 +29,27 @@ The whole design rests on one invariant:
 That is achieved by splitting every entry point into two modes (`boot_components(serve=...)` in
 [src/bootstrap.py](../src/bootstrap.py)):
 
-- **Build mode** (`serve=False`) — the only process that may write. It updates Isabelle and the AFP,
+- **Build mode** (`serve=False`) — the only process that builds. It updates Isabelle and the AFP,
   builds the FindFacts index, fetches the document indexes from Solr, informalizes what is missing,
   and embeds and prunes the ChromaDB collections. Run alone, in a maintenance window.
-- **Serve mode** (`serve=True`) — any number of processes, strictly read-only. Every one of those
-  steps is turned off. A corpus that was not built beforehand is reported, never built.
+- **Serve mode** (`serve=True`) — read-only with respect to the corpus. Every one of those steps is
+  turned off. A corpus that was not built beforehand is reported, never built.
 
-Because serving never writes, the two serving processes cannot corrupt each other's state, and no
-locking or coordination between them is needed.
+**Correction (this is not what an earlier version of this document claimed).** Serve mode is not
+write-free. The web application writes `.cache/llm_output_cache.json` on every query refinement that
+was not cached yet ([src/embeddings.py](../src/embeddings.py), `save_llm_output_cache`), and the
+duplicate detection writes its own `llm_output_cache_dedup.json`. The invariant that actually holds
+is the weaker per-file one: the two serving processes use different cache names, so they never write
+the same file — but **only one web application process may run**, because that file has no locking.
+`threads=1` in [src/app.py](../src/app.py) is what serialises writes within that process, which is a
+second reason not to raise it (section 5). The file also grows for as long as the site is up;
+`"enable_llm_output_cache": false` turns it off at the price of repeating every refinement after a
+restart. It is deliberately left on.
 
-Isabelle installs itself: [check_and_update](../src/installation.py) clones the Isabelle and AFP
-mirrors (`--depth 1`) and [setup_isabelle_components](../src/installation.py) runs
-`isabelle components -I` and `-a` to fetch the contrib components. There is no manual installation
-step anywhere — but it needs `git` on the PATH, which matters for the container (task 2).
+Isabelle and the AFP install themselves; there is no manual installation step anywhere.
+[check_and_update](../src/installation.py) dispatches on the component's configuration: Isabelle is
+installed from its release archive (`archive_url` + `version`) and the AFP from a shallow git clone
+(`remote_url` + `target_branch`). See section 4a for why they differ.
 
 ## 3. Already done (commit `e83e410`)
 
@@ -57,6 +66,29 @@ Do not redo these; read them for context.
 | Tests | `tests/test_serve_and_update.py`, 24 offline tests. |
 | Docs | README sections "Running on a server" and "Updating to a newer AFP version". |
 
+## 3b. Also done — tasks 1–5
+
+| Task | What |
+|---|---|
+| 1 | `connect_solr` only offers the interactive Docker fallback when `sys.stdin.isatty()`; otherwise it raises a `RuntimeError` naming `solr_core_url`, chained from the original error. `start_local_solr` no longer gates on the unused `isabelle_version` and its readiness loop actually pings instead of only constructing a client. |
+| 2 | [Dockerfile](../Dockerfile) rewritten: code + dependencies only, `git` installed, no Solr, no baked assets, `HOME=/data/home`, the state directories symlinked out of `/app` onto the volume, `EXPOSE 5001`, and [docker-entrypoint.sh](../docker-entrypoint.sh) creating the volume targets so the symlinks never dangle. |
+| 3 | [compose.yaml](../compose.yaml): `solr`, `app` and a `run`-only `tools` service, one named `state` volume, the server's `config.json` bind-mounted, `ISASEARCH_API_KEY` passed through. |
+| 4 | `docker_build.sh`, `docker_push.sh`, `docker_run.sh` and `solr_db.sh` deleted — `docker compose build` replaces them and the registry push is no longer wanted. `.dockerignore` is now a real checked-in file instead of a copy of `.gitignore` (which excluded `.cache` and `afp/` from the context by construction). |
+| 5 | README rewritten for the container model, plus a new "Pinned Isabelle and AFP versions" section. |
+| — | Isabelle and the AFP pinned to 2025-2, see section 4a. |
+| — | `src/installation.py` no longer reads `config.json` at import time; `setup_isabelle_components` and `get_isabelle_version` take the config. A checkout of a different remote, or an installation of a different release, is now reported instead of being pulled into or overwritten. |
+| — | The build is split in two. `isabelle find_facts_index` writes the same Lucene index the `solr` service holds open, so it has to run with the service stopped — but everything after it needs the service up, and it is all one `boot_components` call. The part before Solr is now `prepare_corpus_sources` in `src/bootstrap.py`, reachable on its own as `python -m src.duplicates --index-only`. Without it, the documented single build command could not succeed on a fresh volume. |
+| — | LLM completion requests had `timeout=None` on all three backends. One wedged response would have frozen the site permanently, since `threads=1` and the process stays alive so `restart: unless-stopped` never fires. Now bounded by `config["llm_request_timeout"]` (600 s). |
+| — | `prompts/qwen3-gemma/` — the folder `config.json` actually points at — was missing `describe_definition.txt` and `duplicate_judge.txt`; only the `microsoft-Phi` folders got them when the duplicate detection was added. The build would have raised `KeyError` after days of theorem informalization and before any embedding, and every LLM-judged analysis would have crashed. Both prompts added, to the `-with-metadata` variant as well. |
+| — | A failed `isabelle find_facts_index` was caught and only printed. As a standalone step (`--index-only`) that exit status is the only signal a runbook has, so it now raises, with the "Solr is still holding the index" cause named. `setup_isabelle_components` still only warns, on purpose. |
+| Tests | `tests/test_installation.py` (new) and a `SolrConnectionTest` in `tests/test_serve_and_update.py`; 72 offline tests pass. |
+
+Defects found on the way that this document did not name: `docker build` failed outright
+(`COPY artifacts` — the directory is untracked and absent), `docker_run.sh` published 5000 while the
+app binds `api_port` 5001, `solr_core_url` was `localhost`, `solr_db.sh` pointed at
+`/home/fabian/.isabelle/Isabelle_16-May-2025/…`, and `docker_build.sh` used GNU `sed -i` on a macOS
+checkout.
+
 ## 4. Decisions already taken
 
 - **Keep Docker, restructure it.** The image becomes code + Python dependencies only. All mutable
@@ -69,13 +101,47 @@ Do not redo these; read them for context.
 - **The build runs in a container too** (same image, different command), since Isabelle installs
   itself. There is no native-host installation step.
 
+## 4a. Pinning Isabelle and the AFP to 2025-2
+
+The AFP is pinned by pointing `components.afp.remote_url` at
+`https://github.com/isabelle-prover/mirror-afp-2025-2.git`, the release mirror for the matching
+year. The release mirrors are separate repositories with a single `master` branch, so a version bump
+changes the URL, not the branch. `afp_remote_thys_folder_url` moves with it, otherwise search results
+link to devel revisions.
+
+Isabelle **cannot** be pinned the same way, which is the trap here: setting
+`target_branch: "Isabelle2025-2"` on `mirror-isabelle` looks right and does not work. That mirror has
+only `master` (devel) plus a dependabot branch, and its newest tag is `Isabelle2021-1-RC5`; it is the
+only Isabelle repository in the `isabelle-prover` organisation. A commit-SHA pin was rejected too:
+releases are cut on a Mercurial release branch that is not on the mirrored default branch, so no ref
+identifies the release commit, and it would force a full clone. Cloning upstream Mercurial at tag
+`Isabelle2025-2` would add an `hg` dependency and re-download contrib for nothing.
+
+So Isabelle is installed from its official release archive
+(`https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz`), which is canonical, versioned, and
+bundles contrib **and** a JDK — which is why the image needs neither `openjdk-17-jre-headless` nor a
+separate 10–15 GB contrib download. The installed tree identifies itself through
+`etc/ISABELLE_IDENTIFIER`, which is compared against the configured `version`, so a release is
+downloaded exactly once and a differing installation is reported rather than replaced.
+
+Caveat: that URL 301-redirects to **plain HTTP** on `dist.isabelle.cit.tum.de`, which some networks
+drop — it was unreachable from the development machine, while the same path over HTTPS worked.
+`archive_url` is a config key, so the fallback is a one-line edit; the README names it. **Verify the
+download from the server before task 6** — it is the first thing the build does and the cheapest
+thing to get wrong.
+
+Both components must move together: an AFP release checkout does not build against a devel Isabelle,
+so pinning one and not the other is worse than pinning neither.
+
 ## 5. Open decisions — ask the user before implementing
 
 1. **`waitress` threads.** [src/app.py](../src/app.py) ends with `serve(app, …, threads=1)`, so the
    site handles one request at a time; a slow LLM query refinement blocks every other visitor.
    Raising it requires auditing shared mutable state first — `llm_output_cache` is a plain dict
    mutated during search, and `search()` writes it. For a low-traffic academic site, keeping 1 is
-   defensible. **Do not change this without asking.**
+   defensible. **Do not change this without asking.** *Decided: it stays at 1. See the correction in
+   section 2 — `threads=1` is what serialises the cache writes, so raising it is a correctness
+   change, not a throughput knob.*
 2. **Reverse proxy and TLS** in front of `config["api_port"]` (5001) — depends on what the
    university provides.
 3. **Embedding dimension.** Currently Qwen3-Embedding-4B at 2560 dimensions. Truncating to 1024
@@ -84,9 +150,11 @@ Do not redo these; read them for context.
 
 ## 6. Tasks
 
-Ordered. Each has an acceptance criterion. Tasks 1–5 need no server and can be done immediately.
+Ordered. Each has an acceptance criterion. **Tasks 1–5 are done** — what was actually changed is in
+section 3b, and the descriptions below are kept only so that the acceptance criteria can be re-run.
+Tasks 6–8 need the server.
 
-### Task 1 — Make Solr connection non-interactive (do this first, independent of everything else)
+### Task 1 — Make Solr connection non-interactive — DONE
 
 **Problem.** [connect_solr](../src/solr.py) calls
 `input("Solr seems to be down. Do you want to start a local Solr instance via Docker? [Y/n]: ")`
@@ -102,9 +170,9 @@ local development. Consider gating it further behind an explicit config key.
 **Accept.** With Solr down and stdin closed (`python -m src.app < /dev/null`), the process exits
 with a one-line error mentioning the Solr URL, and no traceback from `input()`. Add a test.
 
-### Task 2 — Restructure the Dockerfile
+### Task 2 — Restructure the Dockerfile — DONE
 
-**Problem.** [Dockerfile](../Dockerfile) has not been touched in 15 commits (last change
+**Problem.** [Dockerfile](../Dockerfile) had not been touched in 15 commits (last change
 2026-04-28, before `bootstrap.py`, the duplicate detection and the openai/llamacpp backends). It has
 three concrete defects:
 
@@ -115,6 +183,9 @@ three concrete defects:
   `components.afp.local_folder == "afp"`.
 - It bakes `chroma_storages`, the Solr index and the AFP checkout into the image, and installs Solr
   inside the app container.
+- Not named when this was written: it did not build at all. `COPY artifacts /app/artifacts` refers to
+  a directory that is neither present nor tracked, as do the `assets/` tarballs `docker_build.sh`
+  extracted.
 
 **Do.**
 - Add `git` to the `apt-get install` line.
@@ -125,10 +196,14 @@ three concrete defects:
   FindFacts Solr core — lands on the mounted volume rather than in the container layer.
 - Replace `CMD` with the app only; the build and analysis roles get their command at run time.
 
-**Accept.** `docker build` succeeds. `docker run --rm <image> git --version` works.
-`docker run --rm <image> python -c "import chromadb, flask, pysolr"` works.
+**Accept.** `docker compose build` succeeds. `docker run --rm isasearch git --version` works.
+`docker run --rm isasearch python -c "import chromadb, flask, pysolr"` works.
+`docker run --rm isasearch python -m unittest discover -s tests -t .` runs the offline tests inside
+the image (`tests/` is copied in precisely for this smoke test; the `test_server_availability` errors
+are expected without the API key and the servers). **Not yet run — no Docker daemon was available on
+the development machine.**
 
-### Task 3 — Add a compose file
+### Task 3 — Add a compose file — DONE
 
 **Do.** Add `compose.yaml` with three services, all using the same image:
 
@@ -145,24 +220,31 @@ Prefer one mount over six by rooting the config's relative paths inside it.
 
 **Accept.** `docker compose up solr` starts Solr against the shared volume. `docker compose run --rm
 tools python -m src.duplicates --serve --newest 1` reaches Solr and fails with the "corpus not
-built" message rather than a connection error.
+built" message rather than a connection error or an `EOFError`. **Not yet run — no Docker daemon.**
+Note that this check on an empty volume starts Solr before any index exists; wipe
+`~/.isabelle/find_facts/solr` on the volume before the real build so that nothing Solr created is
+mistaken for a FindFacts core.
 
-### Task 4 — Rewrite `docker_build.sh`
+### Task 4 — Replace the Docker helper scripts — DONE
 
-**Problem.** It does `cp .gitignore .dockerignore`, then removes only the `assets_extracted` line.
-`.cache` is the second line of `.gitignore`, so the cache directory is excluded from the build
-context by construction. With the assets no longer baked in, all of this disappears.
+**Problem.** `docker_build.sh` did `cp .gitignore .dockerignore`, then removed only the
+`assets_extracted` line. `.cache` is the second line of `.gitignore` and `afp*/` the tenth, so both
+were excluded from the build context by construction. It also used GNU `sed -i`, which fails on
+macOS, and extracted tarballs from an `assets/` directory that does not exist.
 
-**Do.** Reduce it to `docker build` + tag + push. Drop the tarball extraction and the
-`.dockerignore` juggling. Write a real `.dockerignore` instead of generating one.
+**Done.** All four scripts (`docker_build.sh`, `docker_push.sh`, `docker_run.sh`, `solr_db.sh`) are
+deleted: `docker compose build` replaces the build and the registry push is no longer wanted.
+`.dockerignore` is a real checked-in file.
 
-**Accept.** The script no longer references `assets/` or `assets_extracted/`.
+**Accept.** No script references `assets/` or `assets_extracted/`; nothing generates `.dockerignore`.
 
-### Task 5 — Update the README deployment section
+### Task 5 — Update the README deployment section — DONE
 
-**Do.** Rewrite "Running on a server" for the container model: one image, three commands, one state
-volume, Solr as a service. Keep the build/serve explanation and the update runbook — only the
-invocation changes. Document that the first build downloads Isabelle plus 10–15 GB of contrib.
+**Done.** "Running on a server" rewritten for the container model: one image, three roles, one state
+volume, Solr as a service, plus a new "Pinned Isabelle and AFP versions" section. The build/serve
+explanation and the update runbook are kept. The first-build download is **~1.2 GB for the Isabelle
+distribution, contrib included** — the "Isabelle plus 10–15 GB of contrib" figure applied to the git
+install and no longer holds.
 
 **Accept.** A reader who has only the README can deploy from scratch.
 
@@ -171,27 +253,51 @@ invocation changes. Document that the first build downloads Isabelle plus 10–1
 Do **not** start the full AFP build before this. The full build takes days; a config error found 30
 hours in is expensive.
 
-**Do.** Keep `"isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"]`, set the production
-paths and export the API key. Run the build, then start the app and an analysis in parallel.
-While it runs, measure (see section 7).
+**Do.** Keep `"isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"]`, set
+`solr_core_url` to `http://solr:8983/solr/local` and put the API key in `.env`. Run the build, then
+start the app and an analysis in parallel. While it runs, measure (see section 7).
+
+**Also verify here — these could not be checked without the server:**
+
+1. **The Isabelle download.** `https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz`
+   redirects to plain HTTP; use the HTTPS mirror in the README if the redirect is dropped.
+2. **The Solr image version.** `compose.yaml` pins `solr:9.8.1`. Compare it against the Solr that
+   the pinned Isabelle bundles (look for `Isabelle/contrib/solr-*` on the volume) and match the tag;
+   a newer Solr can refuse an index written by an older Lucene.
+3. **The Solr home layout.** The service serves `~/.isabelle/find_facts/solr` directly with
+   `solr-foreground -s`. Confirm that the directory the indexer produces is a valid Solr home with a
+   core named `local`, and that the `user: "0:0"` in `compose.yaml` really is the uid that owns it.
+4. **Shared libraries.** `python:3.11-slim` may lack libraries the Isabelle build needs (fontconfig
+   is the usual suspect). Add apt packages to the Dockerfile if the build complains.
+5. **`find_facts_index` under 2025-2.** The `-A <afp>` flag and the indexing of definitional commands
+   were exercised against a devel-era Isabelle. `build_definition_corpus` fails loudly with a rebuild
+   hint if definitions are missing.
 
 **Accept.** Build completes; the website answers a search; `--serve` produces a report; neither
-process writes a file the other owns (check timestamps on `.cache/`, `artifacts/`, `chroma_storages/`).
+process writes a file the other owns (check timestamps on `.cache/`, `artifacts/`, `chroma_storages/`
+— `llm_output_cache.json` and `llm_output_cache_dedup.json` are expected to change, one per process).
 
 ### Task 7 — Production config and full build (needs the server)
 
-**Do.** Set `"isabelle_sessions": ["all"]`, point `chroma_db_path`/`artifacts_folder`/`cache_folder`
-at the state volume, export `ISASEARCH_API_KEY`, confirm the LLM and embedding server URLs are
-reachable from inside the container. Then run `--build-corpus-only` and let it run.
+**Do.** Set `"isabelle_sessions": ["all"]` and confirm the LLM and embedding server URLs are
+reachable from inside the container. The paths need no change: every relative path in `config.json`
+resolves under `/app`, whose state directories are symlinks onto the volume. Then run
+`--build-corpus-only` and let it run.
 
 **Accept.** `python3 -m src.duplicates --serve --newest 10` produces a report whose self-retrieval
 control passes (the run exits non-zero if more than 5 % of documents fail to retrieve themselves).
 
 ### Task 8 — Service management and exposure (needs the server)
 
-**Do.** systemd units wrapping `docker compose` (or the equivalent), a reverse proxy with TLS in
-front of `api_port`, and a decision on task-5-open-item 1 (`threads`). Restart policy: the app must
-come up after `solr`.
+**Do.** systemd units wrapping `docker compose` (or the equivalent) and a reverse proxy with TLS in
+front of `api_port`. Ordering and restart policy are already in `compose.yaml` (`depends_on` with a
+Solr healthcheck, `restart: unless-stopped`), so the unit only has to bring compose up on boot.
+`threads` stays at 1 — see section 5, item 1. Whatever supervises this must never start a second
+`app` container: the LLM output cache it writes is not locked.
+
+Hardening left undone on purpose: the containers run as root, which matches the previous behaviour
+and is what lets the build container and Solr share one volume. Moving to a fixed non-root uid is
+possible but has to be done for both at once.
 
 ## 7. Numbers, and what still has to be measured
 
@@ -220,9 +326,11 @@ definitions; `--cross` or `--kinds all` loads both.
 
 Disk, full AFP: heaps 10–25 GB (only *parent* sessions get heap images — `find_facts_index` does not
 store heaps for the sessions it indexes, confirmed on the 2026-04-28 run where `Ramsey-Infinite` and
-`Ordinals_and_Cardinals` produced session databases but no heaps), session databases 2–5 GB, Isabelle
-contrib 10–15 GB, shallow clones 2–4 GB, Solr index 5–15 GB, ChromaDB ~8 GB, caches and artifacts
-~4 GB. Total roughly **45–80 GB**, so 500 GB is generous.
+`Ordinals_and_Cardinals` produced session databases but no heaps), session databases 2–5 GB, the
+Isabelle distribution ~4 GB unpacked (contrib included — this was 10–15 GB while contrib was fetched
+separately by `isabelle components -a`; the release archive bundles it), the AFP shallow clone
+1–2 GB, Solr index 5–15 GB, ChromaDB ~8 GB, caches and artifacts ~4 GB. Total roughly **35–65 GB**,
+so 500 GB is generous.
 
 **Still unmeasured — do these in task 6:**
 
@@ -248,12 +356,12 @@ Offline tests, no network, no Solr, no GPU server:
 python3 -m unittest discover -s tests -t .
 ```
 
-Expect all to pass except `tests/test_server_availability.py`, which needs `ISASEARCH_API_KEY`
-exported and the configured servers reachable. Formatting and linting:
+72 tests pass; the 7 errors from `tests/test_server_availability.py` are expected, it needs
+`ISASEARCH_API_KEY` exported and the configured servers reachable. Formatting and linting:
 
 ```bash
 nix shell nixpkgs#ruff -c ruff format src tests benchmark
 ```
 
-`ruff check` currently reports 26 pre-existing findings across the codebase; keep that number from
-growing rather than trying to reach zero.
+`ruff check` currently reports 25 pre-existing findings across the codebase (26 before tasks 1–5);
+keep that number from growing rather than trying to reach zero.

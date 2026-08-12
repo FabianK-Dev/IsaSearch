@@ -2,8 +2,6 @@
 solr.py: This file connects to Solr and retrieves documents by their IDs.
 """
 
-import secrets
-import string
 import sys
 import time
 import subprocess
@@ -15,9 +13,6 @@ from requests.exceptions import RequestException
 
 # Global reference to the Solr Docker process
 solr_process = None
-SOLR_PASSWORD = "".join(
-    secrets.choice(string.ascii_letters + string.digits) for _ in range(64)
-)
 
 
 def cleanup_solr():
@@ -51,15 +46,9 @@ def start_local_solr(config):
     """Start Solr via Docker based on the user command."""
     global solr_process
 
-    # Build path: /home/user/.isabelle/{version}/find_facts/solr/local
+    # The local path where Isabelle stores the FindFacts index, i.e. the same one that
+    # src/installation.py builds into: ~/.isabelle/find_facts/solr/local
     user_home = os.path.expanduser("~")
-    isabelle_version = config.get("isabelle_version")
-
-    if isabelle_version is None:
-        print("Error: 'isabelle_version' is unknown.")
-        return False
-
-    # The local path where Isabelle stores the data
     local_mount_path = os.path.join(
         user_home, ".isabelle", "find_facts", "solr", "local"
     )
@@ -93,12 +82,12 @@ def start_local_solr(config):
         solr_process = True
 
         print("Waiting for Solr to become ready (this may take a few seconds)...")
-        # Wait until Solr really responds
-        for i in range(30):
+        # Wait until Solr really responds. Constructing pysolr.Solr does not contact the server, so
+        # the readiness check has to ping it; otherwise this loop reports success immediately.
+        for _ in range(30):
             try:
-                # Simple ping on the admin endpoint or core
-                pysolr.Solr(config["solr_core_url"], timeout=1)
-                print("Solr is up and running!")
+                pysolr.Solr(config["solr_core_url"], timeout=1).ping()
+                print("\nSolr is up and running!")
                 return True
             except Exception:
                 time.sleep(1)
@@ -129,8 +118,17 @@ def connect_solr(config):
 
         solr.ping()
         return solr
-    except (pysolr.SolrError, RequestException, Exception):
+    except (pysolr.SolrError, RequestException, Exception) as error:
         print(f"Could not connect to Solr at {url}.")
+
+        # A deployed process (systemd, 'docker run' without -it, a cron job) has no terminal, so
+        # asking a question there raises EOFError from inside this handler and buries the actual
+        # cause in a confusing traceback. Report what is wrong instead and let the caller fail.
+        if not sys.stdin.isatty():
+            raise RuntimeError(
+                f"Solr is not reachable at {url}. It has to be running and reachable before this "
+                "process is started; see the deployment section of the README."
+            ) from error
 
         # User input loop
         while True:
@@ -152,6 +150,8 @@ def connect_solr(config):
             elif choice in ["n", "no"]:
                 print("Exiting because Solr is required.")
                 sys.exit(1)
+            else:
+                print("Please answer with 'y' or 'n'.")
 
 
 # Given a list of Solr document IDs, return a list of all documents identified by the IDs.

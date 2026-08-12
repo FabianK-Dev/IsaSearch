@@ -38,6 +38,18 @@ SUPPORTED_BACKENDS = [OLLAMA_BACKEND, LLAMACPP_BACKEND, OPENAI_BACKEND]
 # everything the other one cached since it started.
 DEFAULT_LLM_OUTPUT_CACHE = "llm_output_cache.json"
 
+# How long a single completion request may take, overridable through config["llm_request_timeout"].
+# Without a timeout a server that accepts the connection but never answers blocks the caller for as
+# long as the process lives. That is fatal for the web application, which serves with a single
+# thread: one wedged request would freeze the site until the process is restarted by hand. The
+# default is generous, because informalizing a long theorem on a busy server is genuinely slow.
+DEFAULT_LLM_REQUEST_TIMEOUT = 600
+
+
+def llm_request_timeout(config):
+    return config.get("llm_request_timeout", DEFAULT_LLM_REQUEST_TIMEOUT)
+
+
 # All servers that were started by this application and thus need to be stopped on exit.
 managed_processes = []
 
@@ -459,10 +471,13 @@ def ensure_openai(config):
 
 
 class OllamaLLM:
-    def __init__(self, base_url, model_name, options):
+    def __init__(
+        self, base_url, model_name, options, timeout=DEFAULT_LLM_REQUEST_TIMEOUT
+    ):
         self.base_url = base_url.rstrip("/")
         self.model_name = model_name
         self.options = options
+        self.timeout = timeout
 
     def generate(self, prompt):
         response = requests.post(
@@ -473,16 +488,17 @@ class OllamaLLM:
                 "stream": False,
                 "options": self.options,
             },
-            timeout=None,
+            timeout=self.timeout,
         )
         response.raise_for_status()
         return response.json()["response"]
 
 
 class LlamaCppLLM:
-    def __init__(self, base_url, options):
+    def __init__(self, base_url, options, timeout=DEFAULT_LLM_REQUEST_TIMEOUT):
         self.base_url = base_url.rstrip("/")
         self.options = options
+        self.timeout = timeout
 
     def generate(self, prompt):
         # The model is not part of the request, because a llama-server process always serves a single model.
@@ -493,18 +509,26 @@ class LlamaCppLLM:
                 "stream": False,
                 **self.options,
             },
-            timeout=None,
+            timeout=self.timeout,
         )
         response.raise_for_status()
         return response.json()["content"]
 
 
 class OpenAILLM:
-    def __init__(self, base_url, model_name, options, api_key=None):
+    def __init__(
+        self,
+        base_url,
+        model_name,
+        options,
+        api_key=None,
+        timeout=DEFAULT_LLM_REQUEST_TIMEOUT,
+    ):
         self.base_url = base_url.rstrip("/")
         self.model_name = model_name
         self.options = options
         self.headers = openai_headers(api_key)
+        self.timeout = timeout
 
     def generate(self, prompt):
         # The prompt is sent as a single user message, because the server applies the chat template
@@ -519,7 +543,7 @@ class OpenAILLM:
                 **self.options,
             },
             headers=self.headers,
-            timeout=None,
+            timeout=self.timeout,
         )
         raise_for_status_with_body(
             response, "Generating a completion at " + self.base_url
@@ -589,6 +613,7 @@ def get_llm(config):
         return LlamaCppLLM(
             config["llamacpp_base_url"],
             llamacpp_options(config),
+            llm_request_timeout(config),
         )
 
     if backend == OPENAI_BACKEND:
@@ -597,12 +622,14 @@ def get_llm(config):
             config["openai_query_model"],
             openai_options(config),
             openai_api_key(config),
+            llm_request_timeout(config),
         )
 
     return OllamaLLM(
         config["ollama_base_url"],
         config["ollama_query_model"],
         ollama_options(config),
+        llm_request_timeout(config),
     )
 
 
@@ -616,6 +643,7 @@ def get_document_llm(config):
             config["openai_document_model"],
             openai_options(config),
             openai_api_key(config),
+            llm_request_timeout(config),
         )
 
     if llm_backend(config) == LLAMACPP_BACKEND:
@@ -630,12 +658,15 @@ def get_document_llm(config):
             else config["llamacpp_document_base_url"]
         )
 
-        return LlamaCppLLM(base_url, llamacpp_options(config))
+        return LlamaCppLLM(
+            base_url, llamacpp_options(config), llm_request_timeout(config)
+        )
 
     return OllamaLLM(
         config["ollama_base_url"],
         config["ollama_document_model"],
         ollama_options(config),
+        llm_request_timeout(config),
     )
 
 

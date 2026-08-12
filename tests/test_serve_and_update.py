@@ -17,12 +17,15 @@ These tests need neither a network, nor Solr, nor a GPU server. Run them with
 import os
 import pathlib
 import shutil
+import subprocess
 import tempfile
 import unittest
 import unittest.mock
 import zlib
 
-from src import documents, duplicates, embeddings, installation, llm
+from requests.exceptions import RequestException
+
+from src import documents, duplicates, embeddings, installation, llm, solr
 from tests.stub_openai_server import StubOpenAIServer
 
 
@@ -397,6 +400,47 @@ class DuplicatesEntryPointTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             duplicates.parse_args(["--serve", "--build-corpus-only"])
 
+    def test_serving_and_indexing_contradict_each_other(self):
+        with self.assertRaises(SystemExit):
+            duplicates.parse_args(["--serve", "--index-only"])
+
+    # The FindFacts indexer writes the index a running Solr holds open, so indexing has to be
+    # runnable on its own, before Solr is started and before anything contacts it.
+    def test_indexing_only_never_reaches_solr_or_the_backends(self):
+        prepared = []
+
+        with (
+            unittest.mock.patch.object(
+                duplicates,
+                "prepare_corpus_sources",
+                lambda config: prepared.append(config),
+            ),
+            unittest.mock.patch.object(
+                duplicates, "boot_components", self.fail_on_boot
+            ),
+            unittest.mock.patch.object(duplicates, "load_config", dict),
+        ):
+            self.assertEqual(duplicates.main(["--index-only"]), 0)
+
+        self.assertEqual(len(prepared), 1)
+
+    def fail_on_boot(self, *arguments, **keywords):
+        self.fail("--index-only must not boot the components")
+
+    # The exit status of the standalone indexing step is the only signal the deployment runbook
+    # has. Reporting success after a failed 'isabelle find_facts_index' would make the next step
+    # build a corpus from the previous, stale index.
+    def test_a_failed_index_build_is_not_reported_as_success(self):
+        def failing(config):
+            raise RuntimeError("Building the FindFacts index failed")
+
+        with (
+            unittest.mock.patch.object(duplicates, "prepare_corpus_sources", failing),
+            unittest.mock.patch.object(duplicates, "load_config", dict),
+            self.assertRaises(RuntimeError),
+        ):
+            duplicates.main(["--index-only"])
+
     def test_the_duplicate_detection_owns_its_llm_cache(self):
         arguments = self.boot_arguments(["--kinds", "definitions"])
 
@@ -436,6 +480,35 @@ class BackupRetentionTest(TemporaryFolderTestCase):
             ],
         )
 
+    def test_a_failed_indexer_stops_the_build(self):
+        config = {
+            "components": {
+                "isabelle": {"local_folder": self.folder},
+                "afp": {"local_folder": self.folder},
+            },
+            "isabelle_sessions": ["Test_Session"],
+        }
+
+        isabelle_bin = os.path.join(self.folder, "bin", "isabelle")
+        os.makedirs(os.path.dirname(isabelle_bin), exist_ok=True)
+
+        with open(isabelle_bin, "w") as file:
+            file.write("#!/bin/sh\n")
+
+        def failing(command, **keywords):
+            raise subprocess.CalledProcessError(1, command)
+
+        with (
+            unittest.mock.patch.object(installation.subprocess, "run", failing),
+            unittest.mock.patch.object(
+                installation.Path, "home", lambda: pathlib.Path(self.folder)
+            ),
+            self.assertRaises(RuntimeError) as raised,
+        ):
+            installation.build_index(config)
+
+        self.assertIn("FindFacts index", str(raised.exception))
+
     def test_retention_can_be_switched_off(self):
         self.write_backups(3)
 
@@ -444,6 +517,49 @@ class BackupRetentionTest(TemporaryFolderTestCase):
         )
 
         self.assertEqual(len(self.backups()), 3)
+
+
+# A deployed process has no terminal, so connect_solr must never ask a question there. Before this
+# was guarded, a Solr that was down took the whole start-up down with an EOFError raised inside the
+# exception handler, which hid the actual cause.
+class SolrConnectionTest(unittest.TestCase):
+    def setUp(self):
+        self.config = {"solr_core_url": "http://solr.example:8983/solr/local"}
+
+    def connect(self, isatty, answer=None):
+        unreachable = unittest.mock.Mock()
+        unreachable.ping.side_effect = RequestException("connection refused")
+
+        self.asked = unittest.mock.Mock(return_value=answer)
+
+        with unittest.mock.patch.object(solr, "pysolr") as pysolr_module:
+            pysolr_module.Solr.return_value = unreachable
+            pysolr_module.SolrError = Exception
+
+            with (
+                unittest.mock.patch("sys.stdin.isatty", return_value=isatty),
+                unittest.mock.patch("builtins.input", self.asked),
+            ):
+                return solr.connect_solr(self.config)
+
+    def test_without_a_terminal_the_failure_names_the_configured_url(self):
+        with self.assertRaises(RuntimeError) as raised:
+            self.connect(isatty=False)
+
+        self.assertIn(self.config["solr_core_url"], str(raised.exception))
+        self.asked.assert_not_called()
+
+    def test_without_a_terminal_the_original_error_is_kept(self):
+        with self.assertRaises(RuntimeError) as raised:
+            self.connect(isatty=False)
+
+        self.assertIsInstance(raised.exception.__cause__, RequestException)
+
+    def test_with_a_terminal_the_local_instance_is_still_offered(self):
+        with self.assertRaises(SystemExit):
+            self.connect(isatty=True, answer="n")
+
+        self.asked.assert_called()
 
 
 if __name__ == "__main__":
