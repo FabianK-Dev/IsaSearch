@@ -275,7 +275,7 @@ Two things to keep in mind while both run:
 
 ```json
 "isabelle": {
-    "archive_url": "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz",
+    "archive_url": "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz",
     "version": "Isabelle2025-2",
     "local_folder": "Isabelle"
 },
@@ -288,7 +288,15 @@ Two things to keep in mind while both run:
 
 Isabelle is installed from its release archive rather than from git, because the Isabelle git mirror only carries the development branch and has no release branches or tags. `version` is checked against `etc/ISABELLE_IDENTIFIER` in the installed tree, so an already installed release is never downloaded twice.
 
-`archive_url` is the canonical download from isabelle.in.tum.de, which 301-redirects to a mirror over plain HTTP; the downloader follows that. If a network blocks the redirect, `archive_url` is an ordinary config key, so any mirror that serves the same `Isabelle<version>_linux.tar.gz` can be put there instead — the installed tree is checked against `version` either way, so a wrong archive is reported rather than installed.
+`archive_url` points at the Cambridge mirror rather than at `isabelle.in.tum.de/dist/...`, because the canonical URL 301-redirects to plain HTTP on `dist.isabelle.cit.tum.de`, which was unreachable from every network this was tried on. The three mirrors that the [Isabelle homepage](https://isabelle.in.tum.de/) lists all serve the identical file directly over HTTPS with no redirect, and any of them can be used:
+
+```
+https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz
+https://mirror.clarkson.edu/isabelle/dist/Isabelle2025-2_linux.tar.gz
+https://proofcraft.systems/isabelle/dist/Isabelle2025-2_linux.tar.gz
+```
+
+Whatever `archive_url` points at is checked twice: the download has to match the length the server announced, and the extracted tree has to identify itself as `version` through `etc/ISABELLE_IDENTIFIER`. A truncated download and a wrong archive are both reported instead of installed. A mirror may lag by a day or two after a new Isabelle release, so on a version bump check that it already carries the new file.
 
 The AFP is a shallow clone of the release mirror for the matching year. The release mirrors are separate repositories, each with a single `master` branch, so a version bump changes `remote_url`, not `target_branch`. `afp_remote_thys_folder_url` links search results to the sources and has to be moved to the same release.
 

@@ -121,21 +121,26 @@ releases are cut on a Mercurial release branch that is not on the mirrored defau
 identifies the release commit, and it would force a full clone. Cloning upstream Mercurial at tag
 `Isabelle2025-2` would add an `hg` dependency and re-download contrib for nothing.
 
-So Isabelle is installed from its official release archive
-(`https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz`), which is canonical, versioned, and
-bundles contrib **and** a JDK — which is why the image needs neither `openjdk-17-jre-headless` nor a
+So Isabelle is installed from its official release archive, which is versioned and bundles contrib
+**and** a JDK — which is why the image needs neither `openjdk-17-jre-headless` nor a
 separate 10–15 GB contrib download. The installed tree identifies itself through
 `etc/ISABELLE_IDENTIFIER`, which is compared against the configured `version`, so a release is
 downloaded exactly once and a differing installation is reported rather than replaced.
 
-Caveat: that URL 301-redirects to **plain HTTP** on `dist.isabelle.cit.tum.de`, and the downloader
-follows the redirect. Neither hop was reachable from the development machine, so the download could
-never be exercised here — earlier versions of this document suggested the HTTPS mirror as a
-fallback, which turned out not to work either. Treat the canonical URL as the one to use and
-`archive_url` as the knob if a network blocks it: it is an ordinary config key, and whatever it
-points at is checked against `version` after extraction, so a wrong archive is reported rather than
-installed. **Verify the download from the server before task 6** — it is the first thing the build
-does and the cheapest thing to get wrong.
+**Not** from the canonical `https://isabelle.in.tum.de/dist/...`, though: that 301-redirects to
+plain HTTP on `dist.isabelle.cit.tum.de`, which was unreachable from every network this was tried
+on — the development machine and the user's. Two earlier versions of this document got this wrong,
+first recommending the canonical URL and then an HTTPS mirror that does not work either.
+
+`archive_url` therefore points at the Cambridge mirror,
+`https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz`. All three mirrors
+the Isabelle homepage lists (Cambridge, mirror.clarkson.edu, proofcraft.systems) were verified to
+serve the identical 1,228,480,874-byte file directly over HTTPS with no redirect. Cambridge is the
+default because it is one of Isabelle's two home institutions and therefore the most durable of the
+three. Upstream publishes no checksum next to the archive, so integrity rests on the two checks the
+installer does: the download must match the announced Content-Length, and the extracted tree must
+identify itself as `version`. Adding a `sha256` to the component config would close that gap and is
+worth doing if the mirror is ever considered untrusted.
 
 Both components must move together: an AFP release checkout does not build against a devel Isabelle,
 so pinning one and not the other is worse than pinning neither.
@@ -266,9 +271,8 @@ start the app and an analysis in parallel. While it runs, measure (see section 7
 
 **Also verify here — these could not be checked without the server:**
 
-1. **The Isabelle download.** `https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz`
-   redirects to plain HTTP and was never reachable from the development machine, so this is the
-   first thing to try on the server. `curl -fL -o /dev/null` on that URL before starting the build.
+1. **The Isabelle download.** `curl -fL -o /dev/null <archive_url>` from the server before starting
+   the build, and pick a different mirror from section 4a if that one is slow or blocked.
 2. **The Solr image version.** `compose.yaml` pins `solr:9.8.1`. Compare it against the Solr that
    the pinned Isabelle bundles (look for `Isabelle/contrib/solr-*` on the volume) and match the tag;
    a newer Solr can refuse an index written by an older Lucene.

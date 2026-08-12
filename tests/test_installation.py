@@ -45,9 +45,18 @@ def archive_bytes(root=VERSION, identifier=VERSION):
 
 # Stand-in for the streaming download in install_from_archive.
 class FakeResponse:
-    def __init__(self, payload):
+    # 'announced' is what the server said the archive is; it differs from what is actually yielded
+    # when a connection drops partway through. None stands for a server that sends no
+    # Content-Length, e.g. a chunked response.
+    def __init__(self, payload, announced=None):
         self.payload = payload
         self.raised = False
+        self.headers = {}
+
+        if announced != "none":
+            self.headers["Content-Length"] = str(
+                len(payload) if announced is None else announced
+            )
 
     def __enter__(self):
         return self
@@ -75,9 +84,11 @@ class ArchiveInstallationTest(unittest.TestCase):
             "local_folder": self.local_path,
         }
 
-    def install(self, payload=None):
+    def install(self, payload=None, announced=None):
         payload = archive_bytes() if payload is None else payload
-        downloads = unittest.mock.Mock(return_value=FakeResponse(payload))
+        downloads = unittest.mock.Mock(
+            return_value=FakeResponse(payload, announced=announced)
+        )
 
         with unittest.mock.patch.object(installation.requests, "get", downloads):
             installation.install_from_archive("isabelle", self.comp_config)
@@ -161,6 +172,23 @@ class ArchiveInstallationTest(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             self.install(buffer.getvalue())
+
+    # A dropped connection ends the stream without raising, so a download of well over a gigabyte
+    # can silently come out short. Reported as a truncated download rather than as tarfile's
+    # "unexpected end of data", which says nothing about the cause.
+    def test_a_truncated_download_is_reported_as_such(self):
+        payload = archive_bytes()
+
+        with self.assertRaises(RuntimeError) as raised:
+            self.install(payload, announced=len(payload) + 4096)
+
+        self.assertIn("incomplete", str(raised.exception))
+        self.assertFalse(os.path.exists(self.local_path))
+
+    def test_a_server_without_a_content_length_is_accepted(self):
+        self.install(announced="none")
+
+        self.assertEqual(self.identifier(), VERSION)
 
     def test_nothing_is_left_behind_when_the_download_fails(self):
         failing = unittest.mock.Mock(side_effect=OSError("network is down"))

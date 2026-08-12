@@ -92,9 +92,21 @@ def install_from_archive(name, comp_config):
 
         with requests.get(archive_url, stream=True, timeout=60) as response:
             response.raise_for_status()
+            announced = response.headers.get("Content-Length")
 
             with open(archive_path, "wb") as file:
                 file.writelines(response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE))
+
+        # A connection that drops partway through a download of well over a gigabyte does not raise
+        # here; it just ends the stream. Without this check the truncated file is handed to tarfile,
+        # which reports an unexpected end of data and says nothing about the actual cause.
+        downloaded = os.path.getsize(archive_path)
+
+        if announced is not None and downloaded != int(announced):
+            raise RuntimeError(
+                f"The download of {name} from {archive_url} is incomplete: got {downloaded} of "
+                f"{announced} bytes. Run this again to retry."
+            )
 
         print(f"Extracting {name} into '{local_path}'...")
         extracted = os.path.join(staging, "extracted")

@@ -2,7 +2,7 @@
     "check_for_updates": true,
     "components": {
         "isabelle": {
-            "archive_url": "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz",
+            "archive_url": "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz",
             "version": "Isabelle2025-2",
             "local_folder": "Isabelle"
         },
