@@ -214,14 +214,28 @@ def check_and_update(name, comp_config):
         install_from_git(name, comp_config)
 
 
-# Install Isabelle components
+# Fetch the Isabelle contrib components, i.e. the tools that are not part of the source tree itself.
+#
+# Only a repository checkout needs this. A release distribution already ships its components under
+# contrib/, and it does not ship Admin/ at all - but 'isabelle components -I' writes an
+# init_components line into $ISABELLE_HOME_USER/etc/settings that points at
+# $ISABELLE_HOME/Admin/components/main. Against a release that catalog does not exist, so every
+# later 'isabelle' invocation aborts with "Bad component catalog file" until that settings file is
+# removed by hand. Running this against an archive installation therefore does not merely do
+# nothing, it breaks the installation.
 def setup_isabelle_components(config):
-    isabelle_bin = os.path.join(
-        config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
-    )
+    comp_config = config["components"]["isabelle"]
+    isabelle_bin = os.path.join(comp_config["local_folder"], "bin", "isabelle")
 
     if not os.path.exists(isabelle_bin):
         raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
+
+    if "archive_url" in comp_config:
+        print(
+            "Isabelle was installed from a release archive, which already contains its "
+            "components. Skipping the component setup."
+        )
+        return
 
     print("Setting up Isabelle components...")
     try:

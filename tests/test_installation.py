@@ -247,6 +247,54 @@ class ArchiveInstallationTest(unittest.TestCase):
         self.assertEqual(self.identifier(), VERSION)
 
 
+# 'isabelle components -I' writes an init_components line pointing at $ISABELLE_HOME/Admin/components,
+# which a release distribution does not have - it ships its components under contrib/ instead. Every
+# later 'isabelle' call then aborts with "Bad component catalog file", so running the component setup
+# against an archive installation does not merely do nothing, it breaks the installation.
+class ComponentSetupTest(unittest.TestCase):
+    def setUp(self):
+        self.folder = tempfile.mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
+
+        isabelle_bin = os.path.join(self.folder, "bin", "isabelle")
+        os.makedirs(os.path.dirname(isabelle_bin))
+
+        with open(isabelle_bin, "w") as file:
+            file.write("#!/bin/sh\n")
+
+    def config(self, comp_config):
+        comp_config = {"local_folder": self.folder, **comp_config}
+        return {"components": {"isabelle": comp_config}}
+
+    def run_setup(self, comp_config):
+        calls = []
+
+        with unittest.mock.patch.object(
+            installation.subprocess, "run", lambda command, **k: calls.append(command)
+        ):
+            installation.setup_isabelle_components(self.config(comp_config))
+
+        return calls
+
+    def test_a_release_archive_is_left_alone(self):
+        calls = self.run_setup(
+            {"archive_url": "https://example.invalid/x.tar.gz", "version": VERSION}
+        )
+
+        self.assertEqual(calls, [])
+
+    def test_a_git_checkout_still_fetches_its_components(self):
+        calls = self.run_setup(
+            {
+                "remote_url": "https://example.invalid/isabelle.git",
+                "target_branch": "master",
+            }
+        )
+
+        self.assertIn(["components", "-I"], [call[1:] for call in calls])
+        self.assertIn(["components", "-a"], [call[1:] for call in calls])
+
+
 class ComponentDispatchTest(unittest.TestCase):
     def setUp(self):
         self.folder = tempfile.mkdtemp()
