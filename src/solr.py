@@ -14,28 +14,40 @@ from requests.exceptions import RequestException
 # Global reference to the Solr Docker process
 solr_process = None
 
+# The name the container is started and stopped under. It has to be the same in both places, and it
+# has to be passed to 'docker run': without it the container is anonymous, 'docker stop' finds
+# nothing, and the container keeps running and keeps port 8983 - which then blocks the next start
+# with "port is already allocated".
+SOLR_CONTAINER_NAME = "local-solr"
+
 
 def cleanup_solr():
     """Runs when the Python script exits."""
     global solr_process
     if solr_process:
-        print("\nStopping Solr Docker container...")
-        # We send a SIGTERM to the Docker process.
-        # Since we use --rm, Docker usually cleans up, but just to be safe:
+        print(f"\nStopping the Solr container '{SOLR_CONTAINER_NAME}'...")
+        # The container runs with --rm, so stopping it also removes it.
         try:
-            # Stop container (name 'local-solr' defined below)
-            subprocess.run(
-                ["docker", "stop", "local-solr"],
+            stopped = subprocess.run(
+                ["docker", "stop", SOLR_CONTAINER_NAME],
                 check=False,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
             )
         except Exception as e:
+            print(f"Error stopping Solr: {e}. Stop the container by hand.")
+            return
+
+        # Reported rather than assumed: claiming success while the container is in fact still up
+        # leaves a process holding port 8983 that nobody is looking for.
+        if stopped.returncode == 0:
+            print("Solr stopped.")
+        else:
             print(
-                f"Error stopping Solr: {e}",
-                "The container may need to be stopped manually.",
+                f"Warning: could not stop '{SOLR_CONTAINER_NAME}': "
+                f"{stopped.stderr.strip()}. Stop it by hand with "
+                f"'docker rm -f {SOLR_CONTAINER_NAME}', it still holds port 8983."
             )
-        print("Solr stopped.")
 
 
 # Register the cleanup function to run at program exit
@@ -73,7 +85,7 @@ def start_local_solr(config):
         "--rm",
         "-d",
         "--name",
-        "local-solr",
+        SOLR_CONTAINER_NAME,
         "-p",
         "8983:8983",
         "-v",
@@ -86,7 +98,15 @@ def start_local_solr(config):
 
     print("Starting Solr Docker container...")
     try:
-        # Start the Docker container
+        # A container left behind by a run that was killed before its cleanup ran still holds both
+        # the name and port 8983, so 'docker run' would fail on one or the other. Removing it first
+        # is safe: it is ours, and it only ever serves an index that is rebuilt from the corpus.
+        subprocess.run(
+            ["docker", "rm", "-f", SOLR_CONTAINER_NAME],
+            check=False,
+            capture_output=True,
+        )
+
         subprocess.run(cmd, check=True)
         # We mark that a process is running (for cleanup)
         solr_process = True
