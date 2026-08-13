@@ -11,7 +11,7 @@ which is what makes the scoring rules readable and testable on their own.
 import difflib
 import re
 
-from src.documents import strip_proof
+from src.documents import strip_proof, KINDS
 from src.llm import extract_marked_output
 
 
@@ -19,10 +19,6 @@ from src.llm import extract_marked_output
 # the first path segment after "/thys/". This is used both to select the documents of an entry and to
 # exclude an entry from its own search results.
 ENTRY_PATH_MARKER = "/thys/"
-
-KIND_DEFINITIONS = "definitions"
-KIND_THEOREMS = "theorems"
-KINDS = [KIND_DEFINITIONS, KIND_THEOREMS]
 
 VERDICTS = ["DUPLICATE", "VARIANT", "RELATED", "DIFFERENT"]
 UNKNOWN_VERDICT = "UNKNOWN"

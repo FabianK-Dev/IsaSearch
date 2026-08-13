@@ -16,7 +16,12 @@ Note: To simplify matters, from now on "theorem" will be used representatively f
 from flask import Flask, request, send_from_directory
 
 from src.bootstrap import load_config, boot_components, DEFINITIONS_LOAD
-from src.documents import BUILD_CORPUS_COMMAND
+from src.documents import (
+    BUILD_CORPUS_COMMAND,
+    KIND_DEFINITIONS,
+    KIND_THEOREMS,
+    KINDS,
+)
 from src.embeddings import search, search_results_to_docs
 
 
@@ -32,38 +37,15 @@ components = boot_components(config, serve=True, definitions=DEFINITIONS_LOAD)
 
 solr = components["solr"]
 prompts = components["prompts"]
-document_index = components["document_index"]
-collection = components["collection"]
 model = components["model"]
 llm_output_cache = components["llm_output_cache"]
 
-THEOREMS = "theorems"
-DEFINITIONS = "definitions"
+# Every searchable corpus, i.e. its ChromaDB collection, its document index and the prompts to
+# search it with. What is searchable is decided by the boot: a definitions corpus that does not
+# exist is simply absent here.
+corpora = components["corpora"]
 
-
-# The definition prompts are optional: if the prompts folder does not contain them, the theorem
-# prompts are used for definitions as well.
-def prompt_key(name):
-    return name + "_definitions" if name + "_definitions" in prompts else name
-
-
-# Every searchable corpus, i.e. its ChromaDB collection, its document index and the prompts to use.
-corpora = {
-    THEOREMS: {
-        "collection": collection,
-        "document_index": document_index,
-        "retrieve_prompt_key": "retrieve",
-        "search_refine_prompt_key": "search_refine",
-    }
-}
-
-if components["definition_collection"] is not None:
-    corpora[DEFINITIONS] = {
-        "collection": components["definition_collection"],
-        "document_index": components["definition_index"],
-        "retrieve_prompt_key": prompt_key("retrieve"),
-        "search_refine_prompt_key": prompt_key("search_refine"),
-    }
+if KIND_DEFINITIONS in corpora:
     print("Definition search is enabled.")
 
 print("Preparing Flask app...")
@@ -85,7 +67,7 @@ def static_files(filename):
 # Report which optional features this server offers, so that the web UI can hide what is unavailable.
 @app.get("/capabilities")
 def capabilities_endpoint():
-    return {"definition_search": DEFINITIONS in corpora}
+    return {"definition_search": KIND_DEFINITIONS in corpora}
 
 
 # Serve the search endpoint at /
@@ -96,12 +78,14 @@ def capabilities_endpoint():
 def search_endpoint():
     query = request.args.get("query", "")
     refine_query = request.args.get("refine_query", "true").lower() == "true"
-    kind = request.args.get("kind", THEOREMS).lower()
+    kind = request.args.get("kind", KIND_THEOREMS).lower()
     print(f"Received search query: {query} (kind: {kind})")
 
-    if kind not in [THEOREMS, DEFINITIONS]:
+    if kind not in KINDS:
         return {
-            "error": f"Unknown kind '{kind}', expected '{THEOREMS}' or '{DEFINITIONS}'."
+            "error": f"Unknown kind '{kind}', expected any of "
+            + ", ".join(f"'{name}'" for name in KINDS)
+            + "."
         }, 400
 
     if kind not in corpora:

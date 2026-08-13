@@ -13,6 +13,7 @@ Finally, for each metric the average will be calculated. All benchmark results w
 """
 
 from src.bootstrap import load_config, boot_components
+from src.documents import KIND_THEOREMS
 from src.embeddings import search, search_results_to_docs
 from src.llm import (
     document_model_name,
@@ -68,8 +69,9 @@ components = boot_components(config, check_updates=False, build_find_facts=False
 
 solr = components["solr"]
 prompts = components["prompts"]
-document_index = components["document_index"]
-collection = components["collection"]
+# The benchmark measures the theorem search only.
+document_index = components["corpora"][KIND_THEOREMS]["document_index"]
+collection = components["corpora"][KIND_THEOREMS]["collection"]
 model = components["model"]
 llm_output_cache = components["llm_output_cache"]
 

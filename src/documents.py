@@ -28,6 +28,14 @@ cached_metadata = {}
 # the lowest module that has to report a missing corpus, and every consumer already imports it.
 BUILD_CORPUS_COMMAND = "python3 -m src.corpus"
 
+# The two kinds of documents this project builds corpora for. Each kind has its own Solr query,
+# its own artifacts and its own ChromaDB collection (see boot_components in src/bootstrap.py).
+# Defined once, here, because the web application, the duplicate detection and the boot sequence
+# all name the same corpora and must agree on the names.
+KIND_THEOREMS = "theorems"
+KIND_DEFINITIONS = "definitions"
+KINDS = [KIND_DEFINITIONS, KIND_THEOREMS]
+
 # How many informalization requests are in flight at once, overridable through
 # config["llm_concurrency"]. One request at a time leaves an inference server that batches - every
 # llama-server started with --parallel does - mostly idle, and informalization is the longest step

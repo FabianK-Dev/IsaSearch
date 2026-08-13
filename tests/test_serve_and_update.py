@@ -698,6 +698,29 @@ class BootEmbedderTest(unittest.TestCase):
         self.assertEqual(received, [built[0], built[0]])
         self.assertIs(components["embedder"], built[0])
 
+        # Both corpora came up, so both have to be offered as one coherent entry each.
+        self.assertEqual(
+            sorted(components["corpora"]),
+            [documents.KIND_DEFINITIONS, documents.KIND_THEOREMS],
+        )
+
+
+# The definition prompts are optional; a prompts folder without them serves definitions with the
+# theorem prompts, and this decision belongs to the boot, not to the web application.
+class DefinitionPromptKeyTest(unittest.TestCase):
+    def test_the_definitions_variant_is_preferred(self):
+        prompts = {"retrieve": "r", "retrieve_definitions": "d"}
+
+        self.assertEqual(
+            bootstrap.definition_prompt_key(prompts, "retrieve"),
+            "retrieve_definitions",
+        )
+
+    def test_missing_variants_fall_back_to_the_theorem_prompt(self):
+        self.assertEqual(
+            bootstrap.definition_prompt_key({"retrieve": "r"}, "retrieve"), "retrieve"
+        )
+
 
 class DuplicatesEntryPointTest(unittest.TestCase):
     """What src/duplicates.py asks boot_components for decides both how much memory a run needs and
@@ -711,12 +734,7 @@ class DuplicatesEntryPointTest(unittest.TestCase):
 
             # An unavailable definitions corpus makes main() return right after boot_components,
             # which is all this test needs: what matters is what was asked of boot_components.
-            return {
-                "definition_index": None,
-                "definition_collection": None,
-                "document_index": {},
-                "collection": None,
-            }
+            return {"corpora": {}}
 
         with (
             unittest.mock.patch.object(
@@ -755,10 +773,18 @@ class DuplicatesEntryPointTest(unittest.TestCase):
 
         doc_id = "afp/thys/Only_Theorems/T.thy|1"
         components = {
-            "definition_index": {},
-            "definition_collection": object(),
-            "document_index": {doc_id: indexed_document(doc_id, "lemma a: True")},
-            "collection": object(),
+            "corpora": {
+                documents.KIND_THEOREMS: {
+                    "collection": object(),
+                    "document_index": {
+                        doc_id: indexed_document(doc_id, "lemma a: True")
+                    },
+                },
+                documents.KIND_DEFINITIONS: {
+                    "collection": object(),
+                    "document_index": {},
+                },
+            },
             "prompts": {},
         }
 

@@ -39,7 +39,14 @@ from src.bootstrap import (
     boot_components,
     DEFINITIONS_LOAD,
 )
-from src.documents import llm_concurrency, statement_excerpt, BUILD_CORPUS_COMMAND
+from src.documents import (
+    llm_concurrency,
+    statement_excerpt,
+    BUILD_CORPUS_COMMAND,
+    KIND_DEFINITIONS,
+    KIND_THEOREMS,
+    KINDS,
+)
 from src.duplicate_report import (
     analyses_to_report,
     reported_documents,
@@ -58,9 +65,6 @@ from src.duplicate_scoring import (
     recall_at_k,
     self_retrieval_summary,
     synthetic_ground_truth,
-    KIND_DEFINITIONS,
-    KIND_THEOREMS,
-    KINDS,
     SELF_RETRIEVAL_FAILURE_LIMIT,
 )
 from src.embeddings import (
@@ -516,15 +520,14 @@ def analyse_entry(
 
 # Return the (collection, index) pair that holds the documents of one kind.
 def corpus_target(kind, components):
-    if kind == KIND_DEFINITIONS:
-        return components["definition_collection"], components["definition_index"]
+    corpus = components["corpora"][kind]
 
-    return components["collection"], components["document_index"]
+    return corpus["collection"], corpus["document_index"]
 
 
 # The document index of one kind.
 def corpus_index(kind, components):
-    return corpus_target(kind, components)[1]
+    return components["corpora"][kind]["document_index"]
 
 
 # Run the analysis for one kind of document (definitions or theorems) over all selected entries.
@@ -747,7 +750,7 @@ def main(argv=None):
         llm_cache_name=dedup_llm_cache_name(config),
     )
 
-    if needs_definitions and components["definition_index"] is None:
+    if needs_definitions and KIND_DEFINITIONS not in components["corpora"]:
         print(
             "The definitions corpus is not available. Build it with "
             f"'{BUILD_CORPUS_COMMAND}' first."

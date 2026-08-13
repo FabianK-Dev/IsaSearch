@@ -44,6 +44,8 @@ from src.documents import (
     get_document_descriptions,
     relevant_definition_doc_keys,
     BUILD_CORPUS_COMMAND,
+    KIND_DEFINITIONS,
+    KIND_THEOREMS,
 )
 from src.embeddings import (
     ensure_embedding_backend,
@@ -72,6 +74,15 @@ DEFINITION_INDEX_CACHE = "definition_index.json"
 DEFINITION_DESCRIPTIONS = "definition_descriptions.json"
 DEFINITION_COLLECTION = "afp_definitions"
 DEFINITION_DESCRIBE_PROMPT = "describe_definition"
+
+
+# The search prompts of the definitions corpus are optional: a prompts folder that carries no
+# '<name>_definitions' variant serves definitions with the theorem prompts. This decision lives
+# here, next to the other facts about what a definitions corpus consists of, and not in the web
+# application that merely searches it.
+def definition_prompt_key(prompts, name):
+    return name + "_definitions" if name + "_definitions" in prompts else name
+
 
 # How boot_components treats the definitions corpus.
 # - DEFINITIONS_BUILD fetches, informalizes and embeds whatever is missing. Only the corpus build
@@ -247,7 +258,7 @@ def load_definition_corpus(config, prompts, embedder):
         )
         return None, None
 
-    described_index = described_documents(definition_index, "definitions")
+    described_index = described_documents(definition_index, KIND_DEFINITIONS)
 
     if len(described_index) == 0:
         print("Definition search is disabled, because no definition has a description.")
@@ -359,7 +370,7 @@ def boot_components(
         )
 
         if serve:
-            document_index = described_documents(document_index, "theorems")
+            document_index = described_documents(document_index, KIND_THEOREMS)
 
     definition_index = None
     definition_collection = None
@@ -394,14 +405,33 @@ def boot_components(
         print("Loading LLM output cache if enabled via config...")
         llm_output_cache = get_llm_output_cache(config, llm_cache_name)
 
+    # One entry per searchable corpus: its ChromaDB collection, its document index and the prompt
+    # keys to search it with. A corpus that was not loaded (or could not be, see
+    # load_definition_corpus) is simply absent, so every consumer asks for presence in one place
+    # instead of re-pairing four separate values.
+    corpora = {}
+
+    if theorems:
+        corpora[KIND_THEOREMS] = {
+            "collection": collection,
+            "document_index": document_index,
+            "retrieve_prompt_key": "retrieve",
+            "search_refine_prompt_key": "search_refine",
+        }
+
+    if definition_collection is not None:
+        corpora[KIND_DEFINITIONS] = {
+            "collection": definition_collection,
+            "document_index": definition_index,
+            "retrieve_prompt_key": definition_prompt_key(prompts, "retrieve"),
+            "search_refine_prompt_key": definition_prompt_key(prompts, "search_refine"),
+        }
+
     return {
         "solr": solr,
         "prompts": prompts,
-        "document_index": document_index,
-        "collection": collection,
+        "corpora": corpora,
         "embedder": embedder,
         "model": model,
         "llm_output_cache": llm_output_cache,
-        "definition_index": definition_index,
-        "definition_collection": definition_collection,
     }
