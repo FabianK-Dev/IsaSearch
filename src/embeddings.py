@@ -435,6 +435,9 @@ def reconcile_collection(collection, document_index, existing, collection_name):
 # application uses this to attach to an already built collection without doing any expensive work.
 # With 'prune' enabled the collection is additionally brought in line with the document index, i.e.
 # removed documents are deleted and changed documents are embedded again (see reconcile_collection).
+# 'embedder' lets a caller that opens several collections share one embedding function between them
+# (see boot_components): the local backend loads a model of a few hundred megabytes, so one per
+# collection would multiply the memory of the process for identical copies.
 def get_chromadb_collection(
     config,
     prompts,
@@ -442,8 +445,10 @@ def get_chromadb_collection(
     collection_name="afp_docs",
     add_missing=True,
     prune=True,
+    embedder=None,
 ):
-    embedder = get_embedding_function(config)
+    if embedder is None:
+        embedder = get_embedding_function(config)
 
     # ChromaDB path
     if not os.path.exists(config["chroma_db_path"]):

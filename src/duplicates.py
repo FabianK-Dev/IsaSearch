@@ -203,7 +203,9 @@ def scan_target_results(metadatas, distances, doc, kind, exclude_entry, corpus_i
 # 'home_kind' names the target the query documents themselves live in. The positive control is taken
 # from that target's own ranking only: on the merged ranking a cross kind near twin could outrank the
 # document itself, which would look like a broken embedding space although nothing is wrong.
-def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, config):
+def find_candidates(
+    targets, prompts, query_docs, exclude_entry, home_kind, config, embedder=None
+):
     top_k = config["dedup_top_k"]
     sizes = {}
     n_results = {}
@@ -240,8 +242,23 @@ def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, conf
     for i in tqdm(range(0, len(query_docs), chunk_size)):
         batch = query_docs[i : i + chunk_size]
         query_texts = [document_embedding_string(doc, prompts) for doc in batch]
+
+        # With several targets every collection would embed the identical texts again, which
+        # doubles the requests to a remote embedding server. Embedding once through the shared
+        # embedder of the corpus (see boot_components) yields exactly the vectors each
+        # collection.query would have computed itself - same embedder instance, including the
+        # truncation it applies - so the positive control still verifies the full query path.
+        query_embeddings = None
+
+        if len(targets) > 1 and embedder is not None:
+            query_embeddings = embedder(query_texts)
+
         responses = {
-            kind: collection.query(query_texts=query_texts, n_results=n_results[kind])
+            kind: collection.query(
+                query_embeddings=query_embeddings, n_results=n_results[kind]
+            )
+            if query_embeddings is not None
+            else collection.query(query_texts=query_texts, n_results=n_results[kind])
             for kind, collection, _ in targets
         }
 
@@ -479,7 +496,9 @@ def resolve_urls(doc_ids, corpus_index, solr, config):
 # Analyse a single entry, i.e. match every document of the entry that is of the home kind against
 # every target corpus. 'home_index' is the corpus the query documents are taken from and
 # 'lookup_index' resolves candidates of any target.
-def analyse_entry(entry, home_index, lookup_index, targets, home_kind, prompts, config):
+def analyse_entry(
+    entry, home_index, lookup_index, targets, home_kind, prompts, config, embedder
+):
     query_docs = entry_docs(home_index, entry)
 
     if len(query_docs) == 0:
@@ -487,7 +506,9 @@ def analyse_entry(entry, home_index, lookup_index, targets, home_kind, prompts, 
         return None
 
     print(f"Analysing {len(query_docs)} documents of entry {entry}...")
-    analyses = find_candidates(targets, prompts, query_docs, entry, home_kind, config)
+    analyses = find_candidates(
+        targets, prompts, query_docs, entry, home_kind, config, embedder
+    )
     add_syntactic_similarity(analyses, lookup_index)
 
     return analyses
@@ -551,6 +572,7 @@ def analyse_kind(
             kind,
             components["prompts"],
             config,
+            components.get("embedder"),
         )
 
         if analyses is None:

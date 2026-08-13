@@ -25,7 +25,16 @@ import zlib
 
 from requests.exceptions import RequestException
 
-from src import corpus, documents, duplicates, embeddings, installation, llm, solr
+from src import (
+    bootstrap,
+    corpus,
+    documents,
+    duplicates,
+    embeddings,
+    installation,
+    llm,
+    solr,
+)
 from tests.helpers import isabelle_stub, temporary_folder
 from tests.stub_openai_server import StubOpenAIServer
 
@@ -560,6 +569,134 @@ class CollectionUpdateTest(unittest.TestCase):
         )
 
         self.assertEqual(sorted(collection.get()["ids"]), ["a", "b"])
+
+
+# Cross-kind matching queries two collections with the identical texts. Embedding them once and
+# handing both collections the vectors halves the requests to the embedding server; what must not
+# change is the result, because both collections share one embedder and one cosine space.
+class CrossQueryEmbeddingTest(unittest.TestCase):
+    def setUp(self):
+        self.server = StubOpenAIServer().start()
+        self.addCleanup(self.server.stop)
+
+        self.config = {
+            "embedding_backend": "openai",
+            "openai_embedding_base_url": self.server.base_url,
+            "openai_embedding_model": "Qwen3-Embedding-4B",
+            "openai_embedding_batch_size": 8,
+            "chroma_db_path": temporary_folder(self),
+            "dedup_top_k": 3,
+        }
+        self.prompts = {"embed": "{doc_src}"}
+
+        self.embedder = embeddings.get_embedding_function(self.config)
+        self.definition_index = self.corpus("definition", 3)
+        self.theorem_index = self.corpus("theorem", 4)
+        self.targets = [
+            (
+                "definitions",
+                self.collection("defs", self.definition_index),
+                self.definition_index,
+            ),
+            (
+                "theorems",
+                self.collection("thms", self.theorem_index),
+                self.theorem_index,
+            ),
+        ]
+
+    def corpus(self, command, count):
+        return {
+            f"afp/thys/Entry_{command}/T.thy|{i}": {
+                "id": f"afp/thys/Entry_{command}/T.thy|{i}",
+                "src": f"{command} {'x' * i}: True",
+                "llm_description": f"describes {command} {i}",
+            }
+            for i in range(count)
+        }
+
+    def collection(self, name, index):
+        return embeddings.get_chromadb_collection(
+            self.config,
+            self.prompts,
+            index,
+            collection_name=name,
+            embedder=self.embedder,
+        )
+
+    def query(self, embedder):
+        self.server.requests.clear()
+        analyses = duplicates.find_candidates(
+            self.targets,
+            self.prompts,
+            list(self.definition_index.values()),
+            exclude_entry=None,
+            home_kind="definitions",
+            config=self.config,
+            embedder=embedder,
+        )
+
+        return analyses, len(self.server.requests_to("/v1/embeddings"))
+
+    def test_the_queries_are_embedded_once_instead_of_once_per_target(self):
+        # Without the shared embedder each collection embeds the texts itself: two requests.
+        fallback, fallback_requests = self.query(embedder=None)
+        shared, shared_requests = self.query(embedder=self.embedder)
+
+        self.assertEqual(fallback_requests, 2)
+        self.assertEqual(shared_requests, 1)
+        # Same embedder, same vectors, so the analyses have to be identical either way.
+        self.assertEqual(shared, fallback)
+
+    def test_every_document_still_retrieves_itself(self):
+        analyses, _ = self.query(embedder=self.embedder)
+
+        for analysis in analyses:
+            self.assertIsNotNone(analysis["self_rank"])
+
+
+# The embedding function of the local backend loads a model of a few hundred megabytes, so a boot
+# that opens both corpora must build it once and share it, not once per collection.
+class BootEmbedderTest(unittest.TestCase):
+    def test_one_embedder_is_shared_by_every_collection(self):
+        built = []
+        received = []
+
+        def fake_embedding_function(config):
+            built.append(unittest.mock.Mock())
+            return built[-1]
+
+        def fake_collection(config, prompts, index, embedder=None, **kwargs):
+            received.append(embedder)
+            return unittest.mock.Mock(count=lambda: 1)
+
+        def fake_load_definition_corpus(config, prompts, embedder):
+            received.append(embedder)
+            return {}, unittest.mock.Mock(count=lambda: 1)
+
+        with unittest.mock.patch.multiple(
+            bootstrap,
+            get_embedding_function=fake_embedding_function,
+            get_chromadb_collection=fake_collection,
+            load_definition_corpus=fake_load_definition_corpus,
+            ensure_llm_backend=lambda config: None,
+            ensure_embedding_backend=lambda config: None,
+            connect_solr=lambda config: object(),
+            load_prompts=lambda config: {},
+            build_document_index=lambda config, solr, read_only=False: {},
+            get_document_descriptions=lambda config, index, prompts, **kwargs: {
+                "d": {"llm_description": "described"}
+            },
+            get_llm=lambda config: object(),
+            get_llm_output_cache=lambda config, name: {},
+        ):
+            components = bootstrap.boot_components(
+                {}, serve=True, definitions=bootstrap.DEFINITIONS_LOAD
+            )
+
+        self.assertEqual(len(built), 1)
+        self.assertEqual(received, [built[0], built[0]])
+        self.assertIs(components["embedder"], built[0])
 
 
 class DuplicatesEntryPointTest(unittest.TestCase):

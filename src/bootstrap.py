@@ -45,7 +45,11 @@ from src.documents import (
     relevant_definition_doc_keys,
     BUILD_CORPUS_COMMAND,
 )
-from src.embeddings import get_chromadb_collection, ensure_embedding_backend
+from src.embeddings import (
+    ensure_embedding_backend,
+    get_chromadb_collection,
+    get_embedding_function,
+)
 from src.llm import (
     load_prompts,
     get_llm,
@@ -133,7 +137,7 @@ def prepare_corpus_sources(config, check_updates=True, build_find_facts=True):
 
 # Build the definitions corpus, i.e. the document index, the LLM descriptions and the ChromaDB
 # collection for all documents matching config["solr_query_definitions"].
-def build_definition_corpus(config, solr, prompts):
+def build_definition_corpus(config, solr, prompts, embedder):
     solr_query = config["solr_query_definitions"]
 
     print("Counting definitions in Solr...")
@@ -187,7 +191,11 @@ def build_definition_corpus(config, solr, prompts):
 
     print("Loading ChromaDB collection for definitions...")
     definition_collection = get_chromadb_collection(
-        config, prompts, definition_index, collection_name=DEFINITION_COLLECTION
+        config,
+        prompts,
+        definition_index,
+        collection_name=DEFINITION_COLLECTION,
+        embedder=embedder,
     )
 
     return definition_index, definition_collection
@@ -201,7 +209,7 @@ def build_definition_corpus(config, solr, prompts):
 # document index is read from its cache file directly (so no Solr fetch can happen), the descriptions
 # are attached with generate_missing disabled (so no LLM call can happen) and the collection is
 # opened with add_missing disabled (so nothing can be embedded).
-def load_definition_corpus(config, prompts):
+def load_definition_corpus(config, prompts, embedder):
     index_cache = document_index_cache_path(config, DEFINITION_INDEX_CACHE)
     descriptions = descriptions_artifact_path(config, DEFINITION_DESCRIPTIONS)
 
@@ -252,6 +260,7 @@ def load_definition_corpus(config, prompts):
         described_index,
         collection_name=DEFINITION_COLLECTION,
         add_missing=False,
+        embedder=embedder,
     )
 
     if definition_collection.count() == 0:
@@ -327,6 +336,16 @@ def boot_components(
     print("Loading prompts...")
     prompts = load_prompts(config)
 
+    # One embedding function for every collection this boot opens. The local backend loads a
+    # sentence-transformers model of a few hundred megabytes, so loading it once per collection
+    # would multiply the memory of a process that serves both corpora for identical copies. It is
+    # also what makes queries embed exactly like the corpus: anything that embeds on behalf of a
+    # collection (see find_candidates in src/duplicates.py) has to use this very embedder.
+    embedder = None
+
+    if theorems or definitions is not None:
+        embedder = get_embedding_function(config)
+
     document_index = None
     collection = None
 
@@ -347,17 +366,17 @@ def boot_components(
 
     if definitions == DEFINITIONS_BUILD:
         definition_index, definition_collection = build_definition_corpus(
-            config, solr, prompts
+            config, solr, prompts, embedder
         )
     elif definitions == DEFINITIONS_LOAD:
         definition_index, definition_collection = load_definition_corpus(
-            config, prompts
+            config, prompts, embedder
         )
 
     if theorems:
         print("Loading ChromaDB collection...")
         collection = get_chromadb_collection(
-            config, prompts, document_index, add_missing=not serve
+            config, prompts, document_index, add_missing=not serve, embedder=embedder
         )
 
         if serve and collection.count() == 0:
@@ -380,6 +399,7 @@ def boot_components(
         "prompts": prompts,
         "document_index": document_index,
         "collection": collection,
+        "embedder": embedder,
         "model": model,
         "llm_output_cache": llm_output_cache,
         "definition_index": definition_index,
