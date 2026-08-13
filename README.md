@@ -339,6 +339,18 @@ If a rebuild would remove more than half of a collection, it aborts instead: tha
 
 Two things are not automatic. After an Isabelle version bump the heap images of the previous version stay in `~/.isabelle/heaps/polyml-*` and can be deleted by hand, which matters because they run to tens of gigabytes for the whole AFP. FindFacts backups in `~/.isabelle/` are pruned to the newest `find_facts_backup_keep` (2 by default; set it to a negative number to keep all of them).
 
+### Migration: descriptions are now cut at `<END>`
+
+Loading a description used to cut only at `<BEGIN>`, so anything a model emitted after `<END>` — trailing reasoning, pleasantries — stayed in the description and in the embedding built from it. The parsing now cuts at both markers.
+
+The rebuild machinery cannot pick this up on its own: the checksum stored next to each embedding covers the source code only, and neither the sources nor the raw artifacts changed — only how they are parsed. Collections embedded before this change therefore keep serving vectors of the old, longer text until they are rebuilt by hand:
+
+1. Stop everything (`docker compose down`).
+2. Delete the ChromaDB storage (the folder at `chroma_db_path`).
+3. Run the corpus build again (step 1b above). It re-embeds everything from the existing descriptions artifact — the raw LLM outputs on disk are untouched and are **not** informalized again, so this costs hours of embedding, not days of LLM calls.
+
+Skipping the rebuild does not break anything; search just keeps ranking against the old embedded text until the next full rebuild.
+
 ### Tests
 
 The tests use only the Python standard library's `unittest`, so they need no additional packages. Run them inside the root folder of the repository:

@@ -222,6 +222,44 @@ class DescriptionConcurrencyTest(TemporaryFolderTestCase):
         self.assertEqual(len(self.written()), 6)
 
 
+# The raw LLM output in the artifact carries the answer between <BEGIN> and <END>; what is loaded
+# (and thus embedded and shown) must be the answer alone, not the reasoning around it.
+class DescriptionParsingTest(TemporaryFolderTestCase):
+    def load(self, raw_description):
+        source = "lemma d: True"
+        index = {"d": indexed_document("d", source)}
+        artifact = {
+            "d": {
+                "llm_description": raw_description,
+                "zlib.adler32_checksum": zlib.adler32(source.encode("utf-8")),
+            }
+        }
+
+        os.makedirs(self.config["artifacts_folder"], exist_ok=True)
+        with open(
+            os.path.join(self.config["artifacts_folder"], "document_descriptions.json"),
+            "w",
+        ) as file:
+            json.dump(artifact, file)
+
+        parsed = documents.get_document_descriptions(
+            self.config, index, {}, generate_missing=False
+        )
+
+        return parsed["d"]["llm_description"]
+
+    def test_the_answer_between_the_markers_is_extracted(self):
+        # Text after <END> is a model's trailing reasoning or pleasantries; leaving it in the
+        # description would embed it along with the answer.
+        self.assertEqual(
+            self.load("<BEGIN>a useful description<END>because of the following..."),
+            "a useful description",
+        )
+
+    def test_output_without_markers_is_loaded_as_is(self):
+        self.assertEqual(self.load("no markers at all"), "no markers at all")
+
+
 # The duplicate judge sends its requests concurrently like the informalization above. What must
 # not change is the outcome: the same verdicts, the same cache entries in the same order, and
 # whatever was already judged survives an interrupted run.

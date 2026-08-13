@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from nltk.corpus import stopwords
 
-from src.llm import get_document_llm, document_model_name
+from src.llm import document_model_name, extract_marked_output, get_document_llm
 from src.solr import count_docs
 
 
@@ -473,7 +473,12 @@ def generate_document_descriptions(
 
 
 # This method loads already generated document descriptions from the artifacts folder, configured at config["artifacts_folder"].
-# It then extracts the content within the <BEGIN> and <END> parts. If extracting the content fails, we simply take the entire LLM output as is.
+# It then extracts the content within the <BEGIN> and <END> parts (see extract_marked_output). If
+# the markers are missing, the entire LLM output is taken as is.
+#
+# Note that this parse decides the text a document is embedded from, while the checksum stored next
+# to each embedding only covers the source code. Changing how descriptions are parsed therefore
+# does not re-embed anything by itself - see the migration note in the README.
 def get_document_descriptions(
     config,
     document_index,
@@ -502,11 +507,10 @@ def get_document_descriptions(
     for doc_id in tqdm(document_descriptions):
         raw_description = document_descriptions[doc_id]["llm_description"]
 
-        try:
-            llm_description = raw_description.split("<BEGIN>")[1]
-        except Exception:
+        llm_description, found = extract_marked_output(raw_description)
+
+        if not found:
             parsing_failed += 1
-            llm_description = raw_description
 
         if doc_id in document_index:
             document_index[doc_id]["llm_description"] = llm_description
