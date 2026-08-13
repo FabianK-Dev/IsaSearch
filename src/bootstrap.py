@@ -56,6 +56,7 @@ from src.installation import (
     build_index,
     setup_isabelle_components,
     get_isabelle_version,
+    find_facts_home,
 )
 
 
@@ -140,12 +141,30 @@ def build_definition_corpus(config, solr, prompts):
     print(f"Solr contains {definition_count} definition blocks.")
 
     if definition_count == 0:
+        # The theorem count tells the two possible causes apart, which matters because they have
+        # opposite remedies. If the index holds theorems, then it and the 'command' field are fine
+        # and the configured sessions simply contain no definitional commands - several small AFP
+        # entries are nothing but lemmas. Only an index with nothing in it at all points at the
+        # other cause, an Isabelle too old to index those commands.
+        theorem_count = count_docs(solr, config["solr_query"])
+        state_file = find_facts_home(config) / "indexed_sessions.json"
+
+        if theorem_count > 0:
+            raise RuntimeError(
+                f"Solr returned {theorem_count} theorem blocks but no definitional ones, so the "
+                f"index is fine and the sessions in config['isabelle_sessions'] "
+                f"({config.get('isabelle_sessions')}) contain no definitions, functions, datatypes "
+                f"or the like. Add sessions that do. Which commands were indexed can be listed "
+                f"with a facet query:\n"
+                f"  curl -s '{config['solr_core_url']}/select?q=*:*&rows=0&facet=true"
+                f"&facet.field=command'"
+            )
+
         raise RuntimeError(
-            "Solr did not return any definitions for query '"
-            + solr_query
-            + "'. If the FindFacts index was built with an older Isabelle version that did not "
-            "index definitional commands, rebuild it by removing "
-            "~/.isabelle/find_facts/indexed_sessions.json and restarting the application."
+            f"Solr returned no documents at all for query '{solr_query}'. If the FindFacts index "
+            f"was built with an older Isabelle version that did not index definitional commands, "
+            f"rebuild it by removing '{state_file}' and running "
+            f"'python3 -m src.corpus --index-only' again."
         )
 
     print("Building definition index...")
