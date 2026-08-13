@@ -132,8 +132,13 @@ def start_local_solr(config):
         "8983:8983",
         "-v",
         f"{solr_home}:/var/solr/data",
+        # As the user who owns the index, not as root. Solr refuses to start as root at all
+        # ("Starting Solr as the root user is a security risk ... Exiting"), and running it that way
+        # would leave root owned files inside the user's own ~/.isabelle, which the next
+        # 'isabelle find_facts_index' then cannot write. Group 0 is what makes the image's /var/solr
+        # writable for an arbitrary uid: it is owned by solr:0 with mode 0770.
         "--user",
-        "0:0",
+        f"{os.getuid()}:0",
         image,
         "solr-foreground",
     ]
@@ -171,10 +176,10 @@ def start_local_solr(config):
         # cannot open the index - most often one older than the Lucene that wrote it - exits within
         # seconds and says why there and nowhere else.
         print(
-            f"\nSolr did not become ready. See 'docker logs {SOLR_CONTAINER_NAME}' for the reason; "
-            f"if it names a version, set config['solr_image'] to match "
-            f"(Isabelle wrote this index with Lucene "
-            f"{isabelle_getenv_quiet(config, 'SOLR_LUCENE_VERSION')})."
+            f"\nSolr did not become ready. It writes the reason to its log and nowhere else, so "
+            f"read 'docker logs {SOLR_CONTAINER_NAME}' before changing anything. If the log names "
+            f"an index version, set config['solr_image'] to match; Isabelle wrote this index with "
+            f"Lucene {isabelle_getenv_quiet(config, 'SOLR_LUCENE_VERSION')}."
         )
         return False
 
