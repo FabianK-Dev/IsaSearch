@@ -40,8 +40,12 @@ services:
     ports:
       - "8983:8983"
     healthcheck:
-      # wget, not curl: the official Solr image installs wget and does not install curl.
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8983/solr/local/admin/ping || exit 1"]
+      # A search, not /admin/ping: the core is created by Isabelle's Find_Facts, whose generated
+      # solrconfig.xml declares '/select' as its only request handler, so /admin/ping answers 404 on
+      # a healthy core. wget, not curl: the official Solr image ships wget and no curl.
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null 'http://localhost:8983/solr/local/select?q=*:*&rows=0' || exit 1
       interval: 10s
       timeout: 5s
       retries: 30

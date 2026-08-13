@@ -593,7 +593,7 @@ class SolrConnectionTest(unittest.TestCase):
 
     def connect(self, isatty, answer=None):
         unreachable = unittest.mock.Mock()
-        unreachable.ping.side_effect = RequestException("connection refused")
+        unreachable.search.side_effect = RequestException("connection refused")
 
         self.asked = unittest.mock.Mock(return_value=answer)
 
@@ -625,6 +625,17 @@ class SolrConnectionTest(unittest.TestCase):
             self.connect(isatty=True, answer="n")
 
         self.asked.assert_called()
+
+    # The cores are created by Isabelle's Find_Facts, whose generated solrconfig.xml declares
+    # '/select' as its only request handler. /admin/ping - what pysolr's ping() uses - therefore
+    # answers 404 on a core that is perfectly healthy, and a health check built on it never passes.
+    def test_the_health_check_is_a_search_and_not_a_ping(self):
+        healthy = unittest.mock.Mock()
+
+        solr.solr_is_healthy(healthy)
+
+        healthy.search.assert_called_once()
+        healthy.ping.assert_not_called()
 
 
 if __name__ == "__main__":

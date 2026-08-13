@@ -21,6 +21,16 @@ solr_process = None
 SOLR_CONTAINER_NAME = "local-solr"
 
 
+# Check that Solr answers and that the core is loaded, by asking it for zero documents.
+#
+# Not '/admin/ping', which is what pysolr's ping() uses: the cores are created by Isabelle's
+# Find_Facts, whose generated solrconfig.xml declares exactly one request handler, '/select'. There
+# is no ping handler, so /admin/ping answers 404 on a core that is perfectly healthy. A search is
+# also the better check of the two, because it is what every later query actually does.
+def solr_is_healthy(solr):
+    solr.search("*:*", rows=0)
+
+
 def cleanup_solr():
     """Runs when the Python script exits."""
     global solr_process
@@ -112,11 +122,12 @@ def start_local_solr(config):
         solr_process = True
 
         print("Waiting for Solr to become ready (this may take a few seconds)...")
-        # Wait until Solr really responds. Constructing pysolr.Solr does not contact the server, so
-        # the readiness check has to ping it; otherwise this loop reports success immediately.
+        # Wait until Solr really answers. Constructing pysolr.Solr does not contact the server, so
+        # the readiness check has to issue a request; otherwise this loop reports success
+        # immediately.
         for _ in range(30):
             try:
-                pysolr.Solr(config["solr_core_url"], timeout=1).ping()
+                solr_is_healthy(pysolr.Solr(config["solr_core_url"], timeout=1))
                 print("\nSolr is up and running!")
                 return True
             except Exception:
@@ -144,9 +155,9 @@ def connect_solr(config):
     try:
         print(f"Connecting to Solr at {url}...")
         solr = pysolr.Solr(url, always_commit=True, timeout=10)
-        print("Ping Solr for health check...")
+        print("Querying Solr for health check...")
 
-        solr.ping()
+        solr_is_healthy(solr)
         return solr
     except (pysolr.SolrError, RequestException, Exception) as error:
         print(f"Could not connect to Solr at {url}.")
