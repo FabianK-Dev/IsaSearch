@@ -8,8 +8,8 @@ A component is installed in one of two ways, chosen by its configuration:
   downloaded and unpacked. This is how Isabelle is pinned to a release, because the Isabelle git
   mirror only carries the development branch and has no release branches or tags.
 - Git (config["components"][name]["remote_url"] and ["target_branch"]): a shallow clone that is
-  pulled on every update. This is how the AFP is tracked, whose release mirrors are separate
-  repositories with a single 'master' branch.
+  fetched and reset to the remote on every update. This is how the AFP is tracked, whose release
+  mirrors are separate repositories with a single 'master' branch.
 
 Both refuse to overwrite a checkout that was installed from a different source. Bumping the pinned
 version is a deliberate edit of config.json, so an existing tree is reported and left alone rather
@@ -193,10 +193,25 @@ def install_from_git(name, comp_config):
             )
 
         print(f"Updating {name} in {local_path}...")
+
+        # Fetch and reset rather than pull. The checkout is ours and is never committed into, so
+        # "update" means "make it match the remote" - and a merge cannot express that. The AFP
+        # release mirrors are re-generated rather than appended to, so the remote history is
+        # rewritten from time to time; against a shallow clone 'git pull' then reports divergent
+        # branches and refuses to do anything until a merge strategy is configured. A reset always
+        # works and cannot leave a half merged tree behind. Untracked files survive it, so a
+        # submission placed under thys/ by hand is not lost - but a modified tracked file is, which
+        # is why a working tree under review wants config["check_for_updates"] = false.
         try:
-            run_git(["-C", local_path, "pull", "origin", target_branch, "--depth", "1"])
+            run_git(
+                ["-C", local_path, "fetch", "--depth", "1", "origin", target_branch]
+            )
+            run_git(["-C", local_path, "reset", "--hard", "FETCH_HEAD"])
         except subprocess.CalledProcessError as e:
-            print(f"Error updating {name}: {e}")
+            print(
+                f"Warning: could not update {name}: {e}. Continuing with the checkout that is "
+                f"already in '{local_path}'."
+            )
     else:
         print(f"Cloning {name} into folder '{local_path}'...")
         try:

@@ -8,6 +8,10 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
 - [pip](https://pip.pypa.io/en/stable/installation/) 23.0.1 or higher
 - [git](https://git-scm.com/downloads) 2.47.3 or higher
 - [Docker](https://www.docker.com/get-started) 29.2.1 or higher
+- `fontconfig` and at least one font family. Isabelle brings its own JDK, but that JVM initializes
+  AWT while indexing and aborts with `*** Fontconfig head is null` on a machine that has no fonts at
+  all — which a minimal server install typically does not. On Debian or Ubuntu:
+  `sudo apt-get install -y fontconfig fonts-dejavu-core`
 - One of the supported LLM backends:
   - an OpenAI-compatible server (what the checked-in `config.json` is configured for, see below), or
   - [Ollama](https://ollama.com/download), which the application starts itself, or
@@ -159,7 +163,7 @@ A new submission has to be built into the corpus before it can be analysed — i
    python3 -m src.duplicates --entry <Entry> --kinds all
    ```
 
-Two things to watch out for while a submission under review sits in the working tree. `"check_for_updates": true` makes every build `git pull` the AFP checkout, so set it to `false` unless you want the archive moving underneath the review. And the entry has to build under the pinned Isabelle release — a submission written against a newer Isabelle will fail during indexing, not during the analysis.
+Two things to watch out for while a submission under review sits in the working tree. `"check_for_updates": true` makes every build fetch the AFP and **reset the checkout to the remote**, so set it to `false` while you are reviewing. The submission itself survives that reset — it is untracked — but any edit you made to a tracked AFP file does not. And the entry has to build under the pinned Isabelle release — a submission written against a newer Isabelle will fail during indexing, not during the analysis.
 
 In both cases the entry's own definitions and theorems are excluded from its own results, so what the report contains is counterparts *elsewhere* in the AFP, for you to compare by hand.
 
@@ -244,7 +248,7 @@ docker compose up -d solr
 docker compose run --rm tools python -m src.corpus
 ```
 
-1b starts by re-checking the index, which is a no-op as long as the session list has not changed since 1a — so repeating it is normally free. It is not free if the list *has* changed: 1b pulls the AFP first, and with `"isabelle_sessions": ["all"]` the session list is read from the AFP's `thys/ROOTS`, so a pull that brings in new entries makes it want to index again while Solr holds the index open. It then aborts with an error naming that as the cause. That is not damage — nothing was written — but the remedy is to stop Solr, run 1a again and then 1b. Set `"check_for_updates": false` to keep the AFP still across a build.
+1b starts by re-checking the index, which is a no-op as long as the session list has not changed since 1a — so repeating it is normally free. It is not free if the list *has* changed: 1b updates the AFP first, and with `"isabelle_sessions": ["all"]` the session list is read from the AFP's `thys/ROOTS`, so an update that brings in new entries makes it want to index again while Solr holds the index open. It then aborts with an error naming that as the cause. That is not damage — nothing was written — but the remedy is to stop Solr, run 1a again and then 1b. Set `"check_for_updates": false` to keep the AFP still across a build.
 
 #### 2. Serve
 

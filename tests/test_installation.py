@@ -352,7 +352,11 @@ class ComponentDispatchTest(unittest.TestCase):
         self.assertIn("mirror-afp-devel", str(raised.exception))
         self.assertIn(self.local_path, str(raised.exception))
 
-    def test_a_checkout_of_the_configured_remote_is_pulled(self):
+    # The AFP release mirrors rewrite their history rather than appending to it, so a shallow
+    # checkout regularly diverges from the remote. 'git pull' then refuses to do anything until a
+    # merge strategy is configured; a fetch and reset is what "track this mirror" actually means and
+    # always works.
+    def test_a_checkout_is_reset_to_the_remote_rather_than_merged(self):
         self.make_checkout()
         calls = []
 
@@ -369,7 +373,11 @@ class ComponentDispatchTest(unittest.TestCase):
         with unittest.mock.patch.object(installation.subprocess, "run", run):
             installation.check_and_update("afp", self.comp_config)
 
-        self.assertIn("pull", calls[-1])
+        verbs = [call[3] for call in calls if len(call) > 3]
+
+        self.assertEqual(verbs, ["remote", "fetch", "reset"])
+        self.assertIn("--hard", calls[-1])
+        self.assertNotIn("pull", verbs)
 
     def test_a_missing_git_is_reported_by_name(self):
         missing = unittest.mock.Mock(side_effect=FileNotFoundError("git"))

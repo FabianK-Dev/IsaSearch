@@ -7,8 +7,12 @@ FROM python:3.11-slim
 
 # git clones and updates the AFP (src/installation.py). Isabelle is installed from its release
 # archive, which bundles both contrib and a JDK, so no wget and no JRE are needed here.
+#
+# fontconfig and a font family are needed even though nothing here draws anything: Isabelle's JVM
+# initializes AWT during 'isabelle find_facts_index' and aborts with "Fontconfig head is null" on a
+# system that has no fonts at all, which a slim base image does not.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git ca-certificates \
+    git ca-certificates fontconfig fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
