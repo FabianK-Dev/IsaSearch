@@ -68,7 +68,19 @@ The `openai` backend targets local inference servers that offer an OpenAI compat
 
 Refined queries are cached per model name, so switching the backend regenerates them. Document descriptions are only regenerated when a theorem's source code changes, so already informalized theorems keep the descriptions of the backend that generated them.
 
-> ⚠️ **Reasoning models and `"stop"`.** A model that thinks before it answers returns its thinking in `reasoning_content` and the answer in `content`, and a stop sequence applies to *both*. The prompts ask for the answer wrapped in `<BEGIN>` and `<END>`, and a reasoning model restates that instruction to itself while thinking — so with `"stop": ["<END>"]` generation ends inside the reasoning block, `content` comes back empty, and every description in the corpus is the empty string. `"stop"` is therefore empty by default. For the same reason `max_tokens` has to cover the reasoning as well as the answer, which is why it is 1024 rather than the 256 the prompts ask for. Check with `python3 -m unittest tests.test_server_availability -v` and by reading `artifacts/<model>/document_descriptions.json`, which stores the raw output and the exact prompt for every document.
+`"openai_extra_body"` is merged verbatim into every request, for the settings a local server needs that the OpenAI API never standardised.
+
+> ⚠️ **Turn a reasoning model's thinking off.** A model that thinks before it answers returns its thinking in `reasoning_content` and the answer in `content`. On this task the thinking does not terminate: measured against `gemma-4-26B-A4B`, a one-line corollary produced 3000–4000 characters of reasoning, ran into `max_tokens` every single time, and returned `content: ""`. The corpus is then built out of empty descriptions, which embed fine and retrieve nothing. Switching it off made the same requests **10× faster** (1.8 s instead of 17.7 s) and correct:
+>
+> ```json
+> "openai_extra_body": {"chat_template_kwargs": {"enable_thinking": false}}
+> ```
+>
+> That is the flag llama.cpp hands to the chat template; the server side equivalent is `--reasoning-budget 0`. To find out whether a model has such a switch, read its `chat_template` from the server's `/props` endpoint and look for `enable_thinking`.
+>
+> Keep `"stop"` empty for the same reason. The prompts ask for the answer wrapped in `<BEGIN>` and `<END>`, and a reasoning model restates that instruction to itself while thinking, so `"stop": ["<END>"]` ends generation *inside* the reasoning block with the same empty result.
+>
+> Verify with `python3 -m unittest tests.test_server_availability -v` and by reading `artifacts/<model>/document_descriptions.json`, which stores the raw output and the exact prompt for every document. A build that produces empty descriptions warns about it, but only after the fact.
 
 ### Embedding backend
 

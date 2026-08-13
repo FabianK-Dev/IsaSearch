@@ -41,6 +41,11 @@
     "openai_document_model": "beaker_gemma4",
     "openai_query_model": "beaker_gemma4",
     "openai_api_key_env": "ISASEARCH_API_KEY",
+    "openai_extra_body": {
+        "chat_template_kwargs": {
+            "enable_thinking": false
+        }
+    },
     "embedding_backend": "openai",
     "openai_embedding_base_url": "http://10.153.73.66:8081/v1",
     "openai_embedding_model": "Qwen3-Embedding-4B",
@@ -54,7 +59,7 @@
         "top_p": 1,
         "top_k": -1,
         "min_p": 0,
-        "max_tokens": 1024,
+        "max_tokens": 256,
         "stop": []
     },
     "benchmark_add_top_results": false,

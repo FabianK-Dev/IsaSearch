@@ -415,6 +415,17 @@ def openai_options(config):
     if sampling_parameters.get("stop"):
         options["stop"] = sampling_parameters["stop"]
 
+    # Anything else the configured server needs, merged verbatim into the request body. This exists
+    # because the settings that matter most to a local server are the ones the OpenAI API never
+    # standardised. The one this project depends on turns a reasoning model's thinking off:
+    #
+    #   "openai_extra_body": {"chat_template_kwargs": {"enable_thinking": false}}
+    #
+    # A model that thinks spends its entire token budget on reasoning and returns an empty
+    # completion, so without this the corpus is built out of empty descriptions. Merged last, so
+    # that a server specific setting can also override one of the values above.
+    options.update(config.get("openai_extra_body", {}))
+
     return options
 
 

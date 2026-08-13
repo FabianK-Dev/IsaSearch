@@ -122,6 +122,36 @@ class LlmBackendTest(OpenAIBackendTestCase):
             self.server.requests_to("/v1/chat/completions")[-1]["body"]["top_k"], 40
         )
 
+    # The settings that decide whether a local server is usable at all are the ones the OpenAI API
+    # never standardised. Turning a reasoning model's thinking off is the one this project depends
+    # on: with thinking on, the whole token budget goes into reasoning and the completion comes back
+    # empty, so every description in the corpus is the empty string.
+    def test_extra_body_is_merged_into_the_request(self):
+        self.config["openai_extra_body"] = {
+            "chat_template_kwargs": {"enable_thinking": False}
+        }
+
+        llm.get_llm(self.config).generate("hello")
+
+        body = self.server.requests_to("/v1/chat/completions")[-1]["body"]
+        self.assertEqual(body["chat_template_kwargs"], {"enable_thinking": False})
+        # Merged next to the sampling parameters, not in place of them.
+        self.assertEqual(
+            body["max_tokens"], self.config["sampling_parameters"]["max_tokens"]
+        )
+
+    def test_extra_body_reaches_the_document_llm_as_well(self):
+        # The descriptions are what an unusable setting silently ruins, so the document model has to
+        # get it too, not only the query model.
+        self.config["openai_extra_body"] = {
+            "chat_template_kwargs": {"enable_thinking": False}
+        }
+
+        llm.get_document_llm(self.config).generate("describe")
+
+        body = self.server.requests_to("/v1/chat/completions")[-1]["body"]
+        self.assertEqual(body["chat_template_kwargs"], {"enable_thinking": False})
+
     def test_document_llm_uses_the_document_model(self):
         self.config["openai_document_model"] = "other-model"
 
