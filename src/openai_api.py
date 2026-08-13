@@ -60,16 +60,22 @@ def openai_headers(api_key):
 
 
 # requests' raise_for_status() only reports the status code, but OpenAI compatible servers explain
-# the actual problem (e.g. an exceeded context size or an unknown model) in the response body.
-# The API key is only ever sent in a header and thus never part of the message raised here.
-def raise_for_status_with_body(response, description):
-    if response.ok:
-        return
-
-    raise RuntimeError(
+# the actual problem (e.g. an exceeded context size or an unknown model) in the response body, thus
+# both are part of the message. The API key is only ever sent in a header and is therefore never
+# part of it. Kept separate from raising, because a retryable status is reported the very same way
+# but through a different exception (see RetryableEmbeddingError in src/embeddings.py).
+def status_error_message(response, description):
+    return (
         description
         + " failed with status code "
         + str(response.status_code)
         + ": "
         + response.text
     )
+
+
+def raise_for_status_with_body(response, description):
+    if response.ok:
+        return
+
+    raise RuntimeError(status_error_message(response, description))

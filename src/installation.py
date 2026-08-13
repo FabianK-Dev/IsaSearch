@@ -299,6 +299,15 @@ def isabelle_getenv(config, name):
     return value
 
 
+# The same setting, for use inside an error message, where failing to read it must not replace the
+# error being reported.
+def isabelle_getenv_quiet(config, name):
+    try:
+        return isabelle_getenv(config, name)
+    except Exception:
+        return "unknown"
+
+
 # Where Isabelle keeps the state of the installed distribution.
 #
 # It is not ~/.isabelle: Isabelle's own etc/settings sets

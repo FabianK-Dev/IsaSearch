@@ -10,9 +10,9 @@ Run them with 'python3 -m unittest discover -s tests -t .' inside the root folde
 repository, or alone with 'python3 -m unittest tests.test_server_availability -v'.
 """
 
-import json
 import unittest
 
+from src.bootstrap import load_config
 from src.embeddings import (
     OPENAI_EMBEDDING_BACKEND,
     embedding_backend,
@@ -33,11 +33,6 @@ from src.llm import (
 # symbols needs about two characters per token, whereas plain text needs about three. A text that
 # is accepted at this density is accepted at any other.
 SYMBOL_HEAVY_FILLER = "⟹∀∃≠⋀⟶λ∈⊆∩∪"
-
-
-def load_config():
-    with open("config.json", "r") as file:
-        return json.loads(file.read())
 
 
 config = load_config()

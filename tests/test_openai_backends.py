@@ -11,8 +11,6 @@ tests/test_server_availability.py.
 """
 
 import os
-import shutil
-import tempfile
 import unittest
 import warnings
 
@@ -20,6 +18,7 @@ import chromadb
 
 from src import embeddings, llm
 from src.openai_api import config_without_secrets, openai_api_key
+from tests.helpers import temporary_folder
 from tests.stub_openai_server import REJECTING_MODEL, StubOpenAIServer
 
 API_KEY_ENV = "ISASEARCH_TEST_API_KEY"
@@ -297,8 +296,7 @@ class ChromaDbCollectionTest(OpenAIBackendTestCase):
 
     def setUp(self):
         super().setUp()
-        self.chroma_db_path = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.chroma_db_path, True)
+        self.chroma_db_path = temporary_folder(self)
 
     def open_collection(self):
         client = chromadb.PersistentClient(path=self.chroma_db_path)
@@ -331,14 +329,16 @@ class ChromaDbCollectionTest(OpenAIBackendTestCase):
             [],
         )
 
-    def test_local_backend_keeps_the_default_distance_function(self):
-        # Existing collections were created without metadata, thus the local backend must keep
-        # passing None so that their default distance function stays untouched.
-        self.assertIsNone(
-            {"hnsw:space": "cosine"}
-            if embeddings.embedding_backend({}) == embeddings.OPENAI_EMBEDDING_BACKEND
-            else None
+    def test_the_distance_function_is_asked_of_the_embedding_function(self):
+        # get_chromadb_collection reads the distance function off the embedder rather than off the
+        # configured backend name, so an embedder that does not ask for one - the local
+        # sentence-transformers backend - leaves ChromaDB's default and with it every collection
+        # that was built before untouched.
+        self.assertEqual(
+            embeddings.OpenAIEmbeddingFunction.collection_metadata,
+            {"hnsw:space": "cosine"},
         )
+        self.assertIsNone(getattr(object(), "collection_metadata", None))
 
 
 if __name__ == "__main__":

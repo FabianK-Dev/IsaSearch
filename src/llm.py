@@ -69,6 +69,30 @@ def load_prompts(config):
     return prompts
 
 
+# The prompts ask the model to wrap its actual answer in these markers, so that the reasoning or
+# the pleasantries around it can be cut away.
+BEGIN_MARKER = "<BEGIN>"
+END_MARKER = "<END>"
+
+
+# Extract the part of an LLM output that the prompt asked for, i.e. what stands between the markers.
+# Returns (text, found), where 'found' reports whether an opening marker was present at all, so that
+# every caller can keep its own way of reporting a model that did not follow the prompt. A marker
+# that is missing is not an error here: the surrounding text is usually still usable, which is why
+# all callers fall back to it.
+def extract_marked_output(raw_output):
+    text = raw_output
+    found = BEGIN_MARKER in text
+
+    if found:
+        text = text.split(BEGIN_MARKER, 1)[1]
+
+    if END_MARKER in text:
+        text = text.split(END_MARKER, 1)[0]
+
+    return text, found
+
+
 # Returns the path of an LLM output cache. 'cache_name' selects the cache file, so that entry points
 # which run next to each other (the web application and the duplicate detection) can each own their
 # own file. Two processes must never share one, because the cache is rewritten as a whole below.
@@ -109,15 +133,21 @@ def save_llm_output_cache(
         raise
 
 
-def ollama_options(config):
+# The sampling parameters of config["sampling_parameters"], translated for one backend. Every
+# backend understands the same five settings but names the token limit differently, which is what
+# 'max_tokens_key' selects. Keeping this in one place means a new sampling parameter is added once
+# instead of once per backend.
+def sampling_options(config, max_tokens_key):
     sampling_parameters = config["sampling_parameters"]
     options = {
         "temperature": sampling_parameters["temperature"],
         "top_p": sampling_parameters["top_p"],
         "min_p": sampling_parameters["min_p"],
-        "num_predict": sampling_parameters["max_tokens"],
+        max_tokens_key: sampling_parameters["max_tokens"],
     }
 
+    # llama.cpp and the OpenAI compatible servers disable top_k sampling for values <= 0, so negative
+    # values are omitted instead of being passed through.
     if sampling_parameters["top_k"] >= 0:
         options["top_k"] = sampling_parameters["top_k"]
 
@@ -127,12 +157,34 @@ def ollama_options(config):
     return options
 
 
-def ollama_is_running(base_url):
+def ollama_options(config):
+    return sampling_options(config, "num_predict")
+
+
+# Returns whether the server at 'base_url' answers 'path' with HTTP 200. The timeout is short,
+# because this only ever asks whether a server is up, never for any actual work.
+def server_answers(base_url, path):
     try:
-        response = requests.get(base_url.rstrip("/") + "/api/tags", timeout=2)
+        response = requests.get(base_url.rstrip("/") + path, timeout=2)
         return response.status_code == 200
     except requests.RequestException:
         return False
+
+
+# A server of these backends is started as a child process of this application, so it can only ever
+# be started on this machine. A remote URL therefore means the server has to be running already.
+def require_local_url(base_url, name):
+    if urlparse(base_url).hostname not in ["localhost", "127.0.0.1"]:
+        raise RuntimeError(
+            name
+            + " is not reachable at "
+            + base_url
+            + " and can only be started automatically for localhost URLs."
+        )
+
+
+def ollama_is_running(base_url):
+    return server_answers(base_url, "/api/tags")
 
 
 def cleanup():
@@ -146,14 +198,7 @@ atexit.register(cleanup)
 
 
 def start_ollama(base_url):
-    parsed_url = urlparse(base_url)
-
-    if parsed_url.hostname not in ["localhost", "127.0.0.1"]:
-        raise RuntimeError(
-            "Ollama is not reachable at "
-            + base_url
-            + " and can only be started automatically for localhost URLs."
-        )
+    require_local_url(base_url, "Ollama")
 
     print("Starting Ollama server...")
     try:
@@ -228,31 +273,12 @@ def ensure_ollama(config):
 # llama.cpp uses slightly different names than Ollama for the same sampling parameters,
 # and expects them at the top level of the request instead of within an "options" object.
 def llamacpp_options(config):
-    sampling_parameters = config["sampling_parameters"]
-    options = {
-        "temperature": sampling_parameters["temperature"],
-        "top_p": sampling_parameters["top_p"],
-        "min_p": sampling_parameters["min_p"],
-        "n_predict": sampling_parameters["max_tokens"],
-    }
-
-    # llama.cpp disables top_k sampling for values <= 0, so negative values are omitted instead of being passed through.
-    if sampling_parameters["top_k"] >= 0:
-        options["top_k"] = sampling_parameters["top_k"]
-
-    if sampling_parameters.get("stop"):
-        options["stop"] = sampling_parameters["stop"]
-
-    return options
+    return sampling_options(config, "n_predict")
 
 
 # llama-server answers /health with 503 while the model is still loading, so this doubles as a readiness check.
 def llamacpp_is_running(base_url):
-    try:
-        response = requests.get(base_url.rstrip("/") + "/health", timeout=2)
-        return response.status_code == 200
-    except requests.RequestException:
-        return False
+    return server_answers(base_url, "/health")
 
 
 # A model can either be given as a path to a local GGUF file or as an 'hf:<repo>[:<quantization>]'
@@ -265,14 +291,8 @@ def llamacpp_model_arguments(model_spec):
 
 
 def start_llamacpp(base_url, model_spec, config):
+    require_local_url(base_url, "llama.cpp")
     parsed_url = urlparse(base_url)
-
-    if parsed_url.hostname not in ["localhost", "127.0.0.1"]:
-        raise RuntimeError(
-            "llama.cpp is not reachable at "
-            + base_url
-            + " and can only be started automatically for localhost URLs."
-        )
 
     # The server is started on the port of the configured URL, which is also the port that is checked
     # for readiness and used for all requests. Guessing a port here would start a server that this
@@ -395,25 +415,12 @@ def ensure_llamacpp(config):
 # The OpenAI API names the token limit "max_tokens" and expects all sampling parameters at the top
 # level of the request instead of within an "options" object.
 def openai_options(config):
-    sampling_parameters = config["sampling_parameters"]
-    options = {
-        "temperature": sampling_parameters["temperature"],
-        "top_p": sampling_parameters["top_p"],
-        # "min_p" and "top_k" are not part of the OpenAI API, but the OpenAI compatible endpoints of
-        # local inference servers such as llama.cpp, vLLM and LM Studio accept them as additional
-        # top level fields, which keeps the sampling configuration identical across all backends.
-        # Note that the hosted API at api.openai.com rejects unknown parameters with HTTP 400
-        # instead of ignoring them, so these two entries have to be removed to target it.
-        "min_p": sampling_parameters["min_p"],
-        "max_tokens": sampling_parameters["max_tokens"],
-    }
-
-    # Like llama.cpp, negative values are omitted instead of being passed through.
-    if sampling_parameters["top_k"] >= 0:
-        options["top_k"] = sampling_parameters["top_k"]
-
-    if sampling_parameters.get("stop"):
-        options["stop"] = sampling_parameters["stop"]
+    # "min_p" and "top_k" are not part of the OpenAI API, but the OpenAI compatible endpoints of
+    # local inference servers such as llama.cpp, vLLM and LM Studio accept them as additional top
+    # level fields, which keeps the sampling configuration identical across all backends. Note that
+    # the hosted API at api.openai.com rejects unknown parameters with HTTP 400 instead of ignoring
+    # them, so those two entries have to be removed to target it.
+    options = sampling_options(config, "max_tokens")
 
     # Anything else the configured server needs, merged verbatim into the request body. This exists
     # because the settings that matter most to a local server are the ones the OpenAI API never
@@ -578,30 +585,24 @@ def llm_backend(config):
     return backend
 
 
+# The two roles an LLM is used in. Both are served by the same backend but usually by a different
+# model, and every backend names its two models 'config["<backend>_<role>_model"]'.
+QUERY_ROLE = "query"
+DOCUMENT_ROLE = "document"
+
+
 # The model names are also used as cache keys and within benchmark result file names,
 # so they have to be resolved for the configured backend.
+def model_name(config, role):
+    return config[f"{llm_backend(config)}_{role}_model"]
+
+
 def query_model_name(config):
-    backend = llm_backend(config)
-
-    if backend == LLAMACPP_BACKEND:
-        return config["llamacpp_query_model"]
-
-    if backend == OPENAI_BACKEND:
-        return config["openai_query_model"]
-
-    return config["ollama_query_model"]
+    return model_name(config, QUERY_ROLE)
 
 
 def document_model_name(config):
-    backend = llm_backend(config)
-
-    if backend == LLAMACPP_BACKEND:
-        return config["llamacpp_document_model"]
-
-    if backend == OPENAI_BACKEND:
-        return config["openai_document_model"]
-
-    return config["ollama_document_model"]
+    return model_name(config, DOCUMENT_ROLE)
 
 
 # Starts the configured backend if required and makes sure that the configured models are available.
@@ -616,69 +617,62 @@ def ensure_llm_backend(config):
         ensure_ollama(config)
 
 
-# The LLM that is used to refine search queries.
-def get_llm(config):
+# The URL the llama.cpp server that serves the model of the given role listens at. A llama-server
+# process serves a single model, so which URL that is follows from the server allocation of
+# llamacpp_servers instead of being decided again here.
+def llamacpp_role_base_url(config, role):
+    if role == QUERY_ROLE:
+        return config["llamacpp_base_url"]
+
+    # Looking the URL up in the allocation also validates the server configuration, so that a
+    # misconfiguration is reported here as well and not only when the servers are started.
+    document_model = config["llamacpp_document_model"]
+
+    return next(
+        base_url
+        for base_url, model_spec in llamacpp_servers(config).items()
+        if model_spec == document_model
+    )
+
+
+# The LLM of one role, built for the configured backend.
+def build_llm(config, role):
     backend = llm_backend(config)
+    timeout = llm_request_timeout(config)
 
     if backend == LLAMACPP_BACKEND:
+        # The model is not part of a llama.cpp request, so the role only selects the URL.
         return LlamaCppLLM(
-            config["llamacpp_base_url"],
-            llamacpp_options(config),
-            llm_request_timeout(config),
+            llamacpp_role_base_url(config, role), llamacpp_options(config), timeout
         )
 
     if backend == OPENAI_BACKEND:
+        # A single OpenAI compatible server can serve more than one model, so unlike llama.cpp the
+        # roles only differ by the model name and not by the URL they are requested at.
         return OpenAILLM(
             config["openai_base_url"],
-            config["openai_query_model"],
+            model_name(config, role),
             openai_options(config),
             openai_api_key(config),
-            llm_request_timeout(config),
+            timeout,
         )
 
     return OllamaLLM(
         config["ollama_base_url"],
-        config["ollama_query_model"],
+        model_name(config, role),
         ollama_options(config),
-        llm_request_timeout(config),
+        timeout,
     )
+
+
+# The LLM that is used to refine search queries.
+def get_llm(config):
+    return build_llm(config, QUERY_ROLE)
 
 
 # The LLM that is used to informalize (i.e. describe) documents.
 def get_document_llm(config):
-    if llm_backend(config) == OPENAI_BACKEND:
-        # A single OpenAI compatible server can serve more than one model, so unlike llama.cpp the
-        # document model only differs by its name and not by the URL it is requested at.
-        return OpenAILLM(
-            config["openai_base_url"],
-            config["openai_document_model"],
-            openai_options(config),
-            openai_api_key(config),
-            llm_request_timeout(config),
-        )
-
-    if llm_backend(config) == LLAMACPP_BACKEND:
-        # Validate the server configuration, so that a misconfiguration is reported here as well and
-        # not only when the servers are started.
-        llamacpp_servers(config)
-
-        # If both models are identical, a single server at config["llamacpp_base_url"] serves both.
-        base_url = (
-            config["llamacpp_base_url"]
-            if config["llamacpp_document_model"] == config["llamacpp_query_model"]
-            else config["llamacpp_document_base_url"]
-        )
-
-        return LlamaCppLLM(
-            base_url, llamacpp_options(config), llm_request_timeout(config)
-        )
-
-    return OllamaLLM(
-        config["ollama_base_url"],
-        config["ollama_document_model"],
-        ollama_options(config),
-        llm_request_timeout(config),
-    )
+    return build_llm(config, DOCUMENT_ROLE)
 
 
 # Load the LLM output from the cache folder, configured at config["cache_folder"].

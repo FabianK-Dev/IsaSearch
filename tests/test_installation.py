@@ -13,14 +13,13 @@ These tests need neither a network nor git. Run them with
 
 import io
 import os
-import shutil
 import subprocess
 import tarfile
-import tempfile
 import unittest
 import unittest.mock
 
 from src import installation
+from tests.helpers import isabelle_stub, temporary_folder
 
 VERSION = "Isabelle2025-2"
 
@@ -74,8 +73,7 @@ class FakeResponse:
 
 class ArchiveInstallationTest(unittest.TestCase):
     def setUp(self):
-        self.folder = tempfile.mkdtemp()
-        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
+        self.folder = temporary_folder(self)
 
         self.local_path = os.path.join(self.folder, "Isabelle")
         self.comp_config = {
@@ -253,14 +251,8 @@ class ArchiveInstallationTest(unittest.TestCase):
 # against an archive installation does not merely do nothing, it breaks the installation.
 class ComponentSetupTest(unittest.TestCase):
     def setUp(self):
-        self.folder = tempfile.mkdtemp()
-        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
-
-        isabelle_bin = os.path.join(self.folder, "bin", "isabelle")
-        os.makedirs(os.path.dirname(isabelle_bin))
-
-        with open(isabelle_bin, "w") as file:
-            file.write("#!/bin/sh\n")
+        self.folder = temporary_folder(self)
+        isabelle_stub(self.folder)
 
     def config(self, comp_config):
         comp_config = {"local_folder": self.folder, **comp_config}
@@ -301,14 +293,8 @@ class ComponentSetupTest(unittest.TestCase):
 # reported as missing and rebuilt on every run, and a Solr started against it serves nothing.
 class FindFactsLocationTest(unittest.TestCase):
     def setUp(self):
-        self.folder = tempfile.mkdtemp()
-        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
-
-        isabelle_bin = os.path.join(self.folder, "bin", "isabelle")
-        os.makedirs(os.path.dirname(isabelle_bin))
-
-        with open(isabelle_bin, "w") as file:
-            file.write("#!/bin/sh\n")
+        self.folder = temporary_folder(self)
+        isabelle_stub(self.folder)
 
         self.config = {"components": {"isabelle": {"local_folder": self.folder}}}
 
@@ -347,8 +333,7 @@ class FindFactsLocationTest(unittest.TestCase):
 
 class ComponentDispatchTest(unittest.TestCase):
     def setUp(self):
-        self.folder = tempfile.mkdtemp()
-        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
+        self.folder = temporary_folder(self)
 
         self.local_path = os.path.join(self.folder, "afp")
         self.comp_config = {

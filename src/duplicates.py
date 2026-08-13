@@ -23,11 +23,7 @@ Semantic similarity is not logical duplication, so the tiers are a triage aid an
 """
 
 import argparse
-import difflib
 import glob
-import json
-import os
-import re
 import sys
 import time
 import tomllib
@@ -42,7 +38,30 @@ from src.bootstrap import (
     boot_components,
     DEFINITIONS_LOAD,
 )
-from src.documents import strip_proof, BUILD_CORPUS_COMMAND
+from src.documents import statement_excerpt, BUILD_CORPUS_COMMAND
+from src.duplicate_report import (
+    analyses_to_report,
+    reported_documents,
+    write_report,
+)
+from src.duplicate_scoring import (
+    add_syntactic_similarity,
+    aggregate,
+    classify_analyses,
+    dedup_thresholds,
+    entries_in_index,
+    entry_doc_ids,
+    entry_docs,
+    entry_of_id,
+    parse_verdict,
+    recall_at_k,
+    self_retrieval_summary,
+    synthetic_ground_truth,
+    KIND_DEFINITIONS,
+    KIND_THEOREMS,
+    KINDS,
+    SELF_RETRIEVAL_FAILURE_LIMIT,
+)
 from src.embeddings import (
     document_embedding_string,
     add_doc_urls,
@@ -51,15 +70,6 @@ from src.embeddings import (
 from src.llm import save_llm_output_cache, query_model_name
 from src.solr import docs_by_ids
 
-
-# Every AFP document ID contains the path of its theory file, so the entry a document belongs to is
-# the first path segment after "/thys/". This is used both to select the documents of an entry and to
-# exclude an entry from its own search results.
-ENTRY_PATH_MARKER = "/thys/"
-
-KIND_DEFINITIONS = "definitions"
-KIND_THEOREMS = "theorems"
-KINDS = [KIND_DEFINITIONS, KIND_THEOREMS]
 
 # The LLM output cache of the duplicate detection, overridable through config["dedup_llm_cache"].
 # It is deliberately not the cache of the web application: both rewrite their cache as a whole, so
@@ -72,91 +82,10 @@ def dedup_llm_cache_name(config):
     return config.get("dedup_llm_cache", DEDUP_LLM_CACHE)
 
 
-VERDICTS = ["DUPLICATE", "VARIANT", "RELATED", "DIFFERENT"]
-UNKNOWN_VERDICT = "UNKNOWN"
-
-TIER_NEAR_EXACT = "near-exact"
-TIER_LIKELY = "likely"
-TIER_POSSIBLE = "possible"
-# Ordered from the strongest to the weakest tier.
-TIERS = [TIER_NEAR_EXACT, TIER_LIKELY, TIER_POSSIBLE]
-
-# Two documents of different entries that define a constant or type of the same base name and whose
-# sources are this similar are treated as a duplicate pair, i.e. as a synthetic ground truth.
-GROUND_TRUTH_SYNTACTIC_THRESHOLD = 0.85
-# Base names such as "empty" or "size" are defined by a lot of entries. Comparing every pair of a very
-# large group is quadratic and yields no useful ground truth, so such groups are skipped.
-GROUND_TRUTH_MAX_GROUP_SIZE = 50
-
-# If more than this fraction of the analysed documents does not retrieve itself, something in the
-# pipeline is broken (e.g. the corpus was embedded with a different prompt or embedder).
-SELF_RETRIEVAL_FAILURE_LIMIT = 0.05
-
 # Upper bound for the number of ChromaDB results that are requested per document and for the number
 # of values of a single ChromaDB response, so that the response size stays bounded for large entries.
 MAX_EXTRA_RESULTS = 300
 MAX_RESPONSE_VALUES = 10000
-
-# Isabelle commands that may start the source code of a document. They are removed before comparing
-# two sources syntactically, because the command itself carries no mathematical content.
-COMMANDS_PATTERN = (
-    "definition|abbreviation|fun|function|primrec|primcorec|datatype|codatatype|"
-    "record|type_synonym|typedef|inductive_set|inductive|coinductive|"
-    "theorem|lemma|corollary|proposition|schematic_goal"
-)
-LEADING_COMMAND = re.compile(r"^\s*(?:" + COMMANDS_PATTERN + r")\b")
-# A name label such as 'foo:' or 'foo [simp]:'. The negative lookahead keeps the type ascription of a
-# definition ('foo :: "nat ⇒ nat"') intact, because that is part of the mathematical content.
-LEADING_NAME = re.compile(r"^\s*[A-Za-z_][A-Za-z0-9_'.]*\s*(?:\[[^\]]*\])?\s*:(?!:)")
-
-# A statement this short carries no mathematical content anymore. This happens if the source starts
-# with something that strip_proof or the patterns above cut away, e.g. a quoted 'proof' token, and
-# two such statements would otherwise compare as identical.
-MIN_STATEMENT_LENGTH = 8
-
-
-# Return the AFP entry a document ID belongs to, or None for documents outside of the AFP
-# (i.e. built-in Isabelle theories, whose IDs start with ISABELLE_HOME).
-def entry_of_id(doc_id):
-    parts = doc_id.split(ENTRY_PATH_MARKER)
-
-    if len(parts) < 2:
-        return None
-
-    return parts[1].split("/")[0]
-
-
-# Reduce the source code of a document to the part that carries mathematical content, i.e. drop the
-# proof, the leading command, an optional name label and any difference in whitespace.
-def normalized_statement(src):
-    statement = strip_proof(src)
-    statement = LEADING_COMMAND.sub(" ", statement, count=1)
-    statement = LEADING_NAME.sub(" ", statement, count=1)
-
-    return re.sub(r"\s+", " ", statement).strip()
-
-
-# Similarity of two sources between 0.0 and 1.0, based on their normalized statements only.
-# This is a purely syntactic signal that complements the semantic distance of the embeddings.
-def syntactic_similarity(a_src, b_src):
-    a_statement = normalized_statement(a_src)
-    b_statement = normalized_statement(b_src)
-
-    # difflib reports a ratio of 1.0 for two empty strings, and a very high one for two statements
-    # that are only a quote character. Both would be false duplicates.
-    if (
-        len(a_statement) < MIN_STATEMENT_LENGTH
-        or len(b_statement) < MIN_STATEMENT_LENGTH
-    ):
-        return 0.0
-
-    return difflib.SequenceMatcher(None, a_statement, b_statement).ratio()
-
-
-# The part of the source code that is shown to the LLM, cut like in generate_document_descriptions
-# (src/documents.py), so that the judge sees the same statement that was informalized.
-def statement_excerpt(src, max_length):
-    return strip_proof(src)[:max_length].strip()
 
 
 # Read the submission date of every AFP entry from afp/metadata/entries/<entry>.toml.
@@ -220,22 +149,40 @@ def newest_entries(config, count, available_entries):
     return selected
 
 
-# All documents of the corpus that belong to the given entry, ordered by their ID for reproducibility.
-def entry_docs(index, entry):
-    return [index[doc_id] for doc_id in sorted(index) if entry_of_id(doc_id) == entry]
+# Scan the results one target returned for one document and pick the usable candidates out of them.
+# Returns the candidates, the position and the distance at which the document retrieved itself
+# (None if it did not show up at all), how many results the target returned and how many of them
+# were skipped because they are no longer part of the corpus.
+def scan_target_results(metadatas, distances, doc, kind, exclude_entry, corpus_index):
+    hits = []
+    self_position = None
+    self_distance = None
+    returned = 0
+    stale = 0
 
+    for position, (metadata, distance) in enumerate(zip(metadatas, distances), start=1):
+        returned += 1
+        candidate_id = metadata["source"]
 
-# All entries that occur in the corpus.
-def entries_in_index(index):
-    entries = set()
+        # The document itself is the positive control and never a candidate.
+        if candidate_id == doc["id"]:
+            self_position = position
+            self_distance = distance
+            continue
 
-    for doc_id in index:
-        entry = entry_of_id(doc_id)
+        if exclude_entry is not None and entry_of_id(candidate_id) == exclude_entry:
+            continue
 
-        if entry is not None:
-            entries.add(entry)
+        # A collection is only ever added to, so it can still contain documents of an older version
+        # of the corpus. Those cannot be reported, because neither their source code nor their
+        # metadata is available anymore.
+        if candidate_id not in corpus_index:
+            stale += 1
+            continue
 
-    return entries
+        hits.append({"id": candidate_id, "distance": distance, "kind": kind})
+
+    return hits, self_position, self_distance, returned, stale
 
 
 # Query every target with every given document and return, per document, the rank at which it
@@ -271,7 +218,7 @@ def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, conf
         # theorems corpus, the theorems of the same entry are excluded as well and there are usually
         # far more of them. The number of requested results is capped, so that the size of a single
         # response stays bounded.
-        entry_size = len(entry_docs(corpus_index, exclude_entry))
+        entry_size = len(entry_doc_ids(corpus_index, exclude_entry))
         n_results[kind] = min(
             sizes[kind], top_k + min(entry_size, MAX_EXTRA_RESULTS) + 1
         )
@@ -299,46 +246,35 @@ def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, conf
 
             for kind, _, corpus_index in targets:
                 response = responses[kind]
-                returned = 0
-                survived = 0
+                (
+                    target_hits,
+                    self_position,
+                    target_self_distance,
+                    returned,
+                    target_stale,
+                ) = scan_target_results(
+                    response["metadatas"][j],
+                    response["distances"][j],
+                    doc,
+                    kind,
+                    exclude_entry,
+                    corpus_index,
+                )
 
-                for position, (metadata, distance) in enumerate(
-                    zip(response["metadatas"][j], response["distances"][j]), start=1
-                ):
-                    returned += 1
-                    candidate_id = metadata["source"]
+                hits.extend(target_hits)
+                stale += target_stale
 
-                    # The document itself is the positive control and never a candidate.
-                    if candidate_id == doc["id"]:
-                        if kind == home_kind:
-                            self_rank = position
-                            self_distance = distance
-                        continue
-
-                    if (
-                        exclude_entry is not None
-                        and entry_of_id(candidate_id) == exclude_entry
-                    ):
-                        continue
-
-                    # A collection is only ever added to, so it can still contain documents of an
-                    # older version of the corpus. Those cannot be reported, because neither their
-                    # source code nor their metadata is available anymore.
-                    if candidate_id not in corpus_index:
-                        stale += 1
-                        continue
-
-                    survived += 1
-                    hits.append(
-                        {"id": candidate_id, "distance": distance, "kind": kind}
-                    )
+                # Only the home target's own ranking counts as the positive control, see above.
+                if kind == home_kind and self_position is not None:
+                    self_rank = self_position
+                    self_distance = target_self_distance
 
                 # If this corpus returned everything that was asked of it and still did not yield
                 # 'top_k' usable candidates, the requested window was too small and duplicates that
                 # rank below the documents of the entry itself were not seen. If the window covers
                 # the whole collection there is nothing below it, so nothing was missed.
                 if (
-                    survived < top_k
+                    len(target_hits) < top_k
                     and returned >= n_results[kind]
                     and n_results[kind] < sizes[kind]
                 ):
@@ -378,44 +314,6 @@ def find_candidates(targets, prompts, query_docs, exclude_entry, home_kind, conf
     return analyses
 
 
-# Add the syntactic similarity of every candidate to its query document.
-def add_syntactic_similarity(analyses, corpus_index):
-    for analysis in analyses:
-        for candidate in analysis["candidates"]:
-            candidate_doc = corpus_index.get(candidate["id"])
-
-            if candidate_doc is None:
-                candidate["syntactic_similarity"] = 0.0
-                continue
-
-            candidate["syntactic_similarity"] = syntactic_similarity(
-                analysis["doc"]["src"], candidate_doc["src"]
-            )
-
-
-# Extract the verdict and its justification from the raw LLM output.
-def parse_verdict(raw_output):
-    text = raw_output
-
-    if "<BEGIN>" in text:
-        text = text.split("<BEGIN>", 1)[1]
-    if "<END>" in text:
-        text = text.split("<END>", 1)[0]
-
-    text = text.strip()
-    match = re.search(r"VERDICT\s*:\s*([A-Za-z]+)", text)
-
-    if match is None:
-        return UNKNOWN_VERDICT, text[:300]
-
-    verdict = match.group(1).upper()
-
-    if verdict not in VERDICTS:
-        return UNKNOWN_VERDICT, text[:300]
-
-    return verdict, text[match.end() :].strip()[:300]
-
-
 # Let the configured LLM decide whether a query document and a candidate are duplicates.
 # Only the closest candidates of every document are judged, so the number of LLM calls stays bounded.
 # Judgements are stored in the existing LLM output cache, which makes repeated runs free.
@@ -446,11 +344,21 @@ def judge_candidates(
     print(f"Judging {len(pending)} candidate pairs with the LLM...")
 
     unsaved = 0
+    # Every document is judged against several candidates and a popular candidate against several
+    # documents, so the excerpts are cut once per document instead of once per pair. Cutting means
+    # a regex split over the full source including its proof, which is by far the longest part.
+    excerpts = {}
+
+    def excerpt_of(doc):
+        if doc["id"] not in excerpts:
+            excerpts[doc["id"]] = statement_excerpt(doc["src"], max_length)
+
+        return excerpts[doc["id"]]
 
     for analysis, candidate in tqdm(pending):
         prompt = prompts["duplicate_judge"].format(
-            item_a=statement_excerpt(analysis["doc"]["src"], max_length),
-            item_b=statement_excerpt(corpus_index[candidate["id"]]["src"], max_length),
+            item_a=excerpt_of(analysis["doc"]),
+            item_b=excerpt_of(corpus_index[candidate["id"]]),
         )
 
         cached = cache.get(model_key, {}).get(prompt)
@@ -482,133 +390,6 @@ def judge_candidates(
 
     if config["enable_llm_output_cache"] and unsaved > 0:
         save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
-
-
-# Decide how strong the evidence for a candidate being a duplicate is, or return None if the
-# candidate is not worth reporting at all.
-def classify(candidate, config):
-    if (
-        candidate["distance"] <= config["dedup_strong_distance_threshold"]
-        or candidate["syntactic_similarity"] >= config["dedup_syntactic_threshold"]
-    ):
-        return TIER_NEAR_EXACT
-
-    if candidate.get("verdict") == "DUPLICATE":
-        return TIER_LIKELY
-
-    if candidate["distance"] <= config["dedup_distance_threshold"]:
-        return TIER_POSSIBLE
-
-    return None
-
-
-# Assign a tier to every candidate and return the strongest tier per analysed document.
-def classify_analyses(analyses, config):
-    for analysis in analyses:
-        tiers = []
-
-        for candidate in analysis["candidates"]:
-            candidate["tier"] = classify(candidate, config)
-
-            if candidate["tier"] is not None:
-                tiers.append(candidate["tier"])
-
-        analysis["best_tier"] = next(
-            (tier for tier in TIERS if tier in tiers),
-            None,
-        )
-
-
-# The base names of all constants and types a document defines, e.g. "Ramsey.part" becomes "part".
-def defined_base_names(doc):
-    names = set()
-
-    for qualified in list(doc.get("consts", [])) + list(doc.get("typs", [])):
-        base = str(qualified).split(".")[-1]
-
-        if base != "":
-            names.add(base)
-
-    return names
-
-
-# Derive a synthetic ground truth without using the semantic search: two documents of different
-# entries that define something of the same base name and whose sources are nearly identical are
-# almost certainly duplicates. The semantic search should find those, which gives a recall number.
-# This is biased towards textual duplicates, so it is a lower bound and not a measure of semantic
-# retrieval quality.
-def synthetic_ground_truth(index):
-    by_name = {}
-
-    for doc_id, doc in index.items():
-        if entry_of_id(doc_id) is None:
-            continue
-
-        for name in defined_base_names(doc):
-            by_name.setdefault(name, []).append(doc)
-
-    duplicates = {}
-    skipped_groups = 0
-
-    for docs in by_name.values():
-        if len(docs) < 2:
-            continue
-
-        if len(docs) > GROUND_TRUTH_MAX_GROUP_SIZE:
-            skipped_groups += 1
-            continue
-
-        for i in range(len(docs)):
-            for j in range(i + 1, len(docs)):
-                a = docs[i]
-                b = docs[j]
-
-                if entry_of_id(a["id"]) == entry_of_id(b["id"]):
-                    continue
-
-                if (
-                    syntactic_similarity(a["src"], b["src"])
-                    >= GROUND_TRUTH_SYNTACTIC_THRESHOLD
-                ):
-                    duplicates.setdefault(a["id"], set()).add(b["id"])
-                    duplicates.setdefault(b["id"], set()).add(a["id"])
-
-    return duplicates, skipped_groups
-
-
-# Fraction of the analysed documents that have a known duplicate outside of their own entry and
-# actually retrieved at least one of them within the top k candidates.
-def recall_at_k(ground_truth, analyses):
-    considered = 0
-    recovered = 0
-
-    for analysis in analyses:
-        expected = ground_truth.get(analysis["doc"]["id"])
-
-        if expected is None:
-            continue
-
-        # Duplicates inside the analysed entry itself are excluded from the results by design and
-        # therefore cannot be recovered.
-        reachable = {
-            doc_id
-            for doc_id in expected
-            if entry_of_id(doc_id) != analysis["exclude_entry"]
-        }
-
-        if len(reachable) == 0:
-            continue
-
-        considered += 1
-
-        if len(reachable & {c["id"] for c in analysis["candidates"]}) > 0:
-            recovered += 1
-
-    return {
-        "documents_with_known_duplicate": considered,
-        "documents_recovered": recovered,
-        "recall": (recovered / considered) if considered > 0 else None,
-    }
 
 
 # Build the links of every document that appears in the report. Definitions carry the required Solr
@@ -679,356 +460,17 @@ def analyse_entry(entry, home_index, lookup_index, targets, home_kind, prompts, 
     return analyses
 
 
-# A document passes the positive control if it retrieved itself at a distance of about 0. Demanding
-# rank 1 alone would be wrong: if the analysed entry really is a copy of an archived one, the copy
-# sits at the same place in the embedding space and the order between the two is arbitrary.
-def self_retrieval_passed(analysis, config):
-    if analysis["self_rank"] is None:
-        return False
-
-    return (
-        analysis["self_rank"] == 1
-        or analysis["self_distance"] <= config["dedup_strong_distance_threshold"]
-    )
-
-
-# Summarize the positive control, i.e. how often a document retrieved itself at a distance of about 0.
-def self_retrieval_summary(analyses, config):
-    distances = [
-        analysis["self_distance"]
-        for analysis in analyses
-        if analysis["self_distance"] is not None
-    ]
-    failures = [
-        {
-            "id": analysis["doc"]["id"],
-            "self_rank": analysis["self_rank"],
-            "self_distance": analysis["self_distance"],
-        }
-        for analysis in analyses
-        if not self_retrieval_passed(analysis, config)
-    ]
-    analysed = len(analyses)
-
-    return {
-        "documents": analysed,
-        "self_retrieved": analysed - len(failures),
-        "failure_fraction": (len(failures) / analysed) if analysed > 0 else 0.0,
-        "mean_self_distance": (sum(distances) / len(distances))
-        if len(distances) > 0
-        else None,
-        "failures": failures[:20],
-    }
-
-
-# Aggregate numbers over all analysed documents of one kind.
-def aggregate(analyses, config):
-    buckets = [0.05, 0.1, 0.2, 0.3, 0.5, 1.0]
-    histogram = {f"<= {bucket}": 0 for bucket in buckets}
-    histogram["> 1.0"] = 0
-
-    tier_counts = {tier: 0 for tier in TIERS}
-    tier_counts["none"] = 0
-    verdict_counts = {verdict: 0 for verdict in VERDICTS}
-    verdict_counts[UNKNOWN_VERDICT] = 0
-    candidate_kind_counts = {kind: 0 for kind in KINDS}
-    overlapping_entries = {}
-
-    for analysis in analyses:
-        if analysis["best_tier"] is None:
-            tier_counts["none"] += 1
-        else:
-            tier_counts[analysis["best_tier"]] += 1
-
-        if len(analysis["candidates"]) > 0:
-            top_distance = analysis["candidates"][0]["distance"]
-
-            for bucket in buckets:
-                if top_distance <= bucket:
-                    histogram[f"<= {bucket}"] += 1
-                    break
-            else:
-                histogram["> 1.0"] += 1
-
-        for candidate in analysis["candidates"]:
-            if "verdict" in candidate:
-                verdict_counts[candidate["verdict"]] += 1
-
-            if candidate["tier"] is not None:
-                candidate_kind_counts[candidate["kind"]] += 1
-                candidate_entry = entry_of_id(candidate["id"])
-
-                if candidate_entry is not None:
-                    overlapping_entries[candidate_entry] = (
-                        overlapping_entries.get(candidate_entry, 0) + 1
-                    )
-
-    flagged = tier_counts[TIER_NEAR_EXACT] + tier_counts[TIER_LIKELY]
-
-    return {
-        "documents": len(analyses),
-        "documents_with_near_exact_or_likely_duplicate": flagged,
-        "tier_counts": tier_counts,
-        "verdict_counts": verdict_counts,
-        "candidate_kind_counts": candidate_kind_counts,
-        "top_1_distance_histogram": histogram,
-        "overlapping_entries": dict(
-            sorted(overlapping_entries.items(), key=lambda item: -item[1])[:20]
-        ),
-        "thresholds": {
-            "top_k": config["dedup_top_k"],
-            "distance": config["dedup_distance_threshold"],
-            "strong_distance": config["dedup_strong_distance_threshold"],
-            "syntactic": config["dedup_syntactic_threshold"],
-        },
-    }
-
-
-# Decide which documents and candidates end up in the report. By default only candidates that reach
-# a tier are reported, with 'report_all' every analysed document and every candidate is reported.
-def is_reported(analysis, report_all):
-    if report_all:
-        return len(analysis["candidates"]) > 0
-
-    return analysis["best_tier"] is not None
-
-
-def is_reported_candidate(candidate, report_all):
-    return report_all or candidate["tier"] is not None
-
-
-# Convert the in-memory analyses into the plain data that is written to the JSON report.
-def analyses_to_report(
-    analyses, corpus_index, urls, report_all=False, source_excerpt_length=600
-):
-    items = []
-
-    for analysis in analyses:
-        if not is_reported(analysis, report_all):
-            continue
-
-        doc = analysis["doc"]
-        candidates = []
-
-        for candidate in analysis["candidates"]:
-            if not is_reported_candidate(candidate, report_all):
-                continue
-
-            candidate_doc = corpus_index[candidate["id"]]
-            candidates.append(
-                {
-                    "id": candidate["id"],
-                    "entry": entry_of_id(candidate["id"]),
-                    "kind": candidate["kind"],
-                    "entity_kname": candidate_doc.get("entity_kname"),
-                    "command": candidate_doc.get("command"),
-                    "tier": candidate["tier"],
-                    "distance": candidate["distance"],
-                    "syntactic_similarity": candidate["syntactic_similarity"],
-                    "verdict": candidate.get("verdict"),
-                    "justification": candidate.get("justification"),
-                    "src": candidate_doc["src"][:source_excerpt_length],
-                    **urls.get(candidate["id"], {}),
-                }
-            )
-
-        items.append(
-            {
-                "id": doc["id"],
-                "entry": analysis["exclude_entry"],
-                "entity_kname": doc.get("entity_kname"),
-                "command": doc.get("command"),
-                "best_tier": analysis["best_tier"],
-                "self_rank": analysis["self_rank"],
-                "self_distance": analysis["self_distance"],
-                "src": doc["src"][:source_excerpt_length],
-                **urls.get(doc["id"], {}),
-                "candidates": candidates,
-            }
-        )
-
-    return items
-
-
-# Render one link, falling back to plain text if no URL is available.
-def markdown_link(text, url):
-    if url is None or url == "#":
-        return text
-
-    return f"[{text}]({url})"
-
-
-# Render the Markdown report that is meant for human inspection.
-def render_markdown(report):
-    lines = []
-    lines.append("# Duplicate analysis of AFP entries")
-    lines.append("")
-    lines.append(f"Generated at {report['generated_at']}.")
-    lines.append("")
-    lines.append(
-        "This report lists, for each analysed AFP entry, material that already exists elsewhere in "
-        "the Archive of Formal Proofs. The entry's own material is excluded from its results. "
-        "Ranking is based on the distance in the embedding space; the tiers are a triage aid for "
-        "human inspection and not a verdict, because semantic similarity is not logical duplication."
-    )
-    lines.append("")
-    lines.append("Tiers:")
-    lines.append("")
-    lines.append(
-        f"- `{TIER_NEAR_EXACT}`: distance <= "
-        f"{report['thresholds']['strong_distance']} or syntactic similarity >= "
-        f"{report['thresholds']['syntactic']}"
-    )
-    lines.append(f"- `{TIER_LIKELY}`: the LLM judged the pair to be a duplicate")
-    lines.append(f"- `{TIER_POSSIBLE}`: distance <= {report['thresholds']['distance']}")
-    lines.append("")
-
-    if not report["llm_judge"]:
-        lines.append(
-            "The LLM adjudication was switched off for this run, so the tiers are based on the "
-            f"distance and the syntactic similarity only and no candidate reaches `{TIER_LIKELY}`."
-        )
-        lines.append("")
-
-    if report.get("cross"):
-        lines.append(
-            "Cross-kind matching is enabled, so every analysed document was matched against the "
-            "definitions *and* the theorems of the AFP. The kind of each candidate is given in "
-            "parentheses. Note that the synthetic ground truth below only contains definitions, "
-            "while candidates of both kinds compete for the reported places, so its recall is not "
-            "comparable to a run without cross-kind matching."
-        )
-        lines.append("")
-
-    if report.get("all_candidates"):
-        lines.append(
-            f"Every analysed document is listed with its closest {report['thresholds']['top_k']} "
-            "candidates, including the ones that reach no tier."
-        )
-        lines.append("")
-
-    for kind, section in report["sections"].items():
-        lines.append(f"## {kind.capitalize()}")
-        lines.append("")
-
-        summary = section["aggregates"]
-        lines.append(
-            f"{summary['documents_with_near_exact_or_likely_duplicate']} of "
-            f"{summary['documents']} analysed {kind} have a near-exact or likely duplicate "
-            "elsewhere in the AFP."
-        )
-        lines.append("")
-
-        control = section["self_retrieval"]
-        lines.append(
-            f"Positive control: {control['self_retrieved']} of {control['documents']} documents "
-            f"retrieved themselves at a distance of about 0 (mean self distance "
-            f"{control['mean_self_distance']})."
-        )
-        lines.append("")
-
-        ground_truth = section["synthetic_ground_truth"]
-        if ground_truth["documents_with_known_duplicate"] > 0:
-            lines.append(
-                f"Synthetic ground truth: {ground_truth['documents_recovered']} of "
-                f"{ground_truth['documents_with_known_duplicate']} documents with a syntactically "
-                f"near-identical counterpart in another entry were recovered within the top "
-                f"{report['thresholds']['top_k']} (recall {ground_truth['recall']:.2f})."
-            )
-            lines.append("")
-
-        lines.append("Top-1 distance histogram:")
-        lines.append("")
-        for bucket, count in summary["top_1_distance_histogram"].items():
-            lines.append(f"- `{bucket}`: {count}")
-        lines.append("")
-
-        if len(summary["overlapping_entries"]) > 0:
-            lines.append("Most overlapping entries:")
-            lines.append("")
-            for overlapping_entry, count in summary["overlapping_entries"].items():
-                lines.append(f"- `{overlapping_entry}`: {count} reported candidates")
-            lines.append("")
-
-        for entry_section in section["entries"]:
-            lines.append(
-                f"### {entry_section['entry']} ({entry_section['date'] or 'unknown date'})"
-            )
-            lines.append("")
-            lines.append(
-                f"{len(entry_section['items'])} of {entry_section['documents']} {kind} of this "
-                "entry have at least one reported candidate."
-            )
-            lines.append("")
-
-            for item in entry_section["items"]:
-                title = item["entity_kname"] or item["id"]
-                lines.append(
-                    f"#### {markdown_link(title, item['remote_url'])} "
-                    f"[{item['best_tier'] or 'no tier'}]"
-                )
-                lines.append("")
-                lines.append("```isabelle")
-                lines.append(item["src"].strip())
-                lines.append("```")
-                lines.append("")
-
-                for candidate in item["candidates"]:
-                    candidate_title = candidate["entity_kname"] or candidate["id"]
-                    lines.append(
-                        f"- **{candidate['tier'] or 'no tier'}** "
-                        f"({candidate['command'] or candidate['kind']}) "
-                        f"{markdown_link(candidate_title, candidate['remote_url'])} "
-                        f"in {markdown_link(candidate['entry'] or '?', candidate['entry_url'])} "
-                        f"(distance {candidate['distance']:.4f}, "
-                        f"syntactic {candidate['syntactic_similarity']:.2f}"
-                        + (
-                            f", verdict {candidate['verdict']}"
-                            if candidate.get("verdict")
-                            else ""
-                        )
-                        + ")"
-                    )
-
-                    if candidate.get("justification"):
-                        lines.append(f"  - {candidate['justification']}")
-
-                    lines.append("")
-                    lines.append("  ```isabelle")
-                    for source_line in candidate["src"].strip().splitlines():
-                        lines.append("  " + source_line)
-                    lines.append("  ```")
-                    lines.append("")
-
-    return "\n".join(lines) + "\n"
-
-
-# Write the JSON and the Markdown report and return both paths.
-def write_report(report, report_folder):
-    folder = os.path.join(report_folder, "duplicates")
-
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    json_path = os.path.join(folder, f"experiment_{timestamp}.json")
-    markdown_path = os.path.join(folder, f"experiment_{timestamp}.md")
-
-    with open(json_path, "w") as file:
-        json.dump(report, file, indent=4)
-
-    with open(markdown_path, "w") as file:
-        file.write(render_markdown(report))
-
-    return json_path, markdown_path
-
-
-# Return the (kind, collection, index) target of one kind.
+# Return the (collection, index) pair that holds the documents of one kind.
 def corpus_target(kind, components):
     if kind == KIND_DEFINITIONS:
-        return kind, components["definition_collection"], components["definition_index"]
+        return components["definition_collection"], components["definition_index"]
 
-    return kind, components["collection"], components["document_index"]
+    return components["collection"], components["document_index"]
+
+
+# The document index of one kind.
+def corpus_index(kind, components):
+    return corpus_target(kind, components)[1]
 
 
 # Run the analysis for one kind of document (definitions or theorems) over all selected entries.
@@ -1037,27 +479,32 @@ def corpus_target(kind, components):
 def analyse_kind(
     kind, selected, components, config, use_llm_judge, report_all=False, cross=False
 ):
-    home_kind, collection, home_index = corpus_target(kind, components)
-    targets = [(home_kind, collection, home_index)]
+    collection, home_index = corpus_target(kind, components)
+    targets = [(kind, collection, home_index)]
 
     if cross:
         other_kind = KIND_THEOREMS if kind == KIND_DEFINITIONS else KIND_DEFINITIONS
-        targets.append(corpus_target(other_kind, components))
+        targets.append((other_kind, *corpus_target(other_kind, components)))
 
     # Candidates can come from any target, so they are resolved against all of them. Merging the
     # indexes is safe because config["solr_query"] and config["solr_query_definitions"] select
-    # disjoint Isabelle commands, so no document can be part of both corpora.
-    lookup_index = dict(home_index)
+    # disjoint Isabelle commands, so no document can be part of both corpora. Without a second
+    # target there is nothing to merge, and copying the index would cost a full dictionary rebuild
+    # of the whole corpus for a value that is only ever read.
+    lookup_index = home_index
 
-    for _, _, index in targets[1:]:
-        overlap = len(lookup_index) + len(index)
-        lookup_index.update(index)
+    if len(targets) > 1:
+        lookup_index = dict(home_index)
 
-        if len(lookup_index) != overlap:
-            print(
-                "Warning: the theorem and the definition corpus share documents. Check that "
-                "config['solr_query'] and config['solr_query_definitions'] do not overlap."
-            )
+        for _, _, index in targets[1:]:
+            overlap = len(lookup_index) + len(index)
+            lookup_index.update(index)
+
+            if len(lookup_index) != overlap:
+                print(
+                    "Warning: the theorem and the definition corpus share documents. Check that "
+                    "config['solr_query'] and config['solr_query_definitions'] do not overlap."
+                )
 
     all_analyses = []
     entry_sections = []
@@ -1068,7 +515,7 @@ def analyse_kind(
             home_index,
             lookup_index,
             targets,
-            home_kind,
+            kind,
             components["prompts"],
             config,
         )
@@ -1102,19 +549,16 @@ def analyse_kind(
     # constants and types they define, which only the definitions corpus stores, so for theorems it
     # is empty by construction and the report suppresses the section.
     print("Deriving a synthetic ground truth from the corpus...")
-    ground_truth, skipped_groups = synthetic_ground_truth(home_index)
+    ground_truth, skipped_groups = synthetic_ground_truth(
+        home_index, {analysis["doc"]["id"] for analysis in all_analyses}
+    )
 
     # Collect every document that shows up in the report, so its links are resolved in one go.
     reported_ids = set()
-    for analysis in all_analyses:
-        if not is_reported(analysis, report_all):
-            continue
 
+    for analysis, candidates in reported_documents(all_analyses, report_all):
         reported_ids.add(analysis["doc"]["id"])
-
-        for candidate in analysis["candidates"]:
-            if is_reported_candidate(candidate, report_all):
-                reported_ids.add(candidate["id"])
+        reported_ids.update(candidate["id"] for candidate in candidates)
 
     urls = resolve_urls(sorted(reported_ids), lookup_index, components["solr"], config)
 
@@ -1270,7 +714,7 @@ def main(argv=None):
     available_entries = set()
 
     for kind in args.kinds:
-        available_entries |= entries_in_index(corpus_target(kind, components)[2])
+        available_entries |= entries_in_index(corpus_index(kind, components))
 
     if args.entry is not None:
         selected = []
@@ -1326,12 +770,7 @@ def main(argv=None):
         "cross": args.cross,
         "query_model": query_model_name(config),
         "embedder": embedding_model_name(config),
-        "thresholds": {
-            "top_k": config["dedup_top_k"],
-            "distance": config["dedup_distance_threshold"],
-            "strong_distance": config["dedup_strong_distance_threshold"],
-            "syntactic": config["dedup_syntactic_threshold"],
-        },
+        "thresholds": dedup_thresholds(config),
         "sections": sections,
     }
 

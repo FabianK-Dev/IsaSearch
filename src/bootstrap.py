@@ -39,6 +39,8 @@ import os
 from src.solr import connect_solr, count_docs
 from src.documents import (
     build_document_index,
+    descriptions_artifact_path,
+    document_index_cache_path,
     get_document_descriptions,
     relevant_definition_doc_keys,
     BUILD_CORPUS_COMMAND,
@@ -55,7 +57,6 @@ from src.installation import (
     check_and_update,
     build_index,
     setup_isabelle_components,
-    get_isabelle_version,
     find_facts_home,
 )
 
@@ -125,7 +126,6 @@ def prepare_corpus_sources(config, check_updates=True, build_find_facts=True):
     if build_find_facts:
         print("Setting up Isabelle components if required...")
         setup_isabelle_components(config)
-        config["isabelle_version"] = get_isabelle_version(config)
 
         print("Building Isabelle FindFacts index if required...")
         build_index(config)
@@ -202,8 +202,8 @@ def build_definition_corpus(config, solr, prompts):
 # are attached with generate_missing disabled (so no LLM call can happen) and the collection is
 # opened with add_missing disabled (so nothing can be embedded).
 def load_definition_corpus(config, prompts):
-    index_cache = f"{config['cache_folder']}/{DEFINITION_INDEX_CACHE}"
-    descriptions = f"{config['artifacts_folder']}/{DEFINITION_DESCRIPTIONS}"
+    index_cache = document_index_cache_path(config, DEFINITION_INDEX_CACHE)
+    descriptions = descriptions_artifact_path(config, DEFINITION_DESCRIPTIONS)
 
     for path in [index_cache, descriptions]:
         if not os.path.isfile(path):

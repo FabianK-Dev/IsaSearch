@@ -23,8 +23,13 @@ from chromadb.api.types import EmbeddingFunction
 
 
 from src.solr import docs_by_ids
-from src.llm import save_llm_output_cache, query_model_name
-from src.openai_api import openai_api_key, openai_headers, raise_for_status_with_body
+from src.llm import extract_marked_output, save_llm_output_cache, query_model_name
+from src.openai_api import (
+    openai_api_key,
+    openai_headers,
+    raise_for_status_with_body,
+    status_error_message,
+)
 
 SENTENCE_TRANSFORMERS_EMBEDDING_BACKEND = "sentence_transformers"
 OPENAI_EMBEDDING_BACKEND = "openai"
@@ -52,6 +57,19 @@ RETRYABLE_STATUS_CODES = [429, 500, 502, 503, 504]
 # therefore has to be started with a physical batch size of at least 4096 (llama-server: '-ub 4096
 # -b 4096'), which is far above its default of 512. Lower this value to embed with a smaller batch.
 DEFAULT_EMBEDDING_MAX_CHARACTERS = 8000
+
+# Number of texts per request to the embedding server, overridable through
+# config["openai_embedding_batch_size"].
+DEFAULT_EMBEDDING_BATCH_SIZE = 32
+
+# How long a single embedding request may take. Generous, because a server that is still loading its
+# model can take a while to answer the first batch of a run.
+EMBEDDING_REQUEST_TIMEOUT = 600
+
+# Embedding models that are served through an OpenAI compatible API (e.g. Qwen3-Embedding) are
+# trained for cosine similarity, whereas ChromaDB defaults to squared L2. This is a property of the
+# embedder and not of the backend name, so it is carried by the embedding function itself.
+COSINE_COLLECTION_METADATA = {"hnsw:space": "cosine"}
 
 
 # Raised for errors that are worth retrying, so that they can be told apart from permanent ones.
@@ -82,6 +100,10 @@ def embedding_backend(config):
 # compare it against the one persisted next to the collection. The parameter of __call__ has to be
 # named 'input', because ChromaDB inspects its signature.
 class OpenAIEmbeddingFunction(EmbeddingFunction):
+    # The distance function a collection built with this embedder has to use, read by
+    # get_chromadb_collection. Embedders that are happy with ChromaDB's default do not define it.
+    collection_metadata = COSINE_COLLECTION_METADATA
+
     def __init__(
         self,
         base_url,
@@ -144,16 +166,12 @@ class OpenAIEmbeddingFunction(EmbeddingFunction):
                     self.base_url + "/embeddings",
                     json={"model": self.model_name, "input": texts},
                     headers=self.headers,
-                    timeout=600,
+                    timeout=EMBEDDING_REQUEST_TIMEOUT,
                 )
 
                 if response.status_code in RETRYABLE_STATUS_CODES:
                     raise RetryableEmbeddingError(
-                        description
-                        + " failed with status code "
-                        + str(response.status_code)
-                        + ": "
-                        + response.text
+                        status_error_message(response, description)
                     )
 
                 # Permanent errors are raised from here and are deliberately not retried.
@@ -256,7 +274,7 @@ def get_embedding_function(config):
         return OpenAIEmbeddingFunction(
             config["openai_embedding_base_url"],
             config["openai_embedding_model"],
-            config.get("openai_embedding_batch_size", 32),
+            config.get("openai_embedding_batch_size", DEFAULT_EMBEDDING_BATCH_SIZE),
             config.get(
                 "openai_embedding_max_characters", DEFAULT_EMBEDDING_MAX_CHARACTERS
             ),
@@ -395,10 +413,12 @@ def reconcile_collection(collection, document_index, existing, collection_name):
     for i in range(0, len(removable), 5000):
         collection.delete(ids=removable[i : i + 5000])
 
+    removable_ids = set(removable)
+
     return {
         doc_id: checksum
         for doc_id, checksum in existing.items()
-        if doc_id not in set(removable)
+        if doc_id not in removable_ids
     }
 
 
@@ -427,13 +447,11 @@ def get_chromadb_collection(
     chroma_db_path = config["chroma_db_path"] + "/chroma_db"
     print("Loading ChromaDB collection at path '" + chroma_db_path + "'...")
 
-    # Embedding models that are served through an OpenAI compatible API (e.g. Qwen3-Embedding) are
-    # trained for cosine similarity, whereas ChromaDB defaults to squared L2. Collections that
-    # already exist keep their configured distance function, because ChromaDB ignores the metadata
-    # of get_or_create_collection for them, thus existing collections stay untouched.
-    collection_metadata = None
-    if embedding_backend(config) == OPENAI_EMBEDDING_BACKEND:
-        collection_metadata = {"hnsw:space": "cosine"}
+    # The embedder decides which distance function its vectors need (see COSINE_COLLECTION_METADATA).
+    # Collections that already exist keep their configured distance function, because ChromaDB
+    # ignores the metadata of get_or_create_collection for them, thus existing collections stay
+    # untouched.
+    collection_metadata = getattr(embedder, "collection_metadata", None)
 
     chroma_client = chromadb.PersistentClient(path=chroma_db_path)
     collection = chroma_client.get_or_create_collection(
@@ -553,10 +571,9 @@ def search(
             if config["enable_llm_output_cache"]:
                 save_llm_output_cache(llm_output_cache, config)
 
-        try:
-            refined_query = refined_query.split("<BEGIN>")[1]
-            refined_query = refined_query.split("<END>")[0]
-        except Exception:
+        refined_query, extracted = extract_marked_output(refined_query)
+
+        if not extracted:
             print(
                 "Warning: Could not extract refined query using <BEGIN> and <END> from text generated by LLM for query '"
                 + search_query
@@ -568,9 +585,7 @@ def search(
         else:
             search_query = refined_query
 
-        query_text = prompts[retrieve_prompt_key].format(search_query=search_query)
-    else:
-        query_text = prompts[retrieve_prompt_key].format(search_query=search_query)
+    query_text = prompts[retrieve_prompt_key].format(search_query=search_query)
 
     # Query the ChromaDB collection with the given query_text
     query_result = collection.query(

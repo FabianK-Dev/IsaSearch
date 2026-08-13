@@ -60,6 +60,14 @@ def strip_proof(src):
     return PROOF_KEYWORD.split(src, maxsplit=1)[0]
 
 
+# The part of the source code of a document that stands for it in an LLM prompt, i.e. its statement
+# without the proof, truncated and stripped of trailing whitespace. Shared by the informalization
+# below and by the duplicate judge (src/duplicates.py), so that the judge is shown exactly the same
+# statement the description it compares was generated from.
+def statement_excerpt(src, max_length):
+    return strip_proof(src)[:max_length].strip()
+
+
 # This method returns the metadata (i.e. title, abstract, authors, keywords, etc.) for a given entry
 # from a local copy of the Archive of Formal Proofs (configured in config["afp_folder"]).
 # Additionally this method caches loaded entires in the 'cached_metadata' dict.
@@ -174,9 +182,20 @@ def corpus_fingerprint(config, solr, solr_query):
     }
 
 
+# Where the artifacts of a corpus live. Both are derived here and nowhere else, so that a caller
+# which only wants to know whether a corpus was built (see load_definition_corpus in
+# src/bootstrap.py) cannot look in a different place than the functions that write them.
+def document_index_cache_path(config, cache_name):
+    return f"{config['cache_folder']}/{cache_name}"
+
+
+def descriptions_artifact_path(config, artifact_name):
+    return f"{config['artifacts_folder']}/{artifact_name}"
+
+
 def index_fingerprint_path(config, cache_name):
-    return (
-        f"{config['cache_folder']}/{cache_name.removesuffix('.json')}.fingerprint.json"
+    return document_index_cache_path(
+        config, f"{cache_name.removesuffix('.json')}.fingerprint.json"
     )
 
 
@@ -243,7 +262,7 @@ def generate_document_descriptions(
     generate_missing=True,
 ):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
-    DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + artifact_name
+    DOCUMENT_DESCRIPTIONS = descriptions_artifact_path(config, artifact_name)
 
     # With generate_missing disabled no LLM is called at all, so the prompt does not have to exist.
     # This is used by the web application, which must never start a multi hour informalization run
@@ -336,9 +355,9 @@ def generate_document_descriptions(
         # Create all doc_strings, i.e. all prompts that contain the theorems and metadata, if enabled, along with the instructions for the LLM
         for doc in tqdm(filtered_docs):
             # Remove the proof part of the theorem source code, truncate to max length and strip trailing whitespaces
-            theorem_content = strip_proof(doc["src"])[
-                : config["theorem_max_length"]
-            ].strip()
+            theorem_content = statement_excerpt(
+                doc["src"], config["theorem_max_length"]
+            )
 
             # If enabled, add the metadata to the prompt, otherwise only provive the theorem content.
             if config["add_metadata"]:
@@ -466,34 +485,31 @@ def get_document_descriptions(
 
     print("Parsing LLM descriptions...")
     parsing_failed = 0
+    # An empty description is worse than a missing one: it is embedded like any other text, so the
+    # document is searchable but its vector says nothing about it. Counted separately from the
+    # parsing failures, which include documents that came back with usable prose and merely without
+    # the markers.
+    empty = 0
 
     for doc_id in tqdm(document_descriptions):
+        raw_description = document_descriptions[doc_id]["llm_description"]
+
         try:
-            llm_description = document_descriptions[doc_id]["llm_description"].split(
-                "<BEGIN>"
-            )[1]
+            llm_description = raw_description.split("<BEGIN>")[1]
         except Exception:
             parsing_failed += 1
-            llm_description = document_descriptions[doc_id]["llm_description"]
+            llm_description = raw_description
 
         if doc_id in document_index:
             document_index[doc_id]["llm_description"] = llm_description
+
+            if not llm_description.strip():
+                empty += 1
 
     if parsing_failed > 0:
         print(
             f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for {parsing_failed} documents, thus loading them as-is."
         )
-
-    # An empty description is worse than a missing one: it is embedded like any other text, so the
-    # document is searchable but its vector says nothing about it. Counted separately from the
-    # parsing failures above, which include documents that came back with usable prose and merely
-    # without the markers.
-    empty = sum(
-        1
-        for doc_id in document_descriptions
-        if doc_id in document_index
-        and not document_index[doc_id]["llm_description"].strip()
-    )
 
     if empty > 0:
         print(
@@ -526,7 +542,7 @@ def build_document_index(
     read_only=False,
 ):
     CACHE_FOLDER = config["cache_folder"]
-    DOCUMENT_INDEX_CACHE = f"{CACHE_FOLDER}/{cache_name}"
+    DOCUMENT_INDEX_CACHE = document_index_cache_path(config, cache_name)
     effective_query = solr_query if solr_query is not None else config["solr_query"]
 
     if os.path.isfile(DOCUMENT_INDEX_CACHE):

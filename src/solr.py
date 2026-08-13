@@ -82,24 +82,13 @@ def solr_image(config):
     return "solr:" + isabelle_getenv(config, "SOLR_LUCENE_VERSION")
 
 
-# The same setting, for use inside an error message, where failing to read it must not replace the
-# error being reported.
-def isabelle_getenv_quiet(config, name):
-    from src.installation import isabelle_getenv
-
-    try:
-        return isabelle_getenv(config, name)
-    except Exception:
-        return "unknown"
-
-
 def start_local_solr(config):
     """Start Solr via Docker based on the user command."""
     global solr_process
 
     # Imported here rather than at the top of the file: this module is the low level Solr access
     # that src/installation.py sits above, and only this development convenience needs to reach up.
-    from src.installation import find_facts_home
+    from src.installation import find_facts_home, isabelle_getenv_quiet
 
     # 'isabelle find_facts_index' writes a complete Solr home, with the index as a core named
     # 'local' inside it. Its location is asked of Isabelle, because it carries the release name and

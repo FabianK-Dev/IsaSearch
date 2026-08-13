@@ -19,7 +19,6 @@ import os
 import pathlib
 import shutil
 import subprocess
-import tempfile
 import unittest
 import unittest.mock
 import zlib
@@ -27,6 +26,7 @@ import zlib
 from requests.exceptions import RequestException
 
 from src import corpus, documents, duplicates, embeddings, installation, llm, solr
+from tests.helpers import isabelle_stub, temporary_folder
 from tests.stub_openai_server import StubOpenAIServer
 
 
@@ -73,8 +73,7 @@ def indexed_document(doc_id, src):
 
 class TemporaryFolderTestCase(unittest.TestCase):
     def setUp(self):
-        self.folder = tempfile.mkdtemp()
-        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
+        self.folder = temporary_folder(self)
 
         self.config = {
             "cache_folder": os.path.join(self.folder, "cache"),
@@ -363,8 +362,7 @@ class CollectionUpdateTest(unittest.TestCase):
         self.server = StubOpenAIServer().start()
         self.addCleanup(self.server.stop)
 
-        self.chroma_db_path = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.chroma_db_path, True)
+        self.chroma_db_path = temporary_folder(self)
 
         self.config = {
             "embedding_backend": "openai",
@@ -638,11 +636,7 @@ class BackupRetentionTest(TemporaryFolderTestCase):
             "isabelle_sessions": ["Test_Session"],
         }
 
-        isabelle_bin = os.path.join(self.folder, "bin", "isabelle")
-        os.makedirs(os.path.dirname(isabelle_bin), exist_ok=True)
-
-        with open(isabelle_bin, "w") as file:
-            file.write("#!/bin/sh\n")
+        isabelle_stub(self.folder)
 
         def failing(command, **keywords):
             raise subprocess.CalledProcessError(1, command)
