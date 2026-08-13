@@ -68,6 +68,8 @@ The `openai` backend targets local inference servers that offer an OpenAI compat
 
 Refined queries are cached per model name, so switching the backend regenerates them. Document descriptions are only regenerated when a theorem's source code changes, so already informalized theorems keep the descriptions of the backend that generated them.
 
+> ⚠️ **Reasoning models and `"stop"`.** A model that thinks before it answers returns its thinking in `reasoning_content` and the answer in `content`, and a stop sequence applies to *both*. The prompts ask for the answer wrapped in `<BEGIN>` and `<END>`, and a reasoning model restates that instruction to itself while thinking — so with `"stop": ["<END>"]` generation ends inside the reasoning block, `content` comes back empty, and every description in the corpus is the empty string. `"stop"` is therefore empty by default. For the same reason `max_tokens` has to cover the reasoning as well as the answer, which is why it is 1024 rather than the 256 the prompts ask for. Check with `python3 -m unittest tests.test_server_availability -v` and by reading `artifacts/<model>/document_descriptions.json`, which stores the raw output and the exact prompt for every document.
+
 ### Embedding backend
 
 The embedding backend is selected with `"embedding_backend"` in `config.json` and is either `"sentence_transformers"` (default) or `"openai"`:
