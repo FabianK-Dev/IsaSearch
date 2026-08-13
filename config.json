@@ -12,7 +12,11 @@
             "target_branch": "master"
         }
     },
-    "isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"],
+    "isabelle_sessions": [
+        "Ramsey-Infinite",
+        "Ordinals_and_Cardinals",
+        "Abstract_Substitution"
+    ],
     "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",

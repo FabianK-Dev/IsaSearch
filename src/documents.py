@@ -436,6 +436,25 @@ def get_document_descriptions(
             f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for {parsing_failed} documents, thus loading them as-is."
         )
 
+    # An empty description is worse than a missing one: it is embedded like any other text, so the
+    # document is searchable but its vector says nothing about it. Counted separately from the
+    # parsing failures above, which include documents that came back with usable prose and merely
+    # without the markers.
+    empty = sum(
+        1
+        for doc_id in document_descriptions
+        if doc_id in document_index
+        and not document_index[doc_id]["llm_description"].strip()
+    )
+
+    if empty > 0:
+        print(
+            f"Warning: the LLM returned an empty description for {empty} documents. They will be "
+            f"embedded as empty text and will not be findable by their content. Inspect "
+            f"'{config['artifacts_folder']}/{artifact_name}', which holds the raw output and the "
+            f"exact prompt that produced it."
+        )
+
     return document_index
 
 
