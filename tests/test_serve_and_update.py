@@ -638,5 +638,22 @@ class SolrConnectionTest(unittest.TestCase):
         healthy.ping.assert_not_called()
 
 
+class SolrImageTest(unittest.TestCase):
+    # Lucene never reads a newer index format than its own, so a Solr older than the one Isabelle
+    # wrote the index with exits instead of loading the core. Isabelle reports the version it used,
+    # so the image follows it rather than a number pinned here that rots at the next release.
+    def test_the_image_follows_the_lucene_version_isabelle_reports(self):
+        with unittest.mock.patch.object(
+            installation, "isabelle_getenv", lambda config, name: "9.10"
+        ):
+            self.assertEqual(solr.solr_image({}), "solr:9.10")
+
+    def test_a_configured_image_wins(self):
+        self.assertEqual(
+            solr.solr_image({"solr_image": "solr:9.9"}),
+            "solr:9.9",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

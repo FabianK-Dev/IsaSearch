@@ -16,10 +16,15 @@
 
 services:
   solr:
-    # Match this tag to the Solr version bundled with the pinned Isabelle release; look for
-    # Isabelle/contrib/solr-* on the state volume after the first build. A newer Solr can refuse to
-    # open an index written by an older Lucene.
-    image: solr:9.8.1
+    # This tag has to match the Solr that the pinned Isabelle bundles, because Lucene reads its own
+    # format and older ones but never a newer one: a Solr older than the one that wrote the index
+    # refuses to open the core and exits within seconds. Isabelle reports the version it writes
+    # with, so ask it rather than guessing:
+    #
+    #   docker compose run --rm tools Isabelle/bin/isabelle getenv -b SOLR_LUCENE_VERSION
+    #
+    # Isabelle2025-2 answers 9.10.
+    image: solr:${SOLR_VERSION:-9.10}
     # 'isabelle find_facts_index' writes a complete Solr home to $ISABELLE_HOME_USER/find_facts/solr,
     # with the index as a core named 'local' inside it. It is served directly from there - no core
     # is precreated and nothing is copied, so a rebuild is picked up by restarting this service.

@@ -55,13 +55,42 @@ def cleanup_solr():
         else:
             print(
                 f"Warning: could not stop '{SOLR_CONTAINER_NAME}': "
-                f"{stopped.stderr.strip()}. Stop it by hand with "
-                f"'docker rm -f {SOLR_CONTAINER_NAME}', it still holds port 8983."
+                f"{stopped.stderr.strip()}. If it is still running it holds port 8983; remove it "
+                f"with 'docker rm -f {SOLR_CONTAINER_NAME}'."
             )
 
 
 # Register the cleanup function to run at program exit
 atexit.register(cleanup_solr)
+
+
+# The Solr image to serve the index with, overridable through config["solr_image"].
+#
+# Lucene reads its own format and older ones, never a newer one, so a Solr older than the one that
+# wrote the index refuses to open the core and exits. The version that wrote it is the one Isabelle
+# bundles, which Isabelle itself reports as SOLR_LUCENE_VERSION and stamps into every core it
+# creates as luceneMatchVersion - so the image is derived from that rather than pinned to a number
+# that silently rots at the next Isabelle release.
+def solr_image(config):
+    configured = config.get("solr_image")
+
+    if configured:
+        return configured
+
+    from src.installation import isabelle_getenv
+
+    return "solr:" + isabelle_getenv(config, "SOLR_LUCENE_VERSION")
+
+
+# The same setting, for use inside an error message, where failing to read it must not replace the
+# error being reported.
+def isabelle_getenv_quiet(config, name):
+    from src.installation import isabelle_getenv
+
+    try:
+        return isabelle_getenv(config, name)
+    except Exception:
+        return "unknown"
 
 
 def start_local_solr(config):
@@ -85,14 +114,17 @@ def start_local_solr(config):
         )
         return False
 
+    image = solr_image(config)
+    print(f"Serving the FindFacts index at '{solr_home}' with {image}...")
+
     # Served directly out of that directory rather than precreated as a copy, so that a rebuilt
     # index is picked up by restarting the container.
-    # --name local-solr: so we can easily find and stop it
-    # --rm: container is removed as soon as it stops
+    #
+    # Deliberately without --rm: a Solr that cannot open the index exits within seconds, and --rm
+    # would delete the container and its log along with it, leaving no way to find out why.
     cmd = [
         "docker",
         "run",
-        "--rm",
         "-d",
         "--name",
         SOLR_CONTAINER_NAME,
@@ -102,7 +134,7 @@ def start_local_solr(config):
         f"{solr_home}:/var/solr/data",
         "--user",
         "0:0",
-        "solr:9.8.1",
+        image,
         "solr-foreground",
     ]
 
@@ -135,7 +167,15 @@ def start_local_solr(config):
                 sys.stdout.write(".")
                 sys.stdout.flush()
 
-        print("\nSolr startup timed out.")
+        # The container is left in place on purpose, so that its log can still be read. A Solr that
+        # cannot open the index - most often one older than the Lucene that wrote it - exits within
+        # seconds and says why there and nowhere else.
+        print(
+            f"\nSolr did not become ready. See 'docker logs {SOLR_CONTAINER_NAME}' for the reason; "
+            f"if it names a version, set config['solr_image'] to match "
+            f"(Isabelle wrote this index with Lucene "
+            f"{isabelle_getenv_quiet(config, 'SOLR_LUCENE_VERSION')})."
+        )
         return False
 
     except FileNotFoundError:

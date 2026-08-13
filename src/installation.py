@@ -276,7 +276,30 @@ def isabelle_binary(config):
     )
 
 
-# Ask Isabelle where it keeps the state of the installed distribution, rather than assuming it.
+# Read one setting out of the installed Isabelle, rather than assuming its value. Everything that
+# depends on how the distribution is laid out or built comes from here, so that it stays right
+# across releases instead of drifting until something breaks quietly.
+def isabelle_getenv(config, name):
+    isabelle_bin = isabelle_binary(config)
+
+    if not os.path.exists(isabelle_bin):
+        raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
+
+    result = subprocess.run(
+        [isabelle_bin, "getenv", "-b", name],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    value = result.stdout.strip()
+
+    if not value:
+        raise RuntimeError(f"Isabelle reported an empty {name}.")
+
+    return value
+
+
+# Where Isabelle keeps the state of the installed distribution.
 #
 # It is not ~/.isabelle: Isabelle's own etc/settings sets
 # ISABELLE_HOME_USER="$USER_HOME/.isabelle/$ISABELLE_IDENTIFIER" whenever ISABELLE_IDENTIFIER is
@@ -285,26 +308,7 @@ def isabelle_binary(config):
 # directory, reported as missing and rebuilt on every single run, and a Solr started against that
 # directory serves nothing.
 def isabelle_home_user(config):
-    isabelle_bin = isabelle_binary(config)
-
-    if not os.path.exists(isabelle_bin):
-        raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
-
-    result = subprocess.run(
-        [isabelle_bin, "getenv", "-b", "ISABELLE_HOME_USER"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    home_user = result.stdout.strip()
-
-    if not home_user:
-        raise RuntimeError(
-            "Isabelle reported an empty ISABELLE_HOME_USER, so the location of the FindFacts "
-            "index is unknown."
-        )
-
-    return Path(home_user)
+    return Path(isabelle_getenv(config, "ISABELLE_HOME_USER"))
 
 
 # Where 'isabelle find_facts_index' writes, i.e. $ISABELLE_HOME_USER/find_facts as defined by the
