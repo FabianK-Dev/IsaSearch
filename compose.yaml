@@ -20,10 +20,18 @@ services:
     # Isabelle/contrib/solr-* on the state volume after the first build. A newer Solr can refuse to
     # open an index written by an older Lucene.
     image: solr:9.8.1
-    # 'isabelle find_facts_index' writes a complete Solr home to ~/.isabelle/find_facts/solr, with
-    # the index as a core named 'local' inside it. It is served directly from there - no core is
-    # precreated and nothing is copied, so a rebuild is picked up by restarting this service.
-    command: ["solr-foreground", "-s", "/data/home/.isabelle/find_facts/solr"]
+    # 'isabelle find_facts_index' writes a complete Solr home to $ISABELLE_HOME_USER/find_facts/solr,
+    # with the index as a core named 'local' inside it. It is served directly from there - no core
+    # is precreated and nothing is copied, so a rebuild is picked up by restarting this service.
+    #
+    # $ISABELLE_HOME_USER carries the release name whenever the distribution sets
+    # ISABELLE_IDENTIFIER, which every release does, so the path is $HOME/.isabelle/<release>. HOME
+    # is /data/home in the image. Keep ISABELLE_RELEASE in step with components.isabelle.version in
+    # config.json; 'python3 -m src.corpus' prints the path it indexed into.
+    command:
+      - solr-foreground
+      - -s
+      - /data/home/.isabelle/${ISABELLE_RELEASE:-Isabelle2025-2}/find_facts/solr
     # The index is written by the build container, which runs as root, and Solr's own uid could not
     # read it. Both share one volume, so they have to agree on the user.
     user: "0:0"

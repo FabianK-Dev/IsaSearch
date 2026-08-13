@@ -46,32 +46,42 @@ def start_local_solr(config):
     """Start Solr via Docker based on the user command."""
     global solr_process
 
-    # The local path where Isabelle stores the FindFacts index, i.e. the same one that
-    # src/installation.py builds into: ~/.isabelle/find_facts/solr/local
-    user_home = os.path.expanduser("~")
-    local_mount_path = os.path.join(
-        user_home, ".isabelle", "find_facts", "solr", "local"
-    )
+    # Imported here rather than at the top of the file: this module is the low level Solr access
+    # that src/installation.py sits above, and only this development convenience needs to reach up.
+    from src.installation import find_facts_home
 
-    # Ensure the directory exists, otherwise Docker will complain
-    os.makedirs(local_mount_path, exist_ok=True)
+    # 'isabelle find_facts_index' writes a complete Solr home, with the index as a core named
+    # 'local' inside it. Its location is asked of Isabelle, because it carries the release name and
+    # guessing it wrong means serving an empty directory that never becomes ready. It has to exist:
+    # there is nothing to serve before the corpus build has run.
+    solr_home = str(find_facts_home(config) / "solr")
 
-    # Build Docker command
-    # --name local-solr: So we can easily find and stop it
-    # --rm: Container is removed as soon as it stops
+    if not os.path.isdir(os.path.join(solr_home, "local")):
+        print(
+            f"There is no FindFacts index at '{solr_home}'. Build it first with "
+            "'python3 -m src.corpus --index-only'."
+        )
+        return False
+
+    # Served directly out of that directory rather than precreated as a copy, so that a rebuilt
+    # index is picked up by restarting the container.
+    # --name local-solr: so we can easily find and stop it
+    # --rm: container is removed as soon as it stops
     cmd = [
         "docker",
         "run",
         "--rm",
         "-d",
+        "--name",
+        "local-solr",
         "-p",
         "8983:8983",
         "-v",
-        f"{local_mount_path}:/opt/solr/server/solr/local",
-        "solr:latest",
-        "solr-precreate",
-        "local",
-        "/opt/solr/server/solr/local",
+        f"{solr_home}:/var/solr/data",
+        "--user",
+        "0:0",
+        "solr:9.8.1",
+        "solr-foreground",
     ]
 
     print("Starting Solr Docker container...")

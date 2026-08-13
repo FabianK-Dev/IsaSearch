@@ -564,7 +564,9 @@ class BackupRetentionTest(TemporaryFolderTestCase):
         with (
             unittest.mock.patch.object(installation.subprocess, "run", failing),
             unittest.mock.patch.object(
-                installation.Path, "home", lambda: pathlib.Path(self.folder)
+                installation,
+                "find_facts_home",
+                lambda config: pathlib.Path(self.folder) / "find_facts",
             ),
             self.assertRaises(RuntimeError) as raised,
         ):

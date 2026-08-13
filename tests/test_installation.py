@@ -295,6 +295,56 @@ class ComponentSetupTest(unittest.TestCase):
         self.assertIn(["components", "-a"], [call[1:] for call in calls])
 
 
+# Isabelle's own etc/settings sets ISABELLE_HOME_USER to $USER_HOME/.isabelle/$ISABELLE_IDENTIFIER
+# whenever that identifier is set, which every release distribution does. Assuming ~/.isabelle
+# instead is quiet and expensive: the FindFacts index is then looked for in an empty directory,
+# reported as missing and rebuilt on every run, and a Solr started against it serves nothing.
+class FindFactsLocationTest(unittest.TestCase):
+    def setUp(self):
+        self.folder = tempfile.mkdtemp()
+        self.addCleanup(lambda: shutil.rmtree(self.folder, ignore_errors=True))
+
+        isabelle_bin = os.path.join(self.folder, "bin", "isabelle")
+        os.makedirs(os.path.dirname(isabelle_bin))
+
+        with open(isabelle_bin, "w") as file:
+            file.write("#!/bin/sh\n")
+
+        self.config = {"components": {"isabelle": {"local_folder": self.folder}}}
+
+    def answer(self, stdout):
+        return lambda command, **keywords: subprocess.CompletedProcess(
+            command, 0, stdout=stdout
+        )
+
+    def test_the_location_is_asked_of_isabelle(self):
+        asked = []
+
+        def run(command, **keywords):
+            asked.append(command)
+            return subprocess.CompletedProcess(
+                command, 0, stdout="/home/u/.isabelle/Isabelle2025-2\n"
+            )
+
+        with unittest.mock.patch.object(installation.subprocess, "run", run):
+            home = installation.find_facts_home(self.config)
+
+        self.assertEqual(str(home), "/home/u/.isabelle/Isabelle2025-2/find_facts")
+        self.assertIn("ISABELLE_HOME_USER", asked[0])
+        self.assertIn("getenv", asked[0])
+
+    def test_an_empty_answer_is_reported_instead_of_guessed(self):
+        with (
+            unittest.mock.patch.object(
+                installation.subprocess, "run", self.answer("\n")
+            ),
+            self.assertRaises(RuntimeError) as raised,
+        ):
+            installation.find_facts_home(self.config)
+
+        self.assertIn("ISABELLE_HOME_USER", str(raised.exception))
+
+
 class ComponentDispatchTest(unittest.TestCase):
     def setUp(self):
         self.folder = tempfile.mkdtemp()

@@ -270,10 +270,51 @@ def setup_isabelle_components(config):
         print(f"Warning: error setting up Isabelle components: {e}")
 
 
-def get_isabelle_version(config):
-    isabelle_bin = os.path.join(
+def isabelle_binary(config):
+    return os.path.join(
         config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
     )
+
+
+# Ask Isabelle where it keeps the state of the installed distribution, rather than assuming it.
+#
+# It is not ~/.isabelle: Isabelle's own etc/settings sets
+# ISABELLE_HOME_USER="$USER_HOME/.isabelle/$ISABELLE_IDENTIFIER" whenever ISABELLE_IDENTIFIER is
+# set, which every release distribution does, so the real location carries the release name.
+# Guessing it wrong is quiet and expensive: the FindFacts index is then looked for in an empty
+# directory, reported as missing and rebuilt on every single run, and a Solr started against that
+# directory serves nothing.
+def isabelle_home_user(config):
+    isabelle_bin = isabelle_binary(config)
+
+    if not os.path.exists(isabelle_bin):
+        raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
+
+    result = subprocess.run(
+        [isabelle_bin, "getenv", "-b", "ISABELLE_HOME_USER"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    home_user = result.stdout.strip()
+
+    if not home_user:
+        raise RuntimeError(
+            "Isabelle reported an empty ISABELLE_HOME_USER, so the location of the FindFacts "
+            "index is unknown."
+        )
+
+    return Path(home_user)
+
+
+# Where 'isabelle find_facts_index' writes, i.e. $ISABELLE_HOME_USER/find_facts as defined by the
+# settings of the Find_Facts component.
+def find_facts_home(config):
+    return isabelle_home_user(config) / "find_facts"
+
+
+def get_isabelle_version(config):
+    isabelle_bin = isabelle_binary(config)
 
     if not os.path.exists(isabelle_bin):
         raise FileNotFoundError(f"Isabelle binary not found at: {isabelle_bin}")
@@ -334,14 +375,12 @@ def build_index(config):
        c. Runs Isabelle 'find_facts_index'.
        d. Saves the new session list to 'indexed_sessions.json'.
     """
-    isabelle_bin = os.path.join(
-        config["components"]["isabelle"]["local_folder"], "bin", "isabelle"
-    )
+    isabelle_bin = isabelle_binary(config)
     afp_folder = str(Path(config["components"]["afp"]["local_folder"]).absolute())
 
-    # Paths
-    isabelle_home = Path.home() / ".isabelle"
-    find_facts_dir = isabelle_home / "find_facts"
+    # Paths, asked of Isabelle rather than assumed: see isabelle_home_user above.
+    find_facts_dir = find_facts_home(config)
+    isabelle_home = find_facts_dir.parent
     solr_index_dir = find_facts_dir / "solr" / "local"
     state_file = find_facts_dir / "indexed_sessions.json"
 
@@ -410,6 +449,7 @@ def build_index(config):
             prune_backups(isabelle_home, config)
 
     # 4. Build the index
+    print(f"Building FindFacts index in {solr_index_dir}...")
     print(f"Building FindFacts index for sessions: {current_sessions}...")
     cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"] + current_sessions
 
