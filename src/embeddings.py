@@ -23,7 +23,13 @@ from chromadb.api.types import EmbeddingFunction
 
 
 from src.solr import docs_by_ids
-from src.llm import extract_marked_output, save_llm_output_cache, query_model_name
+from src.llm import (
+    cached_output,
+    extract_marked_output,
+    query_model_name,
+    save_llm_output_cache,
+    store_output,
+)
 from src.openai_api import (
     openai_api_key,
     openai_headers,
@@ -542,31 +548,33 @@ def search(
         model_key = query_model_name(config)
 
         # Check if a cached response for the search query and prompt already exists
-        if (
-            llm_output_cache is not None
-            and model_key in llm_output_cache
-            and llm_prompt in llm_output_cache[model_key]
-        ):
+        cached = (
+            cached_output(llm_output_cache, model_key, llm_prompt)
+            if llm_output_cache is not None
+            else None
+        )
+
+        if cached is not None:
             print(f"Using cached LLM response for prompt '{llm_prompt[:200]}...'")
-            refined_query = llm_output_cache[model_key][llm_prompt]["output"]
+            refined_query = cached["output"]
             # If using a cached response, also use a cached duration (i.e. the original response generation duration).
             # Otherwise the duration would be very short for consecutive benchmark runs and would falsify the benchmark result.
-            cached_duration = llm_output_cache[model_key][llm_prompt]["output_duration"]
+            cached_duration = cached["output_duration"]
         else:
             # If config["enable_llm_output_cache"] is False, the method parameter llm_output_cache will be None. In that case reset it to an empty dictionary {} so we can write into it.
             llm_output_cache = llm_output_cache if llm_output_cache is not None else {}
             refined_query = model.generate(llm_prompt)
 
-            end = time.time()
-            output_duration = end - start
-
-            if model_key not in llm_output_cache:
-                llm_output_cache[model_key] = {}
-
-            llm_output_cache[model_key][llm_prompt] = {
-                "output": refined_query,
-                "output_duration": output_duration,
-            }
+            # Deliberately timed from the start of the whole search and not around the request
+            # alone: this duration is replayed by cached benchmark runs, so its meaning must not
+            # change between a cached and an uncached run.
+            store_output(
+                llm_output_cache,
+                model_key,
+                llm_prompt,
+                refined_query,
+                time.time() - start,
+            )
 
             if config["enable_llm_output_cache"]:
                 save_llm_output_cache(llm_output_cache, config)

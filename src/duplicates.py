@@ -67,7 +67,12 @@ from src.embeddings import (
     add_doc_urls,
     embedding_model_name,
 )
-from src.llm import save_llm_output_cache, query_model_name
+from src.llm import (
+    cached_output,
+    query_model_name,
+    save_llm_output_cache,
+    store_output,
+)
 from src.solr import docs_by_ids
 
 
@@ -361,7 +366,7 @@ def judge_candidates(
             item_b=excerpt_of(corpus_index[candidate["id"]]),
         )
 
-        cached = cache.get(model_key, {}).get(prompt)
+        cached = cached_output(cache, model_key, prompt)
 
         if cached is not None:
             raw_output = cached["output"]
@@ -369,13 +374,7 @@ def judge_candidates(
             start = time.time()
             raw_output = model.generate(prompt)
 
-            if model_key not in cache:
-                cache[model_key] = {}
-
-            cache[model_key][prompt] = {
-                "output": raw_output,
-                "output_duration": time.time() - start,
-            }
+            store_output(cache, model_key, prompt, raw_output, time.time() - start)
             unsaved += 1
 
             # Writing the whole cache after every single judgement would dominate the runtime, so it

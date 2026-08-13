@@ -675,6 +675,21 @@ def get_document_llm(config):
     return build_llm(config, DOCUMENT_ROLE)
 
 
+# The cache nests by model and then by prompt, so that switching the configured model never reuses
+# an output that a different model generated. The two helpers below are the only places that know
+# this layout; callers hold on to the returned entry, whose "output" and "output_duration" keys are
+# part of the on-disk format that save_llm_output_cache writes.
+def cached_output(cache, model_key, prompt):
+    return cache.get(model_key, {}).get(prompt)
+
+
+def store_output(cache, model_key, prompt, output, duration):
+    cache.setdefault(model_key, {})[prompt] = {
+        "output": output,
+        "output_duration": duration,
+    }
+
+
 # Load the LLM output from the cache folder, configured at config["cache_folder"].
 def get_llm_output_cache(config, cache_name=DEFAULT_LLM_OUTPUT_CACHE):
     llm_output_cache = None
