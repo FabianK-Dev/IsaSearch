@@ -213,6 +213,141 @@ class DescriptionConcurrencyTest(TemporaryFolderTestCase):
         self.assertEqual(len(self.written()), 6)
 
 
+# The duplicate judge sends its requests concurrently like the informalization above. What must
+# not change is the outcome: the same verdicts, the same cache entries in the same order, and
+# whatever was already judged survives an interrupted run.
+class JudgeConcurrencyTest(TemporaryFolderTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.config.update(
+            {
+                "dedup_max_judged_per_item": 3,
+                "dedup_distance_threshold": 0.5,
+                "theorem_max_length": 1000,
+                "llm_backend": "openai",
+                "openai_query_model": "judge-model",
+            }
+        )
+        self.prompts = {"duplicate_judge": "A: {item_a}\nB: {item_b}"}
+        self.corpus_index = {
+            f"thys/E{i}/T.thy|{i}": indexed_document(
+                f"thys/E{i}/T.thy|{i}", f"lemma l{i}: True"
+            )
+            for i in range(8)
+        }
+
+    def doc_id(self, i):
+        return f"thys/E{i}/T.thy|{i}"
+
+    # 'pairs' is a list of (query index, [candidate indexes]) tuples.
+    def analyses_for(self, pairs):
+        return [
+            {
+                "doc": self.corpus_index[self.doc_id(query)],
+                "candidates": [
+                    {"id": self.doc_id(candidate), "distance": 0.1}
+                    for candidate in candidates
+                ],
+            }
+            for query, candidates in pairs
+        ]
+
+    def judge(self, analyses, generate, concurrency, cache):
+        self.config["llm_concurrency"] = concurrency
+        model = unittest.mock.Mock()
+        model.generate.side_effect = generate
+
+        duplicates.judge_candidates(
+            model, self.prompts, self.config, analyses, self.corpus_index, cache
+        )
+
+        return model
+
+    def echo(self, prompt):
+        return "<BEGIN>VERDICT: DUPLICATE\njudged " + prompt + "<END>"
+
+    def run_with(self, concurrency):
+        analyses = self.analyses_for([(0, [1, 2]), (3, [1]), (4, [5, 6, 7])])
+        cache = {}
+        self.judge(analyses, self.echo, concurrency, cache)
+
+        return analyses, cache
+
+    def test_concurrency_does_not_change_the_verdicts_or_the_cache(self):
+        sequential, sequential_cache = self.run_with(concurrency=1)
+        concurrent, concurrent_cache = self.run_with(concurrency=4)
+
+        self.assertEqual(concurrent, sequential)
+        # The entries and even their order have to match, because executor.map yields in input
+        # order; only the measured durations may differ between the two runs.
+        self.assertEqual(
+            list(concurrent_cache["judge-model"]), list(sequential_cache["judge-model"])
+        )
+        self.assertEqual(
+            {p: e["output"] for p, e in concurrent_cache["judge-model"].items()},
+            {p: e["output"] for p, e in sequential_cache["judge-model"].items()},
+        )
+
+    def test_every_verdict_belongs_to_its_own_pair(self):
+        # The failure this guards against is silent: a mismatched result ordering assigns each
+        # pair someone else's verdict, and nothing downstream would ever notice.
+        analyses, _ = self.run_with(concurrency=4)
+
+        for analysis in analyses:
+            for candidate in analysis["candidates"]:
+                self.assertEqual(candidate["verdict"], "DUPLICATE")
+                self.assertIn(analysis["doc"]["src"], candidate["justification"])
+                self.assertIn(
+                    self.corpus_index[candidate["id"]]["src"],
+                    candidate["justification"],
+                )
+
+    def test_a_repeated_pair_is_judged_once(self):
+        # The same pair can show up under several analysed documents; the sequential loop judged
+        # it once through the cache, and sending the requests concurrently must not undo that.
+        analyses = self.analyses_for([(0, [1]), (0, [1])])
+        model = self.judge(analyses, self.echo, concurrency=4, cache={})
+
+        self.assertEqual(model.generate.call_count, 1)
+        for analysis in analyses:
+            self.assertEqual(analysis["candidates"][0]["verdict"], "DUPLICATE")
+
+    def test_cached_pairs_are_not_judged_again(self):
+        analyses = self.analyses_for([(0, [1])])
+        cache = {}
+        self.judge(analyses, self.echo, concurrency=4, cache=cache)
+
+        model = self.judge(self.analyses_for([(0, [1])]), self.echo, 4, cache)
+
+        self.assertEqual(model.generate.call_count, 0)
+
+    def test_an_interrupted_run_keeps_the_finished_judgements(self):
+        calls = []
+
+        def generate(prompt):
+            calls.append(prompt)
+
+            if len(calls) > 2:
+                raise RuntimeError("the server went away")
+
+            return self.echo(prompt)
+
+        analyses = self.analyses_for([(0, [1]), (2, [3]), (4, [5]), (6, [7])])
+
+        # Sequential, so that exactly two completions exist when the third request fails.
+        with self.assertRaises(RuntimeError):
+            self.judge(analyses, generate, concurrency=1, cache={})
+
+        with open(
+            os.path.join(self.config["cache_folder"], duplicates.DEDUP_LLM_CACHE)
+        ) as file:
+            saved = json.load(file)
+
+        # The completions the run already paid for are on disk for the next run to reuse.
+        self.assertEqual(len(saved["judge-model"]), 2)
+
+
 class DocumentIndexCacheTest(TemporaryFolderTestCase):
     def setUp(self):
         super().setUp()

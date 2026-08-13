@@ -28,6 +28,7 @@ import sys
 import time
 import tomllib
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -38,7 +39,7 @@ from src.bootstrap import (
     boot_components,
     DEFINITIONS_LOAD,
 )
-from src.documents import statement_excerpt, BUILD_CORPUS_COMMAND
+from src.documents import llm_concurrency, statement_excerpt, BUILD_CORPUS_COMMAND
 from src.duplicate_report import (
     analyses_to_report,
     reported_documents,
@@ -348,7 +349,6 @@ def judge_candidates(
 
     print(f"Judging {len(pending)} candidate pairs with the LLM...")
 
-    unsaved = 0
     # Every document is judged against several candidates and a popular candidate against several
     # documents, so the excerpts are cut once per document instead of once per pair. Cutting means
     # a regex split over the full source including its proof, which is by far the longest part.
@@ -360,35 +360,69 @@ def judge_candidates(
 
         return excerpts[doc["id"]]
 
-    for analysis, candidate in tqdm(pending):
-        prompt = prompts["duplicate_judge"].format(
+    pair_prompts = [
+        prompts["duplicate_judge"].format(
             item_a=excerpt_of(analysis["doc"]),
             item_b=excerpt_of(corpus_index[candidate["id"]]),
         )
+        for analysis, candidate in pending
+    ]
 
-        cached = cached_output(cache, model_key, prompt)
+    # The prompts that actually need a completion, deduplicated in first-seen order: the same pair
+    # can show up under several analysed documents, and generating it twice would waste a request
+    # on an answer that the cache already holds by the time the second one is assigned.
+    uncached = list(
+        dict.fromkeys(
+            prompt
+            for prompt in pair_prompts
+            if cached_output(cache, model_key, prompt) is None
+        )
+    )
 
-        if cached is not None:
-            raw_output = cached["output"]
-        else:
-            start = time.time()
-            raw_output = model.generate(prompt)
+    workers = llm_concurrency(config)
 
-            store_output(cache, model_key, prompt, raw_output, time.time() - start)
-            unsaved += 1
+    if len(uncached) > 0:
+        print(
+            f"{len(uncached)} of the pairs are not cached yet, judging them with "
+            f"{workers} request(s) in flight..."
+        )
 
-            # Writing the whole cache after every single judgement would dominate the runtime, so it
-            # is written in batches instead.
-            if config["enable_llm_output_cache"] and unsaved >= save_every:
-                save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
-                unsaved = 0
+    def timed_generate(prompt):
+        start = time.time()
+        return model.generate(prompt), time.time() - start
 
-        verdict, justification = parse_verdict(raw_output)
+    unsaved = 0
+
+    # The requests are independent and the server processes several at once, so they are sent
+    # concurrently, exactly like the informalization in src/documents.py. Only this thread ever
+    # touches the cache: the workers do nothing but the HTTP request, and executor.map yields in
+    # input order, so the cache contents are identical to what a sequential run produces.
+    try:
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            for prompt, (raw_output, duration) in tqdm(
+                zip(uncached, executor.map(timed_generate, uncached)),
+                total=len(uncached),
+            ):
+                store_output(cache, model_key, prompt, raw_output, duration)
+                unsaved += 1
+
+                # Writing the whole cache after every single judgement would dominate the runtime,
+                # so it is written in batches instead.
+                if config["enable_llm_output_cache"] and unsaved >= save_every:
+                    save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
+                    unsaved = 0
+    finally:
+        # Whatever came back is saved even when a request failed or the run was interrupted, so
+        # that the completions a long run already paid for are not judged again by the next one.
+        if config["enable_llm_output_cache"] and unsaved > 0:
+            save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
+
+    for (analysis, candidate), prompt in zip(pending, pair_prompts):
+        verdict, justification = parse_verdict(
+            cached_output(cache, model_key, prompt)["output"]
+        )
         candidate["verdict"] = verdict
         candidate["justification"] = justification
-
-    if config["enable_llm_output_cache"] and unsaved > 0:
-        save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
 
 
 # Build the links of every document that appears in the report. Definitions carry the required Solr
