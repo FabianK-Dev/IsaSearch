@@ -70,6 +70,8 @@ Refined queries are cached per model name, so switching the backend regenerates 
 
 `"openai_extra_body"` is merged verbatim into every request, for the settings a local server needs that the OpenAI API never standardised.
 
+`"llm_concurrency"` is how many informalization requests are in flight at once. Informalizing is by far the longest step of a build, and an inference server that batches — every `llama-server` started with `--parallel` — is mostly idle while one blocking request is answered. Match it to what the server can actually take; llama.cpp reports that as `total_slots` at its `/props` endpoint. It defaults to 1, because a server that does not batch gains nothing and one that is also serving the website should not be saturated by a build.
+
 > ⚠️ **Turn a reasoning model's thinking off.** A model that thinks before it answers returns its thinking in `reasoning_content` and the answer in `content`. On this task the thinking does not terminate: measured against `gemma-4-26B-A4B`, a one-line corollary produced 3000–4000 characters of reasoning, ran into `max_tokens` every single time, and returned `content: ""`. The corpus is then built out of empty descriptions, which embed fine and retrieve nothing. Switching it off made the same requests **10× faster** (1.8 s instead of 17.7 s) and correct:
 >
 > ```json

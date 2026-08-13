@@ -14,6 +14,7 @@ These tests need neither a network, nor Solr, nor a GPU server. Run them with
 'python3 -m unittest tests.test_serve_and_update -v'.
 """
 
+import json
 import os
 import pathlib
 import shutil
@@ -126,6 +127,91 @@ class LlmOutputCacheTest(TemporaryFolderTestCase):
         ]
 
         self.assertEqual(leftovers, [])
+
+
+# Informalizing is the longest step of a build, and the inference server processes several requests
+# at once, so the requests go out concurrently. What must not change is the artifact: same entries,
+# same order, and whatever came back is written even when the run is interrupted.
+class DescriptionConcurrencyTest(TemporaryFolderTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.config["prompts_folder"] = self.folder
+        self.config["theorem_max_length"] = 1000
+        self.config["llm_backend"] = "openai"
+        self.config["openai_document_model"] = "test-model"
+        self.index = {
+            f"thys/E/T.thy|{i}": indexed_document(
+                f"thys/E/T.thy|{i}", f"lemma l{i}: True"
+            )
+            for i in range(12)
+        }
+
+    def describe(self, generate, concurrency):
+        self.config["llm_concurrency"] = concurrency
+        llm_stub = unittest.mock.Mock()
+        llm_stub.generate.side_effect = generate
+
+        # Neither the NLTK download nor its corpora are part of what this pins down, and the
+        # download needs a network.
+        with (
+            unittest.mock.patch.object(
+                documents, "get_document_llm", lambda config: llm_stub
+            ),
+            unittest.mock.patch.object(
+                documents.nltk, "download", lambda *a, **k: None
+            ),
+            # Replaced as a whole rather than by attribute: nltk's corpus objects load themselves on
+            # the first attribute access, which is exactly what has to be avoided here.
+            unittest.mock.patch.object(
+                documents,
+                "stopwords",
+                unittest.mock.Mock(words=lambda language: ["the", "a"]),
+            ),
+        ):
+            return documents.generate_document_descriptions(
+                self.config, self.index, {"describe": "{theorem_content}"}
+            )
+
+    def written(self):
+        with open(
+            os.path.join(self.config["artifacts_folder"], "document_descriptions.json")
+        ) as file:
+            return json.load(file)
+
+    def test_concurrency_does_not_change_the_artifact(self):
+        sequential = self.describe(lambda prompt: "about " + prompt, concurrency=1)
+        shutil.rmtree(self.config["artifacts_folder"])
+        concurrent = self.describe(lambda prompt: "about " + prompt, concurrency=4)
+
+        self.assertEqual(list(concurrent), list(sequential))
+        self.assertEqual(concurrent, sequential)
+
+    def test_every_description_belongs_to_its_own_document(self):
+        # The failure this guards against is silent: a mismatched result ordering pairs each
+        # document with someone else's description, and nothing downstream would ever notice.
+        described = self.describe(lambda prompt: "about " + prompt, concurrency=4)
+
+        for doc_id, entry in described.items():
+            self.assertIn(self.index[doc_id]["src"], entry["llm_description"])
+
+    def test_an_interrupted_batch_keeps_what_was_already_described(self):
+        calls = []
+
+        def generate(prompt):
+            calls.append(prompt)
+
+            if len(calls) > 6:
+                raise RuntimeError("the server went away")
+
+            return "about " + prompt
+
+        with self.assertRaises(RuntimeError):
+            self.describe(generate, concurrency=1)
+
+        # Hours of a multi day run must not be lost to one failed request; the next run describes
+        # whatever has no entry yet.
+        self.assertEqual(len(self.written()), 6)
 
 
 class DocumentIndexCacheTest(TemporaryFolderTestCase):

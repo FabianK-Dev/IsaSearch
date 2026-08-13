@@ -10,6 +10,8 @@ import zlib
 import re
 import nltk
 
+from concurrent.futures import ThreadPoolExecutor
+
 
 from tqdm import tqdm
 from nltk.corpus import stopwords
@@ -25,6 +27,26 @@ cached_metadata = {}
 # point would be circular: src/corpus.py imports src/bootstrap.py, which imports this file. This is
 # the lowest module that has to report a missing corpus, and every consumer already imports it.
 BUILD_CORPUS_COMMAND = "python3 -m src.corpus"
+
+# How many informalization requests are in flight at once, overridable through
+# config["llm_concurrency"]. One request at a time leaves an inference server that batches - every
+# llama-server started with --parallel does - mostly idle, and informalization is the longest step
+# of a build. The default is 1 because a server that does not batch gains nothing and a local one
+# that is also serving the website should not be saturated by a build. Match it to the server's
+# capacity: llama.cpp reports that as 'total_slots' at its /props endpoint.
+DEFAULT_LLM_CONCURRENCY = 1
+
+
+def llm_concurrency(config):
+    workers = config.get("llm_concurrency", DEFAULT_LLM_CONCURRENCY)
+
+    if not isinstance(workers, int) or workers < 1:
+        raise ValueError(
+            f"config['llm_concurrency'] has to be a positive integer, got {workers!r}."
+        )
+
+    return workers
+
 
 # The 'proof' keyword as a whole word, i.e. not as part of an identifier such as 'proof_system'.
 PROOF_KEYWORD = re.compile(r"(?<![A-Za-z0-9_'])proof(?![A-Za-z0-9_'])")
@@ -351,6 +373,9 @@ def generate_document_descriptions(
         print("Loading LLM...")
         llm = get_document_llm(config)
 
+        workers = llm_concurrency(config)
+        print(f"Describing documents with {workers} request(s) in flight...")
+
         # Generate document descriptions for all filtered_docs
         for i in tqdm(range(0, len(filtered_docs), save_every)):
             print(
@@ -365,30 +390,53 @@ def generate_document_descriptions(
                 + "..."
             )
             batch_doc_strings = doc_strings[i : i + save_every]
-            for j, doc_string in enumerate(tqdm(batch_doc_strings)):
-                doc_id = filtered_docs[i + j]["id"]
-                doc_src = filtered_docs[i + j]["src"]
-                raw_llm_description = llm.generate(doc_string).strip()
+            described = []
 
-                # For debugging purposes, only print the first the generated document descriptions
-                if j < 3:
-                    print(
-                        f"Raw LLM output for doc_id {doc_id}: '{raw_llm_description}'"
-                    )
+            # The requests are independent of each other and the server processes several at once,
+            # so they are sent concurrently: informalizing the whole AFP one blocking request at a
+            # time is the longest single step of a build by a wide margin. executor.map yields in
+            # input order, which keeps the artifact identical to what a sequential run produces.
+            try:
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    for raw_llm_description in tqdm(
+                        executor.map(
+                            lambda doc_string: llm.generate(doc_string).strip(),
+                            batch_doc_strings,
+                        ),
+                        total=len(batch_doc_strings),
+                    ):
+                        described.append(raw_llm_description)
+            finally:
+                # Whatever came back is written even when the batch was interrupted, so that hours
+                # of a multi day run are not lost to one failed request. The rest is picked up by
+                # the next run, which describes exactly what has no entry yet.
+                for j, raw_llm_description in enumerate(described):
+                    doc = filtered_docs[i + j]
 
-                document_descriptions[doc_id] = {
-                    "llm_description": raw_llm_description,
-                    "zlib.adler32_checksum": zlib.adler32(doc_src.encode("utf-8")),
-                    "model": document_model_name(config),
-                    "prompt": doc_string,
-                }
+                    # For debugging purposes, only print the first generated document descriptions
+                    if j < 3:
+                        print(
+                            f"Raw LLM output for doc_id {doc['id']}: "
+                            f"'{raw_llm_description}'"
+                        )
 
-            print("Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "...")
-            if not os.path.exists(ARTIFACTS_FOLDER):
-                os.makedirs(ARTIFACTS_FOLDER)
+                    document_descriptions[doc["id"]] = {
+                        "llm_description": raw_llm_description,
+                        "zlib.adler32_checksum": zlib.adler32(
+                            doc["src"].encode("utf-8")
+                        ),
+                        "model": document_model_name(config),
+                        "prompt": doc_strings[i + j],
+                    }
 
-            with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
-                json.dump(document_descriptions, outfile, indent=4)
+                print(
+                    "Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "..."
+                )
+                if not os.path.exists(ARTIFACTS_FOLDER):
+                    os.makedirs(ARTIFACTS_FOLDER)
+
+                with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
+                    json.dump(document_descriptions, outfile, indent=4)
 
         print("Finished generating document descriptions.")
     else:

@@ -52,6 +52,7 @@
     "openai_embedding_batch_size": 32,
     "openai_embedding_max_characters": 8000,
     "llm_request_timeout": 600,
+    "llm_concurrency": 4,
     "theorem_max_length": 1000,
     "metadata_max_length": 300,
     "sampling_parameters": {
