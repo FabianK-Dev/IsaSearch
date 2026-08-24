@@ -12,11 +12,7 @@
             "target_branch": "master"
         }
     },
-    "isabelle_sessions": [
-        "Ramsey-Infinite",
-        "Ordinals_and_Cardinals",
-        "Abstract_Substitution"
-    ],
+    "isabelle_sessions": ["all"],
     "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
@@ -52,7 +48,7 @@
     "openai_embedding_batch_size": 32,
     "openai_embedding_max_characters": 8000,
     "llm_request_timeout": 600,
-    "llm_concurrency": 4,
+    "llm_concurrency": 8,
     "theorem_max_length": 1000,
     "metadata_max_length": 300,
     "sampling_parameters": {
