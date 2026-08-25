@@ -12,6 +12,12 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
   AWT while indexing and aborts with `*** Fontconfig head is null` on a machine that has no fonts at
   all — which a minimal server install typically does not. On Debian or Ubuntu:
   `sudo apt-get install -y fontconfig fonts-dejavu-core`
+- `libgomp1`. Isabelle ships z3 in its `contrib` directory, but that binary links against the GNU
+  OpenMP runtime, which a minimal server install does not have. Without it every proof that calls
+  the `smt` method fails with `Solver terminated abnormally with error code 127` — the shell's
+  "command not found", reported because the dynamic loader cannot start the binary at all — so every
+  AFP session containing such a proof fails to build and is missing from the index afterwards. On
+  Debian or Ubuntu: `sudo apt-get install -y libgomp1`
 - One of the supported LLM backends:
   - an OpenAI-compatible server (what the checked-in `config.json` is configured for, see below), or
   - [Ollama](https://ollama.com/download), which the application starts itself, or
