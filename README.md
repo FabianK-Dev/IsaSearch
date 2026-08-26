@@ -26,6 +26,13 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
   `sudo apt-get install -y texlive-full` — a targeted subset tends to trip on a missing `.sty` in
   some entry, and only the few entries that ask for a document build one, so the full install is
   the cheaper choice in practice.
+- A C toolchain with the GMP headers, if the AFP is indexed. Several entries (`PAC_Checker`,
+  `Native_Word`, `Buchi_Complementation`, `Munta_Model_Checker`) export code and compile it with
+  MLton as part of the session, and MLton emits C which it hands to `cc` and links against GMP for
+  its arbitrary-precision integers. Without a compiler the session fails with
+  `call to system failed with Fail: exit status 7F` — hex for 127, the shell's "command not found" —
+  and without the headers with a `compilation terminated` from `cc`. On Debian or Ubuntu:
+  `sudo apt-get install -y build-essential libgmp-dev`
 - One of the supported LLM backends:
   - an OpenAI-compatible server (what the checked-in `config.json` is configured for, see below), or
   - [Ollama](https://ollama.com/download), which the application starts itself, or
@@ -76,6 +83,32 @@ Two settings exist for the sessions that will not build:
   values are chosen for the machine the Archive is built on; a slower one needs more room. Scaling
   is the way to give it, because an absolute timeout in a session's `ROOT` overrides anything passed
   on the command line.
+
+#### Memory for indexing the whole AFP
+
+The index is built by a JVM whose default limits are sized for a handful of sessions, not for the
+~1000 entries of the Archive. Both have to be raised in `$ISABELLE_HOME_USER/etc/settings` — that
+path is what `isabelle getenv -b ISABELLE_HOME_USER` prints, e.g. `~/.isabelle/Isabelle2025-2` —
+which Isabelle reads after its own settings, so an assignment there wins:
+
+```
+ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms2g -Xmx24g -Xss128m"
+```
+
+- **Heap** (`-Xmx`). The default of 4 GB runs out part way through indexing the full Archive, and
+  the run dies with `java.lang.OutOfMemoryError: Java heap space` *after* every session has been
+  built — the most expensive possible moment to fail. Give it what the machine can spare while
+  leaving room for the file cache; half of physical memory is a reasonable choice.
+- **Stack** (`-Xss`). The default of 16 MB overflows on `Isabelle_C`, whose theories embed a
+  machine-generated C parser, with `java.lang.StackOverflowError` while `Indexing theory
+  "Isabelle_C...."`. The recursion is deep rather than unbounded, so more stack does fix it, and
+  stack is committed per thread only as it is used — a large value costs nothing in practice. If
+  raising it does not help, exclude `Isabelle_C` (see `"isabelle_excluded_sessions"` above).
+- Keep `-Djava.awt.headless=true`, or the JVM initializes AWT and aborts on a machine without fonts.
+
+Sessions are cached, so a failure here does not rebuild them — but the indexing itself starts over,
+which is why both values are worth setting before the first full run rather than discovering them
+one at a time.
 
 ### LLM backend
 
