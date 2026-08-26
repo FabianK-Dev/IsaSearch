@@ -12,7 +12,14 @@
             "target_branch": "master"
         }
     },
-    "isabelle_sessions": ["all"],
+    "isabelle_sessions": [
+        "all"
+    ],
+    "isabelle_excluded_sessions": [
+        "Detour_Calculus",
+        "Perrons_Formula"
+    ],
+    "isabelle_timeout_scale": 3,
     "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",

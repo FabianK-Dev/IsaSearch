@@ -64,6 +64,19 @@ Building the full FindFacts index for the entire Archive of Formal Proofs takes 
 
 If you want to search the entire AFP, you need to update the `isabelle_sessions` list in `config.json` to include all desired sessions (or use `["all"]` if supported by your setup), but be prepared for the significant processing time mentioned above.
 
+Two settings exist for the sessions that will not build:
+
+- `"isabelle_excluded_sessions"` is subtracted from the session list, `["all"]` included. A single
+  failing session fails the whole index build, and with it the corpus, so an entry that is broken in
+  the Archive itself would otherwise block everything else. What is excluded is printed on every
+  run, because an entry that is not indexed can never be searched or reported as a duplicate — that
+  gap should be visible, not inferred. Note that a session which an included one depends on is still
+  built as a dependency, so excluding it achieves nothing.
+- `"isabelle_timeout_scale"` multiplies the timeout each session declares in its `ROOT`. Those
+  values are chosen for the machine the Archive is built on; a slower one needs more room. Scaling
+  is the way to give it, because an absolute timeout in a session's `ROOT` overrides anything passed
+  on the command line.
+
 ### LLM backend
 
 The LLM backend is selected with `"llm_backend"` in `config.json` and is either `"ollama"` (default), `"llamacpp"` or `"openai"`:

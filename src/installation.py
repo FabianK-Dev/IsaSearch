@@ -379,6 +379,45 @@ def prune_backups(isabelle_home, config):
             print(f"Warning: could not remove {path}: {error}")
 
 
+# Drop the sessions named by config["isabelle_excluded_sessions"] from the session list.
+#
+# A single failing session makes the whole index build fail (see below), so one entry that is broken
+# in the Archive itself blocks the corpus for everything else. Excluding it is the way out, and it
+# is deliberately loud: an entry that is not indexed can never be searched or reported as a
+# duplicate, so what a corpus is missing has to be visible in the build output rather than inferred
+# from its absence.
+#
+# Note that this only stops a session from being requested, not from being built: a session that an
+# included one depends on is still built as a dependency. Excluding a session that others build on
+# therefore achieves nothing, and the build fails as before.
+def without_excluded_sessions(sessions, config):
+    excluded = set(config.get("isabelle_excluded_sessions", []))
+
+    if not excluded:
+        return sessions
+
+    remaining = [session for session in sessions if session not in excluded]
+    dropped = sorted(set(sessions) & excluded)
+
+    if dropped:
+        print(
+            f"Excluding {len(dropped)} session(s) from the index, so they are not part of the "
+            f"corpus: {', '.join(dropped)}."
+        )
+
+    # A name that matches nothing is almost always a typo, and a typo here is silent: the session it
+    # was meant to exclude is built, fails, and takes the run down with it.
+    unknown = sorted(excluded - set(sessions))
+
+    if unknown:
+        print(
+            f"Warning: config['isabelle_excluded_sessions'] names {len(unknown)} session(s) that "
+            f"are not in the session list anyway: {', '.join(unknown)}."
+        )
+
+    return remaining
+
+
 def build_index(config):
     """
     1. Checks if index exists AND if the session list matches the last build.
@@ -407,6 +446,8 @@ def build_index(config):
                 current_sessions = [line.strip() for line in f if line.strip()]
         else:
             raise FileNotFoundError(f"ROOTS file not found at: {roots_file}")
+
+    current_sessions = without_excluded_sessions(current_sessions, config)
 
     # 1. Check logic: Index exists? Sessions changed?
     index_exists = solr_index_dir.exists() and any(solr_index_dir.iterdir())
@@ -464,7 +505,18 @@ def build_index(config):
     # 4. Build the index
     print(f"Building FindFacts index in {solr_index_dir}...")
     print(f"Building FindFacts index for sessions: {current_sessions}...")
-    cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"] + current_sessions
+    cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"]
+
+    # Sessions declare their own timeout in their ROOT, chosen for the machine the Archive is built
+    # on. timeout_scale multiplies whatever a session declares, so a slower machine can be given
+    # more room without touching any of them - unlike an absolute timeout, which a session option
+    # would override.
+    timeout_scale = config.get("isabelle_timeout_scale")
+
+    if timeout_scale is not None:
+        cmd += ["-o", f"timeout_scale={timeout_scale}"]
+
+    cmd += current_sessions
 
     try:
         subprocess.run(cmd, check=True)

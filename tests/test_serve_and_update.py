@@ -990,6 +990,78 @@ class BackupRetentionTest(TemporaryFolderTestCase):
 
         self.assertIn("FindFacts index", str(raised.exception))
 
+    # One session that is broken in the Archive itself fails the whole index build and with it the
+    # corpus, so a run has to be able to leave it out - and has to say which entries it left out,
+    # because an entry that is not indexed is one that can never be searched or reported.
+    def indexed_sessions(self, config):
+        commands = []
+        config = {
+            "components": {
+                "isabelle": {"local_folder": self.folder},
+                "afp": {"local_folder": self.folder},
+            },
+            **config,
+        }
+        isabelle_stub(self.folder)
+
+        with (
+            unittest.mock.patch.object(
+                installation.subprocess,
+                "run",
+                lambda command, **keywords: commands.append(command),
+            ),
+            unittest.mock.patch.object(
+                installation,
+                "find_facts_home",
+                lambda config: pathlib.Path(self.folder) / "find_facts",
+            ),
+        ):
+            installation.build_index(config)
+
+        return commands[0]
+
+    def test_excluded_sessions_are_not_indexed(self):
+        command = self.indexed_sessions(
+            {
+                "isabelle_sessions": ["Good", "Broken", "Also_Good"],
+                "isabelle_excluded_sessions": ["Broken"],
+            }
+        )
+
+        self.assertIn("Good", command)
+        self.assertIn("Also_Good", command)
+        self.assertNotIn("Broken", command)
+
+    def test_the_session_order_survives_an_exclusion(self):
+        command = self.indexed_sessions(
+            {
+                "isabelle_sessions": ["A", "B", "C"],
+                "isabelle_excluded_sessions": ["B"],
+            }
+        )
+
+        self.assertEqual(command[-2:], ["A", "C"])
+
+    def test_nothing_is_dropped_without_an_exclusion(self):
+        command = self.indexed_sessions({"isabelle_sessions": ["A", "B"]})
+
+        self.assertEqual(command[-2:], ["A", "B"])
+
+    # A session's own timeout is chosen for the machine the Archive is built on. Scaling gives a
+    # slower machine more room, and unlike an absolute timeout a session option cannot override it.
+    def test_the_timeout_scale_is_passed_to_the_indexer(self):
+        command = self.indexed_sessions(
+            {"isabelle_sessions": ["A"], "isabelle_timeout_scale": 3}
+        )
+
+        self.assertIn("timeout_scale=3", command)
+        self.assertEqual(command[command.index("timeout_scale=3") - 1], "-o")
+
+    def test_no_timeout_scale_is_passed_unless_configured(self):
+        command = self.indexed_sessions({"isabelle_sessions": ["A"]})
+
+        self.assertNotIn("-o", command)
+
     def test_retention_can_be_switched_off(self):
         self.write_backups(3)
 
