@@ -464,21 +464,7 @@ def build_index(config):
     # 4. Build the index
     print(f"Building FindFacts index in {solr_index_dir}...")
     print(f"Building FindFacts index for sessions: {current_sessions}...")
-    # Documents are the session's PDF documentation, which needs a full LaTeX toolchain
-    # (lualatex and a wide spread of TeX packages) and is of no use to a search index: FindFacts
-    # indexes the theory content, never the PDF. Left on, a machine without LaTeX fails every
-    # session that has a document with 'lualatex: command not found', and a failed session is
-    # missing from the index afterwards - so this trades an unused artifact for entries that would
-    # otherwise be silently absent from the corpus.
-    cmd = [
-        isabelle_bin,
-        "find_facts_index",
-        "-o",
-        "document=false",
-        "-A",
-        afp_folder,
-        "-v",
-    ] + current_sessions
+    cmd = [isabelle_bin, "find_facts_index", "-A", afp_folder, "-v"] + current_sessions
 
     try:
         subprocess.run(cmd, check=True)

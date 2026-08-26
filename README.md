@@ -18,6 +18,14 @@ This repository provides an AI-assisted semantic theorem search for the Archive 
   "command not found", reported because the dynamic loader cannot start the binary at all — so every
   AFP session containing such a proof fails to build and is missing from the index afterwards. On
   Debian or Ubuntu: `sudo apt-get install -y libgomp1`
+- A LaTeX installation providing `lualatex`, if the AFP is indexed. A handful of AFP entries set
+  `document = pdf` in their own `ROOT`, which builds the entry's PDF documentation as part of the
+  session. Session options are applied on top of the command line, so `-o document=false` does not
+  override them: without LaTeX those sessions fail with `lualatex: command not found` and are
+  missing from the index afterwards. On Debian or Ubuntu:
+  `sudo apt-get install -y texlive-full` — a targeted subset tends to trip on a missing `.sty` in
+  some entry, and only the few entries that ask for a document build one, so the full install is
+  the cheaper choice in practice.
 - One of the supported LLM backends:
   - an OpenAI-compatible server (what the checked-in `config.json` is configured for, see below), or
   - [Ollama](https://ollama.com/download), which the application starts itself, or

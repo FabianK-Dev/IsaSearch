@@ -990,42 +990,6 @@ class BackupRetentionTest(TemporaryFolderTestCase):
 
         self.assertIn("FindFacts index", str(raised.exception))
 
-    # Building a session's PDF documentation needs a LaTeX toolchain that a server has no reason to
-    # carry, and a session whose document fails is missing from the index afterwards. The index has
-    # no use for the PDF either way, so the option that switches it off has to stay on the command.
-    def test_the_indexer_does_not_build_documents(self):
-        config = {
-            "components": {
-                "isabelle": {"local_folder": self.folder},
-                "afp": {"local_folder": self.folder},
-            },
-            "isabelle_sessions": ["Test_Session"],
-        }
-
-        isabelle_stub(self.folder)
-        commands = []
-
-        with (
-            unittest.mock.patch.object(
-                installation.subprocess,
-                "run",
-                lambda command, **keywords: commands.append(command),
-            ),
-            unittest.mock.patch.object(
-                installation,
-                "find_facts_home",
-                lambda config: pathlib.Path(self.folder) / "find_facts",
-            ),
-        ):
-            installation.build_index(config)
-
-        self.assertEqual(len(commands), 1)
-        command = commands[0]
-        self.assertIn("find_facts_index", command)
-        self.assertIn("document=false", command)
-        # Passed as its own '-o' argument, not glued to the option name.
-        self.assertEqual(command[command.index("document=false") - 1], "-o")
-
     def test_retention_can_be_switched_off(self):
         self.write_backups(3)
 
