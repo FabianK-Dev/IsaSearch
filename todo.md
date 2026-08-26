@@ -35,11 +35,15 @@
     `+ f95f9664...a7c6f77d master -> origin/master (Aktualisierung erzwungen)`, i.e. the history
     the previous run built against no longer exists. What the corpus was built from is therefore
     not reproducible from the branch name alone.
-  - The branch moves *while* it is being consumed, and it can move to a state where entries do not
-    typecheck. `Detour_Calculus` failed with `Undefined fact: "eqloops_reversepath_cong"` and
-    `Perrons_Formula` with `Undefined fact: "nat_sum_has_integral_ceiling"` — breakage inside the
-    entries, not in our environment. Since a failed session is not indexed, those entries are then
-    silently absent from the corpus.
+  - The branch moves *while* it is being consumed, so a run can start against one state of the
+    Archive and finish against another.
+
+  (Note: the `Undefined fact` failures of `Detour_Calculus` and `Perrons_Formula` are *not* caused
+  by the mirror. They are upstream breakage, introduced by Mercurial changeset `a094b05c15ec`
+  "migration of Manuel's material to the repository" (2026-07-05), which modified exactly
+  `Detour_Calculus.thy` and `Perron_Prerequisites.thy` and left the two facts undefined. Both the
+  mirror and the Mercurial repository carry it, so switching sources does not fix them - they need
+  excluding until upstream repairs them, and are worth reporting to the AFP maintainers.)
 
   The authoritative source is the Mercurial repository at
   `https://foss.heptapod.net/isa-afp/afp-2025-2` (already referenced by
