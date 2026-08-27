@@ -84,3 +84,52 @@
 
   Whatever is chosen, a document whose statement had to be cut should be counted and reported, the
   way truncated completions now are — the current cut is silent, which is why it went unnoticed.
+
+  Measured on the full corpus (302,873 theorem documents), so the cost of raising it is known:
+  median statement 149 characters, 95th percentile 461, longest 19,960. The cap only bites on a
+  long tail, which is why raising it is cheap — only the affected documents send longer prompts.
+
+  | cap | statements still cut |
+  | --- | --- |
+  | 1000 (current) | 2,513 (0.83%) |
+  | 2000 | 621 (0.21%) |
+  | 3000 | 288 (0.10%) |
+  | 5000 | 113 (0.04%) |
+
+  3000 looks like the right trade: it removes 88% of the breakage for roughly an hour across a
+  multi-day build. Higher mainly buys the thin tail, and long prompts start competing for the
+  per-slot context, which `--parallel` divides among the slots — check `n_ctx` at the server's
+  `/props` before going further. Note that raising the cap does not regenerate the descriptions
+  that were already made from a cut statement: the checksum covers `src`, not the excerpt, so those
+  entries have to be deleted by hand to be redone.
+
+## Keeping the corpus current
+
+- [ ] **Rebuild in the background when the AFP moves, and swap the result in when it is finished.**
+  Today a corpus is only as current as the last manual `python3 -m src.corpus`, and bringing it up
+  to date means a maintenance window: the web application has to be stopped, because the build is
+  the one process that may write and a serving process reads the same artifacts. For an Archive
+  that gains entries continuously that is the wrong shape — and the update is usually small, since
+  descriptions are keyed by a checksum of the source and only changed or new documents are
+  informalized.
+
+  What it needs, roughly:
+  - **A trigger.** Poll the AFP for new commits (or watch it) rather than rebuilding on a timer, so
+    a quiet week costs nothing.
+  - **Somewhere to build that is not what is being served.** The build writes the document index,
+    the descriptions artifact and the ChromaDB collections in place, so a background rebuild needs
+    its own `cache_folder`, `artifacts_folder` and `chroma_db_path` — the config already makes all
+    three configurable, so this is mostly a matter of pointing a second config at a second set of
+    paths.
+  - **An atomic swap.** Once the rebuild succeeds, the serving process has to start reading the new
+    corpus. Simplest is the same trick `save_llm_output_cache` already uses: build beside the live
+    copy, then move into place, then have the application reload. Note the application reads its
+    corpus once at start-up, so today "reload" means a restart; a swap without one needs the
+    corpora (see `components["corpora"]`) to be replaceable at runtime.
+  - **A gate before swapping.** A rebuild that failed halfway must never become the served corpus.
+    The duplicate detection's positive control is a ready-made check — every document has to
+    retrieve itself at a distance of about 0 — and the run already exits non-zero when it does not.
+
+  Note that the FindFacts index is the awkward part: `isabelle find_facts_index` writes the same
+  Lucene index a running Solr holds open, so that step cannot simply run beside the live one. It
+  needs its own Solr home and its own container, swapped the same way as the rest.
