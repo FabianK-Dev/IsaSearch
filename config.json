@@ -63,7 +63,7 @@
         "top_p": 1,
         "top_k": -1,
         "min_p": 0,
-        "max_tokens": 256,
+        "max_tokens": 512,
         "stop": []
     },
     "benchmark_add_top_results": false,

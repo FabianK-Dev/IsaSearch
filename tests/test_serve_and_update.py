@@ -158,7 +158,8 @@ class DescriptionConcurrencyTest(TemporaryFolderTestCase):
     def describe(self, generate, concurrency):
         self.config["llm_concurrency"] = concurrency
         llm_stub = unittest.mock.Mock()
-        llm_stub.generate.side_effect = generate
+        # generate() also receives the per-attempt option overrides, which these tests ignore.
+        llm_stub.generate.side_effect = lambda prompt, extra=None: generate(prompt)
 
         # Neither the NLTK download nor its corpora are part of what this pins down, and the
         # download needs a network.
@@ -203,23 +204,43 @@ class DescriptionConcurrencyTest(TemporaryFolderTestCase):
         for doc_id, entry in described.items():
             self.assertIn(self.index[doc_id]["src"], entry["llm_description"])
 
-    def test_an_interrupted_batch_keeps_what_was_already_described(self):
+    # A server that has gone away must not be mistaken for documents that cannot be described: it
+    # would "skip" every remaining document and end reporting an empty corpus as a success.
+    def test_a_failing_server_stops_the_run_but_keeps_what_was_described(self):
         calls = []
 
         def generate(prompt):
             calls.append(prompt)
 
-            if len(calls) > 6:
+            if len(calls) > 3:
                 raise RuntimeError("the server went away")
 
             return "about " + prompt
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(RuntimeError) as raised:
             self.describe(generate, concurrency=1)
 
-        # Hours of a multi day run must not be lost to one failed request; the next run describes
-        # whatever has no entry yet.
-        self.assertEqual(len(self.written()), 6)
+        self.assertIn(
+            "server is failing rather than the documents", str(raised.exception)
+        )
+        # Hours of a multi day run must not be lost; the next run describes whatever has no entry.
+        self.assertEqual(len(self.written()), 3)
+
+    # One document the server refuses is left without an entry and the run carries on, because a
+    # single bad theorem in hundreds of thousands must not end a build that takes days.
+    def test_a_single_undescribable_document_is_skipped(self):
+        def generate(prompt):
+            if "l7:" in prompt:
+                raise RuntimeError("does not match the expected format")
+
+            return "about " + prompt
+
+        described = self.describe(generate, concurrency=1)
+
+        self.assertEqual(len(described), 11)
+        self.assertNotIn("thys/E/T.thy|7", described)
+        # No entry means the next run tries it again rather than embedding an empty description.
+        self.assertNotIn("thys/E/T.thy|7", self.written())
 
 
 # The raw LLM output in the artifact carries the answer between <BEGIN> and <END>; what is loaded
@@ -258,6 +279,61 @@ class DescriptionParsingTest(TemporaryFolderTestCase):
 
     def test_output_without_markers_is_loaded_as_is(self):
         self.assertEqual(self.load("no markers at all"), "no markers at all")
+
+
+# A completion that a server refuses must not end a run that has been going for days. Retrying is
+# what the embedding side has always done; the temperature bump exists because greedy sampling makes
+# a failure as reproducible as a success, so a plain retry would send the same request and be
+# refused again.
+class GenerateRetryTest(unittest.TestCase):
+    def setUp(self):
+        # The backoff between attempts is real time, which a test has no reason to spend.
+        patcher = unittest.mock.patch.object(llm.time, "sleep", lambda seconds: None)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def model_failing(self, times, error=None):
+        model = unittest.mock.Mock()
+        error = error or RuntimeError("failed with status code 500")
+        model.generate.side_effect = [error] * times + ["described"]
+
+        return model
+
+    def test_a_completion_that_works_is_not_retried(self):
+        model = self.model_failing(0)
+
+        self.assertEqual(llm.generate_with_retries(model, "prompt"), "described")
+        self.assertEqual(model.generate.call_count, 1)
+
+    def test_the_configured_sampling_is_used_for_the_first_attempt(self):
+        model = self.model_failing(0)
+        llm.generate_with_retries(model, "prompt")
+
+        self.assertEqual(model.generate.call_args.args[1], {})
+
+    def test_a_retry_perturbs_the_temperature(self):
+        model = self.model_failing(1)
+
+        self.assertEqual(llm.generate_with_retries(model, "prompt"), "described")
+        self.assertEqual(model.generate.call_count, 2)
+        self.assertEqual(
+            model.generate.call_args.args[1], {"temperature": llm.RETRY_TEMPERATURE}
+        )
+
+    def test_a_connection_error_is_retried_as_well(self):
+        model = self.model_failing(1, RequestException("connection reset"))
+
+        self.assertEqual(llm.generate_with_retries(model, "prompt"), "described")
+
+    def test_giving_up_names_the_last_failure(self):
+        model = unittest.mock.Mock()
+        model.generate.side_effect = RuntimeError("does not match the expected format")
+
+        with self.assertRaises(RuntimeError) as raised:
+            llm.generate_with_retries(model, "prompt", attempts=3)
+
+        self.assertEqual(model.generate.call_count, 3)
+        self.assertIn("does not match the expected format", str(raised.exception))
 
 
 # The duplicate judge sends its requests concurrently like the informalization above. What must

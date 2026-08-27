@@ -497,14 +497,14 @@ class OllamaLLM:
         self.options = options
         self.timeout = timeout
 
-    def generate(self, prompt):
+    def generate(self, prompt, extra_options=None):
         response = requests.post(
             self.base_url + "/api/generate",
             json={
                 "model": self.model_name,
                 "prompt": prompt,
                 "stream": False,
-                "options": self.options,
+                "options": {**self.options, **(extra_options or {})},
             },
             timeout=self.timeout,
         )
@@ -518,7 +518,7 @@ class LlamaCppLLM:
         self.options = options
         self.timeout = timeout
 
-    def generate(self, prompt):
+    def generate(self, prompt, extra_options=None):
         # The model is not part of the request, because a llama-server process always serves a single model.
         response = requests.post(
             self.base_url + "/completion",
@@ -526,6 +526,7 @@ class LlamaCppLLM:
                 "prompt": prompt,
                 "stream": False,
                 **self.options,
+                **(extra_options or {}),
             },
             timeout=self.timeout,
         )
@@ -548,7 +549,7 @@ class OpenAILLM:
         self.headers = openai_headers(api_key)
         self.timeout = timeout
 
-    def generate(self, prompt):
+    def generate(self, prompt, extra_options=None):
         # The prompt is sent as a single user message, because the server applies the chat template
         # of the model itself. Prompts for this backend therefore must not contain model specific
         # markers such as '<|user|>', which would end up as literal text within the message.
@@ -559,6 +560,7 @@ class OpenAILLM:
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
                 **self.options,
+                **(extra_options or {}),
             },
             headers=self.headers,
             timeout=self.timeout,
@@ -567,6 +569,45 @@ class OpenAILLM:
             response, "Generating a completion at " + self.base_url
         )
         return response.json()["choices"][0]["message"]["content"]
+
+
+# Number of attempts per completion. The embedding side has retried from the start (see
+# EMBEDDING_ATTEMPTS in src/embeddings.py); the LLM side did not, and a single failed request was
+# enough to end an informalization run that had been going for days.
+LLM_ATTEMPTS = 3
+
+# The temperature of every attempt after the first. The configured sampling is usually greedy
+# (temperature 0), which makes a run reproducible but also makes a failure reproducible: a server
+# that rejects what its model produced - a completion cut off at max_tokens no longer parses as the
+# chat format, for instance - rejects the identical output again on a plain retry. Perturbing the
+# temperature is what gives the next attempt a different completion to return.
+RETRY_TEMPERATURE = 0.3
+
+
+# Generate a completion, retrying a failure a few times before giving up.
+#
+# Retrying covers both kinds of failure a server produces: a transient one (a dropped connection, a
+# 503 while a model is loading), which the same request survives, and a deterministic one, which it
+# does not - hence the temperature above. The exception of the last attempt is raised, so a caller
+# that cannot go on still sees why.
+def generate_with_retries(model, prompt, attempts=LLM_ATTEMPTS):
+    last_error = None
+
+    for attempt in range(attempts):
+        try:
+            extra_options = {} if attempt == 0 else {"temperature": RETRY_TEMPERATURE}
+            return model.generate(prompt, extra_options)
+        except (requests.RequestException, RuntimeError, ValueError, KeyError) as exc:
+            last_error = exc
+
+            if attempt + 1 < attempts:
+                # Backoff, so that a server which is briefly overloaded is given time rather than
+                # the same burst of requests again.
+                time.sleep(2**attempt)
+
+    raise RuntimeError(
+        f"Generating a completion failed after {attempts} attempts: {last_error}"
+    ) from last_error
 
 
 # Returns the configured LLM backend and validates it, so that a typo fails early instead of silently falling back.

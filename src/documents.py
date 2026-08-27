@@ -16,7 +16,12 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from nltk.corpus import stopwords
 
-from src.llm import document_model_name, extract_marked_output, get_document_llm
+from src.llm import (
+    document_model_name,
+    extract_marked_output,
+    generate_with_retries,
+    get_document_llm,
+)
 from src.solr import count_docs
 
 
@@ -43,6 +48,12 @@ KINDS = [KIND_DEFINITIONS, KIND_THEOREMS]
 # that is also serving the website should not be saturated by a build. Match it to the server's
 # capacity: llama.cpp reports that as 'total_slots' at its /props endpoint.
 DEFAULT_LLM_CONCURRENCY = 1
+
+# The share of a batch that may fail before a run gives up. Skipping a document the server will not
+# describe is right when it is one document; it is wrong when the server has gone away, because then
+# every remaining document "fails" too and the run would end reporting an empty corpus as a success.
+# A batch that is mostly failures is the difference between the two.
+MAX_FAILURE_FRACTION = 0.5
 
 
 def llm_concurrency(config):
@@ -403,6 +414,10 @@ def generate_document_descriptions(
         workers = llm_concurrency(config)
         print(f"Describing documents with {workers} request(s) in flight...")
 
+        # Documents the server refused even after retrying, collected so that the run reports them
+        # once at the end instead of burying them in the progress output.
+        undescribable = []
+
         # Generate document descriptions for all filtered_docs
         for i in tqdm(range(0, len(filtered_docs), save_every)):
             print(
@@ -418,6 +433,19 @@ def generate_document_descriptions(
             )
             batch_doc_strings = doc_strings[i : i + save_every]
             described = []
+            failures_before = len(undescribable)
+
+            # A document the server will not describe must not end the run. Every completion is
+            # already retried (see generate_with_retries), so reaching this means the server refused
+            # it repeatedly - a completion of its own that it cannot parse back, for instance. The
+            # document is left without an entry: the next run tries it again, and until then it is
+            # simply not searchable, which described_documents in src/bootstrap.py already reports.
+            def describe(doc_string):
+                try:
+                    return generate_with_retries(llm, doc_string).strip()
+                except RuntimeError as error:
+                    undescribable.append(str(error))
+                    return None
 
             # The requests are independent of each other and the server processes several at once,
             # so they are sent concurrently: informalizing the whole AFP one blocking request at a
@@ -426,10 +454,7 @@ def generate_document_descriptions(
             try:
                 with ThreadPoolExecutor(max_workers=workers) as executor:
                     for raw_llm_description in tqdm(
-                        executor.map(
-                            lambda doc_string: llm.generate(doc_string).strip(),
-                            batch_doc_strings,
-                        ),
+                        executor.map(describe, batch_doc_strings),
                         total=len(batch_doc_strings),
                     ):
                         described.append(raw_llm_description)
@@ -439,6 +464,9 @@ def generate_document_descriptions(
                 # the next run, which describes exactly what has no entry yet.
                 for j, raw_llm_description in enumerate(described):
                     doc = filtered_docs[i + j]
+
+                    if raw_llm_description is None:
+                        continue
 
                     # For debugging purposes, only print the first generated document descriptions
                     if j < 3:
@@ -465,7 +493,25 @@ def generate_document_descriptions(
                 with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
                     json.dump(document_descriptions, outfile, indent=4)
 
+            # Checked after the batch was written, so that whatever succeeded is kept either way.
+            batch_failures = len(undescribable) - failures_before
+
+            if batch_failures > len(batch_doc_strings) * MAX_FAILURE_FRACTION:
+                raise RuntimeError(
+                    f"{batch_failures} of {len(batch_doc_strings)} documents in this batch could "
+                    f"not be described, so the server is failing rather than the documents. "
+                    f"Stopping instead of leaving the corpus without descriptions. The first "
+                    f"failure was: {undescribable[failures_before]}"
+                )
+
         print("Finished generating document descriptions.")
+
+        if len(undescribable) > 0:
+            print(
+                f"Warning: {len(undescribable)} documents could not be described and have no entry "
+                f"in {DOCUMENT_DESCRIPTIONS}, so they are not searchable. The next run tries them "
+                f"again. The first failure was: {undescribable[0]}"
+            )
     else:
         print("No documents need to be described by the LLM.")
 
