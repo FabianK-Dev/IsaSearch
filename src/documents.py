@@ -21,6 +21,7 @@ from src.llm import (
     extract_marked_output,
     generate_with_retries,
     get_document_llm,
+    TruncatedCompletionError,
 )
 from src.solr import count_docs
 
@@ -417,6 +418,8 @@ def generate_document_descriptions(
         # Documents the server refused even after retrying, collected so that the run reports them
         # once at the end instead of burying them in the progress output.
         undescribable = []
+        # Documents whose description was cut off at max_tokens on every attempt.
+        truncated = []
 
         # Generate document descriptions for all filtered_docs
         for i in tqdm(range(0, len(filtered_docs), save_every)):
@@ -443,6 +446,12 @@ def generate_document_descriptions(
             def describe(doc_string):
                 try:
                     return generate_with_retries(llm, doc_string).strip()
+                except TruncatedCompletionError as error:
+                    # Cut off at max_tokens rather than refused. The text is damaged but carries
+                    # most of the description, which searches better than nothing, so it is kept
+                    # and counted instead of thrown away.
+                    truncated.append(str(error))
+                    return error.output.strip()
                 except RuntimeError as error:
                     undescribable.append(str(error))
                     return None
@@ -511,6 +520,14 @@ def generate_document_descriptions(
                 f"Warning: {len(undescribable)} documents could not be described and have no entry "
                 f"in {DOCUMENT_DESCRIPTIONS}, so they are not searchable. The next run tries them "
                 f"again. The first failure was: {undescribable[0]}"
+            )
+
+        if len(truncated) > 0:
+            print(
+                f"Warning: {len(truncated)} descriptions were cut off at "
+                f"config['sampling_parameters']['max_tokens'] and are embedded in that state. "
+                f"Raise it and delete those entries from {DOCUMENT_DESCRIPTIONS} to have them "
+                f"generated again. The first was: {truncated[0]}"
             )
     else:
         print("No documents need to be described by the LLM.")

@@ -341,5 +341,41 @@ class ChromaDbCollectionTest(OpenAIBackendTestCase):
         self.assertIsNone(getattr(object(), "collection_metadata", None))
 
 
+# A completion stopped at max_tokens is cut off mid-sentence and would otherwise be embedded in
+# that state without anything saying so, which is how ~5% of a real run's descriptions ended up
+# damaged before anyone noticed.
+class TruncatedCompletionTest(OpenAIBackendTestCase):
+    def model(self):
+        return llm.get_llm(self.config)
+
+    def test_a_completion_that_finishes_is_returned(self):
+        self.assertEqual(self.model().generate("prompt"), "<BEGIN>answer<END>")
+
+    def test_a_completion_cut_off_at_max_tokens_is_reported(self):
+        self.server.truncated_completions = 1
+
+        with self.assertRaises(llm.TruncatedCompletionError) as raised:
+            self.model().generate("prompt")
+
+        self.assertIn("max_tokens", str(raised.exception))
+        # The text is carried on the error, so a caller can keep it rather than lose it.
+        self.assertEqual(raised.exception.output, "<BEGIN>cut off here")
+
+    def test_a_retry_can_still_produce_a_whole_completion(self):
+        self.server.truncated_completions = 1
+
+        self.assertEqual(
+            llm.generate_with_retries(self.model(), "prompt"), "<BEGIN>answer<END>"
+        )
+
+    def test_a_completion_that_is_always_cut_off_is_still_returned(self):
+        self.server.truncated_completions = llm.LLM_ATTEMPTS
+
+        with self.assertRaises(llm.TruncatedCompletionError) as raised:
+            llm.generate_with_retries(self.model(), "prompt")
+
+        self.assertEqual(raised.exception.output, "<BEGIN>cut off here")
+
+
 if __name__ == "__main__":
     unittest.main()

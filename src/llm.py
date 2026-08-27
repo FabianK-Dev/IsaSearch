@@ -568,7 +568,31 @@ class OpenAILLM:
         raise_for_status_with_body(
             response, "Generating a completion at " + self.base_url
         )
-        return response.json()["choices"][0]["message"]["content"]
+
+        choice = response.json()["choices"][0]
+        content = choice["message"]["content"]
+
+        # "length" means the model was stopped at max_tokens instead of finishing, which leaves the
+        # description cut off mid-sentence - and embedded that way, silently, unless it is reported.
+        # Servers that do not report a reason are taken at their word that the completion is whole.
+        if choice.get("finish_reason") == "length":
+            raise TruncatedCompletionError(
+                "The completion was cut off at max_tokens ("
+                + str(self.options.get("max_tokens"))
+                + "). Raise config['sampling_parameters']['max_tokens'].",
+                content,
+            )
+
+        return content
+
+
+# Raised when a completion was cut off at max_tokens rather than ending on its own. Its own type,
+# because the retry loop treats it differently from a refusal: a truncated description is damaged
+# but still usable, so the last one is kept rather than discarded.
+class TruncatedCompletionError(RuntimeError):
+    def __init__(self, message, output):
+        super().__init__(message)
+        self.output = output
 
 
 # Number of attempts per completion. The embedding side has retried from the start (see
@@ -602,8 +626,20 @@ def generate_with_retries(model, prompt, attempts=LLM_ATTEMPTS):
 
             if attempt + 1 < attempts:
                 # Backoff, so that a server which is briefly overloaded is given time rather than
-                # the same burst of requests again.
-                time.sleep(2**attempt)
+                # the same burst of requests again. A truncated completion is not the server's
+                # fault and needs no pause, only another sample that might end on its own.
+                if not isinstance(exc, TruncatedCompletionError):
+                    time.sleep(2**attempt)
+
+    # A completion that only ever came back truncated is still returned: it is cut off at the end
+    # but carries most of what it should, which is better for search than no description at all.
+    # The caller counts these (see generate_document_descriptions) so a run reports how many of its
+    # descriptions are damaged instead of embedding them silently.
+    if isinstance(last_error, TruncatedCompletionError):
+        raise TruncatedCompletionError(
+            f"Every one of {attempts} attempts was cut off at max_tokens: {last_error}",
+            last_error.output,
+        ) from last_error
 
     raise RuntimeError(
         f"Generating a completion failed after {attempts} attempts: {last_error}"

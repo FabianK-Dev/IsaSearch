@@ -23,6 +23,9 @@ class StubOpenAIServer:
         self.requests = []
         # Number of upcoming embedding requests that answer with a retryable error.
         self.transient_failures = 0
+        # Number of upcoming completions that report having been cut off at max_tokens, as a
+        # server does when the model runs into the limit instead of finishing on its own.
+        self.truncated_completions = 0
         self.http_server = HTTPServer(("127.0.0.1", 0), self.build_handler())
         self.thread = threading.Thread(
             target=self.http_server.serve_forever, daemon=True
@@ -90,6 +93,11 @@ class StubOpenAIServer:
                     self.respond(400, {"error": {"message": "context size exceeded"}})
                     return
 
+                truncated = stub.truncated_completions > 0
+
+                if truncated:
+                    stub.truncated_completions -= 1
+
                 self.respond(
                     200,
                     {
@@ -97,8 +105,11 @@ class StubOpenAIServer:
                             {
                                 "message": {
                                     "role": "assistant",
-                                    "content": "<BEGIN>answer<END>",
-                                }
+                                    "content": "<BEGIN>cut off here"
+                                    if truncated
+                                    else "<BEGIN>answer<END>",
+                                },
+                                "finish_reason": "length" if truncated else "stop",
                             }
                         ]
                     },

@@ -226,6 +226,22 @@ class DescriptionConcurrencyTest(TemporaryFolderTestCase):
         # Hours of a multi day run must not be lost; the next run describes whatever has no entry.
         self.assertEqual(len(self.written()), 3)
 
+    # A description cut off at max_tokens is damaged but still carries most of its content, so it
+    # is kept rather than discarded - and counted, because embedding it silently is how a real run
+    # ended up with thousands of descriptions that stop mid-sentence.
+    def test_a_truncated_description_is_kept(self):
+        def generate(prompt):
+            if "l7:" in prompt:
+                raise llm.TruncatedCompletionError("cut off", "about " + prompt)
+
+            return "about " + prompt
+
+        described = self.describe(generate, concurrency=1)
+
+        self.assertEqual(len(described), 12)
+        self.assertIn("thys/E/T.thy|7", described)
+        self.assertIn("lemma l7:", self.written()["thys/E/T.thy|7"]["llm_description"])
+
     # One document the server refuses is left without an entry and the run carries on, because a
     # single bad theorem in hundreds of thousands must not end a build that takes days.
     def test_a_single_undescribable_document_is_skipped(self):
