@@ -58,3 +58,29 @@
 
   Either way, record the exact revision or archive checksum in the run's report, so a corpus can be
   traced back to the sources it was built from.
+
+## Informalization
+
+- [ ] **Do not cut the statement at a fixed number of characters.** `statement_excerpt`
+  (`src/documents.py`) is `strip_proof(src)[:config["theorem_max_length"]].strip()`, i.e. a plain
+  slice at 1000 characters with no regard for where it lands. A long statement is therefore handed
+  to the LLM broken off mid-string — a real run produced the description *"Due to the incomplete
+  nature of the input (the theorem ends abruptly with `and \"`)"*, which is the good case; the bad
+  case is a model that does not notice and describes a statement that was never there.
+
+  This truncates the *input*, so it is worse than the output cut at `max_tokens`: the description is
+  not merely missing its tail, it is about something incomplete. It also affects the duplicate
+  detection, which shares `statement_excerpt` on purpose so that the judge compares the same text
+  the description was generated from.
+
+  Options, roughly in order of effort:
+  - Raise `theorem_max_length` until almost nothing is cut. Input tokens are much cheaper than
+    output tokens (prefill runs faster than generation), so this costs little; the limit is the
+    per-slot context, which `--parallel` divides among the slots.
+  - Cut at a boundary rather than a character count — the end of the last complete line, or of the
+    last balanced `"..."` — so what the model receives is always a syntactically whole prefix.
+  - Cut only what genuinely does not fit, i.e. derive the budget from the model's context window
+    and the configured `max_tokens` instead of from a constant that has no relation to either.
+
+  Whatever is chosen, a document whose statement had to be cut should be counted and reported, the
+  way truncated completions now are — the current cut is silent, which is why it went unnoticed.
