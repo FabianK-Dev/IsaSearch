@@ -43,9 +43,12 @@ SELF_RETRIEVAL_FAILURE_LIMIT = 0.05
 # Isabelle commands that may start the source code of a document. They are removed before comparing
 # two sources syntactically, because the command itself carries no mathematical content.
 COMMANDS_PATTERN = (
-    "definition|abbreviation|fun|function|primrec|primcorec|datatype|codatatype|"
-    "record|type_synonym|typedef|inductive_set|inductive|coinductive|"
-    "theorem|lemma|corollary|proposition|schematic_goal"
+    "lift_definition|quotient_definition|definition|abbreviation|fun|function|"
+    "primrec|primcorec|datatype|codatatype|record|type_synonym|typedef|"
+    "inductive_set|inductive|coinductive_set|coinductive|partial_function|"
+    "quotient_type|axiomatization|specification|locale|class|consts|domain|fixrec|"
+    "nominal_datatype|nominal_function|nominal_primrec|"
+    "theorem|lemma|corollary|proposition|schematic_goal|tts_lemma"
 )
 LEADING_COMMAND = re.compile(r"^\s*(?:" + COMMANDS_PATTERN + r")\b")
 # A name label such as 'foo:' or 'foo [simp]:'. The negative lookahead keeps the type ascription of a

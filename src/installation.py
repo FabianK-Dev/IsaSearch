@@ -394,23 +394,34 @@ def afp_sessions(afp_folder):
 # Every HOL session of the Isabelle distribution, asked of Isabelle itself: '-B HOL' selects the
 # session HOL and everything that (transitively) builds on it, which is the actual meaning of
 # "HOL-based" - unlike filtering names by a "HOL" prefix, which is a naming convention the
-# distribution happens to follow, not a contract. Non-HOL logics (Pure, FOL, ZF, CTT) are not
-# descendants of HOL and therefore fall out by construction: the corpus is a search over HOL
-# mathematics, and their statements would only blur it. '-X doc' drops the documentation group,
-# whose sessions build on HOL but consist of tutorial material rather than a library.
+# distribution mostly follows but a contract it does not (IOA, Naproche and How_to_Prove_it are
+# HOL-based and named otherwise). '-X doc' drops the documentation group, whose sessions build on
+# HOL but consist of tutorial material rather than a library.
+#
+# The tool's output is meant to feed 'isabelle build', so it lists the selection's *requirements*
+# too (Pure, FOL, Tools, ...). '-R' names exactly those requirements, and subtracting them leaves
+# the HOL family itself - so the non-HOL logics fall out by the session graph, not by string luck.
 def hol_distribution_sessions(config):
-    result = subprocess.run(
-        [isabelle_binary(config), "sessions", "-B", "HOL", "-X", "doc"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    sessions = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    def sessions_tool(*flags):
+        result = subprocess.run(
+            [isabelle_binary(config), "sessions", *flags],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+    closure = sessions_tool("-B", "HOL", "-X", "doc")
+    requirements = set(sessions_tool("-B", "HOL", "-X", "doc", "-R"))
+    sessions = [name for name in closure if name not in requirements]
 
     if "HOL" not in sessions:
         raise RuntimeError(
-            "'isabelle sessions -B HOL -X doc' did not report the session HOL itself; its "
-            "output was: " + result.stdout[:500]
+            "Subtracting the requirements from 'isabelle sessions -B HOL -X doc' did not leave "
+            "the session HOL itself, so the tool did not answer the question asked. Selection: "
+            + ", ".join(closure[:20])
+            + "; requirements: "
+            + ", ".join(sorted(requirements)[:20])
         )
 
     return sessions

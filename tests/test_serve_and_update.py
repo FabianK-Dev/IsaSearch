@@ -1196,14 +1196,20 @@ class BackupRetentionTest(TemporaryFolderTestCase):
 
     # The classification is delegated to Isabelle: '-B HOL' means "HOL and everything that builds
     # on it", which is what HOL-based actually means - a name filter would encode the naming
-    # convention instead. The doc group is dropped, being tutorials rather than a library.
+    # convention instead (and miss IOA or Naproche, which are HOL-based and named otherwise).
+    # The tool lists the selection's requirements too, because its output is meant to feed
+    # 'isabelle build'; '-R' names exactly those, and the difference is the HOL family.
     def test_distribution_sessions_are_selected_by_descent_from_hol(self):
         commands = []
 
         def sessions_tool(command, **keywords):
             commands.append(command)
+
+            if "-R" in command:
+                return subprocess.CompletedProcess(command, 0, stdout="Pure\nFOL\nTools\n")
+
             return subprocess.CompletedProcess(
-                command, 0, stdout="HOL\nHOL-Analysis\nHOLCF\n"
+                command, 0, stdout="Pure\nFOL\nTools\nHOL\nHOL-Analysis\nHOLCF\nIOA\n"
             )
 
         with unittest.mock.patch.object(installation.subprocess, "run", sessions_tool):
@@ -1211,8 +1217,9 @@ class BackupRetentionTest(TemporaryFolderTestCase):
                 {"components": {"isabelle": {"local_folder": self.folder}}}
             )
 
-        self.assertEqual(sessions, ["HOL", "HOL-Analysis", "HOLCF"])
+        self.assertEqual(sessions, ["HOL", "HOL-Analysis", "HOLCF", "IOA"])
         self.assertEqual(commands[0][1:], ["sessions", "-B", "HOL", "-X", "doc"])
+        self.assertEqual(commands[1][1:], ["sessions", "-B", "HOL", "-X", "doc", "-R"])
 
     def test_a_session_listing_without_hol_is_rejected(self):
         # An output that lacks HOL itself means the tool did not answer the question asked (a
