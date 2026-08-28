@@ -96,7 +96,12 @@
   | 3000 | 288 (0.10%) |
   | 5000 | 113 (0.04%) |
 
-  3000 looks like the right trade: it removes 88% of the breakage for roughly an hour across a
+  Done: the cap is 3000 since the locale measurement below; the boundary-aware cut and the
+  reporting remain open. Locales made the decision urgent - measured over the AFP, 7.2% of locale
+  blocks exceed 1000 characters (median 219, p99 2619, max 6311), against 0.8-2% for the other
+  definitional commands; at 3000 every category is below 1%.
+
+  3000 removes 88% of the cut theorem statements for roughly an hour across a
   multi-day build. Higher mainly buys the thin tail, and long prompts start competing for the
   per-slot context, which `--parallel` divides among the slots — check `n_ctx` at the server's
   `/props` before going further. Note that raising the cap does not regenerate the descriptions

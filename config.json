@@ -59,7 +59,7 @@
     "openai_embedding_max_characters": 8000,
     "llm_request_timeout": 600,
     "llm_concurrency": 8,
-    "theorem_max_length": 1000,
+    "theorem_max_length": 3000,
     "metadata_max_length": 300,
     "sampling_parameters": {
         "temperature": 0,
