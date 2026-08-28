@@ -391,28 +391,29 @@ def afp_sessions(afp_folder):
         return [line.strip() for line in f if line.strip()]
 
 
-# Every HOL session of the Isabelle distribution (HOL, HOL-Library, HOL-Analysis, ..., HOLCF),
-# asked of Isabelle itself rather than parsed out of its ROOT files: the distribution defines many
-# sessions per ROOT and the format is not the AFP's one-name-per-line. Non-HOL logics (Pure, FOL,
-# ZF, CTT) are left out - the corpus is a search over HOL mathematics, and their statements would
-# only blur it.
+# Every HOL session of the Isabelle distribution, asked of Isabelle itself: '-B HOL' selects the
+# session HOL and everything that (transitively) builds on it, which is the actual meaning of
+# "HOL-based" - unlike filtering names by a "HOL" prefix, which is a naming convention the
+# distribution happens to follow, not a contract. Non-HOL logics (Pure, FOL, ZF, CTT) are not
+# descendants of HOL and therefore fall out by construction: the corpus is a search over HOL
+# mathematics, and their statements would only blur it. '-X doc' drops the documentation group,
+# whose sessions build on HOL but consist of tutorial material rather than a library.
 def hol_distribution_sessions(config):
     result = subprocess.run(
-        [isabelle_binary(config), "sessions", "-a"],
+        [isabelle_binary(config), "sessions", "-B", "HOL", "-X", "doc"],
         capture_output=True,
         text=True,
         check=True,
     )
     sessions = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-    hol = [name for name in sessions if name == "HOL" or name.startswith("HOL")]
 
-    if not hol:
+    if "HOL" not in sessions:
         raise RuntimeError(
-            "'isabelle sessions -a' reported no HOL sessions. The tool's output was: "
-            + result.stdout[:500]
+            "'isabelle sessions -B HOL -X doc' did not report the session HOL itself; its "
+            "output was: " + result.stdout[:500]
         )
 
-    return hol
+    return sessions
 
 
 # Expand the aliases in config["isabelle_sessions"] into concrete session names:

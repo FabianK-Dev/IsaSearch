@@ -1194,18 +1194,42 @@ class BackupRetentionTest(TemporaryFolderTestCase):
         self.assertEqual(command[-1], "Entry_A")
         self.assertNotIn("Broken_Entry", command)
 
-    def test_only_hol_sessions_of_the_distribution_are_taken(self):
+    # The classification is delegated to Isabelle: '-B HOL' means "HOL and everything that builds
+    # on it", which is what HOL-based actually means - a name filter would encode the naming
+    # convention instead. The doc group is dropped, being tutorials rather than a library.
+    def test_distribution_sessions_are_selected_by_descent_from_hol(self):
+        commands = []
+
         def sessions_tool(command, **keywords):
+            commands.append(command)
             return subprocess.CompletedProcess(
-                command, 0, stdout="CTT\nFOL\nHOL\nHOL-Analysis\nHOLCF\nPure\nZF\n"
+                command, 0, stdout="HOL\nHOL-Analysis\nHOLCF\n"
             )
 
         with unittest.mock.patch.object(installation.subprocess, "run", sessions_tool):
-            hol = installation.hol_distribution_sessions(
+            sessions = installation.hol_distribution_sessions(
                 {"components": {"isabelle": {"local_folder": self.folder}}}
             )
 
-        self.assertEqual(hol, ["HOL", "HOL-Analysis", "HOLCF"])
+        self.assertEqual(sessions, ["HOL", "HOL-Analysis", "HOLCF"])
+        self.assertEqual(commands[0][1:], ["sessions", "-B", "HOL", "-X", "doc"])
+
+    def test_a_session_listing_without_hol_is_rejected(self):
+        # An output that lacks HOL itself means the tool did not answer the question asked (a
+        # changed flag, a different working directory) - building an index from it would silently
+        # produce a corpus of whatever it did answer.
+        def sessions_tool(command, **keywords):
+            return subprocess.CompletedProcess(command, 0, stdout="something-else\n")
+
+        with (
+            unittest.mock.patch.object(installation.subprocess, "run", sessions_tool),
+            self.assertRaises(RuntimeError) as raised,
+        ):
+            installation.hol_distribution_sessions(
+                {"components": {"isabelle": {"local_folder": self.folder}}}
+            )
+
+        self.assertIn("HOL", str(raised.exception))
 
     # A session's own timeout is chosen for the machine the Archive is built on. Scaling gives a
     # slower machine more room, and unlike an absolute timeout a session option cannot override it.

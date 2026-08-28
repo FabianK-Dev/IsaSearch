@@ -17,7 +17,10 @@
     ],
     "isabelle_excluded_sessions": [
         "Detour_Calculus",
-        "Perrons_Formula"
+        "Perrons_Formula",
+        "HOL-Proofs",
+        "HOL-Proofs-Extraction",
+        "HOL-Proofs-Lambda"
     ],
     "isabelle_timeout_scale": 3,
     "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
