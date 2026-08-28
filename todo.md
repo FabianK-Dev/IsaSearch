@@ -163,3 +163,22 @@
   Note that the FindFacts index is the awkward part: `isabelle find_facts_index` writes the same
   Lucene index a running Solr holds open, so that step cannot simply run beside the live one. It
   needs its own Solr home and its own container, swapped the same way as the rest.
+
+## Build ergonomics
+
+- [ ] **Start Solr without asking during a corpus build.** `connect_solr` asks
+  "Solr seems to be down. Do you want to start a local Solr instance via Docker? [Y/n]"
+  whenever it runs in a terminal. For the web application that question is reasonable; for
+  `python3 -m src.corpus` it is not: the question comes right after the indexing phase, i.e.
+  hours into an unattended run, and the pipeline then blocks at the prompt until a human
+  reattaches the tmux session and presses Y - observed repeatedly during the full-AFP builds,
+  where it cost idle hours each time. A build that was started deliberately has already answered
+  the question; there is nothing left to ask.
+
+  Sketch: a config key (e.g. `"solr_autostart": true`) consulted before prompting - when set,
+  `connect_solr` starts the local Solr directly and only falls back to the question when the key
+  is absent and stdin is a terminal. The non-interactive path must keep its current behaviour of
+  raising instead of prompting (a deployed process has no terminal, and that guard exists for a
+  reason - see the SolrConnectionTest cases). Alternatively the corpus entry point could pass an
+  "autostart" intent down to connect_solr explicitly, which keeps the decision per entry point
+  rather than global.
