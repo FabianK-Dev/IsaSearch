@@ -1139,6 +1139,74 @@ class BackupRetentionTest(TemporaryFolderTestCase):
 
         self.assertEqual(command[-2:], ["A", "B"])
 
+    def write_roots(self, sessions):
+        os.makedirs(os.path.join(self.folder, "thys"), exist_ok=True)
+
+        with open(os.path.join(self.folder, "thys", "ROOTS"), "w") as file:
+            file.write("\n".join(sessions) + "\n")
+
+    # "all-AFP" is the Archive alone; "all" is everything a search should be able to find, i.e.
+    # the Archive plus the HOL sessions of the distribution - theorems people look for live in
+    # HOL-Analysis or HOL-Library at least as often as in the AFP, and a corpus without them
+    # silently caps what any search over it can find.
+    def test_all_afp_expands_to_the_roots_file(self):
+        self.write_roots(["Entry_A", "Entry_B"])
+
+        command = self.indexed_sessions({"isabelle_sessions": ["all-AFP"]})
+
+        self.assertEqual(command[-2:], ["Entry_A", "Entry_B"])
+        self.assertNotIn("all-AFP", command)
+
+    def test_all_includes_the_distribution_hol_sessions(self):
+        self.write_roots(["Entry_A"])
+
+        with unittest.mock.patch.object(
+            installation,
+            "hol_distribution_sessions",
+            lambda config: ["HOL", "HOL-Library", "HOL-Analysis"],
+        ):
+            command = self.indexed_sessions({"isabelle_sessions": ["all"]})
+
+        self.assertEqual(
+            command[-4:], ["Entry_A", "HOL", "HOL-Library", "HOL-Analysis"]
+        )
+        self.assertNotIn("all", command)
+
+    def test_aliases_mix_with_literal_names_without_duplicates(self):
+        self.write_roots(["Entry_A"])
+
+        command = self.indexed_sessions(
+            {"isabelle_sessions": ["all-AFP", "Entry_A", "Extra_Session"]}
+        )
+
+        self.assertEqual(command[-2:], ["Entry_A", "Extra_Session"])
+
+    def test_exclusions_apply_to_expanded_aliases(self):
+        self.write_roots(["Entry_A", "Broken_Entry"])
+
+        command = self.indexed_sessions(
+            {
+                "isabelle_sessions": ["all-AFP"],
+                "isabelle_excluded_sessions": ["Broken_Entry"],
+            }
+        )
+
+        self.assertEqual(command[-1], "Entry_A")
+        self.assertNotIn("Broken_Entry", command)
+
+    def test_only_hol_sessions_of_the_distribution_are_taken(self):
+        def sessions_tool(command, **keywords):
+            return subprocess.CompletedProcess(
+                command, 0, stdout="CTT\nFOL\nHOL\nHOL-Analysis\nHOLCF\nPure\nZF\n"
+            )
+
+        with unittest.mock.patch.object(installation.subprocess, "run", sessions_tool):
+            hol = installation.hol_distribution_sessions(
+                {"components": {"isabelle": {"local_folder": self.folder}}}
+            )
+
+        self.assertEqual(hol, ["HOL", "HOL-Analysis", "HOLCF"])
+
     # A session's own timeout is chosen for the machine the Archive is built on. Scaling gives a
     # slower machine more room, and unlike an absolute timeout a session option cannot override it.
     def test_the_timeout_scale_is_passed_to_the_indexer(self):

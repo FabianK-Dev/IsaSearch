@@ -69,7 +69,10 @@ Building the full FindFacts index for the entire Archive of Formal Proofs takes 
 "isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"]
 ```
 
-If you want to search the entire AFP, you need to update the `isabelle_sessions` list in `config.json` to include all desired sessions (or use `["all"]` if supported by your setup), but be prepared for the significant processing time mentioned above.
+If you want to search everything, set the `isabelle_sessions` list in `config.json` to `["all"]`, but be prepared for the significant processing time mentioned above. Two aliases are expanded to concrete session names and can be mixed with literal ones:
+
+- `"all"` — the whole AFP **plus every HOL session of the Isabelle distribution** (HOL, HOL-Library, HOL-Analysis, ..., asked of `isabelle sessions -a`). The distribution is included on purpose: the theorems people search for live in HOL-Analysis or HOL-Library at least as often as in the Archive, and a corpus without them silently caps what any search over it can find. Non-HOL logics (Pure, FOL, ZF, CTT) are left out.
+- `"all-AFP"` — the Archive alone, i.e. what `"all"` used to mean before the distribution was included.
 
 Two settings exist for the sessions that will not build:
 

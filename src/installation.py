@@ -379,6 +379,67 @@ def prune_backups(isabelle_home, config):
             print(f"Warning: could not remove {path}: {error}")
 
 
+# Every AFP session, read from the checkout's thys/ROOTS, where by AFP convention each line names
+# one entry whose session carries the same name.
+def afp_sessions(afp_folder):
+    roots_file = Path(afp_folder) / "thys" / "ROOTS"
+
+    if not roots_file.exists():
+        raise FileNotFoundError(f"ROOTS file not found at: {roots_file}")
+
+    with open(roots_file, "r") as f:
+        return [line.strip() for line in f if line.strip()]
+
+
+# Every HOL session of the Isabelle distribution (HOL, HOL-Library, HOL-Analysis, ..., HOLCF),
+# asked of Isabelle itself rather than parsed out of its ROOT files: the distribution defines many
+# sessions per ROOT and the format is not the AFP's one-name-per-line. Non-HOL logics (Pure, FOL,
+# ZF, CTT) are left out - the corpus is a search over HOL mathematics, and their statements would
+# only blur it.
+def hol_distribution_sessions(config):
+    result = subprocess.run(
+        [isabelle_binary(config), "sessions", "-a"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    sessions = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    hol = [name for name in sessions if name == "HOL" or name.startswith("HOL")]
+
+    if not hol:
+        raise RuntimeError(
+            "'isabelle sessions -a' reported no HOL sessions. The tool's output was: "
+            + result.stdout[:500]
+        )
+
+    return hol
+
+
+# Expand the aliases in config["isabelle_sessions"] into concrete session names:
+# - "all-AFP" stands for every session of the AFP checkout.
+# - "all" stands for everything, i.e. the AFP plus every HOL session of the Isabelle distribution.
+#   The distribution is included on purpose: theorems people search for live in HOL-Analysis or
+#   HOL-Library at least as often as in the Archive, and a corpus without them silently caps what
+#   any search over it can find.
+# Aliases mix with literal names, duplicates are dropped and the first occurrence keeps its place.
+def expand_session_aliases(sessions, afp_folder, config):
+    if isinstance(sessions, str):
+        sessions = [sessions]
+
+    expanded = []
+
+    for name in sessions:
+        if name == "all-AFP":
+            expanded.extend(afp_sessions(afp_folder))
+        elif name == "all":
+            expanded.extend(afp_sessions(afp_folder))
+            expanded.extend(hol_distribution_sessions(config))
+        else:
+            expanded.append(name)
+
+    return list(dict.fromkeys(expanded))
+
+
 # Drop the sessions named by config["isabelle_excluded_sessions"] from the session list.
 #
 # A single failing session makes the whole index build fail (see below), so one entry that is broken
@@ -436,17 +497,9 @@ def build_index(config):
     solr_index_dir = find_facts_dir / "solr" / "local"
     state_file = find_facts_dir / "indexed_sessions.json"
 
-    current_sessions = config.get("isabelle_sessions", ["all"])
-
-    # Handle "all" sessions by reading from ROOTS file
-    if current_sessions == "all" or current_sessions == ["all"]:
-        roots_file = Path(afp_folder) / "thys" / "ROOTS"
-        if roots_file.exists():
-            with open(roots_file, "r") as f:
-                current_sessions = [line.strip() for line in f if line.strip()]
-        else:
-            raise FileNotFoundError(f"ROOTS file not found at: {roots_file}")
-
+    current_sessions = expand_session_aliases(
+        config.get("isabelle_sessions", ["all"]), afp_folder, config
+    )
     current_sessions = without_excluded_sessions(current_sessions, config)
 
     # 1. Check logic: Index exists? Sessions changed?
