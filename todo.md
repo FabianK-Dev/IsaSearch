@@ -108,6 +108,31 @@
   that were already made from a cut statement: the checksum covers `src`, not the excerpt, so those
   entries have to be deleted by hand to be redone.
 
+- [ ] **Show the LLM the enclosing locale when it describes a locale-interior document.**
+  Lemmas and definitions inside a `locale`/`context` block are covered — each is its own outer
+  command, so FindFacts gives it its own block — but the block is *just the statement*: the
+  locale's `fixes` and `assumes` live in the locale's own header block and are not repeated. The
+  informalization therefore describes `lemma add_commute: "a + b = b + a"` without ever seeing
+  that it holds under the assumptions of, say, a commutative-group locale, and the description
+  cannot mention hypotheses it was never shown. The statement is searchable and dedupable either
+  way; its description is just less precise than the source allows.
+
+  Sketch: the entity kname already names the enclosing locale (e.g.
+  `Abstract_First_Goedel.Goedel_Form.goedel_first_theEasyHalf` is *theory.locale.name*), and the
+  locale's header is itself a corpus document since the `locale` command was added to
+  `solr_query_definitions` — so the header text could be looked up by kname and prepended to the
+  describe prompt as context ("this statement is made inside the following locale: ...").
+  Two costs to weigh: every locale-interior description changes, which re-informalizes a large
+  part of the corpus (do it together with the next deliberate corpus rebuild, not casually), and
+  the duplicate judge shares the excerpt via `statement_excerpt`, so either the judge sees the
+  locale context too — probably an improvement, cross-locale near-twins get judged with their
+  hypotheses visible — or the excerpt and the describe input stop being identical, which breaks
+  the "judge sees what was informalized" invariant on purpose and must be documented.
+
+  (Related, decided and fine: facts *generated* by `interpretation` are not separate documents —
+  the locale-level original represents them. That is what keeps thousands of near-identical
+  instantiation copies out of search results and the duplicate report.)
+
 ## Keeping the corpus current
 
 - [ ] **Rebuild in the background when the AFP moves, and swap the result in when it is finished.**
