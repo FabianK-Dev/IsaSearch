@@ -19,6 +19,7 @@
         "Detour_Calculus",
         "Perrons_Formula",
         "HOL-Proofs",
+        "HOL-Proofs-ex",
         "HOL-Proofs-Extraction",
         "HOL-Proofs-Lambda"
     ],
