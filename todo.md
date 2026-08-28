@@ -133,6 +133,29 @@
   the locale-level original represents them. That is what keeps thousands of near-identical
   instantiation copies out of search results and the duplicate report.)
 
+- [ ] **Decide whether package-generated lemmas and constants should be searchable.** The corpus
+  is built from FindFacts *source blocks*, and a block exists only where a command stands in the
+  theory text. The facts that Isabelle's definitional packages generate — `list.induct`,
+  `t.simps`, `t.cases`, discriminators and selectors from `datatype`, `.intros` from `inductive`,
+  `.psimps` from `function`, and so on — have no source line of their own, so none of them is a
+  document: not searchable, not informalized, invisible to the duplicate detection. Only the
+  generating command's block is in the corpus (and, for the definitions corpus, its Solr
+  `consts`/`typs` fields do list the generated constant names, which is what the synthetic ground
+  truth already keys on).
+
+  Whether that is a gap or a feature needs deciding before any implementing: a user searching
+  "induction principle for rose trees" is well served by finding the `datatype rose_tree` block
+  itself, and generated facts are numerous, mechanical and mutually near-identical — embedding
+  hundreds of thousands of them would flood search results and the duplicate report with
+  boilerplate (IsaFinder indexes them per entity and needed dedicated agent skills for datatype
+  and intro/elim rules plus an infrastructure filter to keep that manageable). If they are added,
+  it cannot be done with Solr queries: it needs an entity-level export out of Isabelle/ML (the
+  theory's fact space, e.g. what `find_theorems` sees), i.e. a second export path next to
+  FindFacts — which is the same machinery the Isabelle/Scala component idea from the Zulip
+  discussion would need anyway. A cheaper middle ground: mention the generated fact names inside
+  the *generating* block's description, so "list.induct" is at least findable by name through
+  the description text.
+
 ## Keeping the corpus current
 
 - [ ] **Rebuild in the background when the AFP moves, and swap the result in when it is finished.**
