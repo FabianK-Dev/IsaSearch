@@ -182,3 +182,27 @@
   reason - see the SolrConnectionTest cases). Alternatively the corpus entry point could pass an
   "autostart" intent down to connect_solr explicitly, which keeps the decision per entry point
   rather than global.
+
+## Indexing
+
+- [ ] **Incremental FindFacts indexing.** Every index build starts from zero, and that is the
+  tool's doing, not ours: `find_facts_index` hardcodes `clean = true` when it opens the Solr
+  database (`src/Tools/Find_Facts/src/find_facts.scala`, `find_facts_index`), and neither its
+  usage nor any system option offers a way around it - verified against Isabelle2025-2. The
+  irony is that the incremental machinery already exists two screens up in the same file and
+  runs on every build: `delete_session` clears a session before it is re-indexed and
+  `update_theory` diffs per-theory block domains. Only the CLI entry point wipes first.
+  Realistic fix: an upstream patch that makes `clean` an option (index the named sessions into
+  the existing database, `delete_session` handles replacement; dropped sessions need explicit
+  removal). Until then, our delete-and-rebuild in `build_index` merely mirrors what the tool
+  does anyway, and the hours per rebuild are the price of any session-list change.
+
+- [ ] **An AFP content update does not re-index.** `build_index` skips when the index exists and
+  the *session list* is unchanged - the state file compares names, not content. An AFP pull that
+  modifies existing entries without adding any (the common case for a release mirror taking
+  fixes) therefore changes nothing in the index: Solr keeps serving the old blocks, the document
+  fetch reads them, and the corpus quietly diverges from the checkout while the README's update
+  section claims otherwise. The fingerprint downstream (document count) can even match, hiding
+  it completely. Fix ideas: include a content hash (e.g. the AFP checkout's git commit) in the
+  state file next to the session list, so a moved checkout triggers a rebuild - which today
+  means a full one, and is what makes the incremental indexing above worth having first.
