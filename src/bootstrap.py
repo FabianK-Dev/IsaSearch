@@ -93,10 +93,14 @@ DEFINITIONS_BUILD = "build"
 DEFINITIONS_LOAD = "load"
 
 
-# Documents without a description were never embedded and can therefore not be searched. A corpus
-# that is only attached to is served without them instead of failing, because a partially built
-# corpus is still useful. Documents whose description is outdated are kept: their embedding was built
-# from that same outdated description, so they are still found consistently.
+# Documents without a description cannot be embedded (the embedded text is built from the description)
+# and can therefore not be searched, so they are left out of the corpus - in both modes. A serving
+# process attaches to a partially built corpus without them instead of failing, because a partial
+# corpus is still useful. A build leaves them out because a description can be refused for good (see
+# generate_document_descriptions): the run skips that document rather than stopping, so from here on
+# the index may hold documents that have no description, and embedding one would fail at the very
+# end of a multi day build. Documents whose description is outdated are kept: their embedding was
+# built from that same outdated description, so they are still found consistently.
 def described_documents(document_index, kind):
     described = {
         doc_id: doc
@@ -199,6 +203,7 @@ def build_definition_corpus(config, solr, prompts, embedder):
         artifact_name=DEFINITION_DESCRIPTIONS,
         describe_prompt_key=DEFINITION_DESCRIBE_PROMPT,
     )
+    definition_index = described_documents(definition_index, KIND_DEFINITIONS)
 
     print("Loading ChromaDB collection for definitions...")
     definition_collection = get_chromadb_collection(
@@ -368,9 +373,7 @@ def boot_components(
         document_index = get_document_descriptions(
             config, document_index, prompts, generate_missing=not serve
         )
-
-        if serve:
-            document_index = described_documents(document_index, KIND_THEOREMS)
+        document_index = described_documents(document_index, KIND_THEOREMS)
 
     definition_index = None
     definition_collection = None

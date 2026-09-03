@@ -835,6 +835,56 @@ class BootEmbedderTest(unittest.TestCase):
         )
 
 
+# A description can be refused for good, and the run then skips that document instead of stopping.
+# From that point on the index may hold documents without a description, and a build that hands
+# one to the embedder fails on the very last step of a multi day run - which is what happened.
+class UndescribedDocumentsTest(unittest.TestCase):
+    def build(self):
+        embedded = {}
+
+        def fake_collection(
+            config, prompts, index, collection_name="afp_docs", **kwargs
+        ):
+            embedded[collection_name] = sorted(index)
+            return unittest.mock.Mock(count=lambda: len(index))
+
+        def with_one_undescribed(config, index, prompts, **kwargs):
+            return {
+                "described": {"src": "lemma a: True", "llm_description": "described"},
+                "refused": {"src": "lemma b: True"},
+            }
+
+        with unittest.mock.patch.multiple(
+            bootstrap,
+            get_embedding_function=lambda config: object(),
+            get_chromadb_collection=fake_collection,
+            ensure_llm_backend=lambda config: None,
+            ensure_embedding_backend=lambda config: None,
+            connect_solr=lambda config: object(),
+            count_docs=lambda solr, query: 2,
+            load_prompts=lambda config: {},
+            build_document_index=lambda config, solr, **kwargs: {},
+            get_document_descriptions=with_one_undescribed,
+            get_llm=lambda config: object(),
+            get_llm_output_cache=lambda config, name: {},
+        ):
+            bootstrap.boot_components(
+                {"solr_query_definitions": "command:definition"},
+                check_updates=False,
+                build_find_facts=False,
+                definitions=bootstrap.DEFINITIONS_BUILD,
+                llm_cache_name=None,
+            )
+
+        return embedded
+
+    def test_a_build_does_not_embed_documents_without_a_description(self):
+        embedded = self.build()
+
+        self.assertEqual(embedded["afp_docs"], ["described"])
+        self.assertEqual(embedded[bootstrap.DEFINITION_COLLECTION], ["described"])
+
+
 # The definition prompts are optional; a prompts folder without them serves definitions with the
 # theorem prompts, and this decision belongs to the boot, not to the web application.
 class DefinitionPromptKeyTest(unittest.TestCase):
@@ -1206,7 +1256,9 @@ class BackupRetentionTest(TemporaryFolderTestCase):
             commands.append(command)
 
             if "-R" in command:
-                return subprocess.CompletedProcess(command, 0, stdout="Pure\nFOL\nTools\n")
+                return subprocess.CompletedProcess(
+                    command, 0, stdout="Pure\nFOL\nTools\n"
+                )
 
             return subprocess.CompletedProcess(
                 command, 0, stdout="Pure\nFOL\nTools\nHOL\nHOL-Analysis\nHOLCF\nIOA\n"
