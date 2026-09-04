@@ -142,7 +142,7 @@ sum-of-the-angles-of-a-triangle,Sum of the Angles of a Triangle,"[ {""entity_kna
 the-ballot-problem,The Ballot Problem,"[ {""entity_kname"":null, ""theory"": ""HOL-ex.Ballot"", ""command"": ""lemma""} ]","lemma
   ""valid_countings a b = (if a ≤ b then (if b = 0 then 1 else 0) else (a - b) / (a + b) * all_countings a b)""
 ",https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Ballot.html,HOL,The Ballot Problem,candidate A receives p votes and candidate B receives q votes with p > q,https://en.wikipedia.org/wiki/Bertrand%27s_ballot_theorem,,
-ramseys-theorem,Ramsey's Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""}, {""entity_kname"": ""Infinite_Set.MOST_nat|thm""}, {""entity_kname"": ""Orderings.exists_least_iff|thm""}, {""entity_kname"": ""Algebra1.lbs_ex_Zleast|thm""}, {""entity_kname"": ""Orderings.exists_least_iff'|thm""}, {""entity_kname"": ""Orderings.exists_least_iff|thm""}, {""entity_kname"": ""Algebra1.lbs_ex_Zleast|thm""}, {""entity_kname"": ""Orderings.exists_least_iff'|thm""} ]","lemma ramsey: ""
+ramseys-theorem,Ramsey's Theorem,"[ {""entity_kname"":""Ramsey.ramsey|thm""}, {""entity_kname"": ""Infinite_Set.MOST_nat|thm""}, {""entity_kname"": ""Orderings.wellorder.exists_least_iff|thm""}, {""entity_kname"": ""Algebra1.lbs_ex_Zleast|thm""}, {""entity_kname"": ""Orderings.wellorder.exists_least_iff'|thm""}, {""entity_kname"": ""Orderings.wellorder.exists_least_iff|thm""}, {""entity_kname"": ""Algebra1.lbs_ex_Zleast|thm""}, {""entity_kname"": ""Orderings.wellorder.exists_least_iff'|thm""} ]","lemma ramsey: ""
   ∀(s::nat) (r::nat) (YY::'a set) (f::'a set => nat).
   infinite YY
   ∧ (∀X. X <= YY ∧ finite X ∧ card X = r ⟶ f X < s)
