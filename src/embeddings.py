@@ -45,9 +45,17 @@ SUPPORTED_EMBEDDING_BACKENDS = [
     OPENAI_EMBEDDING_BACKEND,
 ]
 
-# Number of attempts per embedding request before giving up, so that a single hiccup of the
-# embedding server does not abort an indexing run that has already taken hours.
-EMBEDDING_ATTEMPTS = 3
+# Number of attempts per embedding request before giving up. Together with the capped backoff below
+# this amounts to roughly twenty minutes of patience, which is enough to survive not only a busy
+# server but also a crashed one being restarted and reloading its model (a GPU can drop out under
+# sustained load, observed as 'vk::Queue::submit: ErrorDeviceLost'), while a run whose server is
+# gone for good still fails instead of hanging forever. Chunks that were already added to ChromaDB
+# are persisted, so restarting an aborted run only re-embeds the chunk it failed in.
+EMBEDDING_ATTEMPTS = 12
+
+# Upper bound in seconds for the exponential backoff between attempts, so that the later attempts
+# poll the recovering server every few minutes instead of doubling into hours.
+EMBEDDING_BACKOFF_CAP = 300
 
 # HTTP status codes that are worth retrying, i.e. a busy or temporarily unavailable server. Every
 # other error is permanent (e.g. an unknown model or an input that exceeds the batch size of the
@@ -211,13 +219,17 @@ class OpenAIEmbeddingFunction(EmbeddingFunction):
                 if attempt + 1 < EMBEDDING_ATTEMPTS:
                     # Exponential backoff, so that a server which is busy loading or swapping a
                     # model gets some time to recover before the next attempt.
-                    backoff = 2**attempt
+                    backoff = min(2**attempt, EMBEDDING_BACKOFF_CAP)
                     print(
                         "Embedding request to "
                         + self.base_url
                         + " failed ("
                         + str(exc)
-                        + "). Retrying in "
+                        + "). Retrying attempt "
+                        + str(attempt + 2)
+                        + " of "
+                        + str(EMBEDDING_ATTEMPTS)
+                        + " in "
                         + str(backoff)
                         + " second(s)..."
                     )

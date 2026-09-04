@@ -14,6 +14,8 @@ import os
 import unittest
 import warnings
 
+from unittest import mock
+
 import chromadb
 
 from src import embeddings, llm
@@ -262,8 +264,11 @@ class EmbeddingBackendTest(OpenAIBackendTestCase):
         embedder = embeddings.get_embedding_function(self.config)
         self.server.transient_failures = 99
 
-        with self.assertRaises(RuntimeError) as error:
-            embedder(["always fails"])
+        # Exhausting the real attempts would spend the full real-world patience of roughly twenty
+        # minutes asleep, so the backoff is capped at zero for this test.
+        with mock.patch.object(embeddings, "EMBEDDING_BACKOFF_CAP", 0):
+            with self.assertRaises(RuntimeError) as error:
+                embedder(["always fails"])
 
         self.assertIn("model is loading", str(error.exception))
         self.assertEqual(
