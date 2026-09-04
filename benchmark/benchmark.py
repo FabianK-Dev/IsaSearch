@@ -1,11 +1,10 @@
 """
-benchmark.py: This file initializes all required components, i.e. Solr, tokenizer, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and runs the benchmark based on the configuration and the benchmark.csv file. The beginning of the file is similar to app.py.
+benchmark.py: This file initializes all required components, i.e. Solr, prompts, document_index, document_descriptions, ChromaDB, LLM and LLM output cache and runs the benchmark based on the configuration and the benchmark.csv file. The beginning of the file is similar to app.py.
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
-- Tokenizer: loads the configured tokenizer model to calculate the maximum number of tokens required for all prompts
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
 - document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
-- document_descriptions: Loads or generates an informal description for each document using Ollama to allow more effective search with informal user queries
+- document_descriptions: Loads or generates an informal description for each document using the configured LLM backend to allow more effective search with informal user queries
 - ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
@@ -13,10 +12,14 @@ benchmark.py: This file initializes all required components, i.e. Solr, tokenize
 Finally, for each metric the average will be calculated. All benchmark results will be saved to the results/ folder.
 """
 
-from src.solr import connect_solr
-from src.documents import build_document_index, get_document_descriptions
-from src.embeddings import search, search_results_to_docs, get_chromadb_collection
-from src.llm import load_prompts, get_llm, get_llm_output_cache, ensure_ollama
+from src.bootstrap import load_config, boot_components
+from src.documents import KIND_THEOREMS
+from src.embeddings import search, search_results_to_docs
+from src.llm import (
+    document_model_name,
+    query_model_name,
+)
+from src.openai_api import config_without_secrets
 from benchmark.metrics import (
     top_k_accuracy,
     normalized_discounted_cumulative_gain,
@@ -26,7 +29,6 @@ from benchmark.metrics import (
     is_correct_target,
 )
 
-from transformers import AutoTokenizer
 from tqdm import tqdm
 from pprint import pprint
 from nltk.corpus import stopwords
@@ -38,16 +40,7 @@ import nltk
 import random
 import re
 
-print("Loading config...")
-with open("config.json", "r") as file:
-    data = file.read()
-    config = json.loads(data)
-
-print("Checking Ollama and pulling configured models if required...")
-ensure_ollama(config)
-
-print("Loading Solr...")
-solr = connect_solr(config)
+config = load_config()
 
 # Depending on the strategy that will be investigated, the benchmark result file suffix will change to distinguish the results.
 results_suffix = ""
@@ -67,32 +60,20 @@ if results_suffix == "":
     results_suffix = "baseline"
 
 print("Using config for benchmark:")
-pprint(config)
+# Printed without credentials, because config["openai_api_key"] can hold an API key.
+pprint(config_without_secrets(config))
 
-print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
+# The benchmark neither updates the components nor rebuilds the FindFacts index, it only runs
+# against whatever is already indexed.
+components = boot_components(config, check_updates=False, build_find_facts=False)
 
-print("Loading prompts...")
-prompts = load_prompts(config)
-
-print("Building document index...")
-document_index = build_document_index(config, solr)
-
-print("Getting document descriptions...")
-document_index = get_document_descriptions(config, document_index, prompts, tokenizer)
-
-print("Deleting tokenizer object...")
-del tokenizer
-print("Finished deleting tokenizer object.")
-
-print("Loading ChromaDB collection...")
-collection = get_chromadb_collection(config, prompts, document_index)
-
-print("Loading LLM pipeline and gerneration arguments...")
-model = get_llm(config)
-
-print("Check if loading LLM output cache is enabled via config...")
-llm_output_cache = get_llm_output_cache(config)
+solr = components["solr"]
+prompts = components["prompts"]
+# The benchmark measures the theorem search only.
+document_index = components["corpora"][KIND_THEOREMS]["document_index"]
+collection = components["corpora"][KIND_THEOREMS]["collection"]
+model = components["model"]
+llm_output_cache = components["llm_output_cache"]
 
 print("Downloading/Updating NLTK resources (punkt and stopwords)...")
 nltk.download("punkt")
@@ -287,9 +268,9 @@ benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
 benchmark_model_name = (
     results_suffix
     + "_"
-    + config["ollama_document_model"].replace("/", "-")
+    + document_model_name(config).replace("/", "-")
     + "_"
-    + config["ollama_query_model"].replace("/", "-")
+    + query_model_name(config).replace("/", "-")
 )
 
 if not os.path.exists("./benchmark/results/"):

@@ -1,0 +1,23 @@
+<|system|>
+Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to explain the formal definition provided below in under 256 tokens, so that it is accessible to mathematicians. Describe which concept is being defined and what it means, not how it is written down. Do not mention the name of the Isabelle command. Please utilize the provided definition's session metadata (title and abstract, stopwords removed) to better understand the formal definition. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.
+
+=== Start of example input ===
+definition coprime :: "'a ⇒ 'a ⇒ bool"
+where "coprime a b ⟷ (∀d. d dvd a ⟶ d dvd b ⟶ is_unit d)"
+
+Title: Lemmas for calculating the degree of univariate polynomials
+Abstract: This file defines Polynomial R, the type of univariate polynomials over the semiring R, builds a semiring structure it, and gives basic definitions that are expanded in other files in this directory.
+=== End of example input ===
+
+=== Start of example output ===
+<BEGIN>
+Definition (Coprimality):
+Two elements \(a\) and \(b\) of a commutative ring are called coprime if every common divisor of \(a\) and \(b\) is a unit, i.e. \(d \mid a\) and \(d \mid b\) imply that \(d\) is invertible. Over the integers this is the usual condition \(\gcd(a, b) = 1\).
+<END>
+=== End of example output ===<|end|>
+<|user|>
+{theorem_content}
+
+Title: {title}
+Abstract: {abstract}<|end|>
+<|assistant|>

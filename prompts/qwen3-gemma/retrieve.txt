@@ -1,0 +1,2 @@
+Instruct: Given a natural language description of a mathematical statement, retrieve semantically equivalent theorems from the Archive of Formal Proofs that are stated in natural language and in Isabelle/HOL
+Query: {search_query}

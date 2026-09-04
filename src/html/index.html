@@ -48,9 +48,22 @@
 
         <form>
             <div class="mb-3">
-                <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem to search for</label>
+                <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem or definition to search for</label>
                 <textarea class="form-control" id="searchInput" rows="2" placeholder="Examples: a^2 + b^2 = c^2,
 bijections have inverses, bubblesort, ..."></textarea>
+            </div>
+            <div class="mb-3" id="kindSelector" style="display: none;">
+                <label class="form-label"><b>Search in:</b></label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="searchKind" id="kindTheorems" value="theorems" checked>
+                        <label class="form-check-label" for="kindTheorems">Theorems</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="searchKind" id="kindDefinitions" value="definitions">
+                        <label class="form-check-label" for="kindDefinitions"><a href="#" data-bs-toggle="tooltip" data-bs-title="Search definitional commands (definition, fun, datatype, ...) instead of theorems, lemmas, corollaries and propositions.">Definitions</a></label>
+                    </div>
+                </div>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="disableRefineCheck">
@@ -106,9 +119,21 @@ bijections have inverses, bubblesort, ..."></textarea>
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         let firstSearch = true;
 
+        // Definition search is only available if the server has a definitions corpus, so the
+        // selector stays hidden until the server says otherwise.
+        fetch("/capabilities")
+        .then(response => response.json())
+        .then(res => {
+            if (res.definition_search) {
+                document.getElementById("kindSelector").style.display = "block";
+            }
+        })
+        .catch(err => console.log(err));
+
         function search() {
             const input = document.getElementById("searchInput").value;
             const refineQuery = !document.getElementById("disableRefineCheck").checked;
+            const kind = document.querySelector('input[name="searchKind"]:checked').value;
             const resultList = document.getElementById("searchResults");
             const template = document.getElementById("theoremTemplate");
             const llmRefinedQuery = document.getElementById("LLMRefinedQuery");
@@ -121,11 +146,26 @@ bijections have inverses, bubblesort, ..."></textarea>
             const searchButton = document.getElementById("searchButton");
             searchButton.innerText = "Searching...";
 
-            fetch("/search?query=" + encodeURIComponent(input) + "&refine_query=" + refineQuery)
+            fetch("/search?query=" + encodeURIComponent(input) + "&refine_query=" + refineQuery + "&kind=" + encodeURIComponent(kind))
             .then(response => {
                 if (!response.ok) {
+                    searchButton.innerText = "Search";
+
                     response.text().then(res => {
-                        resultList.innerText = "An error occured:\n" + res;
+                        // The search endpoint reports its own errors as JSON with an 'error' key.
+                        let message = res;
+
+                        try {
+                            const parsed = JSON.parse(res);
+
+                            if (parsed.error) {
+                                message = parsed.error;
+                            }
+                        } catch(err) {
+                            console.log(err);
+                        }
+
+                        resultList.innerText = "An error occured:\n" + message;
                     });
                 } else {
                     response.json().then(res => {

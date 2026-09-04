@@ -1,0 +1,100 @@
+# Three roles, one image, one state volume.
+#
+#   docker compose run --rm tools python -m src.corpus --index-only     # 1a, with solr stopped
+#   docker compose up -d solr
+#   docker compose run --rm tools python -m src.corpus                  # 1b, with solr running
+#   docker compose up -d                                                # serve the website
+#   docker compose run --rm tools python -m src.duplicates --newest 10  # duplicate report
+#
+# The two build steps are separate because 'isabelle find_facts_index' writes the same Lucene index
+# that the 'solr' service holds open, so the indexing has to happen with the service stopped, while
+# everything after it needs the service up. The corpus has to be built before the website is started
+# for the first time: the 'app' service runs in serve mode and reports a missing corpus instead of
+# building one.
+#
+# ISASEARCH_API_KEY has to be set in the environment or in a .env file next to this file.
+
+services:
+  solr:
+    # This tag has to match the Solr that the pinned Isabelle bundles, because Lucene reads its own
+    # format and older ones but never a newer one: a Solr older than the one that wrote the index
+    # refuses to open the core and exits within seconds. Isabelle reports the version it writes
+    # with, so ask it rather than guessing:
+    #
+    #   docker compose run --rm tools Isabelle/bin/isabelle getenv -b SOLR_LUCENE_VERSION
+    #
+    # Isabelle2025-2 answers 9.10.
+    image: solr:${SOLR_VERSION:-9.10}
+    # 'isabelle find_facts_index' writes a complete Solr home to $ISABELLE_HOME_USER/find_facts/solr,
+    # with the index as a core named 'local' inside it. It is served directly from there - no core
+    # is precreated and nothing is copied, so a rebuild is picked up by restarting this service.
+    #
+    # $ISABELLE_HOME_USER carries the release name whenever the distribution sets
+    # ISABELLE_IDENTIFIER, which every release does, so the path is $HOME/.isabelle/<release>. HOME
+    # is /data/home in the image. Keep ISABELLE_RELEASE in step with components.isabelle.version in
+    # config.json; 'python3 -m src.corpus' prints the path it indexed into.
+    #
+    # --force because of the user below: Solr refuses to start as root at all, exiting with
+    # "Starting Solr as the root user is a security risk", and says to pass this to override it.
+    command:
+      - solr-foreground
+      - --force
+      - -s
+      - /data/home/.isabelle/${ISABELLE_RELEASE:-Isabelle2025-2}/find_facts/solr
+    # The index is written by the build container, which runs as root, and Solr's own uid could not
+    # read it. Both share one volume, so they have to agree on the user. Running the whole
+    # deployment as root is a called-out decision, see section 8 of docs/deployment-plan.md; giving
+    # the image a fixed non-root uid would let this drop both the root user and --force.
+    user: "0:0"
+    volumes:
+      - state:/data
+    ports:
+      - "8983:8983"
+    healthcheck:
+      # A search, not /admin/ping: the core is created by Isabelle's Find_Facts, whose generated
+      # solrconfig.xml declares '/select' as its only request handler, so /admin/ping answers 404 on
+      # a healthy core. wget, not curl: the official Solr image ships wget and no curl.
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null 'http://localhost:8983/solr/local/select?q=*:*&rows=0' || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+  app:
+    build: .
+    image: isasearch
+    command: ["python", "-m", "src.app"]
+    depends_on:
+      solr:
+        condition: service_healthy
+    environment:
+      ISASEARCH_API_KEY: ${ISASEARCH_API_KEY:?ISASEARCH_API_KEY has to be set}
+    volumes:
+      - state:/data
+      # The deployed configuration differs from the checked in one (solr_core_url has to name the
+      # 'solr' service, isabelle_sessions is ["all"] in production), so the server's edited
+      # config.json is mounted rather than a second configuration mechanism being introduced.
+      - ./config.json:/app/config.json:ro
+    ports:
+      - "5001:5001"
+    # boot_components probes the LLM and embedding servers before anything else and the application
+    # boots at import time, so a server that is briefly unreachable kills the process. Restarting
+    # covers that, and the Solr healthcheck covers the ordering on a cold start.
+    restart: unless-stopped
+
+  # Build and analysis runs. Started explicitly with 'docker compose run', never by 'up'.
+  tools:
+    build: .
+    image: isasearch
+    profiles: ["tools"]
+    environment:
+      ISASEARCH_API_KEY: ${ISASEARCH_API_KEY:?ISASEARCH_API_KEY has to be set}
+    volumes:
+      - state:/data
+      - ./config.json:/app/config.json:ro
+
+volumes:
+  state:

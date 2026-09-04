@@ -10,14 +10,82 @@ import zlib
 import re
 import nltk
 
+from concurrent.futures import ThreadPoolExecutor
+
 
 from tqdm import tqdm
 from nltk.corpus import stopwords
 
-from src.llm import OllamaLLM, ollama_options
+from src.llm import (
+    document_model_name,
+    extract_marked_output,
+    generate_with_retries,
+    get_document_llm,
+    TruncatedCompletionError,
+)
+from src.solr import count_docs
 
 
 cached_metadata = {}
+
+# The command that builds the corpus, named by every message that reports a missing or stale one.
+# It lives here rather than in src/corpus.py, which owns it in spirit, because importing the entry
+# point would be circular: src/corpus.py imports src/bootstrap.py, which imports this file. This is
+# the lowest module that has to report a missing corpus, and every consumer already imports it.
+BUILD_CORPUS_COMMAND = "python3 -m src.corpus"
+
+# The two kinds of documents this project builds corpora for. Each kind has its own Solr query,
+# its own artifacts and its own ChromaDB collection (see boot_components in src/bootstrap.py).
+# Defined once, here, because the web application, the duplicate detection and the boot sequence
+# all name the same corpora and must agree on the names.
+KIND_THEOREMS = "theorems"
+KIND_DEFINITIONS = "definitions"
+KINDS = [KIND_DEFINITIONS, KIND_THEOREMS]
+
+# How many informalization requests are in flight at once, overridable through
+# config["llm_concurrency"]. One request at a time leaves an inference server that batches - every
+# llama-server started with --parallel does - mostly idle, and informalization is the longest step
+# of a build. The default is 1 because a server that does not batch gains nothing and a local one
+# that is also serving the website should not be saturated by a build. Match it to the server's
+# capacity: llama.cpp reports that as 'total_slots' at its /props endpoint.
+DEFAULT_LLM_CONCURRENCY = 1
+
+# The share of a batch that may fail before a run gives up. Skipping a document the server will not
+# describe is right when it is one document; it is wrong when the server has gone away, because then
+# every remaining document "fails" too and the run would end reporting an empty corpus as a success.
+# A batch that is mostly failures is the difference between the two.
+MAX_FAILURE_FRACTION = 0.5
+
+
+def llm_concurrency(config):
+    workers = config.get("llm_concurrency", DEFAULT_LLM_CONCURRENCY)
+
+    if not isinstance(workers, int) or workers < 1:
+        raise ValueError(
+            f"config['llm_concurrency'] has to be a positive integer, got {workers!r}."
+        )
+
+    return workers
+
+
+# The 'proof' keyword as a whole word, i.e. not as part of an identifier such as 'proof_system'.
+PROOF_KEYWORD = re.compile(r"(?<![A-Za-z0-9_'])proof(?![A-Za-z0-9_'])")
+
+
+# Drop everything from the first 'proof' keyword on, so that only the statement remains.
+# 'proof' has to be matched as a whole word here, because a lot of AFP entries name things like
+# 'proofs' or 'soundness_proof_of'. Cutting inside such an identifier would leave an empty or
+# meaningless statement, which would then be informalized and embedded as such.
+def strip_proof(src):
+    return PROOF_KEYWORD.split(src, maxsplit=1)[0]
+
+
+# The part of the source code of a document that stands for it in an LLM prompt, i.e. its statement
+# without the proof, truncated and stripped of trailing whitespace. Shared by the informalization
+# below and by the duplicate judge (src/duplicates.py), so that the judge is shown exactly the same
+# statement the description it compares was generated from.
+def statement_excerpt(src, max_length):
+    return strip_proof(src)[:max_length].strip()
 
 
 # This method returns the metadata (i.e. title, abstract, authors, keywords, etc.) for a given entry
@@ -61,14 +129,35 @@ def relevant_doc_keys(solr_document, config):
     }
 
 
+# Like relevant_doc_keys, but keeps the additional keys that the duplicate detection needs:
+# - "command" tells which definitional command (definition, fun, datatype, ...) the block belongs to
+# - "consts" and "typs" contain the constants and types that the block defines, which is used to
+#   derive a syntactic ground truth in src/duplicates.py
+# - "file", "url_path" and "start_line" allow building links without querying Solr again
+def relevant_definition_doc_keys(solr_document, config):
+    document = relevant_doc_keys(solr_document, config)
+
+    document["command"] = solr_document.get("command", None)
+    document["consts"] = solr_document.get("consts", []) or []
+    document["typs"] = solr_document.get("typs", []) or []
+    document["file"] = solr_document.get("file", None)
+    document["url_path"] = solr_document.get("url_path", None)
+    document["start_line"] = solr_document.get("start_line", None)
+
+    return document
+
+
 # This method fetches all documents, i.e. is any theorems, lemmas, corollaries and propositions
 # from Solr in batches of 10000 documents per request.
-def fetch_all_docs(solr, config):
+# 'solr_query' defaults to config["solr_query"] and 'keys_fn' decides which Solr keys are kept,
+# so that the same paging logic can also fetch definitions (see src/duplicates.py).
+def fetch_all_docs(solr, config, solr_query=None, keys_fn=relevant_doc_keys):
     document_index = {}
+    solr_query = solr_query if solr_query is not None else config["solr_query"]
 
     docs_per_page = 10000
     results = solr.search(
-        config["solr_query"],
+        solr_query,
         start=0,
         rows=docs_per_page,
     )
@@ -77,23 +166,79 @@ def fetch_all_docs(solr, config):
     max_docs = results.raw_response["response"]["numFound"]
 
     for result in results:
-        result_filtered = relevant_doc_keys(result, config)
+        result_filtered = keys_fn(result, config)
         document_index[result["id"]] = result_filtered
 
     pages = math.ceil(max_docs / docs_per_page) if docs_per_page > 0 else 1
     for i in range(1, pages):
         print(f"Fetching page {i + 1} of {pages} pages...")
         results = solr.search(
-            config["solr_query"],
+            solr_query,
             start=i * docs_per_page,
             rows=docs_per_page,
         )
 
         for result in results:
-            result_filtered = relevant_doc_keys(result, config)
+            result_filtered = keys_fn(result, config)
             document_index[result["id"]] = result_filtered
 
     return document_index
+
+
+# The fingerprint of the corpus a cached document index was built from. It is stored next to the
+# cache and compared on every start, because the cache itself cannot tell whether Solr still contains
+# the same documents. Without it a cached index would hide every AFP entry that was added after it
+# was written, since the cache is loaded unconditionally whenever the file exists.
+#
+# The number of matching documents in Solr is the cheap and reliable part: the AFP only ever grows
+# over an update, so a changed corpus practically always changes the count. The query and the
+# session list are included as well, because changing either of them changes what belongs to the
+# corpus without necessarily changing its size.
+def corpus_fingerprint(config, solr, solr_query):
+    return {
+        "solr_query": solr_query,
+        "document_count": count_docs(solr, solr_query),
+        "isabelle_sessions": sorted(config.get("isabelle_sessions", ["all"])),
+    }
+
+
+# Where the artifacts of a corpus live. Both are derived here and nowhere else, so that a caller
+# which only wants to know whether a corpus was built (see load_definition_corpus in
+# src/bootstrap.py) cannot look in a different place than the functions that write them.
+def document_index_cache_path(config, cache_name):
+    return f"{config['cache_folder']}/{cache_name}"
+
+
+def descriptions_artifact_path(config, artifact_name):
+    return f"{config['artifacts_folder']}/{artifact_name}"
+
+
+def index_fingerprint_path(config, cache_name):
+    return document_index_cache_path(
+        config, f"{cache_name.removesuffix('.json')}.fingerprint.json"
+    )
+
+
+def read_index_fingerprint(config, cache_name):
+    path = index_fingerprint_path(config, cache_name)
+
+    if not os.path.isfile(path):
+        return None
+
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+    # A truncated or corrupted fingerprint must not take the application down. It only means that
+    # the cache cannot be trusted, which is handled exactly like a missing fingerprint.
+    except (ValueError, OSError):
+        return None
+
+
+def write_index_fingerprint(config, cache_name, fingerprint):
+    os.makedirs(config["cache_folder"], exist_ok=True)
+
+    with open(index_fingerprint_path(config, cache_name), "w") as file:
+        json.dump(fingerprint, file, indent=4)
 
 
 # This method returns only relevant information from a given entry metadata (i.e. title, abstract, etc.).
@@ -122,13 +267,31 @@ def prepare_metadata(metadata, stop_words_set):
 # This document generates document descriptions. That means that a LLM summaries each theorem into natural language.
 # This process is only done for theorems that haven't been summarized or whose source code has changed.
 # Source code changes are detected by calculating, saving and comparing the Adler32 checksum for a theorem's source code.
-# Document summaries are generated by Ollama through its local HTTP API.
+# Document summaries are generated by the configured LLM backend (Ollama or llama.cpp) through its local HTTP API.
 # Generated document descriptions will be saved to the artifacts folder, configured at config["artifacts_folder"].
+#
+# 'artifact_name' and 'describe_prompt_key' allow describing another kind of document (e.g. definitions)
+# into a separate artifact file with a separate prompt, without touching the theorem artifact.
 def generate_document_descriptions(
-    config, document_index, prompts, tokenizer, save_every=1000
+    config,
+    document_index,
+    prompts,
+    save_every=1000,
+    artifact_name="document_descriptions.json",
+    describe_prompt_key="describe",
+    generate_missing=True,
 ):
     ARTIFACTS_FOLDER = config["artifacts_folder"]
-    DOCUMENT_DESCRIPTIONS = ARTIFACTS_FOLDER + "/" + "document_descriptions.json"
+    DOCUMENT_DESCRIPTIONS = descriptions_artifact_path(config, artifact_name)
+
+    # With generate_missing disabled no LLM is called at all, so the prompt does not have to exist.
+    # This is used by the web application, which must never start a multi hour informalization run
+    # just because a description is missing.
+    if generate_missing and describe_prompt_key not in prompts:
+        raise KeyError(
+            f"Prompt '{describe_prompt_key}' does not exist in the prompts folder "
+            f"'{config['prompts_folder']}'. Expected a file named '{describe_prompt_key}.txt'."
+        )
 
     if os.path.isfile(DOCUMENT_DESCRIPTIONS):
         print(f"Artifact {DOCUMENT_DESCRIPTIONS} already exists. Loading...")
@@ -175,6 +338,32 @@ def generate_document_descriptions(
         + " documents that need to be described by the LLM."
     )
 
+    if not generate_missing:
+        # A document that was never described has no description to attach and is therefore dropped
+        # by the caller. A document whose source code changed still has its old description, which is
+        # also the text its embedding was built from, so it stays usable but is outdated.
+        undescribed = [
+            doc for doc in filtered_docs if doc["id"] not in document_descriptions
+        ]
+        outdated = len(filtered_docs) - len(undescribed)
+
+        if len(undescribed) >= 1:
+            print(
+                f"Warning: {len(undescribed)} documents have no description at all and can "
+                "therefore not be searched."
+            )
+
+        if outdated >= 1:
+            print(
+                f"Warning: {outdated} documents have a description of an older version of their "
+                "source code and are searched with that outdated description."
+            )
+
+        if len(filtered_docs) >= 1:
+            print(f"Rebuild the corpus with '{BUILD_CORPUS_COMMAND}' to describe them.")
+
+        return document_descriptions
+
     if len(filtered_docs) >= 1:
         # Only update NLTK resources if any documents need to be described, to avoid unnecessary downloads
         print("Downloading/Updating NLTK resources (punkt and stopwords)...")
@@ -186,8 +375,8 @@ def generate_document_descriptions(
         # Create all doc_strings, i.e. all prompts that contain the theorems and metadata, if enabled, along with the instructions for the LLM
         for doc in tqdm(filtered_docs):
             # Remove the proof part of the theorem source code, truncate to max length and strip trailing whitespaces
-            theorem_content = (
-                doc["src"].split("proof")[0][: config["theorem_max_length"]].strip()
+            theorem_content = statement_excerpt(
+                doc["src"], config["theorem_max_length"]
             )
 
             # If enabled, add the metadata to the prompt, otherwise only provive the theorem content.
@@ -210,34 +399,27 @@ def generate_document_descriptions(
                 if abstract == "":
                     abstract = "-- no abstract --"
 
-                doc_string = prompts["describe"].format(
+                doc_string = prompts[describe_prompt_key].format(
                     theorem_content=theorem_content, title=title, abstract=abstract
                 )
             else:
-                doc_string = prompts["describe"].format(theorem_content=theorem_content)
+                doc_string = prompts[describe_prompt_key].format(
+                    theorem_content=theorem_content
+                )
 
             doc_strings.append(doc_string)
 
-        print(
-            "Calculating maximum number of tokens required to describe filtered documents..."
-        )
-        max_tokens = 0
+        print("Loading LLM...")
+        llm = get_document_llm(config)
 
-        for doc in tqdm(doc_strings):
-            token_ids = tokenizer.encode(doc)
-            num_tokens = len(token_ids)
+        workers = llm_concurrency(config)
+        print(f"Describing documents with {workers} request(s) in flight...")
 
-            if num_tokens > max_tokens:
-                max_tokens = num_tokens
-
-        print("Max tokens for prompt and document string: " + str(max_tokens))
-
-        print("Loading Ollama LLM...")
-        llm = OllamaLLM(
-            config["ollama_base_url"],
-            config["ollama_document_model"],
-            ollama_options(config),
-        )
+        # Documents the server refused even after retrying, collected so that the run reports them
+        # once at the end instead of burying them in the progress output.
+        undescribable = []
+        # Documents whose description was cut off at max_tokens on every attempt.
+        truncated = []
 
         # Generate document descriptions for all filtered_docs
         for i in tqdm(range(0, len(filtered_docs), save_every)):
@@ -253,32 +435,100 @@ def generate_document_descriptions(
                 + "..."
             )
             batch_doc_strings = doc_strings[i : i + save_every]
-            for j, doc_string in enumerate(tqdm(batch_doc_strings)):
-                doc_id = filtered_docs[i + j]["id"]
-                doc_src = filtered_docs[i + j]["src"]
-                raw_llm_description = llm.generate(doc_string).strip()
+            described = []
+            failures_before = len(undescribable)
 
-                # For debugging purposes, only print the first the generated document descriptions
-                if j < 3:
-                    print(
-                        f"Raw LLM output for doc_id {doc_id}: '{raw_llm_description}'"
-                    )
+            # A document the server will not describe must not end the run. Every completion is
+            # already retried (see generate_with_retries), so reaching this means the server refused
+            # it repeatedly - a completion of its own that it cannot parse back, for instance. The
+            # document is left without an entry: the next run tries it again, and until then it is
+            # simply not searchable, which described_documents in src/bootstrap.py already reports.
+            def describe(doc_string):
+                try:
+                    return generate_with_retries(llm, doc_string).strip()
+                except TruncatedCompletionError as error:
+                    # Cut off at max_tokens rather than refused. The text is damaged but carries
+                    # most of the description, which searches better than nothing, so it is kept
+                    # and counted instead of thrown away.
+                    truncated.append(str(error))
+                    return error.output.strip()
+                except RuntimeError as error:
+                    undescribable.append(str(error))
+                    return None
 
-                document_descriptions[doc_id] = {
-                    "llm_description": raw_llm_description,
-                    "zlib.adler32_checksum": zlib.adler32(doc_src.encode("utf-8")),
-                    "model": config["ollama_document_model"],
-                    "prompt": doc_string,
-                }
+            # The requests are independent of each other and the server processes several at once,
+            # so they are sent concurrently: informalizing the whole AFP one blocking request at a
+            # time is the longest single step of a build by a wide margin. executor.map yields in
+            # input order, which keeps the artifact identical to what a sequential run produces.
+            try:
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    for raw_llm_description in tqdm(
+                        executor.map(describe, batch_doc_strings),
+                        total=len(batch_doc_strings),
+                    ):
+                        described.append(raw_llm_description)
+            finally:
+                # Whatever came back is written even when the batch was interrupted, so that hours
+                # of a multi day run are not lost to one failed request. The rest is picked up by
+                # the next run, which describes exactly what has no entry yet.
+                for j, raw_llm_description in enumerate(described):
+                    doc = filtered_docs[i + j]
 
-            print("Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "...")
-            if not os.path.exists(ARTIFACTS_FOLDER):
-                os.makedirs(ARTIFACTS_FOLDER)
+                    if raw_llm_description is None:
+                        continue
 
-            with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
-                json.dump(document_descriptions, outfile, indent=4)
+                    # For debugging purposes, only print the first generated document descriptions
+                    if j < 3:
+                        print(
+                            f"Raw LLM output for doc_id {doc['id']}: "
+                            f"'{raw_llm_description}'"
+                        )
+
+                    document_descriptions[doc["id"]] = {
+                        "llm_description": raw_llm_description,
+                        "zlib.adler32_checksum": zlib.adler32(
+                            doc["src"].encode("utf-8")
+                        ),
+                        "model": document_model_name(config),
+                        "prompt": doc_strings[i + j],
+                    }
+
+                print(
+                    "Saving document descriptions to " + DOCUMENT_DESCRIPTIONS + "..."
+                )
+                if not os.path.exists(ARTIFACTS_FOLDER):
+                    os.makedirs(ARTIFACTS_FOLDER)
+
+                with open(DOCUMENT_DESCRIPTIONS, "w") as outfile:
+                    json.dump(document_descriptions, outfile, indent=4)
+
+            # Checked after the batch was written, so that whatever succeeded is kept either way.
+            batch_failures = len(undescribable) - failures_before
+
+            if batch_failures > len(batch_doc_strings) * MAX_FAILURE_FRACTION:
+                raise RuntimeError(
+                    f"{batch_failures} of {len(batch_doc_strings)} documents in this batch could "
+                    f"not be described, so the server is failing rather than the documents. "
+                    f"Stopping instead of leaving the corpus without descriptions. The first "
+                    f"failure was: {undescribable[failures_before]}"
+                )
 
         print("Finished generating document descriptions.")
+
+        if len(undescribable) > 0:
+            print(
+                f"Warning: {len(undescribable)} documents could not be described and have no entry "
+                f"in {DOCUMENT_DESCRIPTIONS}, so they are not searchable. The next run tries them "
+                f"again. The first failure was: {undescribable[0]}"
+            )
+
+        if len(truncated) > 0:
+            print(
+                f"Warning: {len(truncated)} descriptions were cut off at "
+                f"config['sampling_parameters']['max_tokens'] and are embedded in that state. "
+                f"Raise it and delete those entries from {DOCUMENT_DESCRIPTIONS} to have them "
+                f"generated again. The first was: {truncated[0]}"
+            )
     else:
         print("No documents need to be described by the LLM.")
 
@@ -286,30 +536,62 @@ def generate_document_descriptions(
 
 
 # This method loads already generated document descriptions from the artifacts folder, configured at config["artifacts_folder"].
-# It then extracts the content within the <BEGIN> and <END> parts. If extracting the content fails, we simply take the entire LLM output as is.
-def get_document_descriptions(config, document_index, prompts, tokenizer):
+# It then extracts the content within the <BEGIN> and <END> parts (see extract_marked_output). If
+# the markers are missing, the entire LLM output is taken as is.
+#
+# Note that this parse decides the text a document is embedded from, while the checksum stored next
+# to each embedding only covers the source code. Changing how descriptions are parsed therefore
+# does not re-embed anything by itself - see the migration note in the README.
+def get_document_descriptions(
+    config,
+    document_index,
+    prompts,
+    artifact_name="document_descriptions.json",
+    describe_prompt_key="describe",
+    generate_missing=True,
+):
     document_descriptions = generate_document_descriptions(
-        config, document_index, prompts, tokenizer
+        config,
+        document_index,
+        prompts,
+        artifact_name=artifact_name,
+        describe_prompt_key=describe_prompt_key,
+        generate_missing=generate_missing,
     )
 
     print("Parsing LLM descriptions...")
     parsing_failed = 0
+    # An empty description is worse than a missing one: it is embedded like any other text, so the
+    # document is searchable but its vector says nothing about it. Counted separately from the
+    # parsing failures, which include documents that came back with usable prose and merely without
+    # the markers.
+    empty = 0
 
     for doc_id in tqdm(document_descriptions):
-        try:
-            llm_description = document_descriptions[doc_id]["llm_description"].split(
-                "<BEGIN>"
-            )[1]
-        except Exception:
+        raw_description = document_descriptions[doc_id]["llm_description"]
+
+        llm_description, found = extract_marked_output(raw_description)
+
+        if not found:
             parsing_failed += 1
-            llm_description = document_descriptions[doc_id]["llm_description"]
 
         if doc_id in document_index:
             document_index[doc_id]["llm_description"] = llm_description
 
+            if not llm_description.strip():
+                empty += 1
+
     if parsing_failed > 0:
         print(
             f"Warning: Could not extract theorem description using <BEGIN> and <END> from source provided by LLM for {parsing_failed} documents, thus loading them as-is."
+        )
+
+    if empty > 0:
+        print(
+            f"Warning: the LLM returned an empty description for {empty} documents. They will be "
+            f"embedded as empty text and will not be findable by their content. Inspect "
+            f"'{config['artifacts_folder']}/{artifact_name}', which holds the raw output and the "
+            f"exact prompt that produced it."
         )
 
     return document_index
@@ -317,29 +599,102 @@ def get_document_descriptions(config, document_index, prompts, tokenizer):
 
 # Building the document index means, saving all loaded documents with its loaded entry metadata.
 # This is done to avoid having to refetch all documents from Solr on every program start.
-def build_document_index(config, solr):
+#
+# The cache is only reused while it still matches the corpus in Solr (see corpus_fingerprint). After
+# an AFP update Solr contains documents the cache does not know about, so it is refetched instead of
+# silently serving the previous state of the Archive.
+#
+# With 'read_only' enabled nothing is ever fetched or written. A serving process uses this: it must
+# not spend the first minutes of its start-up scanning Solr, and above all it must not write files
+# that the build process owns. A stale cache is reported and used as-is there, because serving
+# slightly outdated documents is better than refusing to start.
+def build_document_index(
+    config,
+    solr,
+    solr_query=None,
+    cache_name="document_index.json",
+    keys_fn=relevant_doc_keys,
+    read_only=False,
+):
     CACHE_FOLDER = config["cache_folder"]
-    DOCUMENT_INDEX_CACHE = f"{CACHE_FOLDER}/document_index.json"
+    DOCUMENT_INDEX_CACHE = document_index_cache_path(config, cache_name)
+    effective_query = solr_query if solr_query is not None else config["solr_query"]
 
     if os.path.isfile(DOCUMENT_INDEX_CACHE):
-        print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
+        cached_fingerprint = read_index_fingerprint(config, cache_name)
 
-        with open(DOCUMENT_INDEX_CACHE, "r") as file:
-            data = file.read()
+        if read_only:
+            # The fingerprint of a serving process is only compared, never acted upon, thus Solr is
+            # not asked for a count when there is nothing to compare against.
+            if cached_fingerprint is not None:
+                current_fingerprint = corpus_fingerprint(config, solr, effective_query)
 
-        document_index = json.loads(data)
-        print(f"Finished loading {DOCUMENT_INDEX_CACHE}")
+                if cached_fingerprint != current_fingerprint:
+                    print(
+                        f"Warning: {DOCUMENT_INDEX_CACHE} was built from a different corpus "
+                        f"(cached: {cached_fingerprint}, current: {current_fingerprint}). It is "
+                        "used as-is, because a serving process never rebuilds it. Rebuild the "
+                        f"corpus with '{BUILD_CORPUS_COMMAND}'."
+                    )
+
+            print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
+
+            with open(DOCUMENT_INDEX_CACHE, "r") as file:
+                return json.loads(file.read())
+
+        current_fingerprint = corpus_fingerprint(config, solr, effective_query)
+
+        if cached_fingerprint == current_fingerprint:
+            print(f"Cached {DOCUMENT_INDEX_CACHE} already exists. Loading...")
+
+            with open(DOCUMENT_INDEX_CACHE, "r") as file:
+                data = file.read()
+
+            document_index = json.loads(data)
+            print(f"Finished loading {DOCUMENT_INDEX_CACHE}")
+
+            return document_index
+
+        if cached_fingerprint is None:
+            # Caches written before fingerprints existed (and the prebuilt ones that are shipped)
+            # have no fingerprint. Refetching them once is cheap compared to the alternative of
+            # never noticing that they are outdated.
+            print(
+                f"{DOCUMENT_INDEX_CACHE} has no fingerprint and can therefore not be checked "
+                "against Solr. Refetching all documents once..."
+            )
+        else:
+            print(
+                f"{DOCUMENT_INDEX_CACHE} was built from a different corpus "
+                f"(cached: {cached_fingerprint}, current: {current_fingerprint}). "
+                "Refetching all documents..."
+            )
+    elif read_only:
+        raise RuntimeError(
+            f"'{DOCUMENT_INDEX_CACHE}' does not exist, but this process may not build it. "
+            f"Build the corpus with '{BUILD_CORPUS_COMMAND}' first."
+        )
     else:
         print(
             f"{DOCUMENT_INDEX_CACHE} does not already exist. Fetching all documents..."
         )
-        document_index = fetch_all_docs(solr, config)
 
-        # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
-        if not os.path.exists(CACHE_FOLDER):
-            os.makedirs(CACHE_FOLDER)
+    document_index = fetch_all_docs(
+        solr, config, solr_query=solr_query, keys_fn=keys_fn
+    )
 
-        with open(DOCUMENT_INDEX_CACHE, "w") as file:
-            json.dump(document_index, file)
+    # Double check in case that the .cache folder already exists, but the entry_db_cache.json does not exist
+    if not os.path.exists(CACHE_FOLDER):
+        os.makedirs(CACHE_FOLDER)
+
+    with open(DOCUMENT_INDEX_CACHE, "w") as file:
+        json.dump(document_index, file)
+
+    # The fingerprint is written after the index, so that an interrupted write leaves an index
+    # without a fingerprint (which is refetched next time) instead of a fingerprint that claims a
+    # partial index is complete.
+    write_index_fingerprint(
+        config, cache_name, corpus_fingerprint(config, solr, effective_query)
+    )
 
     return document_index

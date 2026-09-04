@@ -2,45 +2,80 @@
     "check_for_updates": true,
     "components": {
         "isabelle": {
-            "remote_url": "https://github.com/isabelle-prover/mirror-isabelle.git",
-            "local_folder": "Isabelle",
-            "target_branch": "master"
+            "archive_url": "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz",
+            "version": "Isabelle2025-2",
+            "local_folder": "Isabelle"
         },
         "afp": {
-            "remote_url": "https://github.com/isabelle-prover/mirror-afp-devel.git",
+            "remote_url": "https://github.com/isabelle-prover/mirror-afp-2025-2.git",
             "local_folder": "afp",
             "target_branch": "master"
         }
     },
-    "isabelle_sessions": ["Ramsey-Infinite", "Ordinals_and_Cardinals"],
-    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-devel/-/tree/branch/default/thys",
+    "isabelle_sessions": [
+        "all"
+    ],
+    "isabelle_excluded_sessions": [],
+    "isabelle_timeout_scale": 3,
+    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
     "afp_remote_entry_url": "https://isa-afp.org/entries",
     "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
     "solr_core_url": "http://localhost:8983/solr/local",
-    "solr_query": "command:theorem OR command:lemma OR command:corollary OR command:proposition",
+    "solr_query": "command:theorem OR command:lemma OR command:corollary OR command:proposition OR command:schematic_goal OR command:tts_lemma OR command:AOT_theorem OR command:AOT_act_theorem OR command:AOT_lemma",
+    "solr_query_definitions": "command:definition OR command:abbreviation OR command:fun OR command:function OR command:primrec OR command:primcorec OR command:datatype OR command:codatatype OR command:record OR command:type_synonym OR command:typedef OR command:inductive OR command:inductive_set OR command:coinductive OR command:coinductive_set OR command:lift_definition OR command:partial_function OR command:quotient_type OR command:quotient_definition OR command:axiomatization OR command:specification OR command:locale OR command:class OR command:consts OR command:domain OR command:fixrec OR command:nominal_datatype OR command:nominal_function OR command:nominal_primrec OR command:AOT_define OR command:AOT_axiom OR command:AOT_act_axiom OR command:concrete_definition OR command:sepref_definition OR command:locset_definition OR command:corec OR command:corecursive OR command:datatype_record OR command:pcpodef OR command:cpodef OR command:domaindef",
     "cache_folder": ".cache",
-    "artifacts_folder": "artifacts/microsoft/Phi-3.5-mini-instruct",
-    "prompts_folder": "prompts/microsoft-Phi",
-    "chroma_db_path": "chroma_storages/microsoft/Phi-3.5-mini-instruct",
+    "artifacts_folder": "artifacts/beaker_gemma4",
+    "prompts_folder": "prompts/qwen3-gemma",
+    "chroma_db_path": "chroma_storages/beaker_gemma4-qwen3-embedding-4b",
     "chroma_db_embedder": "sentence-transformers/multi-qa-distilbert-cos-v1",
+    "llm_backend": "openai",
     "ollama_base_url": "http://localhost:11434",
     "ollama_document_model": "phi3.5",
     "ollama_query_model": "phi3:mini",
-    "tokenizer_name": "microsoft/Phi-3.5-mini-instruct",
-    "theorem_max_length": 1000,
+    "llamacpp_server_binary": "llama-server",
+    "llamacpp_base_url": "http://localhost:8080",
+    "llamacpp_document_base_url": "http://localhost:8081",
+    "llamacpp_document_model": "hf:bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M",
+    "llamacpp_query_model": "hf:bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M",
+    "openai_base_url": "http://10.153.73.66:8082/v1",
+    "openai_document_model": "beaker_gemma4",
+    "openai_query_model": "beaker_gemma4",
+    "openai_api_key_env": "ISASEARCH_API_KEY",
+    "openai_extra_body": {
+        "chat_template_kwargs": {
+            "enable_thinking": false
+        }
+    },
+    "embedding_backend": "openai",
+    "openai_embedding_base_url": "http://10.153.73.66:8081/v1",
+    "openai_embedding_model": "Qwen3-Embedding-4B",
+    "openai_embedding_batch_size": 32,
+    "openai_embedding_max_characters": 8000,
+    "llm_request_timeout": 600,
+    "llm_concurrency": 8,
+    "theorem_max_length": 3000,
     "metadata_max_length": 300,
     "sampling_parameters": {
         "temperature": 0,
         "top_p": 1,
         "top_k": -1,
         "min_p": 0,
-        "max_tokens": 256,
-        "stop": ["<END>"]
+        "max_tokens": 512,
+        "stop": []
     },
     "benchmark_add_top_results": false,
     "add_metadata": false,
     "add_user_query": true,
     "benchmark_search_refine": true,
     "enable_llm_output_cache": true,
+    "dedup_top_k": 10,
+    "dedup_distance_threshold": 0.3,
+    "dedup_strong_distance_threshold": 0.05,
+    "dedup_syntactic_threshold": 0.9,
+    "dedup_llm_judge": true,
+    "dedup_max_judged_per_item": 3,
+    "dedup_report_folder": "reports",
+    "dedup_llm_cache": "llm_output_cache_dedup.json",
+    "find_facts_backup_keep": 2,
     "api_port": 5001
 }
