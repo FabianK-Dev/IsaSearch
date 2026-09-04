@@ -143,6 +143,17 @@
   `consts`/`typs` fields do list the generated constant names, which is what the synthetic ground
   truth already keys on).
 
+  A command facet over the full index (2026-09-04, 817,769 blocks) put numbers on the deliberate
+  exclusions when the custom AOT/sepref/corec commands were added to the queries. Left out on
+  purpose: alias bundles that restate existing facts (`lemmas` 14,345, `named_theorems` 755,
+  `lemmas_with` 136) — including them would inject near-duplicates by construction; generated
+  auxiliary lemmas whose block is a directive rather than a statement (`inductive_cases` 918,
+  `termination` 693, `arity_theorem` 180, `inductive_simps` 147, `equivariance` 109,
+  `sepref_thm` 105); entry-specific generator macros with no readable statement (`derive` 259,
+  `mk_VLambda` 204, `synthesize` 145, `mk_ide` 143); SPARK proof obligations (`spark_vc` 54);
+  and the Isabelle/DOF starred variants (`lemma*` 2, `definition*` 1), which would need
+  wildcard-escaped Solr queries for a handful of documents.
+
   Whether that is a gap or a feature needs deciding before any implementing: a user searching
   "induction principle for rose trees" is well served by finding the `datatype rose_tree` block
   itself, and generated facts are numerous, mechanical and mutually near-identical — embedding

@@ -48,6 +48,9 @@ COMMANDS_PATTERN = (
     "inductive_set|inductive|coinductive_set|coinductive|partial_function|"
     "quotient_type|axiomatization|specification|locale|class|consts|domain|fixrec|"
     "nominal_datatype|nominal_function|nominal_primrec|"
+    "concrete_definition|sepref_definition|locset_definition|"
+    "corecursive|corec|datatype_record|pcpodef|cpodef|domaindef|"
+    "AOT_theorem|AOT_act_theorem|AOT_lemma|AOT_define|AOT_axiom|AOT_act_axiom|"
     "theorem|lemma|corollary|proposition|schematic_goal|tts_lemma"
 )
 LEADING_COMMAND = re.compile(r"^\s*(?:" + COMMANDS_PATTERN + r")\b")
