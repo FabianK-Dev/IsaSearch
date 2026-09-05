@@ -1,0 +1,18 @@
+title = IsaSearch
+module = lib/isasearch.jar
+resources = ../benchmark/benchmark.csv:benchmark/
+requirements = \
+  env:ISABELLE_SCALA_JAR \
+  env:SOLR_JARS
+sources = \
+  src/domain.scala \
+  src/core.scala \
+  src/inference.scala \
+  src/index.scala \
+  src/corpus.scala \
+  src/search.scala \
+  src/duplicates.scala \
+  src/benchmark.scala \
+  src/tools.scala \
+  src/tests.scala
+services = isabelle.isasearch.Tools

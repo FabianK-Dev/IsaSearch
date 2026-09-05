@@ -10,6 +10,10 @@ assets_extracted/
 
 # Downloaded
 Isabelle*/
+!isabelle/
+!isabelle/**
+isabelle/lib/*.jar
+isabelle/lib/*.shasum
 afp*/
 
 # Files
@@ -356,3 +360,7 @@ TSWLatexianTemp*
 .idea
 If
 this
+.DS_Store
+
+# Native component desktop metadata
+isabelle/**/.DS_Store
