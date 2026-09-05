@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Private JVM launcher: isolate Solr's dependencies as FindFacts does.
+isabelle scala_build || exit $?
+eval "declare -a JAVA_ARGS=($ISABELLE_TOOL_JAVA_OPTIONS)"
+classpath "$SOLR_JARS"
+exec isabelle java "${JAVA_ARGS[@]}" --enable-native-access=ALL-UNNAMED isabelle.isasearch.Main "$@"

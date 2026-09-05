@@ -1,5 +1,7 @@
 # IsaSearch
 
+The [Isabelle/Scala component](isabelle/README.md) provides a native API, index migration, corpus building, duplicate analysis, and benchmarks alongside this Python version.
+
 This repository provides an AI-assisted semantic theorem search for the Archive of Formal Proofs using sentence-transformers, ChromaDB and LLMs. Additionally, it contains our benchmark data and results.
 
 ## Requirements

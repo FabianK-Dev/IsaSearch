@@ -1,0 +1,4 @@
+section "IsaSearch"
+
+option isasearch_index : string = "local"
+option isasearch_port : int = 5001

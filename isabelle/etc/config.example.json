@@ -1,0 +1,22 @@
+{
+  "embedding_backend": "openai",
+  "openai_embedding_base_url": "http://localhost:8080/v1",
+  "openai_embedding_model": "replace-with-index-embedding-model",
+  "openai_api_key_env": "ISASEARCH_API_KEY",
+  "llm_backend": "none",
+  "openai_base_url": "http://localhost:8081/v1",
+  "openai_document_model": "replace-with-document-model",
+  "openai_query_model": "replace-with-query-model",
+  "prompts_folder": "../../prompts/qwen3-gemma",
+  "isabelle_sessions": ["Example-Submission"],
+  "isabelle_excluded_sessions": [],
+  "add_metadata": false,
+  "distance_metric": "cosine",
+  "llm_concurrency": 1,
+  "enable_llm_output_cache": true,
+  "sampling_parameters": {
+    "temperature": 0,
+    "top_p": 1,
+    "max_tokens": 512
+  }
+}
