@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-16T11:21:20.483234+00:00",
+  "provenance": "captured_at_start",
+  "note": "",
+  "strategy": "UR",
+  "config": {
+    "check_for_updates": true,
+    "components": {
+      "isabelle": {
+        "archive_url": "https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz",
+        "version": "Isabelle2025-2",
+        "local_folder": "Isabelle"
+      },
+      "afp": {
+        "remote_url": "https://github.com/isabelle-prover/mirror-afp-2025-2.git",
+        "local_folder": "afp",
+        "target_branch": "master"
+      }
+    },
+    "isabelle_sessions": [
+      "all"
+    ],
+    "isabelle_excluded_sessions": [],
+    "isabelle_timeout_scale": 3,
+    "afp_remote_thys_folder_url": "https://foss.heptapod.net/isa-afp/afp-2025-2/-/tree/branch/default/thys",
+    "afp_remote_entry_url": "https://isa-afp.org/entries",
+    "isabelle_remote_theory_url": "https://isabelle.in.tum.de/library",
+    "solr_core_url": "http://localhost:8983/solr/local",
+    "solr_query": "command:theorem OR command:lemma OR command:corollary OR command:proposition OR command:schematic_goal OR command:tts_lemma OR command:AOT_theorem OR command:AOT_act_theorem OR command:AOT_lemma",
+    "solr_query_definitions": "command:definition OR command:abbreviation OR command:fun OR command:function OR command:primrec OR command:primcorec OR command:datatype OR command:codatatype OR command:record OR command:type_synonym OR command:typedef OR command:inductive OR command:inductive_set OR command:coinductive OR command:coinductive_set OR command:lift_definition OR command:partial_function OR command:quotient_type OR command:quotient_definition OR command:axiomatization OR command:specification OR command:locale OR command:class OR command:consts OR command:domain OR command:fixrec OR command:nominal_datatype OR command:nominal_function OR command:nominal_primrec OR command:AOT_define OR command:AOT_axiom OR command:AOT_act_axiom OR command:concrete_definition OR command:sepref_definition OR command:locset_definition OR command:corec OR command:corecursive OR command:datatype_record OR command:pcpodef OR command:cpodef OR command:domaindef",
+    "cache_folder": ".cache",
+    "artifacts_folder": "artifacts/beaker_gemma4",
+    "prompts_folder": "prompts/qwen3-gemma",
+    "chroma_db_path": "chroma_storages/beaker_gemma4-qwen3-embedding-4b",
+    "chroma_db_embedder": "sentence-transformers/multi-qa-distilbert-cos-v1",
+    "llm_backend": "openai",
+    "ollama_base_url": "http://localhost:11434",
+    "ollama_document_model": "phi3.5",
+    "ollama_query_model": "phi3:mini",
+    "llamacpp_server_binary": "llama-server",
+    "llamacpp_base_url": "http://localhost:8080",
+    "llamacpp_document_base_url": "http://localhost:8081",
+    "llamacpp_document_model": "hf:bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M",
+    "llamacpp_query_model": "hf:bartowski/Phi-3.5-mini-instruct-GGUF:Q4_K_M",
+    "openai_base_url": "http://10.153.73.66:8082/v1",
+    "openai_document_model": "beaker_gemma4",
+    "openai_query_model": "beaker_gemma4",
+    "openai_api_key_env": "ISASEARCH_API_KEY",
+    "openai_extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "embedding_backend": "openai",
+    "openai_embedding_base_url": "http://10.153.73.66:8081/v1",
+    "openai_embedding_model": "Qwen3-Embedding-4B",
+    "openai_embedding_batch_size": 32,
+    "openai_embedding_max_characters": 8000,
+    "llm_request_timeout": 600,
+    "llm_concurrency": 8,
+    "theorem_max_length": 3000,
+    "metadata_max_length": 300,
+    "sampling_parameters": {
+      "temperature": 0,
+      "top_p": 1,
+      "top_k": -1,
+      "min_p": 0,
+      "max_tokens": 512,
+      "stop": []
+    },
+    "benchmark_add_top_results": false,
+    "add_metadata": false,
+    "add_user_query": true,
+    "benchmark_search_refine": true,
+    "enable_llm_output_cache": true,
+    "dedup_top_k": 10,
+    "dedup_distance_threshold": 0.3,
+    "dedup_strong_distance_threshold": 0.05,
+    "dedup_syntactic_threshold": 0.9,
+    "dedup_llm_judge": true,
+    "dedup_max_judged_per_item": 3,
+    "dedup_report_folder": "reports",
+    "dedup_llm_cache": "llm_output_cache_dedup.json",
+    "find_facts_backup_keep": 2,
+    "api_port": 5001
+  },
+  "models": {
+    "document": "beaker_gemma4",
+    "query": "beaker_gemma4",
+    "embedding": "Qwen3-Embedding-4B"
+  },
+  "code": {
+    "commit": "cf5974ecc2da99a4acdb1faaf906bc69b3b25b0e",
+    "tracked_changes": true
+  },
+  "source_sha256": {
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/app.py": "be636d62265ba8916c21f7b9d1138fd3bc63836d490fcc802cd48abcd1bf97f4",
+    "src/bootstrap.py": "eb0c725b3e6acc41f408abb31b6e58b8396103fe6a9379bfc633e205aaa48f8d",
+    "src/corpus.py": "6b752be605172f1610b58f0f08a386cef985591ac0518edde25c2339a3c9ecb4",
+    "src/documents.py": "2995f065aca8d3c313efca9d300ea52624397b821a3eb81ee2e9f8c35f43c8e0",
+    "src/duplicate_report.py": "0e6eb757e757a22378d5711d173aa2db2297ab3706c7c939de6b9a386ef9d2b4",
+    "src/duplicate_scoring.py": "02cce975555137a6e0f7f61a475795d034724026513f03b875b1893ef9dd5c00",
+    "src/duplicates.py": "56e4d7f38cf3cda2c719f65280a0f9ad544e398fc2361d4d16cd1d8be0a2da6b",
+    "src/embeddings.py": "a489ec76d88ab31851707ce425e8078e12d835fb0dd531907b0dc5997cac52e6",
+    "src/installation.py": "f0b3c60add35c0943cf43607d8585c52dda540757c4f7ad914b0fda9f69fd8d0",
+    "src/llm.py": "ce2c51ed463215fb5297dd7bfd2f02aa54e18b011cfa07f82d470ea20a030581",
+    "src/openai_api.py": "ea146d37caea245571b1b1bbe807e896fc397c08e2e31d2958a2c08abf97ffd9",
+    "src/solr.py": "3798aa9e7a13039062d0992a0bdeb46e7f9d84ff32fe4b95a66643d7767e84da",
+    "benchmark/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "benchmark/benchmark.py": "cd5c6a25b119bb524bcb5525a36d6e9b59b9bd774854f565c99ffbe658186af2",
+    "benchmark/compare.py": "d632523e59f2a12d2d86a6a6a163298f7c9f6dd1c9aaad9e97fb12cd0e8ad28a",
+    "benchmark/metrics.py": "ed554a366065360119dec8557db18677f9caddc0b50d1bad48632c0f4d5432d8",
+    "benchmark/queries.py": "5ce2b475fd38a2b2f90dfc681c94c0546aaadadc13c8c1fa48670b83e3948e41",
+    "benchmark/runs.py": "b875778903597ea54a87dfbeb9b0b23d3c0adc5fa6001c49a8c5e45be3909ab2",
+    "benchmark/scrape_theorem_list.py": "aea8bbf7702490e96ef0786f8481f5e6af0314db26d116ef73ae6302f85b1f27"
+  },
+  "afp_checkout": {
+    "commit": "148a3d50bd87c4d6dacbd512a113522dd2db1785",
+    "tracked_changes": false
+  },
+  "corpus": {
+    "cached_index_fingerprint": {
+      "solr_query": "command:theorem OR command:lemma OR command:corollary OR command:proposition OR command:schematic_goal OR command:tts_lemma OR command:AOT_theorem OR command:AOT_act_theorem OR command:AOT_lemma",
+      "document_count": 371553,
+      "isabelle_sessions": [
+        "all"
+      ]
+    },
+    "document_index_sha256": "d7584c0f7e8f1e11361e1e58c7609a2fe94a945d99301f1107a61d5dd629de78",
+    "descriptions_sha256": "2c6d2b7788eca38cadc2929049dd499068afc4e5d758b519a6c26450ad39c037",
+    "searchable_documents": 371551,
+    "collection_documents": 371551,
+    "collection_metadata": {
+      "hnsw:space": "cosine"
+    }
+  },
+  "benchmark_csv_sha256": "ea3f0d3ab6712a074080622c7e6355a5574359f596b09031716bda961d6f30b9",
+  "prompts": {
+    "describe.txt": "Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to translate the formal theorem provided below into an informal statement in under 256 tokens that is more accessible to mathematicians. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.\n\n=== Start of example input ===\ntheorem degree_mult:\nassumes \"p \u2260 0\" and \"q \u2260 0\"\nshows \"degree (p * q) = degree p + degree q\"\n=== End of example input ===\n\n=== Start of example output ===\n<BEGIN>\nTheorem (Degree of the Product of Two Polynomials):\nLet \\(p\\) and \\(q\\) be non-zero polynomials over a field \\(K\\). Then the degree of the product \\(p \\cdot q\\) is equal to the sum of the degrees of \\(p\\) and \\(q\\), that is, \\(\\deg(p \\cdot q) = \\deg(p) + \\deg(q)\\).\n<END>\n=== End of example output ===\n\n{theorem_content}\n",
+    "describe_definition.txt": "Suppose you are an expert in mathematics and Isabelle/HOL. Your task is to explain the formal definition provided below in under 256 tokens, so that it is accessible to mathematicians. Describe which concept is being defined and what it means, not how it is written down. Do not mention the name of the Isabelle command. Please express the mathematical formulas in LaTeX when necessary. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.\n\n=== Start of example input ===\ndefinition coprime :: \"'a \u21d2 'a \u21d2 bool\"\nwhere \"coprime a b \u27f7 (\u2200d. d dvd a \u27f6 d dvd b \u27f6 is_unit d)\"\n=== End of example input ===\n\n=== Start of example output ===\n<BEGIN>\nDefinition (Coprimality):\nTwo elements \\(a\\) and \\(b\\) of a commutative ring are called coprime if every common divisor of \\(a\\) and \\(b\\) is a unit, i.e. \\(d \\mid a\\) and \\(d \\mid b\\) imply that \\(d\\) is invertible. Over the integers this is the usual condition \\(\\gcd(a, b) = 1\\).\n<END>\n=== End of example output ===\n\n=== Start of example input ===\ndatatype 'a tree = Leaf | Node \"'a tree\" 'a \"'a tree\"\n=== End of example input ===\n\n=== Start of example output ===\n<BEGIN>\nDefinition (Binary Tree):\nA binary tree over a type \\(a\\) is built inductively: it is either the empty tree, or a node consisting of a left subtree, a label of type \\(a\\), and a right subtree.\n<END>\n=== End of example output ===\n\n{theorem_content}\n",
+    "duplicate_judge.txt": "Suppose you are an expert in mathematics and Isabelle/HOL. You are given two Isabelle/HOL items, A and B. Your task is to decide whether they introduce the same concept or state the same fact. Ignore differences in names, notation, variable order and formatting, and judge the mathematical content only.\n\nAnswer with exactly one verdict from this list:\n- DUPLICATE: A and B introduce the same concept or state the same fact.\n- VARIANT: A and B capture the same concept, but one is a generalisation, a specialisation or a different formulation of the other.\n- RELATED: A and B are about the same area, but neither subsumes the other.\n- DIFFERENT: A and B are unrelated.\n\nWrite the verdict on its own line as \"VERDICT: <one of the four words>\", followed by a single sentence of justification. You must always wrap your answer in <BEGIN> and <END>. Do not skip this.\n\n=== Start of example input ===\nItem A:\ndefinition coprime :: \"'a \u21d2 'a \u21d2 bool\"\nwhere \"coprime a b \u27f7 (\u2200d. d dvd a \u27f6 d dvd b \u27f6 is_unit d)\"\n\nItem B:\ndefinition rel_prime :: \"'a \u21d2 'a \u21d2 bool\"\nwhere \"rel_prime x y \u27f7 (\u2200c. c dvd x \u27f6 c dvd y \u27f6 is_unit c)\"\n=== End of example input ===\n\n=== Start of example output ===\n<BEGIN>\nVERDICT: DUPLICATE\nBoth define the same notion, namely that every common divisor of the two arguments is a unit; only the names of the constant and of the bound variables differ.\n<END>\n=== End of example output ===\n\nItem A:\n{item_a}\n\nItem B:\n{item_b}\n",
+    "embed.txt": "{doc_src}",
+    "retrieve.txt": "Instruct: Given a natural language description of a mathematical statement, retrieve semantically equivalent theorems from the Archive of Formal Proofs that are stated in natural language and in Isabelle/HOL\nQuery: {search_query}",
+    "search_refine.txt": "I have a task for you. In this task, you will be given a short description that user typed in a search engine. It is about some mathematical definition or theorem. You should figure out what this short description points to, and describe it in the same format as the following examples. This paraphrase is intended to provide more information about the same thing, making the search engine performs better if it uses this new description instead, so please be as rich as possible, and don't use mathematics symbols like \">/</=\". Instead, translate them into\u00a0 \"more than/less than/equal\". Do not use any mathematical symbols, especially LaTeX. Focus especially on topics and formalizations that are relevant to the Archive of Formal Proofs.\n\nYou should give your result in following format: Paraphrase: <BEGIN>Theorem (<a proper new name>):\n<your result><END>\n\nExamples:\n\nInput: \"the property that a choose element satisfies\"\nParaphrase: <BEGIN>Theorem (Classical Choose Specification):\nFor any type \u03b1 and a property p on \u03b1, if there exists an element x such that p(x) is true, then the chosen element from the set of elements satisfying p is also true for p.\n\ntheorem some_spec:\n  assumes \"EX x. p x\"\n  shows \"p (SOME x. p x)\"\n<END>\n\nInput: \"if a binary property holds for $(0, n)$, and for any $m \\\\ge 0$, it holds for $(n%m, m)$ implies it holds for $(n, m)$, then this property holds for all $(m, n)$\"\nParaphrase: <BEGIN>Theorem (Strong Induction on Natural Numbers):\nFor any natural number a, if a property holds for 0 and for any natural number n assuming it holds for n, then the property holds for a.\n\ntheorem nat_induct:\n  assumes \"P 0\" and \"ALL n. P n --> P (Suc n)\"\n  shows \"P a\"\n<END>\n\nInput: \"{search_query}\"\nParaphrase:\n"
+  },
+  "python": "3.13.5",
+  "packages": {
+    "chromadb": "1.4.1",
+    "nltk": "3.9.2",
+    "pandas": "3.0.0",
+    "sentence-transformers": "5.2.0"
+  },
+  "started_at": "2026-09-16T11:21:04.250535+00:00",
+  "query_inputs": {
+    "mode": "replay_paper_queries",
+    "reference_strategy": "UR",
+    "reference_result": "UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+    "reference_sha256": "5e6abf8b39f2befaad2886144b676c23cd52dd9831a10f7c9821f374c4eadbcf",
+    "available_targets": 85,
+    "available_queries": 255,
+    "extra_target_input_policy": "csv_title_and_natural_language",
+    "missing_noisy_query_policy": "skip_query"
+  },
+  "finished_at": "2026-09-16T11:24:55.618574+00:00",
+  "archived_at": "2026-09-16T11:24:55.621817+00:00",
+  "results_sha256": "28f1731d626d87168c20234002c63952d30296d952ff522216074872470b6654"
+}
