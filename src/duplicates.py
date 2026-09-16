@@ -715,8 +715,8 @@ def parse_args(argv=None):
         "--all-candidates",
         action="store_true",
         help=(
-            "report the closest candidates of every analysed document, instead of only those that "
-            "reach one of the tiers. Useful to inspect the raw search results."
+            "keep the closest candidates of every analysed document in JSON, including those "
+            "without a tier. The Markdown reports always omit unclassified candidates."
         ),
     )
     parser.add_argument(
@@ -856,7 +856,7 @@ def main(argv=None):
         "sections": sections,
     }
 
-    json_path, markdown_path = write_report(report, report_folder)
+    report_paths = write_report(report, report_folder)
 
     print("")
     for kind, section in sections.items():
@@ -866,7 +866,8 @@ def main(argv=None):
             f"{aggregates['documents']} analysed {kind} have a near-exact or likely duplicate "
             "elsewhere in the AFP."
         )
-    print(f"Wrote report to {markdown_path} and {json_path}.")
+    for path in report_paths.values():
+        print(f"Wrote report to {path}.")
 
     # The positive control is the only hard failure: if documents do not even retrieve themselves,
     # the numbers of this run are meaningless.

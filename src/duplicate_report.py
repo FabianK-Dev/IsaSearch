@@ -1,22 +1,26 @@
 """
-duplicate_report.py: Turns the analyses of src/duplicates.py into the two reports of a run, i.e. the
-JSON report with all raw numbers and the Markdown report that is meant for human inspection.
+duplicate_report.py: Stores the analyses of src/duplicates.py as JSON and renders two Markdown
+views for human inspection: all flagged candidates and only near-exact candidates.
 
 This is the only place that knows what a report looks like. It reads the plain data of an analysis
 and never the corpora, so changing the wording or the layout of a report cannot affect any number
 in it.
 """
 
+import argparse
+import html
 import json
-import os
-
+import re
 from datetime import datetime
+from pathlib import Path
+from urllib.parse import quote
 
 from src.duplicate_scoring import (
-    entry_of_id,
     TIER_LIKELY,
     TIER_NEAR_EXACT,
     TIER_POSSIBLE,
+    TIERS,
+    entry_of_id,
 )
 
 
@@ -99,186 +103,304 @@ def analyses_to_report(
     return items
 
 
-# Render one link, falling back to plain text if no URL is available.
+# Report text is data, including LLM explanations and Isabelle names. Keep it on one line
+# and escape Markdown/HTML syntax; source excerpts are rendered separately in fenced blocks.
+def markdown_text(text):
+    text = html.escape(" ".join(str(text).split()), quote=False)
+    return re.sub(r"([\\`*_{}\[\]()#+.!|~\-])", r"\\\1", text)
+
+
+def usable_url(url):
+    return bool(url and url != "#")
+
+
+# Angle-bracket link destinations and percent encoding handle spaces, parentheses and quotes.
 def markdown_link(text, url):
-    if url is None or url == "#":
-        return text
+    label = markdown_text(text)
+    if not usable_url(url):
+        return label
+    return f"[{label}](<{quote(url, safe=':/?#[]@!$&*+,;=%_-~.')}>)"
 
-    return f"[{text}]({url})"
 
-
-# Render the Markdown report that is meant for human inspection.
-def render_markdown(report):
-    lines = []
-    lines.append("# Duplicate analysis of AFP entries")
-    lines.append("")
-    lines.append(f"Generated at {report['generated_at']}.")
-    lines.append("")
-    lines.append(
-        "This report lists, for each analysed AFP entry, material that already exists elsewhere in "
-        "the Archive of Formal Proofs. The entry's own material is excluded from its results. "
-        "Ranking is based on the distance in the embedding space; the tiers are a triage aid for "
-        "human inspection and not a verdict, because semantic similarity is not logical duplication."
+def document_url(doc):
+    return next(
+        (
+            doc.get(key)
+            for key in ("remote_url", "theory_url")
+            if usable_url(doc.get(key))
+        ),
+        None,
     )
-    lines.append("")
-    lines.append("Tiers:")
-    lines.append("")
-    lines.append(
-        f"- `{TIER_NEAR_EXACT}`: distance <= "
-        f"{report['thresholds']['strong_distance']} or syntactic similarity >= "
-        f"{report['thresholds']['syntactic']}"
-    )
-    lines.append(f"- `{TIER_LIKELY}`: the LLM judged the pair to be a duplicate")
-    lines.append(f"- `{TIER_POSSIBLE}`: distance <= {report['thresholds']['distance']}")
-    lines.append("")
 
+
+def document_location(doc):
+    entry = doc.get("entry") or entry_of_id(doc["id"])
+    if entry:
+        return entry, doc.get("entry_url")
+
+    # Built-in theories have no AFP entry. Their document IDs retain the source path,
+    # and the existing URL resolver supplies a link to Isabelle's library browser.
+    source_path = doc["id"].rsplit("|", 1)[0]
+    if source_path.startswith("ISABELLE_HOME/"):
+        source_path = "Isabelle/" + source_path.removeprefix("ISABELLE_HOME/")
+    return source_path, document_url(doc)
+
+
+def fenced_source(source, indent=""):
+    # A source excerpt may itself contain backticks. Its fence must be longer than any run.
+    source = source.strip()
+    width = max([3, *(len(run) + 1 for run in re.findall(r"`+", source))])
+    fence = "`" * width
+    return [
+        indent + fence + "isabelle",
+        *(indent + line for line in source.splitlines()),
+        indent + fence,
+    ]
+
+
+def filtered_entries(section, tiers):
+    entries = []
+    for entry in section["entries"]:
+        items = []
+        for item in entry["items"]:
+            candidates = [c for c in item["candidates"] if c["tier"] in tiers]
+            if candidates:
+                best_tier = next(
+                    tier for tier in TIERS if any(c["tier"] == tier for c in candidates)
+                )
+                items.append({**item, "candidates": candidates, "best_tier": best_tier})
+        entries.append({**entry, "items": items})
+    return entries
+
+
+# Both readable views are derived from the stored evidence. In particular, --all-candidates
+# preserves extra neighbours in JSON without flooding the shareable Markdown with unclassified hits.
+def render_markdown(report, near_exact_only=False):
+    tiers = {TIER_NEAR_EXACT} if near_exact_only else set(TIERS)
+    title = "Near-exact matches" if near_exact_only else "Possible duplicates"
+    lines = [
+        f"# Duplicate analysis: {title}",
+        "",
+        f"Generated at {markdown_text(report['generated_at'])}.",
+        "",
+    ]
+    lines.extend(
+        [
+            (
+                "The selected AFP entries are compared with the indexed AFP and Isabelle library. "
+                "Matches within the source entry are excluded. The tiers guide human review; "
+                "semantic or syntactic similarity does not establish logical duplication."
+            ),
+            "",
+            "This report contains only **near-exact** candidates."
+            if near_exact_only
+            else "This report includes **possible**, **likely**, and **near-exact** candidates. "
+            "Unclassified neighbours are omitted. Candidate links open the source or library theory; "
+            "the separate near-exact report includes candidate source excerpts for closer inspection.",
+            "",
+            "Source blocks are excerpts and may end mid-statement; follow the links for complete source.",
+            "",
+            "Tiers:",
+            "",
+            (
+                f"- `{TIER_NEAR_EXACT}`: distance ≤ {report['thresholds']['strong_distance']} "
+                f"or syntactic similarity ≥ {report['thresholds']['syntactic']}."
+            ),
+        ]
+    )
+    if not near_exact_only:
+        lines.extend(
+            [
+                f"- `{TIER_LIKELY}`: the LLM judged the pair to be a duplicate.",
+                f"- `{TIER_POSSIBLE}`: distance ≤ {report['thresholds']['distance']}.",
+            ]
+        )
+    lines.append("")
     if not report["llm_judge"]:
-        lines.append(
-            "The LLM adjudication was switched off for this run, so the tiers are based on the "
-            f"distance and the syntactic similarity only and no candidate reaches `{TIER_LIKELY}`."
+        lines.extend(
+            [
+                "LLM judging was disabled. Tiers use only distance and syntactic similarity.",
+                "",
+            ]
         )
-        lines.append("")
-
     if report.get("cross"):
-        lines.append(
-            "Cross-kind matching is enabled, so every analysed document was matched against the "
-            "definitions *and* the theorems of the AFP. The kind of each candidate is given in "
-            "parentheses. Note that the synthetic ground truth below only contains definitions, "
-            "while candidates of both kinds compete for the reported places, so its recall is not "
-            "comparable to a run without cross-kind matching."
+        lines.extend(
+            [
+                (
+                    "Cross-kind matching is enabled: each document was compared with both definitions "
+                    "and theorems. Synthetic-control recall is not comparable with a run without cross-kind matching."
+                ),
+                "",
+            ]
         )
-        lines.append("")
-
-    if report.get("all_candidates"):
-        lines.append(
-            f"Every analysed document is listed with its closest {report['thresholds']['top_k']} "
-            "candidates, including the ones that reach no tier."
-        )
-        lines.append("")
 
     for kind, section in report["sections"].items():
-        lines.append(f"## {kind.capitalize()}")
-        lines.append("")
-
+        entries = filtered_entries(section, tiers)
+        items = [item for entry in entries for item in entry["items"]]
+        candidates = [c for item in items for c in item["candidates"]]
         summary = section["aggregates"]
-        lines.append(
-            f"{summary['documents_with_near_exact_or_likely_duplicate']} of "
-            f"{summary['documents']} analysed {kind} have a near-exact or likely duplicate "
-            "elsewhere in the AFP."
+        lines.extend(
+            [
+                f"## {markdown_text(kind.capitalize())}",
+                "",
+                (
+                    f"{len(items)} of {summary['documents']} analysed {markdown_text(kind)} have matches "
+                    f"in this report ({len(candidates)} candidate pairs)."
+                ),
+                "",
+                "Candidate tiers: "
+                + ", ".join(
+                    f"{sum(c['tier'] == tier for c in candidates)} {tier}"
+                    for tier in TIERS
+                    if tier in tiers
+                )
+                + ".",
+                "",
+            ]
         )
-        lines.append("")
-
         if summary.get("judge_failures", 0):
-            lines.append(
-                f"Warning: {summary['judge_failures']} candidate pairs remain unjudged after "
-                "LLM request failures. Their tiers use only distance and syntactic similarity; "
-                "the LLM adjudication is incomplete. Rerunning retries these pairs."
+            lines.extend(
+                [
+                    (
+                        f"Warning: {summary['judge_failures']} candidate pairs remain unjudged in the full run "
+                        "after LLM request failures. Their tiers use only distance and syntactic similarity. "
+                        "Rerunning retries these pairs."
+                    ),
+                    "",
+                ]
             )
-            lines.append("")
-
         control = section["self_retrieval"]
-        lines.append(
-            f"Positive control: {control['self_retrieved']} of {control['documents']} documents "
-            f"retrieved themselves at a distance of about 0 (mean self distance "
-            f"{control['mean_self_distance']})."
+        lines.extend(
+            [
+                (
+                    f"Full-run positive control: {control['self_retrieved']} of {control['documents']} "
+                    f"documents retrieved themselves at a distance of about 0 "
+                    f"(mean self distance {control['mean_self_distance']})."
+                ),
+                "",
+            ]
         )
-        lines.append("")
-
         ground_truth = section["synthetic_ground_truth"]
         if ground_truth["documents_with_known_duplicate"] > 0:
-            lines.append(
-                f"Synthetic ground truth: {ground_truth['documents_recovered']} of "
-                f"{ground_truth['documents_with_known_duplicate']} documents with a syntactically "
-                f"near-identical counterpart in another entry were recovered within the top "
-                f"{report['thresholds']['top_k']} (recall {ground_truth['recall']:.2f})."
+            lines.extend(
+                [
+                    (
+                        f"Full-run synthetic control: {ground_truth['documents_recovered']} of "
+                        f"{ground_truth['documents_with_known_duplicate']} documents with a syntactically "
+                        f"near-identical counterpart in another entry were recovered within the top "
+                        f"{report['thresholds']['top_k']} (recall {ground_truth['recall']:.2f})."
+                    ),
+                    "",
+                ]
             )
+        # Counts belong to this view, not to the unfiltered run stored in aggregates.
+        locations = {}
+        for candidate in candidates:
+            label, url = document_location(candidate)
+            locations[label] = (url, locations.get(label, (None, 0))[1] + 1)
+        if locations:
+            lines.extend(["Most frequent match locations in this report:", ""])
+            for label, (url, count) in sorted(
+                locations.items(), key=lambda item: -item[1][1]
+            )[:20]:
+                lines.append(f"- {markdown_link(label, url)}: {count} candidate pairs")
             lines.append("")
 
-        lines.append("Top-1 distance histogram:")
-        lines.append("")
-        for bucket, count in summary["top_1_distance_histogram"].items():
-            lines.append(f"- `{bucket}`: {count}")
-        lines.append("")
-
-        if len(summary["overlapping_entries"]) > 0:
-            lines.append("Most overlapping entries:")
-            lines.append("")
-            for overlapping_entry, count in summary["overlapping_entries"].items():
-                lines.append(f"- `{overlapping_entry}`: {count} reported candidates")
-            lines.append("")
-
-        for entry_section in section["entries"]:
-            lines.append(
-                f"### {entry_section['entry']} ({entry_section['date'] or 'unknown date'})"
+        for entry in entries:
+            lines.extend(
+                [
+                    f"### {markdown_text(entry['entry'])} ({markdown_text(entry['date'] or 'unknown date')})",
+                    "",
+                    (
+                        f"{len(entry['items'])} of {entry['documents']} {markdown_text(kind)} "
+                        "have at least one candidate in this report."
+                    ),
+                    "",
+                ]
             )
-            lines.append("")
-            lines.append(
-                f"{len(entry_section['items'])} of {entry_section['documents']} {kind} of this "
-                "entry have at least one reported candidate."
-            )
-            lines.append("")
-
-            for item in entry_section["items"]:
-                title = item["entity_kname"] or item["id"]
-                lines.append(
-                    f"#### {markdown_link(title, item['remote_url'])} "
-                    f"[{item['best_tier'] or 'no tier'}]"
+            for item in entry["items"]:
+                lines.extend(
+                    [
+                        (
+                            f"#### {markdown_link(item['entity_kname'] or item['id'], document_url(item))} "
+                            f"— {item['best_tier']}"
+                        ),
+                        "",
+                        *fenced_source(item["src"]),
+                        "",
+                    ]
                 )
-                lines.append("")
-                lines.append("```isabelle")
-                lines.append(item["src"].strip())
-                lines.append("```")
-                lines.append("")
-
                 for candidate in item["candidates"]:
-                    candidate_title = candidate["entity_kname"] or candidate["id"]
-                    lines.append(
-                        f"- **{candidate['tier'] or 'no tier'}** "
-                        f"({candidate['command'] or candidate['kind']}) "
-                        f"{markdown_link(candidate_title, candidate['remote_url'])} "
-                        f"in {markdown_link(candidate['entry'] or '?', candidate['entry_url'])} "
-                        f"(distance {candidate['distance']:.4f}, "
-                        f"syntactic {candidate['syntactic_similarity']:.2f}"
-                        + (
-                            f", verdict {candidate['verdict']}"
-                            if candidate.get("verdict")
-                            else ""
-                        )
-                        + ")"
+                    label, location_url = document_location(candidate)
+                    verdict = (
+                        f", verdict {markdown_text(candidate['verdict'])}"
+                        if candidate.get("verdict")
+                        else ""
                     )
-
+                    lines.extend(
+                        [
+                            (
+                                f"- **{candidate['tier']}** "
+                                f"({markdown_text(candidate['command'] or candidate['kind'])}) "
+                                f"{markdown_link(candidate['entity_kname'] or candidate['id'], document_url(candidate))} "
+                                f"in {markdown_link(label, location_url)} "
+                                f"(distance {candidate['distance']:.4f}, "
+                                f"syntactic {candidate['syntactic_similarity']:.2f}{verdict})"
+                            ),
+                        ]
+                    )
                     if candidate.get("justification"):
-                        lines.append(f"  - {candidate['justification']}")
-
+                        lines.extend(
+                            ["", "    " + markdown_text(candidate["justification"])]
+                        )
                     if candidate.get("judge_error"):
-                        error = " ".join(candidate["judge_error"].splitlines())
-                        lines.append(f"  - **Unjudged: LLM request failed.** {error}")
-
+                        lines.extend(
+                            [
+                                "",
+                                "    **Unjudged: LLM request failed.** "
+                                + markdown_text(candidate["judge_error"]),
+                            ]
+                        )
+                    if near_exact_only:
+                        lines.extend(
+                            ["", *fenced_source(candidate["src"], indent="    ")]
+                        )
                     lines.append("")
-                    lines.append("  ```isabelle")
-                    for source_line in candidate["src"].strip().splitlines():
-                        lines.append("  " + source_line)
-                    lines.append("  ```")
-                    lines.append("")
-
     return "\n".join(lines) + "\n"
 
 
-# Write the JSON and the Markdown report and return both paths.
+def write_markdown_reports(report, json_path):
+    base = Path(json_path).with_suffix("")
+    paths = {}
+    for name, near_exact_only in (("possible", False), ("near_exact", True)):
+        path = base.with_name(base.name + "_" + name.replace("_", "-") + ".md")
+        path.write_text(
+            render_markdown(report, near_exact_only=near_exact_only), encoding="utf-8"
+        )
+        paths[name] = str(path)
+    return paths
+
+
+# JSON is the source of truth. The two Markdown views can be regenerated without a corpus or LLM.
 def write_report(report, report_folder):
-    folder = os.path.join(report_folder, "duplicates")
-
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
+    folder = Path(report_folder) / "duplicates"
+    folder.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    json_path = os.path.join(folder, f"experiment_{timestamp}.json")
-    markdown_path = os.path.join(folder, f"experiment_{timestamp}.md")
+    json_path = folder / f"experiment_{timestamp}.json"
+    json_path.write_text(json.dumps(report, indent=4), encoding="utf-8")
+    return {"json": str(json_path), **write_markdown_reports(report, json_path)}
 
-    with open(json_path, "w") as file:
-        json.dump(report, file, indent=4)
 
-    with open(markdown_path, "w") as file:
-        file.write(render_markdown(report))
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Regenerate both duplicate reports from saved JSON; no search or LLM calls."
+    )
+    parser.add_argument("results", type=Path, help="path to an experiment JSON report")
+    args = parser.parse_args(argv)
+    report = json.loads(args.results.read_text(encoding="utf-8"))
+    for path in write_markdown_reports(report, args.results).values():
+        print(f"Wrote report to {path}.")
 
-    return json_path, markdown_path
+
+if __name__ == "__main__":
+    main()

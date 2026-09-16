@@ -691,15 +691,15 @@ class JudgeConcurrencyTest(TemporaryFolderTestCase):
                 },
             },
         }
-        json_path, markdown_path = duplicate_report.write_report(report, self.folder)
-        with open(json_path) as file:
+        report_paths = duplicate_report.write_report(report, self.folder)
+        with open(report_paths["json"]) as file:
             saved = json.load(file)
         saved_candidate = saved["sections"]["definitions"]["entries"][0]["items"][0][
             "candidates"
         ][0]
         self.assertIsNone(saved_candidate["verdict"])
         self.assertIn("cut off", saved_candidate["judge_error"])
-        with open(markdown_path) as file:
+        with open(report_paths["possible"]) as file:
             markdown = file.read()
         self.assertIn("1 candidate pairs remain unjudged", markdown)
         self.assertIn("**Unjudged: LLM request failed.**", markdown)

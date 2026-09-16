@@ -195,7 +195,19 @@ For every document of the analysed entry, in this order:
 3. All candidates belonging to the analysed entry are dropped — this is the "ignore the entry's own definitions" part.
 4. Each remaining candidate gets a syntactic similarity score and, unless switched off, a verdict from the LLM. Distance, similarity and verdict together decide the tier it is reported in.
 
-The result is `reports/duplicates/experiment_<timestamp>.md` for reading and `.json` for the raw numbers.
+Each run writes three files under `reports/duplicates/`:
+
+- `experiment_<timestamp>_possible.md`: all flagged candidates (`possible`, `likely`, and `near-exact`), with source links and LLM explanations. Candidate source excerpts are omitted to keep the overview shorter.
+- `experiment_<timestamp>_near-exact.md`: only `near-exact` candidates, including both source excerpts for inspection.
+- `experiment_<timestamp>.json`: the stored results, including unclassified neighbours when `--all-candidates` is enabled. The readable reports always omit unclassified candidates, and their counts reflect the candidates shown in each view.
+
+Regenerate both Markdown files from an existing JSON result without rerunning retrieval or LLM judging:
+
+```bash
+python3 -m src.duplicate_report reports/duplicates/experiment_<timestamp>.json
+```
+
+Matches in Isabelle's bundled library use the theory source path and library link rather than an AFP entry label. Names and LLM explanations are escaped as text; Isabelle source excerpts use fenced code blocks. Large runs can still exceed a hosting site's Markdown preview limit, so open the downloaded file in a local Markdown viewer if its online preview is truncated.
 
 #### Case 1: an entry that is already in the corpus
 
@@ -217,7 +229,7 @@ Useful options:
 | `--kinds all` | analyse definitions *and* theorems (`--kinds theorems` for theorems only) |
 | `--cross` | match every document against *both* corpora, see below |
 | `--no-llm-judge` | switch the LLM adjudication off, see below |
-| `--all-candidates` | report the closest candidates of *every* document, not only those reaching a tier |
+| `--all-candidates` | retain the closest candidates of *every* document in JSON, including those without a tier; Markdown remains filtered |
 | `--report-dir DIR` | override the report location |
 
 Only entries that are part of the corpus can be analysed. An entry that is not is skipped with a warning naming it, and `--newest` warns about newer entries it had to pass over because they are not indexed.
@@ -258,7 +270,7 @@ This is sound because both collections are filled by the same embedding function
 
 #### Switching the LLM adjudication off
 
-The core of the analysis is a plain loop: every definition (and, with `--kinds all`, every theorem) of the analysed entry is used as an IsaSearch query against the rest of the AFP, and the closest counterparts are reported with their distance and a syntactic similarity. The LLM adjudication is an optional layer on top that asks the configured LLM whether a pair really is a duplicate. Switch it off with `--no-llm-judge` (or `"dedup_llm_judge": false`) to get the plain, deterministic search results; no candidate then reaches the `likely` tier and the report says so. Combine it with `--all-candidates` to see the raw ranking for every document, unfiltered by any threshold.
+The core of the analysis is a plain loop: every definition (and, with `--kinds all`, every theorem) of the analysed entry is used as an IsaSearch query against the rest of the AFP, and the closest counterparts are reported with their distance and a syntactic similarity. The LLM adjudication is an optional layer on top that asks the configured LLM whether a pair really is a duplicate. Switch it off with `--no-llm-judge` (or `"dedup_llm_judge": false`) to get the plain, deterministic search results; no candidate then reaches the `likely` tier and the report says so. Combine it with `--all-candidates` to retain the raw ranking for every document in JSON, unfiltered by any threshold.
 
 Note that the LLM is still needed to *build* the corpus, because every definition is informalized once before it is embedded.
 
