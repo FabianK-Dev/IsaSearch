@@ -436,7 +436,45 @@ With `"add_metadata": false`, the benchmark uses the configured corpus paths dir
 
 Query refinement still calls the LLM and writes its output cache, and the benchmark writes results under `benchmark/results/`. Pause the web application while benchmarking because both use `.cache/llm_output_cache.json` (under the configured `cache_folder`); leave Solr running.
 
-**Important:** The results generated with the default configuration will differ from the paper. This is because the test setup only indexes the two sessions mentioned above (`"Ramsey-Infinite"`, `"Ordinals_and_Cardinals"`), whereas the paper results are based on the complete Archive of Formal Proofs.
+#### Strategies and saved runs
+
+The single benchmark command evaluates the strategy selected in `config.json`; it does not run every variant. With `"add_metadata": false`:
+
+| Strategy | `benchmark_search_refine` | `add_user_query` |
+| --- | --- | --- |
+| `baseline`: original query | `false` | ignored |
+| `R`: expanded query only | `true` | `false` |
+| `UR`: original + expanded query | `true` | `true` |
+
+Each new run writes a new directory, for example `benchmark/results/20260916T120000.123456Z_UR/`, containing:
+
+- `results.json`: per-query metrics, input and expanded queries, target identifiers, skipped targets and aggregate metrics.
+- `manifest.json`: effective configuration with the API key redacted, model names (including the embedding model), Git revisions and tracked-change flags, hashes of the Python sources and benchmark CSV, exact prompt templates, corpus artifact hashes and cached fingerprint, loaded corpus counts, collection metadata, noise seed, timestamps and dependency versions.
+
+Commit the whole run directory. Keep the corpus artifacts and ChromaDB storage outside Git; the recorded hashes identify the descriptions and document index used. The manifest records the configured models and the current AFP checkout, not an independently verified history of how old cached descriptions or vectors were generated. Keep that distinction in mind when reusing a corpus across model changes. For the clearest provenance, benchmark a committed checkout and keep the corpus unchanged for the duration of the run.
+
+Existing results can be archived without rerunning the benchmark. Run this **on the server**, from the repository root, while its configuration and corpus still match the completed run:
+
+```bash
+python3 -m benchmark.runs benchmark/results/UR_beaker_gemma4_beaker_gemma4.json \
+  --note "Completed on bunsen; settings captured afterwards, unchanged since evaluation"
+```
+
+This preserves the original result bytes in a new run directory. Its manifest is explicitly marked `captured_after_run_unverified`: the original run did not record its configuration, and settings captured afterwards cannot prove which settings were used. Only use that note if it is true. Copy the new directory back to the repository you intend to commit.
+
+#### Comparing with the paper
+
+The original flat JSON files in `benchmark/results/` are retained as historical results. The [paper baseline index](benchmark/results/README.md) lists all six strategies and their verified provenance. Compare like strategies first. For a new UR run, pass its directory (replace `RUN_DIRECTORY` below with the printed path):
+
+```bash
+python3 -m benchmark.compare \
+  benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
+  RUN_DIRECTORY > RUN_DIRECTORY/comparison-paper-UR.md
+```
+
+The command accepts either run directories or legacy JSON files. It reports evaluated query counts, missing queries, skipped-target reasons, changed query texts and the largest reciprocal-rank improvements and regressions. It recomputes Hit@10, MRR and NDCG for each query type and overall using the same target/query-type pairs with identical input text. Known relevance-label changes are excluded too; old results do not record the labels, so those need manual verification. A Hit@10 delta of `+0.0500` means five percentage points.
+
+Inspect coverage before interpreting the averages: the paper evaluated 85 targets and 255 queries. Noisy queries are saved in the result files, and the comparison excludes changed noise rather than treating it as the same test. Timing is omitted because the benchmark can reuse cached generation durations and the hardware may differ. The current full corpus includes Isabelle HOL sessions as well as AFP, and the configured models differ from the paper; this is a comparison of systems, not an isolated measurement of model improvement.
 
 ## Screenshot
 

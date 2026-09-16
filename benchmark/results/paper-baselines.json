@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "paper_baseline_index",
+  "paper": {
+    "repository": "ai-assisted-theorem-search-in-isabelle",
+    "commit": "0b456d06dd7a4630549162a6bdaf56b285480938",
+    "source": "paper/AFP-AI-search.tex",
+    "source_sha256": "90f70b350565d66551cabcdd0536f1e85d408b0fe51ea79c088065947f6581ef",
+    "table": "tab:suchstrategien_tabelle"
+  },
+  "verification": {
+    "retrieval_values_checked": 96,
+    "matches_paper_to_decimal_places": 3,
+    "metrics": [
+      "top_k_accuracy",
+      "normalized_discounted_cumulative_gain",
+      "reciprocal_rank",
+      "rank"
+    ],
+    "timing_note": "Some stored durations differ from the published timing values; comparison excludes timing."
+  },
+  "historical_run_provenance": {
+    "code_revision": null,
+    "corpus_revision": null,
+    "complete_runtime_configuration": null,
+    "note": "The paper source revision verifies the table, not the original execution environment."
+  },
+  "baselines": {
+    "baseline": {
+      "result_file": "baseline_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+      "results_sha256": "e62a13326ca821e6f1d485e266587b9edffee824a1bce17b2b81841b78cb75c3",
+      "metadata": false,
+      "query_expansion": false,
+      "include_original_query": true,
+      "evaluated_targets": 85,
+      "evaluated_queries": 255
+    },
+    "R": {
+      "result_file": "R_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+      "results_sha256": "fe6075c82d094de9a2b0416ff074cc2e4a0953dca115a64a3133ea0434dac9fd",
+      "metadata": false,
+      "query_expansion": true,
+      "include_original_query": false,
+      "evaluated_targets": 85,
+      "evaluated_queries": 255
+    },
+    "UR": {
+      "result_file": "UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+      "results_sha256": "5e6abf8b39f2befaad2886144b676c23cd52dd9831a10f7c9821f374c4eadbcf",
+      "metadata": false,
+      "query_expansion": true,
+      "include_original_query": true,
+      "evaluated_targets": 85,
+      "evaluated_queries": 255
+    },
+    "M": {
+      "result_file": "M_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+      "results_sha256": "25918c444eb185d59b68d43b23058190f7f54106dc43ed71185c7843c67c7834",
+      "metadata": true,
+      "query_expansion": false,
+      "include_original_query": true,
+      "evaluated_targets": 85,
+      "evaluated_queries": 255
+    },
+    "MR": {
+      "result_file": "MR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+      "results_sha256": "6896cdcdc69ba3420e3f8b1063b00ef48e599a9b553560b7fe6c11a6551dc507",
+      "metadata": true,
+      "query_expansion": true,
+      "include_original_query": false,
+      "evaluated_targets": 85,
+      "evaluated_queries": 255
+    },
+    "MUR": {
+      "result_file": "MUR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+      "results_sha256": "2ec98b348d10b52789de59501f00528941d90208415f5e80e9911e9ae127d25d",
+      "metadata": true,
+      "query_expansion": true,
+      "include_original_query": true,
+      "evaluated_targets": 85,
+      "evaluated_queries": 255
+    }
+  }
+}

@@ -13,7 +13,6 @@ Finally, for each metric the average will be calculated. All benchmark results w
 """
 
 import json
-import os
 import random
 import re
 from pprint import pprint
@@ -31,33 +30,14 @@ from benchmark.metrics import (
     reciprocal_rank,
     top_k_accuracy,
 )
+from benchmark.runs import benchmark_configuration, capture_manifest, now, save_run
 from src.bootstrap import boot_components, load_config
 from src.documents import KIND_THEOREMS
 from src.embeddings import search, search_results_to_docs
-from src.llm import (
-    document_model_name,
-    query_model_name,
-)
 from src.openai_api import config_without_secrets
 
-config = load_config()
-
-# Depending on the strategy that will be investigated, the benchmark result file suffix will change to distinguish the results.
-results_suffix = ""
-if config["add_metadata"]:
-    results_suffix = results_suffix + "M"
-    config["artifacts_folder"] = config["artifacts_folder"] + "-with-metadata"
-    config["prompts_folder"] = config["prompts_folder"] + "-with-metadata"
-    config["chroma_db_path"] = config["chroma_db_path"] + "-with-metadata"
-
-if config["add_user_query"]:
-    results_suffix = results_suffix + "U"
-
-if config["benchmark_search_refine"]:
-    results_suffix = results_suffix + "R"
-
-if results_suffix == "":
-    results_suffix = "baseline"
+started_at = now()
+config, results_suffix = benchmark_configuration(load_config())
 
 print("Using config for benchmark:")
 # Printed without credentials, because config["openai_api_key"] can hold an API key.
@@ -84,6 +64,15 @@ print("Loading benchmark CSV...")
 benchmark_df = pd.read_csv("./benchmark/benchmark.csv")
 benchmark_df = benchmark_df.reset_index()
 
+print("Recording benchmark configuration and corpus fingerprints...")
+manifest = capture_manifest(config, results_suffix)
+manifest["started_at"] = started_at
+manifest["corpus"].update(
+    searchable_documents=len(document_index),
+    collection_documents=collection.count(),
+    collection_metadata=collection.metadata,
+)
+
 query_columns = [
     "Title query",
     "Natural language query",
@@ -91,7 +80,9 @@ query_columns = [
 ]
 benchmark_results = {}
 
-random.seed(129869)
+noise_seed = 129869
+random.seed(noise_seed)
+manifest["noise_seed"] = noise_seed
 
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     # This is a list of dictionaries with potential valid theorems
@@ -154,6 +145,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
     # Remove duplicates from target_identifier (list of dicts)
     target_identifier = [dict(t) for t in {tuple(d.items()) for d in target_identifier}]
+    benchmark_results[row["ID"]]["metadata"]["target_identifier"] = target_identifier
 
     # Check if a theorem identified by a target identifier exists in the document index.
     target_exists = False
@@ -265,16 +257,6 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
 # Calculate the mean of all metrics and save the benchmark result.
 benchmark_results["summary"] = calculate_mean_metrics(benchmark_results)
-benchmark_model_name = (
-    results_suffix
-    + "_"
-    + document_model_name(config).replace("/", "-")
-    + "_"
-    + query_model_name(config).replace("/", "-")
-)
-
-if not os.path.exists("./benchmark/results/"):
-    os.makedirs("./benchmark/results/")
-
-with open("./benchmark/results/" + benchmark_model_name + ".json", "w") as outfile:
-    json.dump(benchmark_results, outfile, indent=4)
+manifest["finished_at"] = now()
+run_folder = save_run(benchmark_results, manifest)
+print(f"Benchmark results and manifest saved to {run_folder}")
