@@ -1,5 +1,6 @@
 """Offline checks for run preservation and fair comparisons with legacy results."""
 
+import csv
 import hashlib
 import json
 import random
@@ -14,7 +15,9 @@ from benchmark.queries import (
     NATURAL_QUERY,
     NOISY_QUERY,
     PAPER_INDEX,
-    load_paper_noisy_queries,
+    QUERY_TYPES,
+    TITLE_QUERY,
+    load_paper_queries,
 )
 from benchmark.runs import benchmark_configuration, capture_manifest, save_run
 
@@ -65,8 +68,15 @@ class ComparisonTest(unittest.TestCase):
 
 
 class PaperQueryTest(unittest.TestCase):
-    def test_every_paper_strategy_has_the_same_frozen_noisy_inputs(self):
-        replay = load_paper_noisy_queries()
+    def test_benchmark_target_ids_are_unique(self):
+        with (PAPER_INDEX.parents[1] / "benchmark.csv").open() as file:
+            ids = [row["ID"] for row in csv.DictReader(file)]
+        self.assertEqual(
+            len(ids), len(set(ids)), "Repeated IDs overwrite benchmark results"
+        )
+
+    def test_every_paper_strategy_has_the_same_frozen_inputs(self):
+        replay = load_paper_queries()
         index = json.loads(PAPER_INDEX.read_text())
         self.assertEqual(len(replay.queries), 85)
         for baseline in index["baselines"].values():
@@ -75,27 +85,37 @@ class PaperQueryTest(unittest.TestCase):
                 if target == "summary" or entry.get("metadata", {}).get("skipped"):
                     continue
                 queries = entry["queries"]
-                self.assertEqual(
-                    replay.get(target, queries[NATURAL_QUERY]["query"]),
-                    queries[NOISY_QUERY]["query"],
-                )
+                for kind in QUERY_TYPES:
+                    self.assertEqual(
+                        replay.for_row({"ID": target})[kind]["query"],
+                        queries[kind]["query"],
+                    )
 
     def test_order_and_other_random_draws_cannot_change_replayed_queries(self):
-        replay = load_paper_noisy_queries()
+        replay = load_paper_queries()
         before = random.getstate()
         self.addCleanup(random.setstate, before)
         for target in reversed(replay.queries):
             random.random()
             queries = replay.queries[target]
             self.assertEqual(
-                replay.get(target, queries[NATURAL_QUERY]["query"]),
+                replay.for_row({"ID": target})[NOISY_QUERY]["query"],
                 queries[NOISY_QUERY]["query"],
             )
-        self.assertIsNone(replay.get("cramers-rule", "new target"))
+        extra = replay.for_row(
+            {"ID": "cramers-rule", TITLE_QUERY: "Cramer", NATURAL_QUERY: "new target"}
+        )
+        self.assertNotIn(NOISY_QUERY, extra)
+        self.assertEqual(extra[NATURAL_QUERY]["query"], "new target")
 
-    def test_changed_natural_language_input_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "differs from the paper"):
-            load_paper_noisy_queries().get("fundamental-theorem-of-algebra", "changed")
+    def test_paper_input_wins_over_changed_csv_wording(self):
+        replay = load_paper_queries()
+        target = "solutions-to-pells-equation"
+        selected = replay.for_row({"ID": target, NATURAL_QUERY: "changed wording"})
+        self.assertEqual(
+            selected[NATURAL_QUERY]["query"],
+            replay.queries[target][NATURAL_QUERY]["query"],
+        )
 
     def test_modified_paper_result_is_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -104,14 +124,14 @@ class PaperQueryTest(unittest.TestCase):
             path.write_text(json.dumps(index))
             Path(folder, index["baselines"]["UR"]["result_file"]).write_text("{}")
             with self.assertRaisesRegex(ValueError, "SHA-256"):
-                load_paper_noisy_queries(path)
+                load_paper_queries(path)
 
     def test_benchmark_replays_255_paper_queries_and_records_missing_extra_noise(self):
         import pandas as pd
 
         from src import bootstrap, embeddings
 
-        replay = load_paper_noisy_queries()
+        replay = load_paper_queries()
         index = json.loads(PAPER_INDEX.read_text())
         paper = load_result(
             PAPER_INDEX.parent / index["baselines"]["UR"]["result_file"]

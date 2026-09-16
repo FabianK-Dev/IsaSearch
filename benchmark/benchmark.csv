@@ -196,7 +196,7 @@ arithmetic-mean-geometric-mean,Arithmetic Mean / Geometric Mean,"[ {""entity_kna
   assumes ""pos z""
   shows ""gmean z ≤ mean z""
 ",https://isa-afp.org/entries/Cauchy.shtml,Cauchy,Arithmetic Mean / Geometric Mean,the arithmetic mean of a list of non-negative real numbers is greater than or equal to the geometric mean of the same list,https://en.wikipedia.org/wiki/AM%E2%80%93GM_inequality,,
-solutions-to-pells-equation,Solutions to Pell's Equation,"[ {""entity_kname"":""Pell.pell_solutions|thm""} ]","theorem pell_solutions:
+rational-approximation-via-pells-equation,Solutions to Pell's Equation,"[ {""entity_kname"":""Pell.pell_solutions|thm""} ]","theorem pell_solutions:
   fixes D :: nat
   assumes ""∄k. D = k⇧2""
   obtains ""x⇩0"" ""y⇩0"" :: nat

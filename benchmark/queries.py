@@ -1,4 +1,4 @@
-"""Replay the paper's noisy inputs without regenerating or mutating them."""
+"""Replay the paper's benchmark inputs without regenerating or mutating them."""
 
 import hashlib
 import json
@@ -6,28 +6,39 @@ from dataclasses import dataclass
 from pathlib import Path
 
 PAPER_INDEX = Path(__file__).parent / "results" / "paper-baselines.json"
+TITLE_QUERY = "Title query"
 NATURAL_QUERY = "Natural language query"
 NOISY_QUERY = "Noisy natural language query"
+QUERY_TYPES = (TITLE_QUERY, NATURAL_QUERY, NOISY_QUERY)
 
 
 @dataclass(frozen=True)
-class PaperNoisyQueries:
+class PaperQueries:
     queries: dict
     provenance: dict
 
-    def get(self, target_id, natural_query):
-        reference = self.queries.get(target_id)
-        if reference is None:
-            return None
-        if natural_query != reference[NATURAL_QUERY]["query"]:
-            raise ValueError(
-                f"Natural-language query for '{target_id}' differs from the paper. "
-                "Cannot pair it with the paper's saved noisy query."
-            )
-        return reference[NOISY_QUERY]["query"]
+    def for_row(self, row):
+        reference = self.queries.get(row["ID"])
+        if reference is not None:
+            return {
+                kind: {
+                    "query": reference[kind]["query"],
+                    "source": reference[kind].get("source"),
+                }
+                for kind in QUERY_TYPES
+            }
+        # Extra targets have no historical noisy input. Keep their ordinary searches without
+        # inventing a noisy variant that could be mistaken for part of the paper benchmark.
+        return {
+            kind: {
+                "query": row[kind],
+                "source": row.get("Natural language query source"),
+            }
+            for kind in (TITLE_QUERY, NATURAL_QUERY)
+        }
 
 
-def load_paper_noisy_queries(index_path=PAPER_INDEX):
+def load_paper_queries(index_path=PAPER_INDEX):
     index_path = Path(index_path)
     index = json.loads(index_path.read_text())
     # All six paper strategies use identical inputs; UR supplies the canonical copy.
@@ -45,18 +56,22 @@ def load_paper_noisy_queries(index_path=PAPER_INDEX):
         if target == "summary" or entry.get("metadata", {}).get("skipped"):
             continue
         reference = entry["queries"]
-        for kind in (NATURAL_QUERY, NOISY_QUERY):
+        for kind in QUERY_TYPES:
             if not isinstance(reference.get(kind, {}).get("query"), str):
-                raise ValueError(f"Paper query source lacks '{kind}' for '{target}'")
+                raise TypeError(
+                    f"Paper query source lacks text for '{kind}' in '{target}'"
+                )
         queries[target] = reference
-    return PaperNoisyQueries(
+    return PaperQueries(
         queries=queries,
         provenance={
-            "mode": "replay_paper_noisy_queries",
+            "mode": "replay_paper_queries",
             "reference_strategy": "UR",
             "reference_result": baseline["result_file"],
             "reference_sha256": digest,
-            "available_noisy_queries": len(queries),
+            "available_targets": len(queries),
+            "available_queries": len(queries) * len(QUERY_TYPES),
+            "extra_target_input_policy": "csv_title_and_natural_language",
             "missing_noisy_query_policy": "skip_query",
         },
     )

@@ -17,7 +17,7 @@ run a comparison.
 Each baseline evaluates 85 targets with three query types, totaling 255 queries.
 The result files contain individual queries and metrics as well as summaries, so
 the comparison can account for changed coverage and noisy-query text.
-The benchmark replays the UR file's saved noisy inputs for all strategies, checking
+The benchmark replays the UR file's saved inputs for all strategies, checking
 its hash against the index below. All six historical files use the same query inputs.
 Keep these files available on the server when rerunning the benchmark.
 

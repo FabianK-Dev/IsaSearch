@@ -26,7 +26,7 @@ from benchmark.metrics import (
     reciprocal_rank,
     top_k_accuracy,
 )
-from benchmark.queries import NOISY_QUERY, load_paper_noisy_queries
+from benchmark.queries import QUERY_TYPES, load_paper_queries
 from benchmark.runs import benchmark_configuration, capture_manifest, now, save_run
 from src.bootstrap import boot_components, load_config
 from src.documents import KIND_THEOREMS
@@ -40,7 +40,8 @@ print("Using config for benchmark:")
 # Printed without credentials, because config["openai_api_key"] can hold an API key.
 pprint(config_without_secrets(config))
 
-paper_queries = load_paper_noisy_queries()
+paper_queries = load_paper_queries()
+print(f"Replaying saved paper inputs for {len(paper_queries.queries)} targets.")
 
 # Evaluate the built corpus as-is, including when some documents could not be described.
 # Disabling component updates and indexing alone still allows informalization and embedding.
@@ -58,11 +59,6 @@ print("Loading benchmark CSV...")
 benchmark_df = pd.read_csv("./benchmark/benchmark.csv")
 benchmark_df = benchmark_df.reset_index()
 
-# Check the natural-language inputs before issuing any search requests, so changed benchmark
-# wording cannot silently be paired with an unrelated frozen noisy query.
-for _, row in benchmark_df.iterrows():
-    paper_queries.get(row["ID"], row["Natural language query"])
-
 print("Recording benchmark configuration and corpus fingerprints...")
 manifest = capture_manifest(config, results_suffix)
 manifest["started_at"] = started_at
@@ -73,11 +69,6 @@ manifest["corpus"].update(
     collection_metadata=collection.metadata,
 )
 
-query_columns = [
-    "Title query",
-    "Natural language query",
-    NOISY_QUERY,
-]
 benchmark_results = {}
 
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
@@ -164,18 +155,17 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
         )
         continue
 
-    # Do a search for each query type
-    for query_type in query_columns:
-        if query_type == NOISY_QUERY:
-            query = paper_queries.get(row["ID"], row["Natural language query"])
-            if query is None:
-                print(f"Skipping noisy query for '{row['ID']}': no saved paper input.")
-                benchmark_results[row["ID"]]["metadata"].setdefault(
-                    "skipped_queries", {}
-                )[query_type] = "paper_noisy_query_missing"
-                continue
-        else:
-            query = row[query_type]
+    # Search the paper's exact inputs, with CSV inputs only for additional targets.
+    query_inputs = paper_queries.for_row(row)
+    for query_type in QUERY_TYPES:
+        if query_type not in query_inputs:
+            print(f"Skipping noisy query for '{row['ID']}': no saved paper input.")
+            benchmark_results[row["ID"]]["metadata"].setdefault("skipped_queries", {})[
+                query_type
+            ] = "paper_noisy_query_missing"
+            continue
+        query_input = query_inputs[query_type]
+        query = query_input["query"]
 
         if not pd.isna(query):
             print(f'Searching: "{query}"')
@@ -228,7 +218,7 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
                     / 10,  # Round to 1 decimal to avoid having a new duration for each benchmark run
                 },
                 "query": query,
-                "source": row["Natural language query source"],
+                "source": query_input["source"],
                 "refined_query": results_dict["refined_query"],
                 "top_results": top_results,
             }
