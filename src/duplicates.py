@@ -74,6 +74,7 @@ from src.embeddings import (
 )
 from src.llm import (
     cached_output,
+    generate_with_retries,
     query_model_name,
     save_llm_output_cache,
     store_output,
@@ -410,9 +411,15 @@ def judge_candidates(
 
     def timed_generate(prompt):
         start = time.time()
-        return model.generate(prompt), time.time() - start
+        try:
+            return generate_with_retries(model, prompt), time.time() - start, None
+        except RuntimeError as exc:
+            # Expected generation failures are normalized by the retry helper. Keep them out of
+            # the completion cache so the next run can try again; other pairs can still finish.
+            return None, time.time() - start, str(exc)
 
     unsaved = 0
+    errors = {}
 
     # The requests are independent and the server processes several at once, so they are sent
     # concurrently, exactly like the informalization in src/documents.py. Only this thread ever
@@ -420,10 +427,15 @@ def judge_candidates(
     # input order, so the cache contents are identical to what a sequential run produces.
     try:
         with ThreadPoolExecutor(max_workers=workers) as executor:
-            for prompt, (raw_output, duration) in tqdm(
+            for prompt, (raw_output, duration, error) in tqdm(
                 zip(uncached, executor.map(timed_generate, uncached)),
                 total=len(uncached),
             ):
+                if error is not None:
+                    errors[prompt] = error
+                    tqdm.write(f"Warning: leaving a candidate pair unjudged: {error}")
+                    continue
+
                 store_output(cache, model_key, prompt, raw_output, duration)
                 unsaved += 1
 
@@ -438,12 +450,24 @@ def judge_candidates(
         if config["enable_llm_output_cache"] and unsaved > 0:
             save_llm_output_cache(cache, config, dedup_llm_cache_name(config))
 
+    failed_pairs = 0
     for (analysis, candidate), prompt in zip(pending, pair_prompts):
+        if prompt in errors:
+            candidate["judge_error"] = errors[prompt]
+            failed_pairs += 1
+            continue
+
         verdict, justification = parse_verdict(
             cached_output(cache, model_key, prompt)["output"]
         )
         candidate["verdict"] = verdict
         candidate["justification"] = justification
+
+    if failed_pairs:
+        print(
+            f"Warning: {failed_pairs} candidate pairs remain unjudged after retries. "
+            "They are marked in the report and will be retried on the next run."
+        )
 
 
 # Build the links of every document that appears in the report. Definitions carry the required Solr

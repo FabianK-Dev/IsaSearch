@@ -374,6 +374,7 @@ def aggregate(analyses, config):
     tier_counts["none"] = 0
     verdict_counts = {verdict: 0 for verdict in VERDICTS}
     verdict_counts[UNKNOWN_VERDICT] = 0
+    judge_failures = 0
     candidate_kind_counts = {kind: 0 for kind in KINDS}
     overlapping_entries = {}
 
@@ -394,6 +395,9 @@ def aggregate(analyses, config):
                 histogram["> 1.0"] += 1
 
         for candidate in analysis["candidates"]:
+            if candidate.get("judge_error"):
+                judge_failures += 1
+
             if "verdict" in candidate:
                 verdict_counts[candidate["verdict"]] += 1
 
@@ -413,6 +417,7 @@ def aggregate(analyses, config):
         "documents_with_near_exact_or_likely_duplicate": flagged,
         "tier_counts": tier_counts,
         "verdict_counts": verdict_counts,
+        "judge_failures": judge_failures,
         "candidate_kind_counts": candidate_kind_counts,
         "top_1_distance_histogram": histogram,
         "overlapping_entries": dict(

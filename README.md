@@ -272,6 +272,8 @@ Every candidate is reported in one of three tiers, configured in `config.json`:
 
 Further keys are `dedup_top_k` (candidates per definition), `dedup_llm_judge` (adjudication on by default), `dedup_max_judged_per_item` (LLM calls per definition) and `dedup_report_folder`.
 
+LLM judging retries failed requests up to three times in total, using temperature 0.3 after the first attempt to avoid repeating the same invalid model output. If all attempts fail, the analysis continues: the pair is marked as unjudged with its error in both reports, and its tier uses only distance and syntactic similarity. Each section reports the number of failed pairs as `judge_failures`. Successful completions are saved in the separate duplicate-judge cache; failures are not cached, so rerunning the same command reuses completed judgments and retries failed pairs.
+
 Two controls are part of every run and are included in the report. First, before its own entry is excluded, each definition must retrieve *itself* at a distance of about 0; if more than 5 % fail to do so, the run exits with a non-zero status because the corpus and the queries are then not in the same embedding space. Second, definitions of different entries that define something of the same base name and whose sources are nearly identical are collected syntactically and used as a ground truth, which yields a recall value for the semantic search.
 
 #### Searching definitions in the web UI

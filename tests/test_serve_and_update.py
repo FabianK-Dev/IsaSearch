@@ -30,6 +30,8 @@ from src import (
     bootstrap,
     corpus,
     documents,
+    duplicate_report,
+    duplicate_scoring,
     duplicates,
     embeddings,
     installation,
@@ -455,6 +457,9 @@ class GenerateRetryTest(unittest.TestCase):
 class JudgeConcurrencyTest(TemporaryFolderTestCase):
     def setUp(self):
         super().setUp()
+        patcher = unittest.mock.patch.object(llm.time, "sleep", lambda seconds: None)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.config.update(
             {
@@ -500,7 +505,7 @@ class JudgeConcurrencyTest(TemporaryFolderTestCase):
 
         return model
 
-    def echo(self, prompt):
+    def echo(self, prompt, extra_options=None):
         return "<BEGIN>VERDICT: DUPLICATE\njudged " + prompt + "<END>"
 
     def run_with(self, concurrency):
@@ -561,18 +566,18 @@ class JudgeConcurrencyTest(TemporaryFolderTestCase):
     def test_an_interrupted_run_keeps_the_finished_judgements(self):
         calls = []
 
-        def generate(prompt):
+        def generate(prompt, extra_options=None):
             calls.append(prompt)
 
             if len(calls) > 2:
-                raise RuntimeError("the server went away")
+                raise KeyboardInterrupt()
 
             return self.echo(prompt)
 
         analyses = self.analyses_for([(0, [1]), (2, [3]), (4, [5]), (6, [7])])
 
         # Sequential, so that exactly two completions exist when the third request fails.
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(KeyboardInterrupt):
             self.judge(analyses, generate, concurrency=1, cache={})
 
         with open(
@@ -582,6 +587,123 @@ class JudgeConcurrencyTest(TemporaryFolderTestCase):
 
         # The completions the run already paid for are on disk for the next run to reuse.
         self.assertEqual(len(saved["judge-model"]), 2)
+
+    def test_a_server_format_error_is_retried_with_different_sampling(self):
+        analyses = self.analyses_for([(0, [1])])
+        model = self.judge(
+            analyses,
+            [
+                RuntimeError(
+                    "500: output does not match the expected peg-gemma4 format"
+                ),
+                "<BEGIN>VERDICT: DUPLICATE\nsame statement<END>",
+            ],
+            concurrency=4,
+            cache={},
+        )
+
+        self.assertEqual(model.generate.call_count, 2)
+        self.assertEqual(model.generate.call_args_list[0].args[1], {})
+        self.assertEqual(
+            model.generate.call_args_list[1].args[1],
+            {"temperature": llm.RETRY_TEMPERATURE},
+        )
+        self.assertEqual(analyses[0]["candidates"][0]["verdict"], "DUPLICATE")
+
+    def test_failed_pairs_do_not_abort_or_poison_the_cache(self):
+        pairs = [(0, [1]), (2, [3]), (4, [5]), (2, [3])]
+        analyses = self.analyses_for(pairs)
+        cache = {}
+
+        def generate(prompt, extra_options=None):
+            if "lemma l2:" in prompt:
+                raise RuntimeError("500: invalid model output")
+            return self.echo(prompt)
+
+        model = self.judge(analyses, generate, concurrency=4, cache=cache)
+        self.assertEqual(model.generate.call_count, 2 + llm.LLM_ATTEMPTS)
+        for i in (0, 2):
+            self.assertEqual(analyses[i]["candidates"][0]["verdict"], "DUPLICATE")
+        for i in (1, 3):
+            failed = analyses[i]["candidates"][0]
+            self.assertNotIn("verdict", failed)
+            self.assertIn("invalid model output", failed["judge_error"])
+
+        with open(
+            llm.llm_output_cache_path(self.config, duplicates.DEDUP_LLM_CACHE)
+        ) as file:
+            saved = json.load(file)
+        self.assertEqual(saved, cache)
+        self.assertEqual(len(saved["judge-model"]), 2)
+
+        # Only the failed prompt is retried on restart, even when several pairs share it.
+        restarted = self.analyses_for(pairs)
+        resumed = self.judge(restarted, self.echo, concurrency=4, cache=saved)
+        self.assertEqual(resumed.generate.call_count, 1)
+        for analysis in restarted:
+            self.assertEqual(analysis["candidates"][0]["verdict"], "DUPLICATE")
+            self.assertNotIn("judge_error", analysis["candidates"][0])
+
+    def test_failed_judgements_are_visible_in_both_reports(self):
+        analyses = self.analyses_for([(0, [1])])
+        self.judge(
+            analyses,
+            llm.TruncatedCompletionError("cut off", "VERDICT: DUPLICATE"),
+            concurrency=4,
+            cache={},
+        )
+        self.config.update(
+            dedup_top_k=10,
+            dedup_strong_distance_threshold=0.05,
+            dedup_syntactic_threshold=0.9,
+        )
+        analysis = analyses[0]
+        analysis.update(exclude_entry="E0", self_rank=1, self_distance=0.0)
+        candidate = analysis["candidates"][0]
+        candidate.update(kind="definitions", syntactic_similarity=0.0)
+        duplicate_scoring.classify_analyses(analyses, self.config)
+        summary = duplicate_scoring.aggregate(analyses, self.config)
+        self.assertEqual(candidate["tier"], duplicate_scoring.TIER_POSSIBLE)
+        self.assertEqual(summary["judge_failures"], 1)
+        self.assertEqual(sum(summary["verdict_counts"].values()), 0)
+
+        urls = {
+            doc_id: {"remote_url": "#", "entry_url": "#"}
+            for doc_id in self.corpus_index
+        }
+        items = duplicate_report.analyses_to_report(analyses, self.corpus_index, urls)
+        report = {
+            "generated_at": "test",
+            "llm_judge": True,
+            "thresholds": duplicate_scoring.dedup_thresholds(self.config),
+            "sections": {
+                "definitions": {
+                    "aggregates": summary,
+                    "self_retrieval": {
+                        "self_retrieved": 1,
+                        "documents": 1,
+                        "mean_self_distance": 0.0,
+                    },
+                    "synthetic_ground_truth": {"documents_with_known_duplicate": 0},
+                    "entries": [
+                        {"entry": "E0", "date": None, "documents": 1, "items": items}
+                    ],
+                },
+            },
+        }
+        json_path, markdown_path = duplicate_report.write_report(report, self.folder)
+        with open(json_path) as file:
+            saved = json.load(file)
+        saved_candidate = saved["sections"]["definitions"]["entries"][0]["items"][0][
+            "candidates"
+        ][0]
+        self.assertIsNone(saved_candidate["verdict"])
+        self.assertIn("cut off", saved_candidate["judge_error"])
+        with open(markdown_path) as file:
+            markdown = file.read()
+        self.assertIn("1 candidate pairs remain unjudged", markdown)
+        self.assertIn("**Unjudged: LLM request failed.**", markdown)
+        self.assertIn("cut off", markdown)
 
 
 class DocumentIndexCacheTest(TemporaryFolderTestCase):

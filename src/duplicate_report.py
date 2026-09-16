@@ -75,6 +75,7 @@ def analyses_to_report(
                     "syntactic_similarity": candidate["syntactic_similarity"],
                     "verdict": candidate.get("verdict"),
                     "justification": candidate.get("justification"),
+                    "judge_error": candidate.get("judge_error"),
                     "src": candidate_doc["src"][:source_excerpt_length],
                     **urls.get(candidate["id"], {}),
                 }
@@ -167,6 +168,14 @@ def render_markdown(report):
         )
         lines.append("")
 
+        if summary.get("judge_failures", 0):
+            lines.append(
+                f"Warning: {summary['judge_failures']} candidate pairs remain unjudged after "
+                "LLM request failures. Their tiers use only distance and syntactic similarity; "
+                "the LLM adjudication is incomplete. Rerunning retries these pairs."
+            )
+            lines.append("")
+
         control = section["self_retrieval"]
         lines.append(
             f"Positive control: {control['self_retrieved']} of {control['documents']} documents "
@@ -240,6 +249,10 @@ def render_markdown(report):
 
                     if candidate.get("justification"):
                         lines.append(f"  - {candidate['justification']}")
+
+                    if candidate.get("judge_error"):
+                        error = " ".join(candidate["judge_error"].splitlines())
+                        lines.append(f"  - **Unjudged: LLM request failed.** {error}")
 
                     lines.append("")
                     lines.append("  ```isabelle")
