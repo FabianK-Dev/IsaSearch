@@ -430,7 +430,11 @@ python3 -m unittest tests.test_server_availability -v
 
 ### Benchmark
 
-To run the Benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. If you want to run a full benchmark that compares different strategies (as discussed in our paper), run `run_full_benchmark.sh`.
+To run the benchmark, use `python3 -m benchmark.benchmark` inside the root folder of the repository. It reads the corpus built by `python3 -m src.corpus`: it does not update the AFP, rebuild the index, generate document descriptions, embed or prune documents. Theorems without descriptions are reported and left out; missing benchmark targets are reported as skipped. Check the evaluated sample size before comparing results with the paper.
+
+With `"add_metadata": false`, the benchmark uses the configured corpus paths directly. Metadata strategies use the corresponding `-with-metadata` paths, which must already contain a built corpus. `run_full_benchmark.sh` evaluates all six strategies and requires both corpora to exist.
+
+Query refinement still calls the LLM and writes its output cache, and the benchmark writes results under `benchmark/results/`. Pause the web application while benchmarking because both use `.cache/llm_output_cache.json` (under the configured `cache_folder`); leave Solr running.
 
 **Important:** The results generated with the default configuration will differ from the paper. This is because the test setup only indexes the two sessions mentioned above (`"Ramsey-Infinite"`, `"Ordinals_and_Cardinals"`), whereas the paper results are based on the complete Archive of Formal Proofs.
 

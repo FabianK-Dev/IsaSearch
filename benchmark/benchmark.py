@@ -3,16 +3,35 @@ benchmark.py: This file initializes all required components, i.e. Solr, prompts,
 
 - Solr: connects to a running Solr database reachable at config["solr_core_url"]
 - Prompts: loads all prompts from prompts/ that will be fed to the embedding function and the LLM
-- document_index: Builds the document_index, i.e. loads all documents (i.e. any theorem, lemma, corollary or proposition) from Solr and filters only necessary information (e.g. theorem source code, file name, session, etc.)
-- document_descriptions: Loads or generates an informal description for each document using the configured LLM backend to allow more effective search with informal user queries
-- ChromaDB: loads an embedding function from the configured pre-trained sentence transformer, creates a new or loads an existing ChromaDB collection and embeds any document that isn't already embedded
+- document_index: Loads the existing theorem document index without fetching or rebuilding it
+- document_descriptions: Loads existing descriptions; undescribed theorems are left out without retrying informalization
+- ChromaDB: Attaches to the built theorem collection without embedding or pruning documents
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
 
 Finally, for each metric the average will be calculated. All benchmark results will be saved to the results/ folder.
 """
 
-from src.bootstrap import load_config, boot_components
+import json
+import os
+import random
+import re
+from pprint import pprint
+
+import nltk
+import pandas as pd
+from nltk.corpus import stopwords
+from tqdm import tqdm
+
+from benchmark.metrics import (
+    calculate_mean_metrics,
+    is_correct_target,
+    normalized_discounted_cumulative_gain,
+    rank,
+    reciprocal_rank,
+    top_k_accuracy,
+)
+from src.bootstrap import boot_components, load_config
 from src.documents import KIND_THEOREMS
 from src.embeddings import search, search_results_to_docs
 from src.llm import (
@@ -20,25 +39,6 @@ from src.llm import (
     query_model_name,
 )
 from src.openai_api import config_without_secrets
-from benchmark.metrics import (
-    top_k_accuracy,
-    normalized_discounted_cumulative_gain,
-    reciprocal_rank,
-    rank,
-    calculate_mean_metrics,
-    is_correct_target,
-)
-
-from tqdm import tqdm
-from pprint import pprint
-from nltk.corpus import stopwords
-
-import json
-import pandas as pd
-import os
-import nltk
-import random
-import re
 
 config = load_config()
 
@@ -63,9 +63,9 @@ print("Using config for benchmark:")
 # Printed without credentials, because config["openai_api_key"] can hold an API key.
 pprint(config_without_secrets(config))
 
-# The benchmark neither updates the components nor rebuilds the FindFacts index, it only runs
-# against whatever is already indexed.
-components = boot_components(config, check_updates=False, build_find_facts=False)
+# Evaluate the built corpus as-is, including when some documents could not be described.
+# Disabling component updates and indexing alone still allows informalization and embedding.
+components = boot_components(config, serve=True)
 
 solr = components["solr"]
 prompts = components["prompts"]

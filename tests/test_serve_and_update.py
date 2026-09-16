@@ -17,6 +17,7 @@ These tests need neither a network, nor Solr, nor a GPU server. Run them with
 import json
 import os
 import pathlib
+import runpy
 import shutil
 import subprocess
 import unittest
@@ -135,6 +136,102 @@ class LlmOutputCacheTest(TemporaryFolderTestCase):
         ]
 
         self.assertEqual(leftovers, [])
+
+
+class BenchmarkReadOnlyTest(TemporaryFolderTestCase):
+    """Exercise the benchmark entry point with the partial corpus seen on the server."""
+
+    class ReadyForQueries(Exception):
+        pass
+
+    def setUp(self):
+        super().setUp()
+        self.config.update(
+            add_user_query=True,
+            benchmark_search_refine=True,
+            enable_llm_output_cache=False,
+        )
+        self.index = {
+            name: indexed_document(name, f"lemma {name}: True")
+            for name in ("described", "missing_one", "missing_two")
+        }
+        self.index_path = documents.document_index_cache_path(
+            self.config, "document_index.json"
+        )
+        with open(self.index_path, "w") as file:
+            json.dump(self.index, file)
+
+        os.makedirs(self.config["artifacts_folder"])
+        self.descriptions_path = documents.descriptions_artifact_path(
+            self.config, "document_descriptions.json"
+        )
+        with open(self.descriptions_path, "w") as file:
+            json.dump(
+                {
+                    "described": {
+                        "llm_description": "<BEGIN>True<END>",
+                        "zlib.adler32_checksum": embeddings.source_checksum(
+                            self.index["described"]
+                        ),
+                    }
+                },
+                file,
+            )
+
+        self.collection = unittest.mock.Mock(
+            return_value=unittest.mock.Mock(count=lambda: 1)
+        )
+
+    def run_benchmark_startup(self):
+        def forbidden(*args, **kwargs):
+            self.fail("The benchmark attempted to build or informalize the corpus")
+
+        with (
+            unittest.mock.patch.multiple(
+                bootstrap,
+                load_config=lambda: dict(self.config),
+                check_and_update=forbidden,
+                build_index=forbidden,
+                setup_isabelle_components=forbidden,
+                ensure_llm_backend=lambda config: None,
+                ensure_embedding_backend=lambda config: None,
+                connect_solr=lambda config: FakeSolr([]),
+                load_prompts=lambda config: {"describe": "{theorem_content}"},
+                get_embedding_function=lambda config: object(),
+                get_chromadb_collection=self.collection,
+                get_llm=lambda config: object(),
+            ),
+            unittest.mock.patch.object(documents, "get_document_llm", forbidden),
+            unittest.mock.patch.object(documents, "fetch_all_docs", forbidden),
+            unittest.mock.patch("nltk.download"),
+            unittest.mock.patch(
+                "nltk.corpus.stopwords", unittest.mock.Mock(words=lambda language: [])
+            ),
+            # Stop after real corpus loading, before evaluation and result-file writes.
+            unittest.mock.patch("pandas.read_csv", side_effect=self.ReadyForQueries),
+        ):
+            runpy.run_module("benchmark.benchmark", run_name="__main__")
+
+    def test_missing_descriptions_are_skipped_without_modifying_the_corpus(self):
+        paths = [self.index_path, self.descriptions_path]
+        before = [pathlib.Path(path).read_bytes() for path in paths]
+
+        with self.assertRaises(self.ReadyForQueries):
+            self.run_benchmark_startup()
+
+        self.assertEqual(before, [pathlib.Path(path).read_bytes() for path in paths])
+        self.collection.assert_called_once()
+        self.assertEqual(list(self.collection.call_args.args[2]), ["described"])
+        self.assertFalse(self.collection.call_args.kwargs["add_missing"])
+
+    def test_missing_document_index_is_reported_instead_of_built(self):
+        os.remove(self.index_path)
+
+        with self.assertRaisesRegex(RuntimeError, "python3 -m src.corpus"):
+            self.run_benchmark_startup()
+
+        self.assertFalse(os.path.exists(self.index_path))
+        self.collection.assert_not_called()
 
 
 # Informalizing is the longest step of a build, and the inference server processes several requests
