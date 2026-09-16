@@ -449,7 +449,7 @@ The single benchmark command evaluates the strategy selected in `config.json`; i
 Each new run writes a new directory, for example `benchmark/results/20260916T120000.123456Z_UR/`, containing:
 
 - `results.json`: per-query metrics, input and expanded queries, target identifiers, skipped targets and aggregate metrics.
-- `manifest.json`: effective configuration with the API key redacted, model names (including the embedding model), Git revisions and tracked-change flags, hashes of the Python sources and benchmark CSV, exact prompt templates, corpus artifact hashes and cached fingerprint, loaded corpus counts, collection metadata, noise seed, timestamps and dependency versions.
+- `manifest.json`: effective configuration with the API key redacted, model names (including the embedding model), Git revisions and tracked-change flags, hashes of the Python sources and benchmark CSV, exact prompt templates, corpus artifact hashes and cached fingerprint, loaded corpus counts, collection metadata, the source and hash of the replayed noisy queries, timestamps and dependency versions.
 
 Commit the whole run directory. Keep the corpus artifacts and ChromaDB storage outside Git; the recorded hashes identify the descriptions and document index used. The manifest records the configured models and the current AFP checkout, not an independently verified history of how old cached descriptions or vectors were generated. Keep that distinction in mind when reusing a corpus across model changes. For the clearest provenance, benchmark a committed checkout and keep the corpus unchanged for the duration of the run.
 
@@ -464,6 +464,10 @@ This preserves the original result bytes in a new run directory. Its manifest is
 
 #### Comparing with the paper
 
+The benchmark reuses the paper's 85 saved noisy queries verbatim. Their source is the UR result referenced by `benchmark/results/paper-baselines.json`, verified against its recorded SHA-256; all six paper strategies used the same inputs. It no longer generates random noise or downloads NLTK resources for queries. If a historical target's natural-language input differs from the paper, evaluation stops rather than pairing it with an outdated noisy variant.
+
+Targets without a saved paper noisy query still receive their title and natural-language searches. Their noisy query is explicitly skipped with `paper_noisy_query_missing` in the result metadata and comparison report. With all 85 paper targets plus Cramer's rule available, expect 257 evaluated queries: 255 matching paper inputs and two additional Cramer's-rule inputs. No synthetic noisy query is added for the new target.
+
 The original flat JSON files in `benchmark/results/` are retained as historical results. The [paper baseline index](benchmark/results/README.md) lists all six strategies and their verified provenance. Compare like strategies first. For a new UR run, pass its directory (replace `RUN_DIRECTORY` below with the printed path):
 
 ```bash
@@ -471,6 +475,8 @@ python3 -m benchmark.compare \
   benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
   RUN_DIRECTORY > RUN_DIRECTORY/comparison-paper-UR.md
 ```
+
+After transferring this code to the server, rerun `python3 -m benchmark.benchmark` with the existing corpus and configuration. It writes a new directory with both result and manifest; no separate `benchmark.runs` archive step is needed. Save the comparison there, then commit `results.json`, `manifest.json` and `comparison-paper-UR.md` together. Preserve the earlier run as a separate record of the old generated-noise evaluation.
 
 The command accepts either run directories or legacy JSON files. It reports evaluated query counts, missing queries, skipped-target reasons, changed query texts and the largest reciprocal-rank improvements and regressions. It recomputes Hit@10, MRR and NDCG for each query type and overall using the same target/query-type pairs with identical input text. Known relevance-label changes are excluded too; old results do not record the labels, so those need manual verification. A Hit@10 delta of `+0.0500` means five percentage points.
 

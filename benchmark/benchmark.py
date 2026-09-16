@@ -13,13 +13,9 @@ Finally, for each metric the average will be calculated. All benchmark results w
 """
 
 import json
-import random
-import re
 from pprint import pprint
 
-import nltk
 import pandas as pd
-from nltk.corpus import stopwords
 from tqdm import tqdm
 
 from benchmark.metrics import (
@@ -30,6 +26,7 @@ from benchmark.metrics import (
     reciprocal_rank,
     top_k_accuracy,
 )
+from benchmark.queries import NOISY_QUERY, load_paper_noisy_queries
 from benchmark.runs import benchmark_configuration, capture_manifest, now, save_run
 from src.bootstrap import boot_components, load_config
 from src.documents import KIND_THEOREMS
@@ -43,6 +40,8 @@ print("Using config for benchmark:")
 # Printed without credentials, because config["openai_api_key"] can hold an API key.
 pprint(config_without_secrets(config))
 
+paper_queries = load_paper_noisy_queries()
+
 # Evaluate the built corpus as-is, including when some documents could not be described.
 # Disabling component updates and indexing alone still allows informalization and embedding.
 components = boot_components(config, serve=True)
@@ -55,18 +54,19 @@ collection = components["corpora"][KIND_THEOREMS]["collection"]
 model = components["model"]
 llm_output_cache = components["llm_output_cache"]
 
-print("Downloading/Updating NLTK resources (punkt and stopwords)...")
-nltk.download("punkt")
-nltk.download("stopwords")
-stop_words_set = set(stopwords.words("english"))
-
 print("Loading benchmark CSV...")
 benchmark_df = pd.read_csv("./benchmark/benchmark.csv")
 benchmark_df = benchmark_df.reset_index()
 
+# Check the natural-language inputs before issuing any search requests, so changed benchmark
+# wording cannot silently be paired with an unrelated frozen noisy query.
+for _, row in benchmark_df.iterrows():
+    paper_queries.get(row["ID"], row["Natural language query"])
+
 print("Recording benchmark configuration and corpus fingerprints...")
 manifest = capture_manifest(config, results_suffix)
 manifest["started_at"] = started_at
+manifest["query_inputs"] = paper_queries.provenance
 manifest["corpus"].update(
     searchable_documents=len(document_index),
     collection_documents=collection.count(),
@@ -76,13 +76,9 @@ manifest["corpus"].update(
 query_columns = [
     "Title query",
     "Natural language query",
-    "Noisy natural language query",
+    NOISY_QUERY,
 ]
 benchmark_results = {}
-
-noise_seed = 129869
-random.seed(noise_seed)
-manifest["noise_seed"] = noise_seed
 
 for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
     # This is a list of dictionaries with potential valid theorems
@@ -170,32 +166,14 @@ for i, row in tqdm(benchmark_df.iterrows(), total=len(benchmark_df)):
 
     # Do a search for each query type
     for query_type in query_columns:
-        # If the query type is "Noisy natural language query", generate the noisy query based on the "Natural language query"
-        if query_type == "Noisy natural language query":
-            query = row["Natural language query"]
-
-            query = query.replace("[...]", " ")
-            query = re.sub(r"[\[\]\.\,\:]", " ", query)
-            query = query.lower()
-
-            # Replace two or more white spaces through single whitespace
-            plain_text = re.sub(r"\s+", " ", query).strip()
-
-            query_tokens = query.split()
-            query_tokens = [word for word in query_tokens if word not in stop_words_set]
-
-            i = 0
-            while i < len(query_tokens) - 1:
-                if random.random() < 0.1:
-                    temp_word = query_tokens[i]
-                    query_tokens[i] = query_tokens[i + 1]
-                    query_tokens[i + 1] = temp_word
-                    i += 2  # Add 2 to avoid double swapping
-                else:
-                    i += 1
-
-            query = " ".join(query_tokens)
-            query = "".join([s for s in query if random.random() < 0.9])
+        if query_type == NOISY_QUERY:
+            query = paper_queries.get(row["ID"], row["Natural language query"])
+            if query is None:
+                print(f"Skipping noisy query for '{row['ID']}': no saved paper input.")
+                benchmark_results[row["ID"]]["metadata"].setdefault(
+                    "skipped_queries", {}
+                )[query_type] = "paper_noisy_query_missing"
+                continue
         else:
             query = row[query_type]
 

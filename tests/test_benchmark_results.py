@@ -2,11 +2,20 @@
 
 import hashlib
 import json
+import random
+import runpy
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from benchmark.compare import compare, load_result, report
+from benchmark.queries import (
+    NATURAL_QUERY,
+    NOISY_QUERY,
+    PAPER_INDEX,
+    load_paper_noisy_queries,
+)
 from benchmark.runs import benchmark_configuration, capture_manifest, save_run
 
 
@@ -53,6 +62,120 @@ class ComparisonTest(unittest.TestCase):
         self.assertEqual(compare(old, new)["matched_count"], 1)
         new["a"]["metadata"]["target_identifier"] = [{"id": "z"}]
         self.assertEqual(compare(old, new)["matched_count"], 0)
+
+
+class PaperQueryTest(unittest.TestCase):
+    def test_every_paper_strategy_has_the_same_frozen_noisy_inputs(self):
+        replay = load_paper_noisy_queries()
+        index = json.loads(PAPER_INDEX.read_text())
+        self.assertEqual(len(replay.queries), 85)
+        for baseline in index["baselines"].values():
+            results = load_result(PAPER_INDEX.parent / baseline["result_file"])
+            for target, entry in results.items():
+                if target == "summary" or entry.get("metadata", {}).get("skipped"):
+                    continue
+                queries = entry["queries"]
+                self.assertEqual(
+                    replay.get(target, queries[NATURAL_QUERY]["query"]),
+                    queries[NOISY_QUERY]["query"],
+                )
+
+    def test_order_and_other_random_draws_cannot_change_replayed_queries(self):
+        replay = load_paper_noisy_queries()
+        before = random.getstate()
+        self.addCleanup(random.setstate, before)
+        for target in reversed(replay.queries):
+            random.random()
+            queries = replay.queries[target]
+            self.assertEqual(
+                replay.get(target, queries[NATURAL_QUERY]["query"]),
+                queries[NOISY_QUERY]["query"],
+            )
+        self.assertIsNone(replay.get("cramers-rule", "new target"))
+
+    def test_changed_natural_language_input_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "differs from the paper"):
+            load_paper_noisy_queries().get("fundamental-theorem-of-algebra", "changed")
+
+    def test_modified_paper_result_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "paper-baselines.json"
+            index = json.loads(PAPER_INDEX.read_text())
+            path.write_text(json.dumps(index))
+            Path(folder, index["baselines"]["UR"]["result_file"]).write_text("{}")
+            with self.assertRaisesRegex(ValueError, "SHA-256"):
+                load_paper_noisy_queries(path)
+
+    def test_benchmark_replays_255_paper_queries_and_records_missing_extra_noise(self):
+        import pandas as pd
+
+        from src import bootstrap, embeddings
+
+        replay = load_paper_noisy_queries()
+        index = json.loads(PAPER_INDEX.read_text())
+        paper = load_result(
+            PAPER_INDEX.parent / index["baselines"]["UR"]["result_file"]
+        )
+        rows = pd.read_csv(PAPER_INDEX.parents[1] / "benchmark.csv")
+        rows = rows[rows["ID"].isin([*replay.queries, "cramers-rule"])]
+        documents = {
+            row["ID"]: json.loads(row["Target Identifier"])[0]
+            for _, row in rows.iterrows()
+        }
+        config = {
+            "add_metadata": False,
+            "add_user_query": True,
+            "benchmark_search_refine": True,
+            "benchmark_add_top_results": False,
+        }
+        components = {
+            "solr": None,
+            "prompts": {},
+            "model": None,
+            "llm_output_cache": None,
+            "corpora": {
+                "theorems": {
+                    "document_index": documents,
+                    "collection": mock.Mock(count=lambda: len(documents), metadata={}),
+                }
+            },
+        }
+        with (
+            mock.patch.object(bootstrap, "load_config", return_value=config),
+            mock.patch.object(
+                bootstrap, "boot_components", return_value=components
+            ) as boot,
+            mock.patch("pandas.read_csv", return_value=rows),
+            mock.patch("benchmark.runs.capture_manifest", return_value={"corpus": {}}),
+            mock.patch("benchmark.runs.save_run") as save,
+            mock.patch.object(
+                embeddings,
+                "search",
+                return_value={"duration": 0, "refined_query": "expanded"},
+            ) as search,
+            mock.patch.object(
+                embeddings, "search_results_to_docs", return_value={"results": []}
+            ),
+            mock.patch(
+                "nltk.download", side_effect=AssertionError("No downloads needed")
+            ),
+        ):
+            runpy.run_module("benchmark.benchmark", run_name="__main__")
+
+        boot.assert_called_once_with(config, serve=True)
+        results, manifest = save.call_args.args
+        comparison = compare(paper, results)
+        self.assertEqual(comparison["matched_count"], 255)
+        self.assertEqual(comparison["changed_queries"], [])
+        self.assertEqual(comparison["new_count"], 257)
+        self.assertEqual(search.call_count, 257)
+        self.assertEqual(
+            results["cramers-rule"]["metadata"]["skipped_queries"],
+            {NOISY_QUERY: "paper_noisy_query_missing"},
+        )
+        self.assertEqual(manifest["query_inputs"], replay.provenance)
+        self.assertNotIn("noise_seed", manifest)
+        self.assertIn("paper_noisy_query_missing", report(paper, results))
 
 
 class RunStorageTest(unittest.TestCase):

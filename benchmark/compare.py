@@ -120,6 +120,20 @@ def report(old, new):
         lines.extend(
             f"- {reason}: {count}" for reason, count in sorted(skipped(results).items())
         )
+        skipped_queries = [
+            (target, kind, reason)
+            for target, entry in results.items()
+            if target != "summary"
+            for kind, reason in entry.get("metadata", {})
+            .get("skipped_queries", {})
+            .items()
+        ]
+        if skipped_queries:
+            lines.extend(["", f"{label} skipped individual queries:"])
+            lines.extend(
+                f"- {target} / {kind}: {reason}"
+                for target, kind, reason in sorted(skipped_queries)
+            )
     for label, changes in (
         (
             "Largest RR regressions",
