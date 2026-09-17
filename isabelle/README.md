@@ -17,8 +17,9 @@ isabelle isasearch_search -?
 ```
 
 Keep the source component in this repository: its build bundles the existing
-`benchmark/benchmark.csv` from the parent directory, which remains the dataset's
-source of truth. Compilation uses `etc/build.props`; registered Scala tools use
+`benchmark/benchmark.csv`, `benchmark/results/paper-baselines.json`, and its
+canonical UR result from the parent directory, which remain the sources of truth.
+Compilation uses `etc/build.props`; registered Scala tools use
 a FindFacts-style launcher to include Isabelle's Solr classpath. No sbt, Maven,
 Python, or extra JVM libraries are needed at Scala runtime.
 
@@ -186,17 +187,26 @@ isabelle isasearch_duplicates -c /path/to/config.json -i migrated -k definitions
 ```
 
 Use repeated `-e` for explicit entries, `-N` for newest entries by indexed dates,
-`-x` for cross-kind matching, `-J` to disable judging, and `-a` to include every
-candidate. Default selection is definitions. Cross-kind matching requires
+`-x` for cross-kind matching, `-J` to disable judging, and `-a` to retain every
+candidate in JSON. Markdown always omits unclassified neighbours. Default
+selection is definitions. Cross-kind matching requires
 compatible embedding contracts. Same-entry results are excluded; self-retrieval
 checks and syntactic evidence are reported independently. Without a usable query
 LLM, reports contain vector/syntactic evidence only.
 
 Defaults match Python: `dedup_top_k=10`, `dedup_distance_threshold=0.3`,
 `dedup_strong_distance_threshold=0.05`, `dedup_syntactic_threshold=0.9`, and
-`dedup_max_judged_per_item=3`. Reports use Markdown and JSON under the user reports
-directory or `-D`. Distances are metric-specific; thresholds must be interpreted
-with the selected index's metric.
+`dedup_max_judged_per_item=3`. Reports are saved under the user reports directory
+or `-D`: one JSON file containing the evidence, a `_possible.md` view of all
+flagged candidates, and a `_near-exact.md` view with candidate source excerpts.
+Both views include source links and escape document names and model text.
+Failed judge requests are retried; exhausted failures remain unjudged, carry
+`judge_error`, and are counted in `judge_failures`. They are never cached, so a
+later run retries them. Other candidate pairs still finish. A self-retrieval
+failure rate above 5% exits unsuccessfully after saving the evidence.
+Distances are metric-specific; thresholds must be interpreted with the selected
+index's metric. Saved Scala JSON also works with `python -m src.duplicate_report`
+to regenerate both Markdown views without an index or inference server.
 
 ## Benchmarks
 
@@ -214,12 +224,18 @@ and no corpus caches are deleted. Scraping remains in the Python implementation.
 The runner handles multiline CSV and JSON targets, skip annotations, missing
 targets, title/natural/noisy queries, and Python's Hit@10, NDCG, reciprocal rank,
 rank, and sample counts. It preserves the existing JSON structure and labels.
-Noise uses CPython-compatible seeded randomness (`benchmark_seed`, default
-129869) and fixed English stopwords, with no NLTK downloads. Set
-`benchmark_add_top_results` for top-ten details.
+Historical targets replay all three saved paper inputs verbatim, including the
+noisy query, verified against the UR checksum in `paper-baselines.json`. This
+matches Python's `benchmark.queries`; it does not generate new noise. Additional
+targets use the CSV title and natural-language queries and record
+`paper_noisy_query_missing` for the noisy query. Current CSV target identifiers
+are retained in result metadata. Set `benchmark_add_top_results` for top-ten details.
 
-Each result has a `.run.json` companion recording index/dataset checksums,
-recipe, sanitized configuration, seed, cache policy, and actual query timings.
+Every invocation creates a new `benchmark-UUID/STRATEGY/` directory per strategy,
+with `results.json` and `manifest.json`. The manifest records index/dataset checksums,
+recipe, sanitized configuration, query-input provenance, timestamps, cache policy,
+and actual query timings. Pass a strategy directory directly to
+`python -m benchmark.compare` to compare it with a Python run or paper baseline.
 Legacy duration includes replayed cached generation time for comparison;
 `elapsed_duration` records measured execution and `cache_hit` identifies replay.
 Set `enable_llm_output_cache=false` for uncached model execution.
@@ -240,6 +256,7 @@ Application choices use enums in `src/domain.scala`; parsing and serialization
 happen at CLI, configuration, and JSON boundaries. Protocol field names remain
 strings. Isabelle supplies JSON, TOML, options, session discovery, HTTP serving,
 Solr (including its multiline CSV reader), and File_Store. Compatibility
-algorithms absent from the bundled API (CPython RNG and SequenceMatcher) are
-local and covered by Python golden comparisons. Scala sources follow the
+algorithms absent from the bundled API (SequenceMatcher) are local. Saved query
+inputs, scoring, and both report views are covered by Python golden comparisons.
+Scala sources follow the
 manual layout of Isabelle and FindFacts; see [the style guide](STYLE.md).

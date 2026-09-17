@@ -1,6 +1,6 @@
 /*  Title:      IsaSearch/isabelle/src/benchmark.scala
 
-Benchmark execution and Python-compatible scoring and query noise.
+Benchmark execution with the paper's saved query inputs and Python-compatible scoring.
 */
 
 package isabelle.isasearch
@@ -11,105 +11,74 @@ import isabelle._
 
 object Benchmark {
   import Data._
-  import Text_Preparation.stopwords
 
 
   /** benchmark defaults **/
 
-  val default_seed = 129869
-  private val swap_probability = 0.1
-  private val character_retention = 0.9
   private val hit_cutoff = 10
+  val query_types = List("Title query", "Natural language query", "Noisy natural language query")
+
+  private def resource(name: String): Bytes = {
+    val stream = Option(getClass.getResourceAsStream("/benchmark/" + name))
+      .getOrElse(error("Missing bundled benchmark resource: " + name))
+    using(stream)(Bytes.read_stream(_))
+  }
 
   def default_csv: Path = {
     val path = home + Path.explode("benchmark/benchmark.csv")
-    val stream = Option(getClass.getResourceAsStream("/benchmark/benchmark.csv"))
-      .getOrElse(error("Missing bundled benchmark CSV"))
-    val content = using(stream)(Bytes.read_stream(_))
+    val content = resource("benchmark.csv")
     Isabelle_System.make_directory(path.dir)
     if (!path.is_file || Bytes.read(path) != content) Bytes.write(path, content)
     path
   }
 
 
-  /** Python-compatible random numbers **/
+  /** saved paper queries (benchmark/queries.py) **/
 
-  // CPython random.Random(integer): MT19937 init_by_array and 53-bit random().
-
-  class Python_Random(seed: Int) {
-    private val mt = new Array[Int](624)
-    private var pos = 624
-    mt(0) = 19650218
-    for (i <- 1 until 624) mt(i) = 1812433253 * (mt(i - 1) ^ (mt(i - 1) >>> 30)) + i
-    private var i = 1
-    for (_ <- 0 until 624) {
-      mt(i) = (mt(i) ^ ((mt(i - 1) ^ (mt(i - 1) >>> 30)) * 1664525)) + seed
-      i += 1
-      if (i >= 624) {
-        mt(0) = mt(623)
-        i = 1
+  case class Paper_Queries(queries: Map[String, Obj], provenance: Obj) {
+    def for_row(row: Map[String, String]): Map[String, Obj] =
+      queries.get(row("ID")) match {
+        case Some(reference) => query_types.map { kind =>
+          val input = object_at(reference, kind)
+          kind -> Map("query" -> input("query"), "source" -> input.getOrElse("source", null))
+        }.toMap
+        case None => query_types.take(2).map { kind =>
+          kind -> Map(
+            "query" -> row.getOrElse(kind, ""),
+            "source" -> row.getOrElse("Natural language query source", null)
+          )
+        }.toMap
       }
-    }
-    for (_ <- 0 until 623) {
-      mt(i) = (mt(i) ^ ((mt(i - 1) ^ (mt(i - 1) >>> 30)) * 1566083941)) - i
-      i += 1
-      if (i >= 624) {
-        mt(0) = mt(623)
-        i = 1
-      }
-    }
-    mt(0) = 0x80000000
-
-    private def next(): Int = {
-      if (pos >= 624) {
-        for (k <- 0 until 624) {
-          val y = (mt(k) & 0x80000000) | (mt((k + 1) % 624) & 0x7fffffff)
-          mt(k) = mt((k + 397) % 624) ^ (y >>> 1) ^ (if ((y & 1) != 0) 0x9908b0df else 0)
-        }
-        pos = 0
-      }
-      var y = mt(pos)
-      pos += 1
-      y ^= y >>> 11
-      y ^= (y << 7) & 0x9d2c5680
-      y ^= (y << 15) & 0xefc60000
-      y ^= y >>> 18
-      y
-    }
-
-    def random(): Double =
-      ((next() >>> 5).toDouble * 67108864.0 + (next() >>> 6)) / 9007199254740992.0
   }
 
-
-  /** query noise **/
-
-  def noisy(text: String, random: Python_Random): String = {
-    val words = text
-      .replace("[...]", " ")
-      .replaceAll("[\\[\\]\\.,:]", " ")
-      .toLowerCase(java.util.Locale.ROOT)
-      .split("(?U)\\s+")
-      .filter(w => w.nonEmpty && !stopwords(w))
-    var i = 0
-    while (i < words.length - 1) {
-      if (random.random() < swap_probability) {
-        val w = words(i)
-        words(i) = words(i + 1)
-        words(i + 1) = w
-        i += 2
-      }
-      else i += 1
-    }
-    val out = new StringBuilder
-    words
-      .mkString(" ")
-      .codePoints()
-      .toArray
-      .foreach(c =>
-        if (random.random() < character_retention) out.append(new String(Character.toChars(c)))
-      )
-    out.toString
+  def paper_queries(load: String => Bytes = resource): Paper_Queries = {
+    val index = JSON.Object.parse(load("results/paper-baselines.json").text)
+    val baseline = object_at(object_at(index, "baselines"), "UR")
+    val filename = str(baseline, "result_file")
+    val content = load("results/" + filename)
+    val digest = hash(content.make_array)
+    if (digest != str(baseline, "results_sha256"))
+      error("Paper query source '" + filename + "' does not match its recorded SHA-256")
+    val results = JSON.Object.parse(content.text)
+    val queries = results.toList.collect {
+      case (target, value) if target != "summary" && !bool(object_at(obj(value), "metadata"), "skipped") =>
+        val reference = object_at(obj(value), "queries")
+        query_types.foreach { kind =>
+          if (JSON.string(object_at(reference, kind), "query").isEmpty)
+            error("Paper query source lacks text for '" + kind + "' in '" + target + "'")
+        }
+        target -> reference
+    }.toMap
+    Paper_Queries(queries, Map(
+      "mode" -> "replay_paper_queries",
+      "reference_strategy" -> "UR",
+      "reference_result" -> filename,
+      "reference_sha256" -> digest,
+      "available_targets" -> queries.size,
+      "available_queries" -> (queries.size * query_types.size),
+      "extra_target_input_policy" -> "csv_title_and_natural_language",
+      "missing_noisy_query_policy" -> "skip_query"
+    ))
   }
 
 
@@ -189,7 +158,7 @@ object Benchmark {
   ): List[Path] = {
     if (requested.isEmpty || requested.exists(s => !strategies.contains(s)))
       error("Strategies: " + strategies.mkString(","))
-    val seed = config.integer("benchmark_seed", default_seed)
+    val paper = paper_queries()
     val rows = csv(File.read(data))
     val selected = requested.distinct
     val names = selected.map(s => if (s.metadata) metadata_index else plain_index).distinct
@@ -212,7 +181,7 @@ object Benchmark {
         val engine = engines(name)
         val corpus = engine.snapshot(Corpus_Kind.Theorems)
         val docs = corpus.all.map(_._2).toList
-        val random = new Python_Random(seed)
+        val started_at = java.time.Instant.now().toString
         var results = Map.empty[String, JSON.T]
         val timings = scala.collection.mutable.ListBuffer.empty[Obj]
         for (row <- rows) {
@@ -222,76 +191,77 @@ object Benchmark {
             reason = "Annotation: " + row.getOrElse("Annotation", "")
           val targetText = row.getOrElse("Target Identifier", "")
           var targets = List.empty[Obj]
+          var metadata = Map.empty[String, JSON.T]
           if (reason.isEmpty && targetText.isEmpty) reason = "target_identifier_missing"
           if (reason.isEmpty) try { targets = list(JSON.parse(targetText)).map(obj).distinct }
           catch { case ERROR(_) => reason = "target_identifier_parse_error" }
+          if (reason.isEmpty) metadata += "target_identifier" -> targets
           if (reason.isEmpty && !docs.exists(correct(_, targets)))
             reason = "target_document_not_found"
           if (reason.nonEmpty)
             results += id -> Map(
-              "metadata" -> Map("skipped" -> true, "skipped_reason" -> reason),
+              "metadata" -> (metadata ++ Map("skipped" -> true, "skipped_reason" -> reason)),
               "queries" -> Map.empty[String, JSON.T]
             )
           else {
             var queries = Map.empty[String, JSON.T]
-            val natural = row.getOrElse("Natural language query", "")
-            for (
-              kind <- List("Title query", "Natural language query", "Noisy natural language query")
-            ) {
-              val query =
-                if (kind == "Noisy natural language query") noisy(natural, random)
-                else row.getOrElse(kind, "")
-              if (query.nonEmpty) {
-                progress.echo(strategy.name + ": " + id + " / " + kind)
-                val response = engine.search(
-                  query,
-                  mode = strategy.mode
-                )
-                val found = list(response("results")).map(obj)
-                val ms = metrics(found, targets).updated(
-                  "duration",
-                  math.rint(num(response, "duration", 0) * 10) / 10
-                )
-                val top =
-                  if (!config.boolean("benchmark_add_top_results")) Nil
-                  else
-                    found.take(hit_cutoff).zipWithIndex.map { case (r, i) =>
-                      Map(
-                        "rank" -> (i + 1),
-                        "distance" -> r("distance"),
-                        "id" -> r("id"),
-                        "entity_kname" -> r.getOrElse("entity_kname", null),
-                        "embedding_string" -> (str(r, "llm_description").trim + "\n\n" + str(
-                          r,
-                          "src"
-                        ).trim)
-                      )
-                    }
-                queries += kind -> Map(
-                  "metrics" -> ms,
-                  "query" -> query,
-                  "source" -> row.getOrElse("Natural language query source", ""),
-                  "refined_query" -> response("refined_query"),
-                  "top_results" -> top
-                )
-                timings += Map(
-                  "id" -> id,
-                  "query_type" -> kind,
-                  "elapsed_duration" -> response("elapsed_duration"),
-                  "cache_hit" -> response("cache_hit")
-                )
+            val inputs = paper.for_row(row)
+            for (kind <- query_types) {
+              if (!inputs.contains(kind))
+                metadata += "skipped_queries" -> Map(kind -> "paper_noisy_query_missing")
+              else {
+                val input = inputs(kind)
+                val query = str(input, "query")
+                if (query.nonEmpty) {
+                  progress.echo(strategy.name + ": " + id + " / " + kind)
+                  val response = engine.search(
+                    query,
+                    mode = strategy.mode
+                  )
+                  val found = list(response("results")).map(obj)
+                  val ms = metrics(found, targets).updated(
+                    "duration",
+                    math.rint(num(response, "duration", 0) * 10) / 10
+                  )
+                  val top =
+                    if (!config.boolean("benchmark_add_top_results")) Nil
+                    else
+                      found.take(hit_cutoff).zipWithIndex.map { case (r, i) =>
+                        Map(
+                          "rank" -> (i + 1),
+                          "distance" -> r("distance"),
+                          "id" -> r("id"),
+                          "entity_kname" -> r.getOrElse("entity_kname", null),
+                          "embedding_string" -> (str(r, "llm_description").trim + "\n\n" + str(
+                            r,
+                            "src"
+                          ).trim)
+                        )
+                      }
+                  queries += kind -> Map(
+                    "metrics" -> ms,
+                    "query" -> query,
+                    "source" -> input("source"),
+                    "refined_query" -> response("refined_query"),
+                    "top_results" -> top
+                  )
+                  timings += Map(
+                    "id" -> id,
+                    "query_type" -> kind,
+                    "elapsed_duration" -> response("elapsed_duration"),
+                    "cache_hit" -> response("cache_hit")
+                  )
+                }
               }
             }
-            results += id -> Map("metadata" -> Map.empty[String, JSON.T], "queries" -> queries)
+            results += id -> Map("metadata" -> metadata, "queries" -> queries)
           }
         }
-        val filename = strategy.name + "_" + str(corpus.spec.recipe, "document_model", "unknown")
-          .replaceAll("[^A-Za-z0-9_.-]", "-") + "_" +
-          engine.inference.model(Model_Role.Query).replaceAll("[^A-Za-z0-9_.-]", "-")
-        val result_path = run_dir + Path.basic(filename + ".json")
+        val strategy_dir = Isabelle_System.make_directory(run_dir + Path.basic(strategy.name))
+        val result_path = strategy_dir + Path.basic("results.json")
         write(result_path, results.updated("summary", summary(results)))
         write(
-          run_dir + Path.basic(filename + ".run.json"),
+          strategy_dir + Path.basic("manifest.json"),
           Map(
             "strategy" -> strategy.name,
             "index" -> name,
@@ -299,10 +269,9 @@ object Benchmark {
               engine.snapshot.root + Path.basic(Index_Format.manifest)
             ),
             "dataset_sha256" -> file_hash(data),
-            "seed" -> seed,
-            "stopwords_sha256" -> file_hash(
-              component + Path.explode("benchmark/stopwords_english.txt")
-            ),
+            "started_at" -> started_at,
+            "finished_at" -> java.time.Instant.now().toString,
+            "query_inputs" -> paper.provenance,
             "config" -> config.public_values,
             "recipe" -> corpus.spec.recipe,
             "cache_policy" -> config.boolean("enable_llm_output_cache", true),

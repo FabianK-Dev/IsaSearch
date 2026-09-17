@@ -69,7 +69,7 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -N COUNT  analyse newest entries (default 10)
   -x        cross-kind duplicate analysis
   -J        disable LLM duplicate judge
-  -a        report all duplicate candidates
+  -a        retain unclassified duplicate candidates in JSON
   -s LIST   benchmark strategies: baseline,R,UR,M,MR,MUR or all
   -v        verbose progress
 

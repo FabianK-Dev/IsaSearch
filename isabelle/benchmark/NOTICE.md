@@ -7,7 +7,8 @@ https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopw
 
 `STOPWORDS_README` is the unchanged upstream README. It credits PostgreSQL's
 Snowball stopword lists and identifies the NLTK English additions. Keeping this
-fixed copy avoids downloads and changes in the benchmark's noise vocabulary.
+fixed copy keeps metadata preprocessing stable without runtime downloads.
+Benchmark query inputs are replayed from the saved paper results.
 
 The NLTK package descriptor does not specify a license:
 https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.xml

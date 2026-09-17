@@ -274,8 +274,15 @@ object Duplicates {
                   "item_b" -> truncate(strip_proof(str(c, "src")), settings.excerpt_length).trim
                 )
               )
-              val (v, reason) = verdict(engine.inference.generate(prompt).text)
-              c = c ++ Map("verdict" -> v.name, "justification" -> reason)
+              try {
+                val (v, reason) = verdict(engine.inference.generate(prompt).text)
+                c = c ++ Map("verdict" -> v.name, "justification" -> reason)
+              }
+              catch {
+                case exn: Inference.Failure =>
+                  Output.warning("Leaving a candidate pair unjudged: " + exn.getMessage)
+                  c = c.updated("judge_error", exn.getMessage)
+              }
             }
             c.updated("tier", classify(c, config).map(_.name).orNull)
           }
@@ -355,6 +362,7 @@ object Duplicates {
           "documents_with_near_exact_or_likely_duplicate" -> (tier_counts(
             Duplicate_Tier.Near_Exact.name
           ) + tier_counts(Duplicate_Tier.Likely.name)),
+          "judge_failures" -> cs.count(c => str(c, "judge_error").nonEmpty),
           "verdict_counts" -> verdicts
             .map(v => v.name -> cs.count(c => str(c, "verdict") == v.name))
             .toMap,
@@ -387,35 +395,17 @@ object Duplicates {
       "llm_judge" -> can_judge,
       "cross" -> cross,
       "all_candidates" -> all_candidates,
+      "entries" -> selected,
       "thresholds" -> thresholds,
       "sections" -> sections
     )
     val target =
       Isabelle_System.make_directory(out) + Path.basic("experiment_" + UUID.random_string())
     write(target.ext("json"), report)
-    val md = new StringBuilder(
-      "# Duplicate analysis of AFP entries\n\nSimilarity is evidence for human review, not a proof of duplication.\n\n"
-    )
-    md.append("Thresholds: " + JSON.Format(thresholds) + ". LLM judge: " + can_judge + ".\n\n")
-    sections.foreach { case (kind, section) =>
-      md.append("## " + kind + "\n\n")
-      md.append("Self-retrieval: " + JSON.Format(section("self_retrieval")) + "\n\n")
-      list(section("entries")).map(obj).foreach { e =>
-        md.append("### " + str(e, "entry") + "\n\n")
-        list(e("items")).map(obj).foreach { item =>
-          md.append("- " + str(item, "id") + " (" + str(item, "best_tier", "unclassified") + ")\n")
-          list(item("candidates")).map(obj).foreach { c =>
-            md.append(
-              "  - " + str(c, "id") + ": distance " + c("distance") + ", syntax " + c(
-                "syntactic_similarity"
-              ) + ", " + str(c, "tier", "unclassified") + "\n"
-            )
-          }
-        }
-        md.append("\n")
-      }
-    }
-    File.write(target.ext("md"), md.toString)
+    Duplicate_Report.write_views(report, target)
+    if (sections.values.exists(s =>
+        num(object_at(s, "self_retrieval"), "failure_fraction", 0) > self_failure_limit))
+      error("Self-retrieval failure rate exceeds " + self_failure_limit + "; see " + target.ext("json"))
     target.ext("json")
   }
 }

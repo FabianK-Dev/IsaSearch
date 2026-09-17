@@ -21,14 +21,6 @@ object Tests {
     assert(Data.floats(Data.bytes(Array(1f, -2f))).toList == List(1f, -2f))
     assert(Data.template("{{x}} {q}", Map("q" -> "{untouched}")) == "{x} {untouched}")
     assert(Duplicates.sequence_ratio("abcd", "bcde") == 0.75)
-    val random = new Benchmark.Python_Random(129869)
-    assert(
-      (1 to 3).map(_ => random.random()).toList == List(
-        0.053190780235274904,
-        0.6151133794983927,
-        0.19201231357249715
-      )
-    )
     assert(Benchmark.csv("ID,query\r\na,\"hello,\nworld\"\r\n").head("query") == "hello,\nworld")
 
 
@@ -43,12 +35,26 @@ object Tests {
           "SequenceMatcher parity: " + JSON.Format(item)
         )
       }
-      val noise_rng = new Benchmark.Python_Random(129869)
-      for (item <- list(golden("noise")).map(obj))
-        assert(
-          Benchmark.noisy(str(item, "input"), noise_rng) == str(item, "output"),
-          "Noisy query parity"
-        )
+      val paper = Benchmark.paper_queries()
+      assert(paper.provenance == object_at(golden, "paper_provenance"))
+      for (item <- list(golden("paper_queries")).map(obj)) {
+        val row = object_at(item, "row").map { case (k, v) => k -> v.toString }
+        assert(paper.for_row(row) == object_at(item, "expected"), "Paper query parity: " + row("ID"))
+      }
+      val index = Map("baselines" -> Map("UR" -> Map(
+        "result_file" -> "bad.json", "results_sha256" -> "wrong")))
+      var rejected = false
+      try {
+        Benchmark.paper_queries(name =>
+          Bytes(if (name.endsWith("paper-baselines.json")) JSON.Format(index) else "{}"))
+      }
+      catch { case ERROR(_) => rejected = true }
+      assert(rejected, "Reject paper inputs with a mismatched checksum")
+      for (item <- list(golden("reports")).map(obj); exact <- List(false, true)) {
+        val got = Duplicate_Report.render(object_at(item, "report"), near_exact_only = exact)
+        val expected = str(item, if (exact) "near_exact" else "possible")
+        assert(got == expected, "Duplicate report parity:\n" + got + "\nExpected:\n" + expected)
+      }
       for (item <- list(golden("metrics")).map(obj)) {
         val got = Benchmark.metrics(list(item("results")).map(obj), list(item("targets")).map(obj))
         object_at(item, "expected").foreach { case (k, v) =>

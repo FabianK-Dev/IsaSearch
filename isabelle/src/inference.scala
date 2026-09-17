@@ -214,27 +214,7 @@ object Inference {
       }
     }
 
-    def generate(
-      prompt: String,
-      role: Model_Role = Model_Role.Query,
-      health: Boolean = false
-    ): Completion = {
-      val (url, body) = request(prompt, role, health)
-      val start = System.nanoTime()
-      val cacheKey = hash(canonical(Map("model" -> model(role), "url" -> url, "body" -> body)))
-      val cache = home + Path.explode("llm_cache/" + cacheKey + ".json")
-      val useCache = !health && config.boolean("enable_llm_output_cache", true)
-      if (useCache && cache.is_file) {
-        val saved = read(cache)
-        return Completion(
-          str(saved, "text"),
-          num(saved, "duration", 0),
-          (System.nanoTime() - start) / 1e9,
-          true
-        )
-      }
-      val response =
-        call(url, body, if (health) 1 else config.positive("llm_attempts", 3), health = health)
+    private def completion_text(response: Obj): String = {
       val text = llm_backend match {
         case Inference_Backend.OpenAI =>
           val choice = list(response.getOrElse("choices", Nil)).headOption
@@ -254,6 +234,52 @@ object Inference {
       }
       if (marked(text).isEmpty)
         throw Failure("Empty LLM completion; check model and thinking settings")
+      text
+    }
+
+    def generate(
+      prompt: String,
+      role: Model_Role = Model_Role.Query,
+      health: Boolean = false
+    ): Completion = {
+      val (url, body) = request(prompt, role, health)
+      val start = System.nanoTime()
+      val cacheKey = hash(canonical(Map("model" -> model(role), "url" -> url, "body" -> body)))
+      val cache = home + Path.explode("llm_cache/" + cacheKey + ".json")
+      val useCache = !health && config.boolean("enable_llm_output_cache", true)
+      if (useCache && cache.is_file) {
+        val saved = read(cache)
+        return Completion(
+          str(saved, "text"),
+          num(saved, "duration", 0),
+          (System.nanoTime() - start) / 1e9,
+          true
+        )
+      }
+      val attempts = if (health) 1 else config.positive("llm_attempts", 3)
+      var text = ""
+      var failure: Option[Failure] = None
+      var attempt = 0
+      while (attempt < attempts && text.isEmpty) {
+        // Python's generate_with_retries changes temperature after a failed completion.
+        val retry_body =
+          if (attempt == 0) body
+          else if (llm_backend == Inference_Backend.Ollama)
+            body.updated("options", object_at(body, "options").updated("temperature", 0.3))
+          else body.updated("temperature", 0.3)
+        try {
+          val response = call(url, retry_body, 1, health = health)
+          text = completion_text(response)
+        }
+        catch {
+          case exn: Failure => failure = Some(exn)
+          case ERROR(message) => failure = Some(Failure(message))
+        }
+        attempt += 1
+        if (text.isEmpty && attempt < attempts)
+          Thread.sleep(math.min(30000L, 1000L << (attempt - 1)))
+      }
+      if (text.isEmpty) throw failure.getOrElse(Failure("Empty LLM completion"))
       val elapsed = (System.nanoTime() - start) / 1e9
       if (useCache) write(cache, Map("text" -> text, "duration" -> elapsed))
       Completion(text, elapsed, elapsed, false)

@@ -5,13 +5,13 @@ An isolated Isabelle user directory is created; no user components are registere
 Inference is provided by a local deterministic HTTP stub, never a real model.
 """
 
+import copy
 import csv
 import difflib
 import hashlib
 import http.server
 import json
 import os
-import random
 import re
 import shutil
 import subprocess
@@ -27,8 +27,10 @@ from pathlib import Path
 import chromadb
 
 from benchmark import metrics
-from src import duplicate_scoring
+from benchmark.queries import load_paper_queries
+from src import duplicate_report, duplicate_scoring
 from src.export_index import export_collection
+from tests.test_duplicate_report import sample_report
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -122,27 +124,53 @@ def goldens(path):
         ("a" * 210 + "xyz", "b" + "a" * 210 + "xyz"),
         ("x" * 500 + "a", "x" * 500 + "b"),
     ]
-    stopwords = set(
-        (ROOT / "isabelle/benchmark/stopwords_english.txt").read_text().splitlines()
+    paper = load_paper_queries()
+    paper_rows = [
+        {
+            "ID": target,
+            "Title query": "Changed CSV title",
+            "Natural language query": "Changed CSV text",
+        }
+        for target in paper.queries
+    ] + [
+        {
+            "ID": "new-target",
+            "Title query": "Extra title",
+            "Natural language query": "Extra natural",
+            "Natural language query source": "Extra source",
+        }
+    ]
+    reports = [sample_report()]
+    # Isabelle's JSON writer emits integral floats as integers in the saved evidence.
+    reports[0]["sections"]["definitions"]["self_retrieval"]["mean_self_distance"] = 0
+    special = copy.deepcopy(reports[0])
+    section = special["sections"]["definitions"]
+    section["aggregates"]["judge_failures"] = 1
+    section["synthetic_ground_truth"] = {
+        "documents_with_known_duplicate": 2,
+        "documents_recovered": 1,
+        "recall": 0.5,
+    }
+    special.update(cross=True, llm_judge=False)
+    item = section["entries"][0]["items"][0]
+    item["src"] = 'text "a"\n```\n# still source\n````\nend'
+    item["candidates"][0].update(
+        id="ISABELLE_HOME/src/HOL/Analysis/Test_Theory.thy|1..2",
+        entry=None,
+        remote_url="#",
+        entry_url="#",
+        theory_url='https://example.org/a (b)".thy#L1',
+        entity_kname="a_[b]*|thm",
+        justification='"quoted" <tag> & x_y\n# heading [fake](url) `code`',
+        judge_error="Failed <request> after retries",
     )
-    rng = random.Random(129869)
-    noise = []
-    for text in [
-        "The sum of two numbers is [...] equal to their total.",
-        "Every polynomial, over the complex numbers, has a root.",
-        "α and 😀 the numbers",
-    ]:
-        words = re.sub(r"[\[\].,:]", " ", text.replace("[...]", " ")).lower().split()
-        words = [w for w in words if w not in stopwords]
-        i = 0
-        while i < len(words) - 1:
-            if rng.random() < 0.1:
-                words[i], words[i + 1] = words[i + 1], words[i]
-                i += 2
-            else:
-                i += 1
-        result = "".join(c for c in " ".join(words) if rng.random() < 0.9)
-        noise.append({"input": text, "output": result})
+    item["candidates"][1].update(
+        id="custom/path/Example.thy|5",
+        entry=None,
+        remote_url=None,
+        entry_url=None,
+    )
+    reports.append(special)
     cases = [
         ([], [{"id": "a"}]),
         ([{"id": "a"}], [{"id": "a"}]),
@@ -178,7 +206,20 @@ def goldens(path):
                     }
                     for a, b in pairs
                 ],
-                "noise": noise,
+                "paper_provenance": paper.provenance,
+                "paper_queries": [
+                    {"row": row, "expected": paper.for_row(row)} for row in paper_rows
+                ],
+                "reports": [
+                    {
+                        "report": report,
+                        "possible": duplicate_report.render_markdown(report),
+                        "near_exact": duplicate_report.render_markdown(
+                            report, near_exact_only=True
+                        ),
+                    }
+                    for report in reports
+                ],
                 "metrics": ms,
                 "classifications": [
                     {
@@ -241,6 +282,8 @@ class Stub(http.server.ThreadingHTTPServer):
         self.completion_mode = "ok"
         self.completion_text = "<BEGIN>VERDICT: DUPLICATE\nSame statement.<END>"
         self.fail_input_contains = ""
+        self.fail_completion_contains = ""
+        self.empty_completions = 0
         owner = self
 
         class Handler(http.server.BaseHTTPRequestHandler):
@@ -294,7 +337,19 @@ class Stub(http.server.ThreadingHTTPServer):
                     if not owner.llm_up:
                         self.send_error(503)
                         return
+                    prompt = body.get(
+                        "prompt", body.get("messages", [{}])[0].get("content", "")
+                    )
+                    if (
+                        owner.fail_completion_contains
+                        and owner.fail_completion_contains in prompt
+                    ):
+                        self.send_error(503)
+                        return
                     text = owner.completion_text
+                    if prompt != "Reply with OK." and owner.empty_completions:
+                        owner.empty_completions -= 1
+                        text = "<BEGIN> <END>"
                     if owner.completion_mode == "empty":
                         text = "<BEGIN> <END>"
                     payload = (
@@ -572,6 +627,18 @@ class ScalaComponentTests(unittest.TestCase):
             stub.llm_up = False
             run("search", "-c", config_path, "-i", "plain", "-r", "test", ok=False)
             stub.llm_up = True
+            configure(llm_attempts=2)
+            stub.empty_completions = 1
+            before_retry = len(stub.calls)
+            run("search", "-c", config_path, "-i", "plain", "-r", "retry empty")
+            retries = [
+                body
+                for path, body, _ in stub.calls[before_retry:]
+                if path.endswith("chat/completions")
+                and body["messages"][0]["content"] != "Reply with OK."
+            ]
+            self.assertEqual(len(retries), 2)
+            self.assertEqual(retries[-1]["temperature"], 0.3)
             configure(enable_llm_output_cache=True)
             first = json.loads(
                 run(
@@ -629,6 +696,14 @@ class ScalaComponentTests(unittest.TestCase):
                         "Natural language query": "The sum,\nof two numbers commutes.",
                     }
                 )
+                writer.writerow(
+                    {
+                        "ID": "solutions-to-pells-equation",
+                        "Target Identifier": json.dumps([{"entity_kname": "T.x0|thm"}]),
+                        "Title query": "Changed title that must not be used",
+                        "Natural language query": "Changed natural query that must not be used",
+                    }
+                )
                 writer.writerow({"ID": "skip", "Skip": "true", "Annotation": "fixture"})
             run(
                 "benchmark",
@@ -645,19 +720,46 @@ class ScalaComponentTests(unittest.TestCase):
                 "-D",
                 root / "reports",
             )
-            outputs = list((root / "reports").glob("benchmark-*/*.json"))
+            outputs = list((root / "reports").glob("benchmark-*/*/*.json"))
             self.assertEqual(len(outputs), 12)
             for output in outputs:
-                if not output.name.endswith(".run.json"):
+                if output.name == "results.json":
                     data = json.loads(output.read_text())
                     self.assertEqual(
                         data["summary"]["all_queries"]["top_k_accuracy"]["average"], 1
                     )
                     self.assertEqual(
                         data["summary"]["all_queries"]["top_k_accuracy"]["sample_size"],
-                        3,
+                        5,
+                    )
+                    expected_inputs = load_paper_queries().for_row(
+                        {"ID": "solutions-to-pells-equation"}
+                    )
+                    self.assertEqual(
+                        {
+                            kind: {key: result[key] for key in ("query", "source")}
+                            for kind, result in data["solutions-to-pells-equation"][
+                                "queries"
+                            ].items()
+                        },
+                        expected_inputs,
+                    )
+                    self.assertEqual(
+                        data["test"]["metadata"]["target_identifier"],
+                        [{"entity_kname": "T.x0|thm"}],
+                    )
+                    self.assertEqual(
+                        data["test"]["metadata"]["skipped_queries"],
+                        {
+                            "Noisy natural language query": "paper_noisy_query_missing",
+                        },
                     )
                     self.assertTrue(data["skip"]["metadata"]["skipped"])
+                else:
+                    self.assertEqual(
+                        json.loads(output.read_text())["query_inputs"],
+                        load_paper_queries().provenance,
+                    )
             run(
                 "duplicates",
                 "-c",
@@ -683,6 +785,68 @@ class ScalaComponentTests(unittest.TestCase):
                         self.assertTrue(
                             all(c["entry"] != "A" for c in item["candidates"])
                         )
+
+            # Exhausted judge failures preserve the run, remain uncached, and retry next time.
+            configure(enable_llm_output_cache=True)
+            stub.fail_completion_contains = "Compare "
+            before_failures = len(stub.calls)
+            failed_dir = root / "failed-judge"
+            run(
+                "duplicates",
+                "-c",
+                config_path,
+                "-i",
+                "plain",
+                "-e",
+                "A",
+                "-a",
+                "-D",
+                failed_dir,
+            )
+            failed_path = next(failed_dir.glob("experiment_*.json"))
+            failed_report = json.loads(failed_path.read_text())
+            section = failed_report["sections"]["definitions"]
+            self.assertEqual(section["aggregates"]["judge_failures"], 1)
+            candidates = section["entries"][0]["items"][0]["candidates"]
+            self.assertIn("judge_error", candidates[0])
+            self.assertNotIn("verdict", candidates[0])
+            attempts = [
+                body
+                for path, body, _ in stub.calls[before_failures:]
+                if path.endswith("chat/completions")
+                and body["messages"][0]["content"].startswith("Compare ")
+            ]
+            self.assertEqual(len(attempts), 2)
+            for suffix, exact in (("possible", False), ("near-exact", True)):
+                view = failed_path.with_name(failed_path.stem + "_" + suffix + ".md")
+                self.assertEqual(
+                    view.read_text(),
+                    duplicate_report.render_markdown(
+                        failed_report, near_exact_only=exact
+                    ),
+                )
+            stub.fail_completion_contains = ""
+            retry_dir = root / "retry-judge"
+            run(
+                "duplicates",
+                "-c",
+                config_path,
+                "-i",
+                "plain",
+                "-e",
+                "A",
+                "-D",
+                retry_dir,
+            )
+            recovered = json.loads(
+                next(retry_dir.glob("experiment_*.json")).read_text()
+            )
+            section = recovered["sections"]["definitions"]
+            self.assertEqual(section["aggregates"]["judge_failures"], 0)
+            self.assertEqual(
+                section["entries"][0]["items"][0]["candidates"][0]["verdict"],
+                "DUPLICATE",
+            )
 
     def test_registered_afp_build(self):
         afp = subprocess.check_output(
@@ -813,7 +977,15 @@ class ScalaComponentTests(unittest.TestCase):
             )
             config["embedding_attempts"] = 1
             cfg.write_text(json.dumps(config))
-            run("index", "Example-Submission")
+            # Relocating the checkout changes every source identity: explicitly accept
+            # this fixture migration, then restore the guard for subsequent update tests.
+            relocated = run("index", "Example-Submission", ok=False)
+            self.assertIn("Refusing to prune", relocated.stderr)
+            config["allow_large_prune"] = True
+            cfg.write_text(json.dumps(config))
+            run("index", "-n", "Example-Submission")
+            config.pop("allow_large_prune")
+            cfg.write_text(json.dumps(config))
             # Only the flag changes: the base prompts folder remains configured.
             # Inspect actual LLM requests to ensure metadata reaches the model.
             calls_before = len(stub.calls)

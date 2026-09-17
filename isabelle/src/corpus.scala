@@ -71,7 +71,9 @@ object Corpus_Build {
 
   private def afp_relative(file: String, afp: Path): Option[String] = {
     // FindFacts serializes Path.squash: environment references lose their '$' marker.
-    val roots = List(Path.explode("$AFP"), AFP.main_dir(), AFP.main_dir(afp))
+    // Session exports can contain canonical paths (e.g. /private/var instead of /var).
+    val roots = List(Path.explode("$AFP"), AFP.main_dir(), AFP.main_dir(afp),
+      AFP.main_dir(afp).canonical)
     roots.map(_.squash.implode + "/").find(file.startsWith).map(file.stripPrefix)
   }
 
