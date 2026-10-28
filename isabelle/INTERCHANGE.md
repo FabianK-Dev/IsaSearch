@@ -50,7 +50,10 @@ backend character truncation. Description markers are removed from
 `description_artifact`. All other source fields are preserved except generated
 HTML/XML. Examples include `entity_kname`, `chapter`, `session`, `theory`, `file`,
 `command`, `start_line`, `consts`, `typs`, `thms`, `url_path`, `entry`,
-`entry_date`, `metadata`, `theory_url`, `entry_url`, and `remote_url`.
+`entry_date`, `metadata`, `theory_url`, `entry_url`, and `remote_url`. Links that
+do not apply are empty: `theory_url` points into the Isabelle library and is set
+only for distribution theories, while AFP documents carry `entry_url` and
+`remote_url`.
 
 The recipe records actual prompt text, not a path to a mutable prompt directory.
 A zero `max_characters` means no client-side truncation; a positive value counts

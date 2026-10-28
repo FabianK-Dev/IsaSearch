@@ -152,29 +152,37 @@ object Duplicates {
 
   /** synthetic ground truth **/
 
-  def ground_truth(docs: List[Obj], relevant: Set[String]): (Map[String, Set[String]], Int) = {
+  private def ground_truth_names(doc: Obj): List[String] =
+    (strings(doc, "consts") ::: strings(doc, "typs"))
+      .map(_.split('.').last).filter(_.nonEmpty).distinct
+
+  // Streams the corpus: every name is counted, but only the groups of names that occur in
+  // relevant documents are retained, which are the only groups that can yield pairs.
+  def ground_truth(docs: Iterator[Obj], relevant: List[Obj]): (Map[String, Set[String]], Int) = {
+    val relevant_ids = relevant.map(d => str(d, "id")).toSet
+    val relevant_names = relevant.flatMap(ground_truth_names).toSet
+    val sizes = scala.collection.mutable.Map.empty[String, Int]
     val groups = scala.collection.mutable.Map.empty[String, List[Obj]]
     docs.filter(d => str(d, "entry", entry(str(d, "id"))).nonEmpty).foreach { d =>
-      (strings(d, "consts") ::: strings(d, "typs"))
-        .map(_.split('.').last)
-        .filter(_.nonEmpty)
-        .distinct
-        .foreach { name =>
-          groups(name) = groups.getOrElse(name, Nil) :+ d
-        }
+      lazy val member = d.view.filterKeys(Set("id", "entry", "src")).toMap
+      ground_truth_names(d).foreach { name =>
+        val size = sizes.getOrElse(name, 0) + 1
+        sizes(name) = size
+        if (relevant_names(name) && size <= max_ground_truth_group + 1)
+          groups(name) = groups.getOrElse(name, Nil) :+ member
+      }
     }
     val result = scala.collection.mutable.Map.empty[String, Set[String]]
-    var skipped = 0
-    groups.values.foreach { group =>
-      if (group.size > max_ground_truth_group) skipped += 1
-      else if (group.exists(d => relevant(str(d, "id")))) {
+    val skipped = sizes.valuesIterator.count(_ > max_ground_truth_group)
+    groups.foreach { case (name, group) =>
+      if (sizes(name) <= max_ground_truth_group && group.exists(d => relevant_ids(str(d, "id")))) {
         for (i <- group.indices; j <- i + 1 until group.size) {
           val a = group(i)
           val b = group(j)
           val x = str(a, "id")
           val y = str(b, "id")
           if (
-            (relevant(x) || relevant(y)) && str(a, "entry", entry(x)) != str(
+            (relevant_ids(x) || relevant_ids(y)) && str(a, "entry", entry(x)) != str(
               b,
               "entry",
               entry(y)
@@ -231,8 +239,8 @@ object Duplicates {
       )
         error("Cross-kind matching requires the same embedding space, metric and embed prompt")
     }
-    val indexes = targets.map(k => k -> engine.snapshot(k).all.map(_._2).toList).toMap
-    val dates = indexes.valuesIterator.flatten
+    def documents(kind: Corpus_Kind): Iterator[Obj] = engine.snapshot(kind).all.map(_._2)
+    val dates = targets.iterator.flatMap(documents)
       .filter(d => str(d, "entry").nonEmpty)
       .map(d => str(d, "entry") -> str(d, "entry_date"))
       .toMap
@@ -249,8 +257,8 @@ object Duplicates {
     selected.foreach(e => if (!dates.contains(e)) error("Entry not present in index: " + e))
     val sections = kinds.map { kind =>
       val corpus = engine.snapshot(kind)
-      val query_docs =
-        indexes(kind).filter(d => selected.contains(str(d, "entry"))).sortBy(d => str(d, "id"))
+      val query_docs = documents(kind).filter(d => selected.contains(str(d, "entry"))).toList
+        .sortBy(d => str(d, "id"))
       val analyses = query_docs.map { doc =>
         val id = str(doc, "id")
         val e = str(doc, "entry")
@@ -301,7 +309,7 @@ object Duplicates {
           "candidates" -> candidates
         )
       }
-      val (truth, skipped) = ground_truth(indexes(kind), query_docs.map(d => str(d, "id")).toSet)
+      val (truth, skipped) = ground_truth(documents(kind), query_docs)
       val with_truth = analyses.filter(a => truth.getOrElse(str(a, "id"), Set.empty).nonEmpty)
       val recovered = with_truth.count(a =>
         list(a("candidates")).map(obj).exists(c => truth(str(a, "id"))(str(c, "id")))
@@ -402,6 +410,7 @@ object Duplicates {
       "cross" -> cross,
       "all_candidates" -> all_candidates,
       "entries" -> selected,
+      "index_provenance" -> object_at(engine.snapshot.manifest, "provenance"),
       "thresholds" -> thresholds,
       "sections" -> sections
     )

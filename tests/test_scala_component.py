@@ -941,6 +941,10 @@ class ScalaComponentTests(unittest.TestCase):
             self.assertTrue(
                 all(d["entry"] == "Example-Submission" for d in found), found
             )
+            # AFP sources link to the repository, not to the Isabelle library.
+            self.assertTrue(
+                all(d["theory_url"] == "" and d["remote_url"] for d in found), found
+            )
             run("index_build", "-D", root / "components")
             run(
                 "duplicates",
@@ -1021,6 +1025,16 @@ class ScalaComponentTests(unittest.TestCase):
             manifest = json.loads(
                 (metadata_index / generation / "manifest.json").read_text()
             )
+            # The copied AFP is not a Mercurial repository: its revision is unknown.
+            provenance = manifest["provenance"]
+            self.assertEqual(
+                provenance["isabelle"]["identifier"],
+                isabelle_getenv("ISABELLE_IDENTIFIER"),
+            )
+            self.assertEqual(
+                provenance["afp"]["version"], isabelle_getenv("AFP_VERSION")
+            )
+            self.assertIsNone(provenance["afp"]["id"])
             for corpus in manifest["corpora"]:
                 self.assertTrue(corpus["recipe"]["add_metadata"])
                 self.assertEqual(

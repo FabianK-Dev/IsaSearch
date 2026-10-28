@@ -55,6 +55,35 @@ object Corpus_Build {
   }
 
 
+  /** source provenance **/
+
+  // Working-directory revision, marked "+" when modified; unlike AFP.hg_id, which is the tip.
+  def revision(root: Path): Option[String] =
+    Mercurial.archive_id(root) orElse Mercurial.id_repository(root, rev = "") orElse
+      Mercurial.Hg_Sync.id_directory(root)
+
+  def provenance(afp: Path, progress: Progress): Obj = {
+    val isabelle_id =
+      try { Some(Isabelle_System.isabelle_id()) } catch { case ERROR(_) => None }
+    val afp_id = revision(afp)
+    if (afp_id.isEmpty)
+      progress.echo_warning("Unknown AFP revision: use a Mercurial clone or hg archive of " +
+        afp.implode)
+    if (afp_id.exists(_.endsWith("+")))
+      progress.echo_warning("AFP working directory has local changes: " + afp.implode)
+    Map(
+      "isabelle" -> Map(
+        "identifier" -> Isabelle_System.isabelle_identifier().orNull,
+        "id" -> isabelle_id.orNull
+      ),
+      "afp" -> Map(
+        "version" -> Isabelle_System.getenv("AFP_VERSION"),
+        "id" -> afp_id.orNull
+      )
+    )
+  }
+
+
   /** source metadata **/
 
   def metadata(root: Path, entry: String): Obj = {
@@ -84,6 +113,7 @@ object Corpus_Build {
     config: Config
   ): Obj = {
     val e = relative.map(_.takeWhile(_ != '/')).getOrElse("")
+    val library = config.string("isabelle_remote_theory_url", "https://isabelle.in.tum.de/library")
     Map(
       "id" -> block.id,
       "src" -> block.src,
@@ -101,9 +131,9 @@ object Corpus_Build {
       "entry" -> e,
       "entry_date" -> str(meta, "date"),
       "metadata" -> meta,
-      "theory_url" -> (config
-        .string("isabelle_remote_theory_url", "https://isabelle.in.tum.de/library")
-        .stripSuffix("/") + "/" + block.url_path.implode),
+      // The Isabelle library hosts only distribution theories; AFP sources use remote_url.
+      "theory_url" ->
+        (if (e.nonEmpty) "" else library.stripSuffix("/") + "/" + block.url_path.implode),
       "entry_url" -> (if (e.isEmpty) ""
                       else
                         config
@@ -399,6 +429,7 @@ object Corpus_Build {
     val preparation = new Preparation(config, afp, recipe, cache, inference)
     val executor = Executors.newFixedThreadPool(config.positive("llm_concurrency", 1)).nn
     try {
+      val sources = provenance(afp, progress)
       inference.generate("Reply with OK.", role = Model_Role.Document, health = true)
       inference.embed(List("IsaSearch embedding readiness check"), preparation.space)
       val source_name = "isasearch_" + name
@@ -451,12 +482,11 @@ object Corpus_Build {
           "format" -> Index_Format.name,
           "version" -> Index_Format.version,
           "corpora" -> corpora,
-          "provenance" -> Map(
+          "provenance" -> (sources ++ Map(
             "source" -> "scala",
             "sessions" -> selected,
-            "afp_version" -> Isabelle_System.getenv("AFP_VERSION"),
             "fingerprint" -> fingerprint
-          )
+          ))
         )
       )
       Index.import_index(output, name, progress)

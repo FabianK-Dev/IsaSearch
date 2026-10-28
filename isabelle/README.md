@@ -30,6 +30,19 @@ Isabelle's session structure, not a hard-coded checkout path. AFP metadata is
 read from the registered root using Isabelle's TOML reader. Searching an imported
 index, benchmarking it, or analyzing duplicates does not need AFP installed.
 
+For a corpus that can be traced to its sources, build from a clean Mercurial clone
+of the release repository, updated to a fixed revision:
+
+```sh
+hg clone -u Isabelle2026 https://foss.heptapod.net/isa-afp/afp-2026 afp-2026
+```
+
+The index manifest records the Isabelle identifier and revision and the AFP version
+and working-directory revision (`hg id`, marked `+` for local changes) under
+`provenance`. Builds warn when the AFP revision is unknown, e.g. for an unpacked
+release tarball, or when its working directory has local changes. Benchmark
+manifests and duplicate reports copy this as `index_provenance`.
+
 ## Migrate the running Python index
 
 Stop corpus updates for the entire export. Searches may continue. Use the Python
@@ -233,8 +246,8 @@ are retained in result metadata. Set `benchmark_add_top_results` for top-ten det
 
 Every invocation creates a new `benchmark-UUID/STRATEGY/` directory per strategy,
 with `results.json` and `manifest.json`. The manifest records index/dataset checksums,
-recipe, sanitized configuration, query-input provenance, timestamps, cache policy,
-and actual query timings. Pass a strategy directory directly to
+recipe, index provenance, sanitized configuration, query-input provenance, timestamps,
+cache policy, and actual query timings. Pass a strategy directory directly to
 `python -m benchmark.compare` to compare it with a Python run or paper baseline.
 Legacy duration includes replayed cached generation time for comparison;
 `elapsed_duration` records measured execution and `cache_hit` identifies replay.

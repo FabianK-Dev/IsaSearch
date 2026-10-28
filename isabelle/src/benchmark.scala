@@ -111,6 +111,21 @@ object Benchmark {
   def correct(doc: Obj, targets: List[Obj]): Boolean =
     targets.exists(t => t.forall { case (k, v) => doc.get(k).contains(v) })
 
+  // One streaming pass instead of holding the corpus in memory.
+  def present(corpus: Index.Corpus, targets: List[Obj]): Set[Obj] = {
+    val missing = scala.collection.mutable.Set.from(targets)
+    val docs = corpus.all.map(_._2)
+    while (missing.nonEmpty && docs.hasNext) {
+      val doc = docs.next()
+      missing.filterInPlace(t => !correct(doc, List(t)))
+    }
+    targets.toSet -- missing
+  }
+
+  private def parse_targets(row: Map[String, String]): Option[List[Obj]] =
+    try { Some(list(JSON.parse(row.getOrElse("Target Identifier", ""))).map(obj).distinct) }
+    catch { case ERROR(_) => None }
+
   def metrics(results: List[Obj], targets: List[Obj]): Obj = {
     val ranks = results.zipWithIndex.collect { case (doc, i) if correct(doc, targets) => i + 1 }
 
@@ -183,7 +198,7 @@ object Benchmark {
         val name = if (strategy.metadata) metadata_index else plain_index
         val engine = engines(name)
         val corpus = engine.snapshot(Corpus_Kind.Theorems)
-        val docs = corpus.all.map(_._2).toList
+        val found = present(corpus, rows.flatMap(parse_targets).flatten)
         val started_at = java.time.Instant.now().toString
         var results = Map.empty[String, JSON.T]
         val timings = scala.collection.mutable.ListBuffer.empty[Obj]
@@ -196,10 +211,12 @@ object Benchmark {
           var targets = List.empty[Obj]
           var metadata = Map.empty[String, JSON.T]
           if (reason.isEmpty && targetText.isEmpty) reason = "target_identifier_missing"
-          if (reason.isEmpty) try { targets = list(JSON.parse(targetText)).map(obj).distinct }
-          catch { case ERROR(_) => reason = "target_identifier_parse_error" }
+          if (reason.isEmpty) parse_targets(row) match {
+            case Some(ts) => targets = ts
+            case None => reason = "target_identifier_parse_error"
+          }
           if (reason.isEmpty) metadata += "target_identifier" -> targets
-          if (reason.isEmpty && !docs.exists(correct(_, targets)))
+          if (reason.isEmpty && !targets.exists(found))
             reason = "target_document_not_found"
           if (reason.nonEmpty)
             results += id -> Map(
@@ -269,6 +286,7 @@ object Benchmark {
             "index_manifest_sha256" -> file_hash(
               engine.snapshot.root + Path.basic(Index_Format.manifest)
             ),
+            "index_provenance" -> object_at(engine.snapshot.manifest, "provenance"),
             "dataset_sha256" -> file_hash(data),
             "started_at" -> started_at,
             "finished_at" -> java.time.Instant.now().toString,

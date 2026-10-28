@@ -234,13 +234,15 @@ def export(config_path, output, kinds=None):
                 )
             doc["entry"] = entry
             doc["entry_date"] = dates.get(entry, "")
-            url_path = doc.get("url_path", "")
+            # The Isabelle library hosts only distribution theories; AFP sources use remote_url.
             doc["theory_url"] = (
-                config.get(
+                ""
+                if entry
+                else config.get(
                     "isabelle_remote_theory_url", "https://isabelle.in.tum.de/library"
                 ).rstrip("/")
                 + "/"
-                + url_path
+                + doc.get("url_path", "")
             )
             if entry:
                 doc["entry_url"] = (
