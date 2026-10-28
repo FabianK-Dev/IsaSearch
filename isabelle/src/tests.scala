@@ -77,6 +77,34 @@ object Tests {
     }
 
 
+    /* description store seeding */
+
+    Isabelle_System.with_tmp_dir("isasearch-seed") { tmp =>
+      val config = Config(Map(
+        "llm_backend" -> "openai",
+        "openai_base_url" -> "http://127.0.0.1:9/v1",
+        "openai_document_model" -> "document-model"
+      ))
+      val artifact = tmp + Path.basic("descriptions.json")
+      def entry(model: String, prompt: String) =
+        Map("llm_description" -> "<BEGIN>seeded<END>", "prompt" -> prompt, "model" -> model,
+          "zlib.adler32_checksum" -> 1)
+      write(artifact, Map(
+        "a" -> entry("document-model", "describe a"),
+        "b" -> entry("other-model", "describe b"),
+        "c" -> entry("document-model", "")))
+      val store = tmp + Path.basic("store")
+      Seed.run(config, List(artifact), new Progress, store = store)
+      val inference = new Inference.Client(config, store = store)
+      val seeded = inference.generate("describe a", role = Model_Role.Document, cached = true)
+      assert(seeded.cached && marked(seeded.text) == "seeded", "Seeded description is reused")
+      assert(!inference.store_output("describe a", Model_Role.Document, "", "again"))
+      for (prompt <- List("describe b", ""))
+        assert(inference.store_output(prompt, Model_Role.Document, "<BEGIN>x<END>", "test"),
+          "Only matching entries are seeded")
+    }
+
+
     /* index import, readers, packaging, and failed imports */
 
     for ((source, n) <- args.drop(1).zipWithIndex) {

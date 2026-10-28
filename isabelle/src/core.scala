@@ -45,10 +45,12 @@ object Data {
 
   def read(p: Path): Obj = JSON.Object.parse(File.read(p))
 
-  def write(p: Path, x: JSON.T): Unit = {
+  def write(p: Path, x: JSON.T): Unit = write_bytes(p, Bytes(JSON.Format(x) + "\n"))
+
+  def write_bytes(p: Path, bytes: Bytes): Unit = {
     Isabelle_System.make_directory(p.dir)
     val tmp = p.dir + Path.basic(p.file_name + "." + UUID.random_string() + ".tmp")
-    File.write(tmp, JSON.Format(x) + "\n")
+    Bytes.write(tmp, bytes)
     Files.move(tmp.java_path, p.java_path,
       StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
   }

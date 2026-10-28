@@ -156,6 +156,7 @@ object Index_Format {
 enum Tool_Command(val name: String) extends Named_Value {
   case Import extends Tool_Command("import")
   case Index extends Tool_Command("index")
+  case Seed extends Tool_Command("seed")
   case Package_Index extends Tool_Command("index_build")
   case Search extends Tool_Command("search")
   case Serve extends Tool_Command("server")

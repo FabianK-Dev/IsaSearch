@@ -26,7 +26,7 @@ object Inference {
 
   /** inference client **/
 
-  class Client(val config: Config) {
+  class Client(val config: Config, store: Path = home) {
 
     /* HTTP requests */
 
@@ -84,10 +84,23 @@ object Inference {
     }
 
 
+    /* persistent stores */
+
+    // Keys cover exactly the inputs that determine an output, never endpoints or limits.
+    private def stored(store: String, key: String, ext: String): Path =
+      this.store + Path.explode(store) + Path.basic(key.take(2)) + Path.basic(key).ext(ext)
+
+
     /* embeddings */
 
     def embedding_model: String =
       config.string("openai_embedding_model", config.string("embedding_model"))
+
+    private def embedding_backend: Inference_Backend =
+      Inference_Backend.parse(config.string("embedding_backend", Inference_Backend.OpenAI.name))
+
+    private def embedding_input(text: String, space: Embedding_Space): String =
+      if (space.max_characters > 0) truncate(text, space.max_characters) else text
 
     def embed(texts: List[String], spec: Index.Spec): List[Array[Float]] = embed(texts, spec.space)
 
@@ -96,15 +109,10 @@ object Inference {
       if (model.isEmpty) throw Failure("Configure openai_embedding_model (or embedding_model)")
       if (model != space.model)
         throw Failure("Embedding model differs from index model: " + space.model)
-      val max = space.max_characters
-      val prepared = texts.map(s => if (max > 0) truncate(s, max) else s)
-      prepared
+      texts.map(embedding_input(_, space))
         .grouped(config.positive("openai_embedding_batch_size", 32))
         .flatMap { batch =>
-          val backend = Inference_Backend.parse(
-            config.string("embedding_backend", Inference_Backend.OpenAI.name)
-          )
-          val vectors = backend match {
+          val vectors = embedding_backend match {
             case Inference_Backend.OpenAI | Inference_Backend.LlamaCpp =>
               val response = call(
                 endpoint("openai_embedding_base_url", "/embeddings"),
@@ -148,6 +156,28 @@ object Inference {
           vectors
         }
         .toList
+    }
+
+    // Embeds only texts without a stored vector, so an interrupted build resumes.
+    def embed_stored(texts: List[String], space: Embedding_Space): List[Array[Float]] = {
+      val paths = texts.map { text =>
+        val key = canonical(Map(
+          "backend" -> embedding_backend.name,
+          "model" -> embedding_model,
+          "extra_body" -> object_at(config.values, "embedding_extra_body"),
+          "input" -> embedding_input(text, space)
+        ))
+        stored("embeddings", hash(key), "f32")
+      }
+      val missing = texts.zip(paths).filterNot(_._2.is_file).distinctBy(_._2)
+      embed(missing.map(_._1), space).zip(missing).foreach { case (vector, (_, path)) =>
+        write_bytes(path, Bytes(bytes(vector)))
+      }
+      paths.map { path =>
+        val vector = floats(Bytes.read(path).make_array)
+        space.validate(vector)
+        vector
+      }
     }
 
 
@@ -236,16 +266,29 @@ object Inference {
       text
     }
 
+    private def output_path(role: Model_Role, body: Obj): Path =
+      stored("llm_cache", hash(canonical(Map("model" -> model(role), "body" -> body))), "json")
+
+    // Stores an output produced elsewhere for the request this client would send.
+    def store_output(prompt: String, role: Model_Role, text: String, source: String): Boolean = {
+      val path = output_path(role, request(prompt, role, false)._2)
+      if (path.is_file) false
+      else {
+        write(path, Map("text" -> text, "source" -> source))
+        true
+      }
+    }
+
     def generate(
       prompt: String,
       role: Model_Role = Model_Role.Query,
-      health: Boolean = false
+      health: Boolean = false,
+      cached: Boolean = config.boolean("enable_llm_output_cache", true)
     ): Completion = {
       val (url, body) = request(prompt, role, health)
       val start = System.nanoTime()
-      val cacheKey = hash(canonical(Map("model" -> model(role), "url" -> url, "body" -> body)))
-      val cache = home + Path.explode("llm_cache/" + cacheKey + ".json")
-      val useCache = !health && config.boolean("enable_llm_output_cache", true)
+      val cache = output_path(role, body)
+      val useCache = !health && cached
       if (useCache && cache.is_file) {
         val saved = read(cache)
         return Completion(

@@ -74,6 +74,7 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -v        verbose progress
 
 Import: -f EXPORT_DIR. Index: SESSION ... (or isabelle_sessions in config).
+Seed: ARTIFACT ... (description artifacts of the Python implementation).
 Search: QUERY. Index_build: -D component output directory.
 Benchmark never builds indexes; supply the required prebuilt variants.
 """
@@ -110,6 +111,7 @@ Benchmark never builds indexes; supply the required prebuilt variants.
       case Tool_Command.Import =>
         Index.import_index(input.getOrElse(error("Use -f EXPORT_DIR")), index, progress)
       case Tool_Command.Index => Corpus_Build.run(config, index, args, no_build, progress)
+      case Tool_Command.Seed => Seed.run(config, args.map(Path.explode), progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
       case Tool_Command.Test => Tests.run(args)
       case Tool_Command.Benchmark =>

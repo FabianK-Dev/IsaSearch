@@ -190,16 +190,6 @@ object Corpus_Build {
       "document_model" -> inference.model(Model_Role.Document),
       "prompts" -> prompts
     )
-    val fingerprint = hash(
-      canonical(
-        Map(
-          "config" -> config.public_values,
-          "recipe" -> recipe,
-          "sessions" -> selected,
-          "afp" -> afp.implode
-        )
-      )
-    )
     val workspace = Isabelle_System.make_directory(home + Path.explode("build/" + safe_name(name)))
     using(
       java.nio.channels.FileChannel.open(
@@ -221,7 +211,6 @@ object Corpus_Build {
           options,
           recipe,
           inference,
-          fingerprint,
           workspace
         )
       }
@@ -232,11 +221,12 @@ object Corpus_Build {
 
   /** resumable inference **/
 
+  // Descriptions and vectors are kept in the stores of Inference.Client, keyed by their
+  // inputs; records are rebuilt from the current blocks, so positions and links stay current.
   private class Preparation(
     config: Config,
     afp: Path,
     recipe: Obj,
-    cache: Path,
     inference: Inference.Client
   ) {
     val space = Embedding_Space(
@@ -246,76 +236,63 @@ object Corpus_Build {
     private val metadata_cache = scala.collection.concurrent.TrieMap.empty[String, Obj]
     private val prompts = object_at(recipe, "prompts")
 
-    def apply(block: Find_Facts.Block, kind: Corpus_Kind): (Obj, Array[Float]) = {
+    def prompt(block: Find_Facts.Block, kind: Corpus_Kind, meta: Obj): String = {
+      val prompt_template = prompts
+        .get(kind.describe_key)
+        .map(_.asInstanceOf[String])
+        .getOrElse(error("Missing prompt: " + kind.describe_key))
+      val with_metadata = config.boolean("add_metadata")
+      val title = if (with_metadata) Text_Preparation.metadata(str(meta, "title")) else ""
+      val abstract_text =
+        if (with_metadata) Text_Preparation.metadata(str(meta, "abstract")) else ""
+      val metadata_limit = config.integer("metadata_max_length", 300)
+      val abstract_excerpt =
+        if (title.length + abstract_text.length > metadata_limit)
+          truncate(abstract_text, math.max(0, metadata_limit - title.length - 3)) + "..."
+        else abstract_text
+      template(
+        prompt_template,
+        Map(
+          "theorem_content" -> Library.trim_string(truncate(
+            Text_Preparation.strip_proof(block.src),
+            config.positive("theorem_max_length", 3000)
+          )),
+          "title" -> (if (title.isEmpty) "-- no title --" else title),
+          "abstract" -> (if (abstract_excerpt.isEmpty) "-- no abstract --"
+                         else abstract_excerpt)
+        )
+      )
+    }
+
+    // The document, and whether its description came from the store.
+    def describe(block: Find_Facts.Block, kind: Corpus_Kind): (Obj, Boolean) = {
       val relative = afp_relative(block.file, afp)
       val entry_name = relative.map(_.takeWhile(_ != '/')).getOrElse("")
       val meta = metadata_cache.getOrElseUpdate(entry_name, metadata(afp, entry_name))
-      val record = source_record(block, relative, meta, config)
-      val cache_path = cache + Path.basic(hash(kind.name + block.id + canonical(record)) + ".json")
-      if (cache_path.is_file) {
-        val saved = read(cache_path)
-        val vector = list(saved("vector")).map(number(_).toFloat).toArray
-        space.validate(vector)
-        (object_at(saved, "document"), vector)
-      }
-      else {
-        val description_path = cache_path.ext("description")
-        val artifact =
-          if (description_path.is_file) read(description_path)
-          else {
-            val prompt_template = prompts
-              .get(kind.describe_key)
-              .map(_.asInstanceOf[String])
-              .getOrElse(error("Missing prompt: " + kind.describe_key))
-            val with_metadata = config.boolean("add_metadata")
-            val title = if (with_metadata) Text_Preparation.metadata(str(meta, "title")) else ""
-            val abstract_text =
-              if (with_metadata) Text_Preparation.metadata(str(meta, "abstract")) else ""
-            val metadata_limit = config.integer("metadata_max_length", 300)
-            val abstract_excerpt =
-              if (title.length + abstract_text.length > metadata_limit)
-                truncate(abstract_text, math.max(0, metadata_limit - title.length - 3)) + "..."
-              else abstract_text
-            val prompt = template(
-              prompt_template,
-              Map(
-                "theorem_content" -> Library.trim_string(truncate(
-                  Text_Preparation.strip_proof(block.src),
-                  config.positive("theorem_max_length", 3000)
-                )),
-                "title" -> (if (title.isEmpty) "-- no title --" else title),
-                "abstract" -> (if (abstract_excerpt.isEmpty) "-- no abstract --"
-                               else abstract_excerpt)
-              )
-            )
-            val completion = inference.generate(prompt, role = Model_Role.Document)
-            val checksum = new java.util.zip.Adler32()
-            checksum.update(block.src.getBytes(java.nio.charset.StandardCharsets.UTF_8))
-            val result = Map(
-              "llm_description" -> completion.text,
-              "prompt" -> prompt,
-              "zlib.adler32_checksum" -> checksum.getValue
-            )
-            write(description_path, result)
-            result
-          }
-        val description = marked(str(artifact, "llm_description"))
-        val embedding = template(
+      val text = prompt(block, kind, meta)
+      val completion = inference.generate(text, role = Model_Role.Document, cached = true)
+      val checksum = new java.util.zip.Adler32()
+      checksum.update(UTF8.bytes(block.src))
+      val description = marked(completion.text)
+      val document = source_record(block, relative, meta, config) ++ Map(
+        "kind" -> kind.name,
+        "checksum" -> checksum.getValue,
+        "llm_description" -> description,
+        "embedding_input" -> template(
           str(prompts, Prompt.Embed),
           Map("doc_src" -> (description + "\n\n" + Library.trim_string(block.src)))
+        ),
+        "description_artifact" -> Map(
+          "llm_description" -> completion.text,
+          "prompt" -> text,
+          "zlib.adler32_checksum" -> checksum.getValue
         )
-        val vector = inference.embed(List(embedding), space).head
-        val doc = record ++ Map(
-          "kind" -> kind.name,
-          "checksum" -> artifact("zlib.adler32_checksum"),
-          "llm_description" -> description,
-          "embedding_input" -> embedding,
-          "description_artifact" -> artifact
-        )
-        write(cache_path, Map("document" -> doc, "vector" -> vector.toList.map(_.toDouble)))
-        (doc, vector)
-      }
+      )
+      (document, completion.cached)
     }
+
+    def vectors(documents: Seq[Obj]): List[Array[Float]] =
+      inference.embed_stored(documents.map(str(_, "embedding_input")).toList, space)
   }
 
 
@@ -364,20 +341,24 @@ object Corpus_Build {
     var dimension = 0
     val seen = scala.collection.mutable.HashSet.empty[String]
     val identities = scala.collection.mutable.HashSet.empty[String]
+    var reused = 0
     using(Files.newBufferedWriter((directory + Path.basic(Index_Format.documents)).java_path)) { docs =>
       using(Files.newOutputStream((directory + Path.basic(Index_Format.vectors)).java_path)) { vectors =>
         blocks.grouped(config.positive("openai_embedding_batch_size", 32)).foreach { batch =>
           val tasks = batch.map { block =>
-            executor.submit(new Callable[(Obj, Array[Float])] {
-              def call(): (Obj, Array[Float]) = preparation(block, kind)
+            executor.submit(new Callable[(Obj, Boolean)] {
+              def call(): (Obj, Boolean) = preparation.describe(block, kind)
             }).nn
           }
-          tasks.foreach { task =>
-            val (doc, vector) = try { task.get().nn }
+          val (described, stored) = tasks.map { task =>
+            try { task.get().nn }
             catch {
               case exn: java.util.concurrent.ExecutionException =>
                 throw proper_value(exn.getCause).getOrElse(exn)
             }
+          }.unzip
+          reused += stored.count(b => b)
+          for ((doc, vector) <- described.zip(preparation.vectors(described))) {
             if (!seen.add(str(doc, "id"))) error("Duplicate source ID")
             identities += identity(doc)
             if (dimension == 0) dimension = vector.length
@@ -386,7 +367,8 @@ object Corpus_Build {
             docs.newLine()
             vectors.write(bytes(vector))
           }
-          progress.echo("Prepared " + seen.size + " " + kind)
+          progress.echo("Prepared " + seen.size + " " + kind + " (" + reused +
+            " stored descriptions reused)")
         }
       }
     }
@@ -420,13 +402,11 @@ object Corpus_Build {
     options: Options,
     recipe: Obj,
     inference: Inference.Client,
-    fingerprint: String,
     workspace: Path
   ): Path = {
     val output =
       Isabelle_System.make_directory(workspace + Path.basic("export-" + UUID.random_string()))
-    val cache = Isabelle_System.make_directory(workspace + Path.basic(fingerprint))
-    val preparation = new Preparation(config, afp, recipe, cache, inference)
+    val preparation = new Preparation(config, afp, recipe, inference)
     val executor = Executors.newFixedThreadPool(config.positive("llm_concurrency", 1)).nn
     try {
       val sources = provenance(afp, progress)
@@ -484,8 +464,7 @@ object Corpus_Build {
           "corpora" -> corpora,
           "provenance" -> (sources ++ Map(
             "source" -> "scala",
-            "sessions" -> selected,
-            "fingerprint" -> fingerprint
+            "sessions" -> selected
           ))
         )
       )

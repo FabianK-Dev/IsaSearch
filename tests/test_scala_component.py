@@ -936,6 +936,33 @@ class ScalaComponentTests(unittest.TestCase):
             self.assertEqual(
                 len(descriptions), 2, "Resumption regenerated unchanged descriptions"
             )
+            # Python description artifacts seed an empty store, which a build then reuses.
+            artifact = root / "document_descriptions.json"
+            artifact.write_text(
+                json.dumps(
+                    {
+                        str(n): {
+                            "llm_description": stub.completion_text,
+                            "zlib.adler32_checksum": 0,
+                            "model": "fixture",
+                            "prompt": body["messages"][0]["content"],
+                        }
+                        for n, (_, body, _) in enumerate(descriptions)
+                    }
+                )
+            )
+            shutil.rmtree(user / "isasearch/llm_cache")
+            self.assertIn("2 stored", run("seed", artifact).stdout)
+            run("index", "-n", "Example-Submission")
+            self.assertEqual(
+                sum(
+                    "chat/completions" in path
+                    and body["messages"][0]["content"] != "Reply with OK."
+                    for path, body, _ in stub.calls
+                ),
+                2,
+                "Seeded descriptions were generated again",
+            )
             found = json.loads(run("search", "truth").stdout)["results"]
             self.assertEqual(len(found), 2)
             self.assertTrue(

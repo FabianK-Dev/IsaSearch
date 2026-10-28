@@ -165,13 +165,51 @@ current; it skips the session build, not extraction or consistency checks.
 
 All generated data lives beneath `$ISABELLE_HOME_USER/isasearch`, apart from the
 standard session databases and FindFacts source index in their Isabelle-managed
-locations. Build concurrency is bounded by `llm_concurrency`. Each finished
-description is saved before embedding, then the document/vector pair is saved.
-Reruns reuse progress keyed by configuration, prompts, sessions, and source
-metadata. Changed inputs invalidate the corresponding cache. A per-index lock
-prevents competing corpus builds. Index generations publish atomically; existing
-readers retain their opened generation. Old generations and progress are retained
-for recovery and may be removed manually once no readers need them.
+locations. Build concurrency is bounded by `llm_concurrency`; each batch of
+`openai_embedding_batch_size` documents is described concurrently and then
+embedded in one request.
+
+Progress is kept in two stores shared by all indexes, keyed only by what
+determines their content:
+
+- `llm_cache`: model outputs, keyed by the model and the exact request body
+  (rendered prompt, sampling parameters, provider extensions), not by endpoint.
+  Corpus builds always store descriptions, independently of
+  `enable_llm_output_cache`, which only governs queries and the duplicate judge.
+- `embeddings`: float32 vectors, keyed by backend, model, `embedding_extra_body`,
+  and the exact (truncated) input.
+
+Document records are rebuilt from the current FindFacts blocks on every run, so
+positions, links, and metadata always describe the indexed sources. An interrupted
+or reconfigured build therefore resumes with everything already described and
+embedded: changing concurrency, timeouts, endpoints, or session selection reuses
+the stores, while a changed prompt, model, or sampling parameter regenerates exactly
+the documents whose request changes. Plain and metadata indexes can be built at the
+same time. A per-index lock prevents competing builds of one index. Index
+generations publish atomically; existing readers retain their opened generation.
+Old generations and store entries are never deleted automatically; remove them
+manually once no readers or builds need them.
+
+### Seed descriptions from Python artifacts
+
+Descriptions that the Python implementation generated can seed the store, so that a
+build does not describe those documents again:
+
+```sh
+isabelle isasearch_seed -c /path/to/build-config.json \
+  artifacts/MODEL/document_descriptions.json artifacts/MODEL/definition_descriptions.json
+```
+
+Use the build configuration: each stored description is keyed by the request this
+configuration sends for the artifact's recorded prompt, so a build reuses it exactly
+when it renders the same prompt for the same document model. Entries of another or
+unrecorded model, and entries without prompt or marked description, are skipped
+and counted. Existing store entries are kept. The configuration must describe how the
+artifacts were generated (sampling parameters and provider extensions); this cannot
+be checked from the artifacts. Python kept descriptions that were cut off at
+`max_tokens`, which builds would reject; seeded entries are accepted as stored.
+Artifacts are streamed and read without Python. After seeding, they are no longer
+needed; each build reports how many stored descriptions it reused.
 
 Pruning more than half of a previously indexed corpus requires the explicit
 configuration `allow_large_prune: true`. Review session selection first. Empty
