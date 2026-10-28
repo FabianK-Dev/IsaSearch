@@ -9,6 +9,7 @@
   "openai_query_model": "replace-with-query-model",
   "isabelle_sessions": ["Example-Submission"],
   "isabelle_excluded_sessions": [],
+  "isabelle_build_jobs": 1,
   "add_metadata": false,
   "distance_metric": "cosine",
   "llm_concurrency": 1,

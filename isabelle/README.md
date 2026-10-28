@@ -151,8 +151,9 @@ isabelle isasearch_index -c /path/to/metadata-config.json -i metadata Example-Su
 Building requires a document LLM and embedder. Set `add_metadata` to false or true
 in the respective configurations. `prompts_folder` names the base folder:
 metadata builds append `-with-metadata` (for example, `qwen3-gemma` becomes
-`qwen3-gemma-with-metadata`). Select explicit
-session arguments or `isabelle_sessions`; `all-AFP` and `all` use Isabelle session discovery.
+`qwen3-gemma-with-metadata`). Select explicit session arguments or
+`isabelle_sessions`: `all-AFP` selects the AFP sessions, and `all` adds the HOL
+sessions of the distribution, without its documentation group (`doc`).
 `isabelle_excluded_sessions` removes sessions. `solr_query` and
 `solr_query_definitions` override command selection; defaults are in
 `etc/corpus_defaults.json`.
@@ -160,14 +161,30 @@ session arguments or `isabelle_sessions`; `all-AFP` and `all` use Isabelle sessi
 The pipeline builds Isabelle sessions, extracts blocks through FindFacts,
 informalizes selected source, then embeds description plus source. Prompts come
 from `prompts_folder`; document/query models are independent. Metadata variants
-are fixed at build time. Use `-n` only when session build databases are already
-current; it skips the session build, not extraction or consistency checks.
+are fixed at build time. `isabelle_build_jobs` (default 1) sets how many sessions
+build in parallel; `isabelle_timeout_scale` scales their timeouts. A session that
+fails to build, or is cancelled after a failed ancestor, is reported and left out;
+the others are indexed, and the manifest lists the sessions in `provenance` under
+`sessions` and `unbuilt_sessions`. `-n` skips building: only sessions whose
+build is already current are indexed.
+
+All builds of a user share one FindFacts database (`isasearch`). It is re-indexed
+only when the indexed sessions or their builds change; otherwise a build reports
+that the index is current and reuses it, so a metadata build after a plain build
+of the same sessions does not index again. Each build exports the blocks it needs
+under a lock, which a concurrent build waits for while the database is re-indexed,
+and then works from its export.
 
 All generated data lives beneath `$ISABELLE_HOME_USER/isasearch`, apart from the
-standard session databases and FindFacts source index in their Isabelle-managed
+standard session databases and the FindFacts database in their Isabelle-managed
 locations. Build concurrency is bounded by `llm_concurrency`; each batch of
 `openai_embedding_batch_size` documents is described concurrently and then
 embedded in one request.
+
+For the whole AFP, raise the JVM limits in `$ISABELLE_HOME_USER/etc/settings`, e.g.
+`ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms2g -Xmx24g -Xss128m"`:
+indexing runs in the tool's JVM, the default heap does not suffice for the whole
+Archive, and `Isabelle_C` overflows the default stack.
 
 Progress is kept in two stores shared by all indexes, keyed only by what
 determines their content:

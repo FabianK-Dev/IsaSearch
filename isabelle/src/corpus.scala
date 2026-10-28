@@ -43,9 +43,12 @@ object Corpus_Build {
     if (requested.isEmpty) error("Select sessions as arguments or set isabelle_sessions")
 
     def hol(name: String): Boolean = name == "HOL" || structure(name).parent.exists(hol)
+    def documentation(name: String): Boolean = structure(name).groups.contains("doc")
 
     val expanded = requested.flatMap {
-      case "all" => structure.imports_topological_order.filter(n => structure(n).is_afp || hol(n))
+      case "all" =>
+        structure.imports_topological_order
+          .filter(n => structure(n).is_afp || hol(n) && !documentation(n))
       case "all-AFP" => structure.imports_topological_order.filter(n => structure(n).is_afp)
       case name =>
         if (!structure.defined(name)) error("Unknown Isabelle session: " + name) else List(name)
@@ -106,14 +109,8 @@ object Corpus_Build {
     roots.map(_.squash.implode + "/").find(file.startsWith).map(file.stripPrefix)
   }
 
-  def source_record(
-    block: Find_Facts.Block,
-    relative: Option[String],
-    meta: Obj,
-    config: Config
-  ): Obj = {
-    val e = relative.map(_.takeWhile(_ != '/')).getOrElse("")
-    val library = config.string("isabelle_remote_theory_url", "https://isabelle.in.tum.de/library")
+  // The FindFacts fields of a block that a corpus document retains.
+  def source(block: Find_Facts.Block): Obj =
     Map(
       "id" -> block.id,
       "src" -> block.src,
@@ -127,13 +124,25 @@ object Corpus_Build {
       "start_line" -> block.start_line,
       "consts" -> block.consts,
       "typs" -> block.typs,
-      "thms" -> block.thms,
+      "thms" -> block.thms
+    )
+
+  def source_record(
+    block: Obj,
+    relative: Option[String],
+    meta: Obj,
+    config: Config
+  ): Obj = {
+    val e = relative.map(_.takeWhile(_ != '/')).getOrElse("")
+    val library = config.string("isabelle_remote_theory_url", "https://isabelle.in.tum.de/library")
+    val url_path = str(block, "url_path")
+    val start_line = num(block, "start_line", 0).toInt
+    block ++ Map(
       "entry" -> e,
       "entry_date" -> str(meta, "date"),
       "metadata" -> meta,
       // The Isabelle library hosts only distribution theories; AFP sources use remote_url.
-      "theory_url" ->
-        (if (e.nonEmpty) "" else library.stripSuffix("/") + "/" + block.url_path.implode),
+      "theory_url" -> (if (e.nonEmpty) "" else library.stripSuffix("/") + "/" + url_path),
       "entry_url" -> (if (e.isEmpty) ""
                       else
                         config
@@ -147,7 +156,7 @@ object Corpus_Build {
                              "https://foss.heptapod.net/isa-afp/afp-" + Isabelle_System
                                .getenv_strict("AFP_VERSION") + "/-/tree/branch/default/thys"
                            )
-                           .stripSuffix("/") + "/" + relative.get + "#L" + block.start_line)
+                           .stripSuffix("/") + "/" + relative.get + "#L" + start_line)
     )
   }
 
@@ -238,7 +247,7 @@ object Corpus_Build {
     private val metadata_cache = scala.collection.concurrent.TrieMap.empty[String, Obj]
     private val prompts = object_at(recipe, "prompts")
 
-    def prompt(block: Find_Facts.Block, kind: Corpus_Kind, meta: Obj): String = {
+    def prompt(block: Obj, kind: Corpus_Kind, meta: Obj): String = {
       val prompt_template = prompts
         .get(kind.describe_key)
         .map(_.asInstanceOf[String])
@@ -256,7 +265,7 @@ object Corpus_Build {
         prompt_template,
         Map(
           "theorem_content" -> Library.trim_string(truncate(
-            Text_Preparation.strip_proof(block.src),
+            Text_Preparation.strip_proof(str(block, "src")),
             config.positive("theorem_max_length", 3000)
           )),
           "title" -> (if (title.isEmpty) "-- no title --" else title),
@@ -267,14 +276,15 @@ object Corpus_Build {
     }
 
     // The document, and whether its description came from the store.
-    def describe(block: Find_Facts.Block, kind: Corpus_Kind): (Obj, Boolean) = {
-      val relative = afp_relative(block.file, afp)
+    def describe(block: Obj, kind: Corpus_Kind): (Obj, Boolean) = {
+      val src = str(block, "src")
+      val relative = afp_relative(str(block, "file"), afp)
       val entry_name = relative.map(_.takeWhile(_ != '/')).getOrElse("")
       val meta = metadata_cache.getOrElseUpdate(entry_name, metadata(afp, entry_name))
       val text = prompt(block, kind, meta)
       val completion = inference.generate(text, role = Model_Role.Document, cached = true)
       val checksum = new java.util.zip.Adler32()
-      checksum.update(UTF8.bytes(block.src))
+      checksum.update(UTF8.bytes(src))
       val description = marked(completion.text)
       val document = source_record(block, relative, meta, config) ++ Map(
         "kind" -> kind.name,
@@ -282,7 +292,7 @@ object Corpus_Build {
         "llm_description" -> description,
         "embedding_input" -> template(
           str(prompts, Prompt.Embed),
-          Map("doc_src" -> (description + "\n\n" + Library.trim_string(block.src)))
+          Map("doc_src" -> (description + "\n\n" + Library.trim_string(src)))
         ),
         "description_artifact" -> Map(
           "llm_description" -> completion.text,
@@ -329,7 +339,7 @@ object Corpus_Build {
   /** corpus output **/
 
   private def write_corpus(
-    blocks: Iterator[Find_Facts.Block],
+    blocks: Iterator[Obj],
     kind: Corpus_Kind,
     preparation: Preparation,
     executor: java.util.concurrent.ExecutorService,
@@ -392,6 +402,118 @@ object Corpus_Build {
   }
 
 
+  /** session builds **/
+
+  sealed case class Built(sessions: List[String], unbuilt: Obj, ids: Obj)
+
+  // A session that fails, or is cancelled after a failed ancestor, is left out and reported;
+  // the remaining sessions are indexed. Build ids identify the builds that were indexed.
+  def build_sessions(
+    config: Config,
+    options: Options,
+    afp: Path,
+    selected: List[String],
+    no_build: Boolean,
+    progress: Progress
+  ): Built = {
+    val results = Build.build(
+      options,
+      selection = Sessions.Selection(sessions = selected),
+      afp_root = Some(afp),
+      max_jobs = Some(config.positive("isabelle_build_jobs", 1)),
+      no_build = no_build,
+      progress = progress
+    )
+    val ok = results.sessions_ok.toSet
+    val (built, unbuilt) = selected.partition(ok)
+    val reasons = unbuilt.map { session =>
+      session ->
+        (if (no_build) "not built"
+         else if (results.sessions(session) && results.cancelled(session)) "cancelled"
+         else "failed")
+    }
+    for ((reason, sessions) <- reasons.groupBy(_._2).toList.sortBy(_._1))
+      progress.echo_warning("Not indexed, " + reason + " (" + sessions.size + "): " +
+        commas(sessions.map(_._1)))
+    if (built.isEmpty) error("No selected session is built")
+    val store = results.store
+    val ids = built.map { session =>
+      session -> using(store.open_database(session)) { db =>
+        store.read_build(db, session).map(_.uuid).getOrElse("")
+      }
+    }
+    Built(built, reasons.toMap, ids.toMap)
+  }
+
+
+  /** shared FindFacts sources **/
+
+  // One FindFacts database serves all corpus builds of this user. It is re-indexed only when
+  // the indexed sessions or their builds change, and each build exports the blocks it needs,
+  // so builds share the database but never read it while it is re-indexed.
+  val source_database = "isasearch"
+
+  private def with_sources_lock[A](progress: Progress)(body: => A): A = {
+    val lock_file = Isabelle_System.make_directory(home) + Path.basic("find_facts.lock")
+    using(
+      java.nio.channels.FileChannel.open(lock_file.java_path,
+        java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.WRITE).nn
+    ) { channel =>
+      val lock = proper_value(channel.tryLock()).getOrElse {
+        progress.echo("Waiting for another build to release the FindFacts sources ...")
+        channel.lock().nn
+      }
+      try { body } finally { lock.release() }
+    }
+  }
+
+  def export_sources(
+    options: Options,
+    afp: Path,
+    built: Built,
+    queries: List[(Corpus_Kind, String)],
+    target: Path,
+    progress: Progress
+  ): Unit =
+    with_sources_lock(progress) {
+      val state = home + Path.basic("find_facts.json")
+      val current: Obj = Map("database" -> source_database, "builds" -> built.ids)
+      if (state.is_file && canonical(read(state)) == canonical(current))
+        progress.echo("FindFacts index is current for " + built.sessions.size + " sessions")
+      else {
+        state.file.delete()
+        Find_Facts.find_facts_index(
+          options + ("find_facts_database_name=" + source_database),
+          built.sessions,
+          afp_root = Some(afp),
+          browser_info = false,
+          progress = progress
+        )
+        write(state, current)
+      }
+      using(Solr.init(Find_Facts.solr_data_dir).open_database(source_database)) { db =>
+        for ((kind, query) <- queries) {
+          using(Files.newBufferedWriter(sources(target, kind).java_path).nn) { out =>
+            Find_Facts.private_data.stream_blocks(db, query, blocks =>
+              for (block <- blocks) {
+                out.write(JSON.Format(source(block)))
+                out.newLine()
+              })
+          }
+        }
+      }
+    }
+
+  private def sources(target: Path, kind: Corpus_Kind): Path =
+    target + Path.basic(kind.name + ".jsonl")
+
+  private def read_sources[A](target: Path, kind: Corpus_Kind)(f: Iterator[Obj] => A): A =
+    using(Files.newBufferedReader(sources(target, kind).java_path).nn) { in =>
+      f(Iterator.continually(in.readLine()).takeWhile(_ != null).map(line =>
+        obj(JSON.parse(line.nn))))
+    }
+
+
   /** build and publication **/
 
   private def build_locked(
@@ -408,54 +530,23 @@ object Corpus_Build {
   ): Path = {
     val output =
       Isabelle_System.make_directory(workspace + Path.basic("export-" + UUID.random_string()))
+    val exported =
+      Isabelle_System.make_directory(workspace + Path.basic("sources-" + UUID.random_string()))
     val preparation = new Preparation(config, afp, recipe, inference)
     val executor = Executors.newFixedThreadPool(config.positive("llm_concurrency", 1)).nn
     try {
       val sources = provenance(afp, progress)
       inference.generate("Reply with OK.", role = Model_Role.Document, health = true)
       inference.embed(List("IsaSearch embedding readiness check"), preparation.space)
-      val source_name = "isasearch_" + name
-      val ff_options = options + ("find_facts_database_name=" + source_name)
-      if (!no_build) {
-        val result = Build.build(
-          options,
-          selection = Sessions.Selection(sessions = selected),
-          afp_root = Some(afp),
-          progress = progress
-        )
-        if (!result.ok) error("Isabelle session build failed")
-      }
-      Find_Facts.find_facts_index(
-        ff_options,
-        selected,
-        afp_root = Some(afp),
-        browser_info = false,
-        progress = progress
-      )
+      val built = build_sessions(config, options, afp, selected, no_build, progress)
       val defaults = read(component + Path.explode("etc/corpus_defaults.json"))
-      val source_system = Solr.init(Find_Facts.solr_data_dir)
-      val corpora = using(source_system.open_database(source_name)) { db =>
-        Index.kinds.flatMap { kind =>
-          val query = config.string(kind.query_key, str(defaults, kind.query_key))
-          var result: Option[Obj] = None
-          Find_Facts.private_data.stream_blocks(
-            db,
-            query,
-            blocks => {
-              result = write_corpus(
-                blocks,
-                kind,
-                preparation,
-                executor,
-                config,
-                name,
-                recipe,
-                output,
-                progress
-              )
-            }
-          )
-          result
+      val queries = Index.kinds.map { kind =>
+        kind -> config.string(kind.query_key, str(defaults, kind.query_key))
+      }
+      export_sources(options, afp, built, queries, exported, progress)
+      val corpora = Index.kinds.flatMap { kind =>
+        read_sources(exported, kind) { blocks =>
+          write_corpus(blocks, kind, preparation, executor, config, name, recipe, output, progress)
         }
       }
       write(
@@ -466,7 +557,8 @@ object Corpus_Build {
           "corpora" -> corpora,
           "provenance" -> (sources ++ Map(
             "source" -> "scala",
-            "sessions" -> selected
+            "sessions" -> built.sessions,
+            "unbuilt_sessions" -> built.unbuilt
           ))
         )
       )
@@ -475,6 +567,7 @@ object Corpus_Build {
     finally {
       executor.shutdownNow()
       Isabelle_System.rm_tree(output)
+      Isabelle_System.rm_tree(exported)
     }
   }
 }

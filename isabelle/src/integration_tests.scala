@@ -536,7 +536,8 @@ object Integration_Tests {
           "openai_api_key_env" -> "ISASEARCH_TEST_KEY",
           "llm_backend" -> "openai",
           "openai_document_model" -> "fixture",
-          "enable_llm_output_cache" -> false)
+          "enable_llm_output_cache" -> false,
+          "isabelle_build_jobs" -> 2)
         def configure(changes: (String, JSON.T)*): Unit = {
           config = config ++ changes
           write(cfg, config)
@@ -551,9 +552,19 @@ object Integration_Tests {
           list(env.json(run("search", List("truth")))("results")).map(obj)
         def described(): Int = stub.completions().size
         def errors(result: Process_Result): String = cat_lines(result.err_lines)
+        def output(result: Process_Result): String = result.out + "\n" + errors(result)
+        def manifest(name: String): Obj = {
+          val index = env.user + Path.explode("isasearch/indexes/" + name)
+          read(index + Path.basic(str(read(index + Path.basic("current.json")), "generation")) +
+            Path.basic(Index_Format.manifest))
+        }
         configure()
 
         progress.echo("Corpus build from the registered AFP ...")
+        // "all" covers the AFP and the HOL distribution, without the documentation group.
+        val all = Corpus_Build.sessions(Config(Map.empty), Options.init(), afp, List("all"))
+        check(all.contains("Example-Submission") && all.contains("HOL-Library") &&
+          !all.contains("Codegen") && !all.contains("Datatypes"), "sessions of all")
         check(errors(run("index", List("Example-Submission"), ok = false))
           .contains("No registered AFP"), "missing AFP reported")
         // Both registration forms must resolve the same AFP root.
@@ -614,27 +625,42 @@ object Integration_Tests {
         run("index", List("-n", "Example-Submission"))
         unset("allow_large_prune")
 
+        // A failing session is reported and left out; the other sessions are indexed, and the
+        // FindFacts index of unchanged builds is reused.
+        val failing = Isabelle_System.make_directory(copied + Path.explode("thys/Failing"))
+        File.write(failing + Path.basic("ROOT"),
+          "chapter AFP\n\nsession Failing = HOL +\n  theories Failing\n")
+        File.write(failing + Path.basic("Failing.thy"),
+          "theory Failing imports Main begin\nlemma \"False\" by simp\nend\n")
+        File.write(copied + Path.explode("thys/ROOTS"), "Example-Submission\nFailing\n")
+        val partial = run("index", List("-i", "afp-partial", "Example-Submission", "Failing"))
+        check(output(partial).contains("Not indexed, failed (1): Failing"), "failed session")
+        check(output(partial).contains("FindFacts index is current"), "shared FindFacts index")
+        val partial_provenance = object_at(manifest("afp-partial"), "provenance")
+        check(same(partial_provenance("sessions"), List("Example-Submission")) &&
+          same(partial_provenance("unbuilt_sessions"), Map("Failing" -> "failed")),
+          "unbuilt sessions recorded")
+
         // Only the flag changes: the base prompts folder remains configured.
         // Inspect actual LLM requests to ensure metadata reaches the model.
         val calls_before = stub.calls.size
         configure("add_metadata" -> true)
-        run("index", List("-i", "afp-metadata-test", "-n", "Example-Submission"))
+        check(output(run("index", List("-i", "afp-metadata-test", "-n", "Example-Submission")))
+          .contains("FindFacts index is current"), "FindFacts index shared by metadata build")
         val prompts = stub.completions(since = calls_before).map(stub.prompt)
         check(prompts.size == 2 && prompts.forall(p =>
           p.contains("Title: metadata regression title") &&
             p.contains("Abstract: metadata regression abstract")), "metadata prompts")
-        val index = env.user + Path.explode("isasearch/indexes/afp-metadata-test")
-        val manifest = read(index + Path.basic(str(read(index + Path.basic("current.json")),
-          "generation")) + Path.basic(Index_Format.manifest))
+        val metadata_manifest = manifest("afp-metadata-test")
         // The copied AFP is not a Mercurial repository: its revision is unknown.
-        val provenance = object_at(manifest, "provenance")
+        val provenance = object_at(metadata_manifest, "provenance")
         check(str(object_at(provenance, "isabelle"), "identifier") ==
           Isabelle_System.getenv("ISABELLE_IDENTIFIER") &&
           str(object_at(provenance, "afp"), "version") == Isabelle_System.getenv("AFP_VERSION") &&
           object_at(provenance, "afp")("id") == null, "provenance")
         val metadata_describe =
           File.read(component + Path.explode("prompts/qwen3-gemma-with-metadata/describe.txt"))
-        for (corpus <- list(manifest("corpora")).map(obj)) {
+        for (corpus <- list(metadata_manifest("corpora")).map(obj)) {
           val recipe = object_at(corpus, "recipe")
           check(bool(recipe, "add_metadata") &&
             str(object_at(recipe, "prompts"), "describe") == metadata_describe, "metadata recipe")
