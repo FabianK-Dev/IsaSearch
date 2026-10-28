@@ -617,12 +617,12 @@ object Integration_Tests {
           "title = \"Metadata regression title\"\nabstract = \"Metadata regression abstract\"\n")
         env.register(copied, component.expand)
         configure("embedding_attempts" -> 1)
-        // Relocating the checkout changes every source identity: explicitly accept this
-        // fixture migration, then restore the guard for subsequent update tests.
-        check(errors(run("index", List("Example-Submission"), ok = false))
-          .contains("Refusing to prune"), "relocation guarded")
+        // Sources are identified by $AFP paths, so relocating the checkout keeps the build and
+        // every source identity, unless the platform exports canonical paths (temporary
+        // directories on macOS). Explicitly accept this possible fixture migration, then
+        // restore the guard for subsequent update tests.
         configure("allow_large_prune" -> true)
-        run("index", List("-n", "Example-Submission"))
+        run("index", List("Example-Submission"))
         unset("allow_large_prune")
 
         // A failing session is reported and left out; the other sessions are indexed, and the
