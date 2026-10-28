@@ -31,39 +31,38 @@ object Inference {
     /* HTTP requests */
 
     private val http = HttpClient
-      .newBuilder()
-      .connectTimeout(Duration.ofSeconds(config.positive("inference_connect_timeout", 10)))
-      .build()
+      .newBuilder().nn
+      .connectTimeout(Duration.ofSeconds(config.positive("inference_connect_timeout", 10))).nn
+      .build().nn
 
     def key: String = {
       val env = config.string("openai_api_key_env")
       if (env.nonEmpty)
-        Option(System.getenv(env))
-          .filter(_.nonEmpty)
+        proper_string(System.getenv(env))
           .getOrElse(throw Failure("Missing API key environment variable: " + env))
       else config.string("openai_api_key")
     }
 
     private def call(url: String, body: Obj, attempts: Int, health: Boolean = false): Obj = {
-      val uri = URI.create(url)
-      if (!Set("http", "https").contains(uri.getScheme) || uri.getUserInfo != null)
+      val uri = URI.create(url).nn
+      if (!proper_string(uri.getScheme).exists(Set("http", "https")) || uri.getUserInfo != null)
         throw Failure("Inference URL must be HTTP(S) without embedded credentials")
       val timeout =
         if (health) config.positive("inference_health_timeout", 10)
         else config.positive("llm_request_timeout", 600)
       val builder = HttpRequest
-        .newBuilder(uri)
-        .timeout(Duration.ofSeconds(timeout))
-        .header("Content-Type", "application/json")
+        .newBuilder(uri).nn
+        .timeout(Duration.ofSeconds(timeout)).nn
+        .header("Content-Type", "application/json").nn
       if (key.nonEmpty) builder.header("Authorization", "Bearer " + key)
-      val request = builder.POST(HttpRequest.BodyPublishers.ofString(JSON.Format(body))).build()
+      val request = builder.POST(HttpRequest.BodyPublishers.ofString(JSON.Format(body))).nn.build()
       var last = "Inference request failed"
       var attempt = 0
       while (attempt < attempts) {
         try {
-          val response = http.send(request, HttpResponse.BodyHandlers.ofString())
+          val response = http.send(request, HttpResponse.BodyHandlers.ofString()).nn
           val code = response.statusCode()
-          if (code >= 200 && code < 300) return obj(JSON.parse(response.body()))
+          if (code >= 200 && code < 300) return obj(JSON.parse(response.body().nn))
           last = "Inference endpoint returned HTTP " + code
           if (!Set(429, 500, 502, 503, 504).contains(code)) throw Failure(last)
         }

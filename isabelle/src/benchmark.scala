@@ -90,7 +90,10 @@ object Benchmark {
       new java.io.StringReader(text),
       org.apache.solr.internal.csv.CSVStrategy.EXCEL_STRATEGY
     )
-    val rows = Option(parser.getAllValues()).toList.flatMap(_.toList).map(_.toList)
+    val rows =
+      proper_value(parser.getAllValues()).toList.flatMap(_.toList).map { row =>
+        row.nn.toList.map(proper_value(_).getOrElse(""))
+      }
     if (rows.isEmpty) error("Empty benchmark CSV")
     val header = rows.head
     rows.tail
@@ -232,10 +235,8 @@ object Benchmark {
                           "distance" -> r("distance"),
                           "id" -> r("id"),
                           "entity_kname" -> r.getOrElse("entity_kname", null),
-                          "embedding_string" -> (str(r, "llm_description").trim + "\n\n" + str(
-                            r,
-                            "src"
-                          ).trim)
+                          "embedding_string" -> (Library.trim_string(str(r, "llm_description")) +
+                            "\n\n" + Library.trim_string(str(r, "src")))
                         )
                       }
                   queries += kind -> Map(

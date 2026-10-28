@@ -10,7 +10,6 @@ import isabelle._
 
 import java.nio.{ByteBuffer, ByteOrder}
 import java.nio.file.{Files, StandardCopyOption}
-import java.security.MessageDigest
 
 
 object Data {
@@ -57,23 +56,11 @@ object Data {
 
   /** checksums **/
 
-  def hash(bytes: Array[Byte]): String =
-    MessageDigest.getInstance("SHA-256").digest(bytes).map(b => f"${b & 255}%02x").mkString
+  def hash(bytes: Array[Byte]): String = SHA256.digest(bytes).rep
 
-  def hash(s: String): String = hash(s.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+  def hash(s: String): String = SHA256.digest(s).rep
 
-  def file_hash(p: Path): String = {
-    val md = MessageDigest.getInstance("SHA-256")
-    using(Files.newInputStream(p.java_path)) { in =>
-      val b = new Array[Byte](65536)
-      var n = in.read(b)
-      while (n >= 0) {
-        if (n > 0) md.update(b, 0, n)
-        n = in.read(b)
-      }
-    }
-    md.digest().map(b => f"${b & 255}%02x").mkString
-  }
+  def file_hash(p: Path): String = SHA256.digest(p).rep
 
   def canonical(x: JSON.T): String = {
     def ordered(value: JSON.T): JSON.T = value match {
@@ -93,14 +80,15 @@ object Data {
 
   def floats(bytes: Array[Byte]): Array[Float] = {
     require(bytes.length % java.lang.Float.BYTES == 0)
-    val b = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+    val b = ByteBuffer.wrap(bytes).nn.order(ByteOrder.LITTLE_ENDIAN).nn
     Array.fill(bytes.length / java.lang.Float.BYTES)(b.getFloat())
   }
 
   def bytes(v: Array[Float]): Array[Byte] = {
-    val b = ByteBuffer.allocate(v.length * java.lang.Float.BYTES).order(ByteOrder.LITTLE_ENDIAN)
+    val b =
+      ByteBuffer.allocate(v.length * java.lang.Float.BYTES).nn.order(ByteOrder.LITTLE_ENDIAN).nn
     v.foreach(b.putFloat)
-    b.array()
+    b.array().nn
   }
 
   def validate(v: Array[Float], dim: Int, metric: Distance_Metric): Unit = {
@@ -133,9 +121,9 @@ object Data {
 
   def marked(s: String): String = {
     val start = s.indexOf(Prompt.Begin)
-    val text = if (start >= 0) s.substring(start + Prompt.Begin.length) else s
+    val text = if (start >= 0) s.drop(start + Prompt.Begin.length) else s
     val end = text.indexOf(Prompt.End)
-    (if (end >= 0) text.substring(0, end) else text).trim
+    Library.trim_string(if (end >= 0) text.take(end) else text)
   }
 
   def template(s: String, values: Map[String, String]): String = {
@@ -153,7 +141,7 @@ object Data {
       else if (s(i) == '{') {
         val end = s.indexOf('}', i)
         if (end < 0) error("Unclosed prompt placeholder")
-        val key = s.substring(i + 1, end)
+        val key = s.slice(i + 1, end)
         out.append(values.getOrElse(key, error("Unknown prompt placeholder: " + key)))
         i = end + 1
       }
@@ -166,13 +154,15 @@ object Data {
   }
 
   def truncate(s: String, n: Int): String =
-    s.substring(0, s.offsetByCodePoints(0, math.min(n, s.codePointCount(0, s.length))))
+    s.take(s.offsetByCodePoints(0, math.min(n, s.codePointCount(0, s.length))))
 
 
   /** paths **/
 
-  def entry(id: String): String =
-    id.split("/thys/", 2).lift(1).map(_.takeWhile(_ != '/')).getOrElse("")
+  def entry(id: String): String = {
+    val i = id.indexOf("/thys/")
+    if (i < 0) "" else id.drop(i + "/thys/".length).takeWhile(_ != '/')
+  }
 
   def safe_name(s: String): String = {
     if (!s.matches("[A-Za-z0-9][A-Za-z0-9_.-]*")) error("Invalid index name: " + s)
@@ -191,15 +181,12 @@ object Text_Preparation {
     File.read(Data.component + Path.explode("benchmark/stopwords_english.txt")).linesIterator.toSet
 
   def strip_proof(source: String): String =
-    proof.findFirstMatchIn(source).map(m => source.substring(0, m.start)).getOrElse(source)
+    proof.findFirstMatchIn(source).map(m => source.take(m.start)).getOrElse(source)
 
-  def metadata(text: String): String = text
-    .toLowerCase(java.util.Locale.ROOT)
-    .replace('\n', ' ')
-    .replaceAll("\\b[a-z]{1,3}\\b|[^a-z ]", " ")
-    .split("\\s+")
-    .filter(w => w.nonEmpty && !stopwords(w))
-    .mkString(" ")
+  def metadata(text: String): String =
+    space_explode(' ', Word.lowercase(text).replacing("\\b[a-z]{1,3}\\b|[^a-z ]".r -> " "))
+      .filter(w => w.nonEmpty && !stopwords(w))
+      .mkString(" ")
 }
 
 
@@ -235,7 +222,7 @@ case class Config(values: Data.Obj, base: Path = Path.current) {
     def redact(x: JSON.T): JSON.T = x match {
       case JSON.Object(m) =>
         m.filterNot { case (k, _) =>
-          val key = k.toLowerCase
+          val key = Word.lowercase(k)
           key.contains("api_key") || key.contains("password") ||
           key == "authorization" || key == "token"
         }.view

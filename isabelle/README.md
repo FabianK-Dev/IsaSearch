@@ -1,6 +1,6 @@
 # IsaSearch for Isabelle/Scala
 
-An Isabelle2025-2 component for semantic search, corpus construction, duplicate
+An Isabelle2026 component for semantic search, corpus construction, duplicate
 analysis and the paper's benchmarks. The Python implementation and browser UI
 remain available in the parent project. This component exposes an HTTP API and
 command-line tools. Scala runtime dependencies come exclusively from Isabelle,
@@ -8,7 +8,7 @@ including its bundled Solr/Lucene. It neither starts nor installs model servers.
 
 ## Register and compile
 
-From the repository root, with Isabelle2025-2 on `PATH`:
+From the repository root, with Isabelle2026 on `PATH`:
 
 ```sh
 isabelle components -u "$PWD/isabelle"
@@ -23,9 +23,9 @@ Compilation uses `etc/build.props`; registered Scala tools use
 a FindFacts-style launcher to include Isabelle's Solr classpath. No sbt, Maven,
 Python, or extra JVM libraries are needed at Scala runtime.
 
-AFP registration is needed only for building new content. Register an existing
-AFP2025-2 installation with `isabelle components -u /path/to/afp` (registering its
-`thys` directory works as well). Discovery uses `AFP.BASE`, `AFP.main_dir`, and
+AFP registration is needed only for building new content. Register an AFP 2026
+installation with `isabelle components -u /path/to/afp` (registering its `thys`
+directory works as well). Discovery uses `AFP.BASE`, `AFP.main_dir`, and
 Isabelle's session structure, not a hard-coded checkout path. AFP metadata is
 read from the registered root using Isabelle's TOML reader. Searching an imported
 index, benchmarking it, or analyzing duplicates does not need AFP installed.

@@ -16,8 +16,8 @@ object Duplicate_Report {
   /** text and source links **/
 
   def markdown_text(text: String): String = {
-    val escaped = text.split("(?U)\\s+").filter(_.nonEmpty).mkString(" ")
-      .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    val escaped = "(?U)\\s+".r.split(text).filter(_.nonEmpty).mkString(" ")
+      .replacing("&" -> "&amp;", "<" -> "&lt;", ">" -> "&gt;")
     escaped.flatMap(c => if ("\\`*_{}[]()#+.!|~-".contains(c)) "\\" + c else c.toString)
   }
 
@@ -28,7 +28,7 @@ object Duplicate_Report {
     if (!usable(url)) label
     else {
       val safe = ":/?#[]@!$&*+,;=%_-~."
-      val encoded = url.getBytes(java.nio.charset.StandardCharsets.UTF_8).map { byte =>
+      val encoded = UTF8.bytes(url).map { byte =>
         val n = byte & 255
         val c = n.toChar
         if (n < 128 && (c.isLetterOrDigit || safe.contains(c))) c.toString
@@ -46,19 +46,20 @@ object Duplicate_Report {
     val e = if (saved.nonEmpty) saved else entry(str(doc, "id"))
     if (e.nonEmpty) (e, str(doc, "entry_url"))
     else {
-      val path = str(doc, "id").split("\\|", 2).head
-      (path.replaceFirst("^ISABELLE_HOME/", "Isabelle/"), document_url(doc))
+      val path = str(doc, "id").takeWhile(_ != '|')
+      (Library.try_unprefix("ISABELLE_HOME/", path).map("Isabelle/" + _).getOrElse(path),
+        document_url(doc))
     }
   }
 
   private def source(text: String, indent: String = ""): List[String] = {
     val fence = "`" * ("`+".r.findAllIn(text).map(_.length + 1).toList :+ 3).max
     List(indent + fence + "isabelle") :::
-      text.trim.linesIterator.map(indent + _).toList ::: List(indent + fence)
+      Library.trim_string(text).linesIterator.map(indent + _).toList ::: List(indent + fence)
   }
 
   private def decimal(value: JSON.T, places: Int): String =
-    java.lang.String.format(java.util.Locale.ROOT, "%." + places + "f", Double.box(number(value)))
+    Library.format("%." + places + "f", number(value))
 
   private def display(value: JSON.T): String = if (value == null) "None" else JSON.Format(value)
 
@@ -120,10 +121,10 @@ object Duplicate_Report {
       val summary = object_at(section, "aggregates")
       lines ++= List(
         "## " + markdown_text(kind.capitalize), "",
-        items.size + " of " + num(summary, "documents", 0).toInt + " analysed " + markdown_text(kind) +
+        items.size.toString + " of " + num(summary, "documents", 0).toInt + " analysed " + markdown_text(kind) +
           " have matches in this report (" + candidates.size + " candidate pairs).", "",
         "Candidate tiers: " + tiers.map(t =>
-          candidates.count(c => str(c, "tier") == t) + " " + t).mkString(", ") + ".", ""
+          candidates.count(c => str(c, "tier") == t).toString + " " + t).mkString(", ") + ".", ""
       )
       val failures = num(summary, "judge_failures", 0).toInt
       if (failures > 0) lines ++= List(
@@ -162,7 +163,7 @@ object Duplicate_Report {
         lines ++= List(
           "### " + markdown_text(str(e, "entry")) + " (" +
             markdown_text(if (date.nonEmpty) date else "unknown date") + ")", "",
-          local.size + " of " + num(e, "documents", 0).toInt + " " + markdown_text(kind) +
+          local.size.toString + " of " + num(e, "documents", 0).toInt + " " + markdown_text(kind) +
             " have at least one candidate in this report.", ""
         )
         local.foreach { item =>

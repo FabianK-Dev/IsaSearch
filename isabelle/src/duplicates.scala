@@ -32,6 +32,9 @@ object Duplicates {
     val max_judged = config.integer("dedup_max_judged_per_item", 3)
     val excerpt_length = config.positive("theorem_max_length", 3000)
 
+    def excerpt(src: String): String =
+      Library.trim_string(truncate(strip_proof(src), excerpt_length))
+
     def json: Obj = Map(
       "top_k" -> top_k,
       "distance" -> distance,
@@ -43,18 +46,21 @@ object Duplicates {
 
   /** syntactic similarity **/
 
-  private lazy val commands = str(read(component + Path.explode("etc/scoring.json")), "commands")
+  private lazy val command_prefix =
+    ("^\\s*(?:" + str(read(component + Path.explode("etc/scoring.json")), "commands") + ")\\b").r
+  private val name_prefix = "^\\s*[A-Za-z_][A-Za-z0-9_'.]*\\s*(?:\\[[^\\]]*\\])?\\s*:(?!:)".r
+  private val spaces = "(?U)\\s+".r
 
-  def normalized(s: String): String = strip_proof(s)
-    .replaceFirst("^\\s*(?:" + commands + ")\\b", " ")
-    .replaceFirst("^\\s*[A-Za-z_][A-Za-z0-9_'.]*\\s*(?:\\[[^\\]]*\\])?\\s*:(?!:)", " ")
-    .replaceAll("(?U)\\s+", " ")
-    .trim
+  def normalized(s: String): String = {
+    val statement =
+      name_prefix.replaceFirstIn(command_prefix.replaceFirstIn(strip_proof(s), " "), " ")
+    Library.trim_string(spaces.replaceAllIn(statement, " "))
+  }
 
   // difflib.SequenceMatcher(None, a, b), including its default autojunk heuristic.
   def sequence_ratio(a0: String, b0: String): Double = {
-    val a = a0.codePoints().toArray
-    val b = b0.codePoints().toArray
+    val a = a0.codePoints().nn.toArray.nn
+    val b = b0.codePoints().nn.toArray.nn
     if (a.length + b.length == 0) return 1.0
     val positions = b.indices
       .groupBy(b(_))
@@ -134,10 +140,10 @@ object Duplicates {
       case Some(m) =>
         val value = verdicts
           .filterNot(_ == Verdict.Unknown)
-          .find(_.name == m.group(1).toUpperCase(java.util.Locale.ROOT))
+          .find(_.name == Word.uppercase(m.group(1)))
         (
           value.getOrElse(Verdict.Unknown),
-          truncate(if (value.isDefined) text.substring(m.end).trim else text, 300)
+          truncate(if (value.isDefined) Library.trim_string(text.drop(m.end)) else text, 300)
         )
       case _ => (Verdict.Unknown, truncate(text, 300))
     }
@@ -270,8 +276,8 @@ object Duplicates {
               val prompt = template(
                 Index.prompt(corpus.spec, Prompt.Judge),
                 Map(
-                  "item_a" -> truncate(strip_proof(str(doc, "src")), settings.excerpt_length).trim,
-                  "item_b" -> truncate(strip_proof(str(c, "src")), settings.excerpt_length).trim
+                  "item_a" -> settings.excerpt(str(doc, "src")),
+                  "item_b" -> settings.excerpt(str(c, "src"))
                 )
               )
               try {
@@ -280,8 +286,8 @@ object Duplicates {
               }
               catch {
                 case exn: Inference.Failure =>
-                  Output.warning("Leaving a candidate pair unjudged: " + exn.getMessage)
-                  c = c.updated("judge_error", exn.getMessage)
+                  Output.warning("Leaving a candidate pair unjudged: " + exn.message)
+                  c = c.updated("judge_error", exn.message)
               }
             }
             c.updated("tier", classify(c, config).map(_.name).orNull)

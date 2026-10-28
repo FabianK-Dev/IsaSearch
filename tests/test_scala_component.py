@@ -1,4 +1,4 @@
-"""Cross-language tests. Requires Isabelle2025-2 on PATH and Python requirements.
+"""Cross-language tests. Requires Isabelle2026 on PATH and Python requirements.
 
 Run: python -m unittest tests.test_scala_component -v
 An isolated Isabelle user directory is created; no user components are registered.
@@ -33,6 +33,34 @@ from src.export_index import export_collection
 from tests.test_duplicate_report import sample_report
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def isabelle_getenv(name):
+    return subprocess.check_output(["isabelle", "getenv", "-b", name], text=True).strip()
+
+
+def isolated_user(root):
+    """Isabelle user directory below root/home that registers only this component.
+
+    Contrib components still come from the real installation. A repository clone of
+    Isabelle initializes them in user settings and keeps its heaps in the user
+    directory; these heaps are shared read-only as system heaps, so that HOL is not
+    rebuilt for every test.
+    """
+    home_user = Path(isabelle_getenv("ISABELLE_HOME_USER"))
+    user = root / "home" / home_user.relative_to(isabelle_getenv("USER_HOME"))
+    etc = user / "etc"
+    etc.mkdir(parents=True)
+    (etc / "components").write_text(str(ROOT / "isabelle") + "\n")
+    (etc / "settings").write_text(
+        f'ISABELLE_COMPONENTS_BASE="{isabelle_getenv("ISABELLE_COMPONENTS_BASE")}"\n'
+        'if [ -f "$ISABELLE_HOME/Admin/components/main" ]; then\n'
+        '  init_components "$ISABELLE_COMPONENTS_BASE" "$ISABELLE_HOME/Admin/components/main"\n'
+        f'  ISABELLE_HEAPS_SYSTEM="{isabelle_getenv("ISABELLE_HEAPS")}"\n'
+        "fi\n"
+        'ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms256m -Xmx4g -Xss16m"\n'
+    )
+    return user
 
 
 def fixture(root, metric="cosine", dimension=3, metadata=False):
@@ -432,7 +460,7 @@ class ExporterTests(unittest.TestCase):
                 )
 
 
-@unittest.skipUnless(shutil.which("isabelle"), "Isabelle2025-2 required")
+@unittest.skipUnless(shutil.which("isabelle"), "Isabelle2026 required")
 class ScalaComponentTests(unittest.TestCase):
     def test_cross_language_and_api(self):
         with tempfile.TemporaryDirectory(prefix="isasearch-test-") as temp:
@@ -440,12 +468,8 @@ class ScalaComponentTests(unittest.TestCase):
             env = os.environ.copy()
             env["USER_HOME"] = str(root / "home")
             env["ISASEARCH_TEST_KEY"] = "test-key"
-            etc = root / "home/.isabelle/Isabelle2025-2/etc"
-            etc.mkdir(parents=True)
-            (etc / "components").write_text(str(ROOT / "isabelle") + "\n")
-            (etc / "settings").write_text(
-                'ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms256m -Xmx4g -Xss16m"\n'
-            )
+            user = isolated_user(root)
+            etc = user / "etc"
 
             def run(tool, *args, ok=True):
                 process = subprocess.run(
@@ -585,9 +609,7 @@ class ScalaComponentTests(unittest.TestCase):
             (etc / "components").write_text(
                 str(ROOT / "isabelle") + "\n" + str(packaged) + "\n"
             )
-            shutil.rmtree(
-                root / "home/.isabelle/Isabelle2025-2/isasearch/indexes/plain"
-            )
+            shutil.rmtree(user / "isasearch/indexes/plain")
             run("search", "-c", config_path, "-i", "plain", "relocated")
             self.assertEqual(
                 hashlib.sha256(archive.read_bytes()).hexdigest(), archive_hash
@@ -849,26 +871,16 @@ class ScalaComponentTests(unittest.TestCase):
             )
 
     def test_registered_afp_build(self):
-        afp = subprocess.check_output(
-            ["isabelle", "getenv", "-b", "AFP_BASE"], text=True
-        ).strip()
+        afp = isabelle_getenv("AFP_BASE")
         if not afp:
             self.skipTest("No registered AFP available for session integration")
-        components_base = subprocess.check_output(
-            ["isabelle", "getenv", "-b", "ISABELLE_COMPONENTS_BASE"], text=True
-        ).strip()
         with tempfile.TemporaryDirectory(prefix="isasearch-afp-") as temp:
             root = Path(temp)
             env = dict(
                 os.environ, USER_HOME=str(root / "home"), ISASEARCH_TEST_KEY="test-key"
             )
-            etc = root / "home/.isabelle/Isabelle2025-2/etc"
-            etc.mkdir(parents=True)
-            (etc / "components").write_text(str(ROOT / "isabelle") + "\n")
-            (etc / "settings").write_text(
-                f'ISABELLE_COMPONENTS_BASE="{components_base}"\n'
-                'ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms256m -Xmx4g -Xss16m"\n'
-            )
+            user = isolated_user(root)
+            etc = user / "etc"
             stub = Stub({})
             self.addCleanup(stub.close)
             config = {
@@ -1002,10 +1014,7 @@ class ScalaComponentTests(unittest.TestCase):
             for prompt in metadata_prompts:
                 self.assertIn("Title: metadata regression title", prompt)
                 self.assertIn("Abstract: metadata regression abstract", prompt)
-            metadata_index = (
-                root
-                / "home/.isabelle/Isabelle2025-2/isasearch/indexes/afp-metadata-test"
-            )
+            metadata_index = user / "isasearch/indexes/afp-metadata-test"
             generation = json.loads((metadata_index / "current.json").read_text())[
                 "generation"
             ]

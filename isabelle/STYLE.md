@@ -1,6 +1,6 @@
 # Isabelle/Scala source style
 
-Use Isabelle2025-2's `src/Tools/Find_Facts/src/find_facts.scala` and `solr.scala`
+Use Isabelle2026's `src/Tools/Find_Facts/src/find_facts.scala` and `solr.scala`
 as references. Maintain the layout by hand: generic Scala formatters rewrite
 Isabelle's section comments and remove the additional spacing between sections.
 
@@ -19,5 +19,10 @@ Isabelle's section comments and remove the additional spacing between sections.
   opening brace where practical.
 - Preserve external API names and the existing underscore-based application
   naming. Formatting changes should not change behavior or serialized data.
+- Isabelle2026 compiles components with explicit nulls. Prefer null-free Scala and
+  Isabelle operations (`take`/`drop`, `Library.trim_string`, `Word.lowercase`,
+  `space_explode`, `replacing`). Wrap Java results that may be null with
+  `proper_value` or `proper_string`; use `.nn` only where the Java API guarantees a
+  value. Do not opt out with `scala.language.unsafeNulls`.
 
 After a style edit, run `isabelle scala_build` and `git diff --check`.

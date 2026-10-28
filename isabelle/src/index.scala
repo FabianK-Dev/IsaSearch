@@ -17,6 +17,8 @@ import org.apache.lucene.search.{
   IndexSearcher,
   KnnFloatVectorQuery,
   TermQuery,
+  TopDocs,
+  ScoreDoc,
   BooleanQuery,
   BooleanClause,
   MatchAllDocsQuery
@@ -262,8 +264,8 @@ object Index {
 
   class Corpus(val root: Path, val spec: Spec) extends AutoCloseable {
     private val dir =
-      FSDirectory.open((root + Path.explode("solr/" + spec.kind + "/data/index")).java_path)
-    private val reader = DirectoryReader.open(dir)
+      FSDirectory.open((root + Path.explode("solr/" + spec.kind + "/data/index")).java_path).nn
+    private val reader = DirectoryReader.open(dir).nn
     if (reader.numDocs() != spec.count) {
       reader.close()
       dir.close()
@@ -276,35 +278,39 @@ object Index {
       dir.close()
     }
 
-    def record(n: Int): Obj = obj(JSON.parse(reader.storedFields().document(n).get("record")))
+    private def stored(n: Int) = reader.storedFields().nn.document(n).nn
+
+    private def hits(top: TopDocs | Null): List[ScoreDoc] =
+      top.nn.scoreDocs.nn.toList.map(_.nn)
+
+    def record(n: Int): Obj =
+      obj(JSON.parse(proper_value(stored(n).get("record")).getOrElse(error("Missing record"))))
 
     def vector(n: Int): Array[Float] = {
-      val b = reader.storedFields().document(n).getBinaryValue("raw_vector")
-      floats(java.util.Arrays.copyOfRange(b.bytes, b.offset, b.offset + b.length))
+      val b =
+        proper_value(stored(n).getBinaryValue("raw_vector")).getOrElse(error("Missing vector"))
+      floats(b.bytes.nn.slice(b.offset, b.offset + b.length))
     }
 
     def all: Iterator[(Int, Obj)] = (0 until reader.maxDoc()).iterator.map(i => i -> record(i))
 
-    def get(id: String): Option[(Int, Obj)] = searcher
-      .search(new TermQuery(new Term("id", id)), 1)
-      .scoreDocs
-      .headOption
-      .map(hit => hit.doc -> record(hit.doc))
+    def get(id: String): Option[(Int, Obj)] =
+      hits(searcher.search(new TermQuery(new Term("id", id)), 1)).headOption
+        .map(hit => hit.doc -> record(hit.doc))
 
     def search(v: Array[Float], limit: Int, exclude: String = ""): List[Obj] = {
       validate(v, spec.dimension, spec.metric)
-      val filter =
-        if (exclude.isEmpty) null
-        else
-          new BooleanQuery.Builder()
-            .add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST)
-            .add(new TermQuery(new Term("entry", exclude)), BooleanClause.Occur.MUST_NOT)
+      val k = math.min(limit, spec.count)
+      val query =
+        if (exclude.isEmpty) new KnnFloatVectorQuery("vector", v, k)
+        else {
+          val filter = new BooleanQuery.Builder()
+            .add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST).nn
+            .add(new TermQuery(new Term("entry", exclude)), BooleanClause.Occur.MUST_NOT).nn
             .build()
-      val hits = searcher.search(
-        new KnnFloatVectorQuery("vector", v, math.min(limit, spec.count), filter),
-        math.min(limit, spec.count)
-      )
-      hits.scoreDocs.toList
+          new KnnFloatVectorQuery("vector", v, k, filter)
+        }
+      hits(searcher.search(query, k))
         .map { hit =>
           record(hit.doc).updated("distance", distance(v, vector(hit.doc), spec.metric))
         }

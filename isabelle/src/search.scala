@@ -43,7 +43,7 @@ object Search {
           embedding_error = ""
         }
         catch {
-          case exn: Inference.Failure => embedding_error = exn.getMessage
+          case exn: Inference.Failure => embedding_error = exn.message
           case ERROR(msg) => embedding_error = msg
         }
         if (!inference.configured(Model_Role.Query))
@@ -54,7 +54,7 @@ object Search {
             query_error = ""
           }
           catch {
-            case exn: Inference.Failure => query_error = exn.getMessage
+            case exn: Inference.Failure => query_error = exn.message
             case ERROR(msg) => query_error = msg
           }
         checked = System.currentTimeMillis()
@@ -88,7 +88,7 @@ object Search {
       mode: Query_Mode = Query_Mode.Original,
       limit: Int = 100
     ): Obj = {
-      if (query.trim.isEmpty) throw Bad_Request("query must not be empty")
+      if (Library.trim_string(query).isEmpty) throw Bad_Request("query must not be empty")
       if (limit < 1 || limit > 1000) throw Bad_Request("limit must be between 1 and 1000")
       if (!snapshot.corpora.contains(kind)) throw Unavailable("Corpus unavailable: " + kind)
       ready(mode.expands)
@@ -102,7 +102,7 @@ object Search {
           try { Some(inference.generate(prompt)) }
           catch {
             case exn: Inference.Failure =>
-              query_error = exn.getMessage
+              query_error = exn.message
               throw Unavailable(query_error)
             case ERROR(msg) =>
               query_error = msg
@@ -115,7 +115,7 @@ object Search {
       val vector = try { inference.embed(List(input), corpus.spec).head }
       catch {
         case exn: Inference.Failure =>
-          embedding_error = exn.getMessage
+          embedding_error = exn.message
           throw Unavailable(embedding_error)
         case ERROR(msg) =>
           embedding_error = msg
@@ -139,21 +139,21 @@ object Search {
 
   /** HTTP requests **/
 
-  def parameters(raw: String): Map[String, String] = {
-    if (raw == null || raw.isEmpty) Map.empty
-    else
-      raw
-        .split("&")
-        .map { field =>
-          val parts = field.split("=", 2)
+  def parameters(raw: String | Null): Map[String, String] = {
+    def decode(s: String): String = URLDecoder.decode(s, "UTF-8").nn
 
-          def decode(s: String) = URLDecoder.decode(s, "UTF-8")
-          decode(parts(0)) -> decode(parts.lift(1).getOrElse(""))
-        }
-        .toMap
+    proper_string(raw) match {
+      case None => Map.empty
+      case Some(query) =>
+        space_explode('&', query).map { field =>
+          val i = field.indexOf('=')
+          if (i < 0) decode(field) -> ""
+          else decode(field.take(i)) -> decode(field.drop(i + 1))
+        }.toMap
+    }
   }
 
-  def boolean(s: String): Boolean = s.toLowerCase match {
+  def boolean(s: String): Boolean = Word.lowercase(s) match {
     case "true" => true
     case "false" => false
     case _ => throw Bad_Request("refine_query must be true or false")
@@ -166,23 +166,26 @@ object Search {
     new HTTP.Service(name) {
       def apply(request: HTTP.Request): Option[HTTP.Response] = None
 
-      override def handler(server_name: String): HttpHandler = (exchange: HttpExchange) => {
+      override def handler(server_name: String): HttpHandler = { (http: HttpExchange | Null) =>
+        val exchange = http.nn
+
         def respond(code: Int, body: Obj): Unit =
           HTTP
             .Response(Bytes(JSON.Format(body)), "application/json; charset=utf-8")
             .write(exchange, code)
         try {
-          if (exchange.getRequestURI.getPath != "/" + this.name)
+          val uri = exchange.getRequestURI.nn
+          if (uri.getPath != "/" + this.name)
             respond(404, Map("error" -> "Unknown endpoint"))
           else if (exchange.getRequestMethod != "GET") respond(405, Map("error" -> "Use GET"))
-          else respond(200, action(parameters(exchange.getRequestURI.getRawQuery)))
+          else respond(200, action(parameters(uri.getRawQuery)))
         }
         catch {
-          case exn: Bad_Request => respond(400, Map("error" -> exn.getMessage))
+          case exn: Bad_Request => respond(400, Map("error" -> exn.message))
           case exn: IllegalArgumentException =>
             respond(400, Map("error" -> "Invalid request parameter"))
-          case exn: Unavailable => respond(503, Map("error" -> exn.getMessage))
-          case exn: Inference.Failure => respond(503, Map("error" -> exn.getMessage))
+          case exn: Unavailable => respond(503, Map("error" -> exn.message))
+          case exn: Inference.Failure => respond(503, Map("error" -> exn.message))
           case ERROR(msg) => respond(500, Map("error" -> msg))
           case scala.util.control.NonFatal(_) =>
             respond(500, Map("error" -> "Internal server error"))

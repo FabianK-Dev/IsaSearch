@@ -178,8 +178,8 @@ object Corpus_Build {
         java.nio.file.StandardOpenOption.WRITE
       )
     ) { channel =>
-      val lock = channel.tryLock()
-      if (lock == null) error("Another corpus build is running for " + name)
+      val lock = proper_value(channel.tryLock())
+        .getOrElse(error("Another corpus build is running for " + name))
       try {
         build_locked(
           config,
@@ -249,10 +249,10 @@ object Corpus_Build {
             val prompt = template(
               prompt_template,
               Map(
-                "theorem_content" -> truncate(
+                "theorem_content" -> Library.trim_string(truncate(
                   Text_Preparation.strip_proof(block.src),
                   config.positive("theorem_max_length", 3000)
-                ).trim,
+                )),
                 "title" -> (if (title.isEmpty) "-- no title --" else title),
                 "abstract" -> (if (abstract_excerpt.isEmpty) "-- no abstract --"
                                else abstract_excerpt)
@@ -272,7 +272,7 @@ object Corpus_Build {
         val description = marked(str(artifact, "llm_description"))
         val embedding = template(
           str(prompts, Prompt.Embed),
-          Map("doc_src" -> (description.trim + "\n\n" + block.src.trim))
+          Map("doc_src" -> (description + "\n\n" + Library.trim_string(block.src)))
         )
         val vector = inference.embed(List(embedding), space).head
         val doc = record ++ Map(
@@ -340,12 +340,13 @@ object Corpus_Build {
           val tasks = batch.map { block =>
             executor.submit(new Callable[(Obj, Array[Float])] {
               def call(): (Obj, Array[Float]) = preparation(block, kind)
-            })
+            }).nn
           }
           tasks.foreach { task =>
-            val (doc, vector) = try { task.get() }
+            val (doc, vector) = try { task.get().nn }
             catch {
-              case exn: java.util.concurrent.ExecutionException => throw exn.getCause
+              case exn: java.util.concurrent.ExecutionException =>
+                throw proper_value(exn.getCause).getOrElse(exn)
             }
             if (!seen.add(str(doc, "id"))) error("Duplicate source ID")
             identities += identity(doc)
@@ -396,7 +397,7 @@ object Corpus_Build {
       Isabelle_System.make_directory(workspace + Path.basic("export-" + UUID.random_string()))
     val cache = Isabelle_System.make_directory(workspace + Path.basic(fingerprint))
     val preparation = new Preparation(config, afp, recipe, cache, inference)
-    val executor = Executors.newFixedThreadPool(config.positive("llm_concurrency", 1))
+    val executor = Executors.newFixedThreadPool(config.positive("llm_concurrency", 1)).nn
     try {
       inference.generate("Reply with OK.", role = Model_Role.Document, health = true)
       inference.embed(List("IsaSearch embedding readiness check"), preparation.space)
