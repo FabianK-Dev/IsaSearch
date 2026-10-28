@@ -2,7 +2,7 @@
 
 The six flat JSON files in this directory are the original per-query results for
 *AI-assisted theorem search in Isabelle*. They are tracked in Git and can be passed
-directly to `python3 -m benchmark.compare`. No separate paper checkout is needed to
+directly to `isabelle isasearch_compare`. No separate paper checkout is needed to
 run a comparison.
 
 | Strategy | Query | Metadata | Result file |
@@ -19,19 +19,19 @@ The result files contain individual queries and metrics as well as summaries, so
 the comparison can account for changed coverage and noisy-query text.
 The benchmark replays the UR file's saved inputs for all strategies, checking
 its hash against the index below. All six historical files use the same query inputs.
-Keep these files available on the server when rerunning the benchmark.
+They ship with the Isabelle component, which reads them from this directory.
 
 From the repository root, compare a new UR run with the matching paper baseline
-(replace `RUN_DIRECTORY` with the path printed by the benchmark or archive command):
+(replace `RUN_DIRECTORY` with the strategy directory printed by the benchmark):
 
 ```bash
-python3 -m benchmark.compare \
-  benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
+isabelle isasearch_compare \
+  isabelle/benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
   RUN_DIRECTORY
 ```
 
-The second argument can also be a legacy result JSON, such as
-`benchmark/results/UR_beaker_gemma4_beaker_gemma4.json`.
+The second argument can also be a flat result JSON, such as
+`isabelle/benchmark/results/UR_beaker_gemma4_beaker_gemma4.json`.
 
 ## Verification and provenance
 
@@ -55,4 +55,5 @@ the complete runtime configuration are unknown here. The index records that
 limitation instead of assigning today's configuration to the old runs.
 
 Keep these baseline JSON files unchanged. New runs belong in their own timestamped
-directories with `results.json` and `manifest.json` as described in the main README.
+directories with `results.json` and `manifest.json` as described in the component
+README.

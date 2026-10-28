@@ -21,8 +21,8 @@ object Tool_Entries {
         " " + Bash.strings(command.name :: args)
       val result = Isabelle_System.bash(
         script,
-        progress_stdout = line => Output.writeln(line, stdout = true),
-        progress_stderr = Output.writeln(_)
+        progress_stdout = line => Output.writeln(line, stdout = true, include_empty = true),
+        progress_stderr = line => Output.writeln(line, include_empty = true)
       )
       if (!result.ok) sys.exit(result.rc)
     }
@@ -77,6 +77,7 @@ Import: -f EXPORT_DIR. Index: SESSION ... (or isabelle_sessions in config).
 Seed: ARTIFACT ... (description artifacts of the Python implementation).
 Search: QUERY. Index_build: -D component output directory.
 Benchmark never builds indexes; supply the required prebuilt variants.
+Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark runs).
 """
     val getopts = Getopts(
       usage,
@@ -114,6 +115,12 @@ Benchmark never builds indexes; supply the required prebuilt variants.
       case Tool_Command.Seed => Seed.run(config, args.map(Path.explode), progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
       case Tool_Command.Test => Tests.run(args)
+      case Tool_Command.Integration_Test => Integration_Tests.run(progress)
+      case Tool_Command.Compare =>
+        args match {
+          case List(previous, current) => Benchmark_Comparison.run(previous, current, progress)
+          case _ => error("Specify the previous and the current benchmark result")
+        }
       case Tool_Command.Benchmark =>
         val csv = input.getOrElse(Benchmark.default_csv)
         Benchmark

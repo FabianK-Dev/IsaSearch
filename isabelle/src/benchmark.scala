@@ -18,22 +18,12 @@ object Benchmark {
   private val hit_cutoff = 10
   val query_types = List("Title query", "Natural language query", "Noisy natural language query")
 
-  private def resource(name: String): Bytes = {
-    val stream = Option(getClass.getResourceAsStream("/benchmark/" + name))
-      .getOrElse(error("Missing bundled benchmark resource: " + name))
-    using(stream)(Bytes.read_stream(_))
-  }
+  def data(name: String): Path = component + Path.explode("benchmark/" + name)
 
-  def default_csv: Path = {
-    val path = home + Path.explode("benchmark/benchmark.csv")
-    val content = resource("benchmark.csv")
-    Isabelle_System.make_directory(path.dir)
-    if (!path.is_file || Bytes.read(path) != content) Bytes.write(path, content)
-    path
-  }
+  def default_csv: Path = data("benchmark.csv")
 
 
-  /** saved paper queries (benchmark/queries.py) **/
+  /** saved paper queries **/
 
   case class Paper_Queries(queries: Map[String, Obj], provenance: Obj) {
     def for_row(row: Map[String, String]): Map[String, Obj] =
@@ -51,7 +41,7 @@ object Benchmark {
       }
   }
 
-  def paper_queries(load: String => Bytes = resource): Paper_Queries = {
+  def paper_queries(load: String => Bytes = name => Bytes.read(data(name))): Paper_Queries = {
     val index = JSON.Object.parse(load("results/paper-baselines.json").text)
     val baseline = object_at(object_at(index, "baselines"), "UR")
     val filename = str(baseline, "result_file")

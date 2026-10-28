@@ -1,6 +1,6 @@
 /*  Title:      IsaSearch/isabelle/src/duplicate_report.scala
 
-Duplicate report views derived from saved evidence, matching src/duplicate_report.py.
+Duplicate report views derived from saved evidence.
 */
 
 package isabelle.isasearch

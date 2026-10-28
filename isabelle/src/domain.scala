@@ -162,7 +162,9 @@ enum Tool_Command(val name: String) extends Named_Value {
   case Serve extends Tool_Command("server")
   case Duplicates extends Tool_Command("duplicates")
   case Benchmark extends Tool_Command("benchmark")
+  case Compare extends Tool_Command("compare")
   case Test extends Tool_Command("test")
+  case Integration_Test extends Tool_Command("integration_test")
 }
 
 object Tool_Command {

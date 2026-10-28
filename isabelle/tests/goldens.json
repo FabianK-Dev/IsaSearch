@@ -1,0 +1,2971 @@
+{
+ "similarity": [
+  {
+   "a": "abcd",
+   "b": "bcde",
+   "ratio": 0.75
+  },
+  {
+   "a": "",
+   "b": "",
+   "ratio": 1.0
+  },
+  {
+   "a": "diet",
+   "b": "tide",
+   "ratio": 0.5
+  },
+  {
+   "a": "α😀abc",
+   "b": "α😁abc",
+   "ratio": 0.8
+  },
+  {
+   "a": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaxyz",
+   "b": "baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaxyz",
+   "ratio": 0.9976580796252927
+  },
+  {
+   "a": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxa",
+   "b": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxb",
+   "ratio": 0.998003992015968
+  }
+ ],
+ "paper_provenance": {
+  "mode": "replay_paper_queries",
+  "reference_strategy": "UR",
+  "reference_result": "UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+  "reference_sha256": "5e6abf8b39f2befaad2886144b676c23cd52dd9831a10f7c9821f374c4eadbcf",
+  "available_targets": 85,
+  "available_queries": 255,
+  "extra_target_input_policy": "csv_title_and_natural_language",
+  "missing_noisy_query_policy": "skip_query"
+ },
+ "paper_queries": [
+  {
+   "row": {
+    "ID": "square-root-of-2-is-irrational",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Square Root of 2 is Irrational",
+     "source": "https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality"
+    },
+    "Natural language query": {
+     "query": "sqrt(2) is not rational",
+     "source": "https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality"
+    },
+    "Noisy natural language query": {
+     "query": "ratonl sqrt(2)",
+     "source": "https://en.wikipedia.org/wiki/Square_root_of_2#Proofs_of_irrationality"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "fundamental-theorem-of-algebra",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Fundamental Theorem of Algebra",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements"
+    },
+    "Natural language query": {
+     "query": "Every univariate polynomial of positive degree with complex coefficients has at least one complex root",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements"
+    },
+    "Noisy natural language query": {
+     "query": "univariate every lynomial positive degree complex coefficients least one rot complex",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "denumerability-of-the-rational-numbers",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Denumerability of the Rational Numbers",
+     "source": "https://en.wikipedia.org/wiki/Countable_set#cite_note-25"
+    },
+    "Natural language query": {
+     "query": "\n\nZ (the set of all integers) and Q (the set of all rational numbers) are countable",
+     "source": "https://en.wikipedia.org/wiki/Countable_set#cite_note-25"
+    },
+    "Noisy natural language query": {
+     "query": "(the z set integer q (the set rational numbers) countable",
+     "source": "https://en.wikipedia.org/wiki/Countable_set#cite_note-25"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "pythagorean-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Pythagorean Theorem",
+     "source": "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+    },
+    "Natural language query": {
+     "query": "The sum of the areas of the two squares on the legs [...] equals the area of the square on the hypotenuse [...]",
+     "source": "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "reas sum two squar legs equals area square hypotenuse",
+     "source": "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "prime-number-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Prime Number Theorem",
+     "source": "https://en.wikipedia.org/wiki/Prime_number_theorem#Statement"
+    },
+    "Natural language query": {
+     "query": "Let pi(x) be the prime-counting function defined to be the number of primes less than or equal to x, for any real number x. [...] x / log x is a good approximation to pi(x)",
+     "source": "https://en.wikipedia.org/wiki/Prime_number_theorem#Statement"
+    },
+    "Noisy natural language query": {
+     "query": "pi(x) let ime-counting function defined number primes less equal rea x number x x / x log good appoximatio pix)",
+     "source": "https://en.wikipedia.org/wiki/Prime_number_theorem#Statement"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "gödels-incompleteness-theorem-1",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Gödel's Incompleteness Theorem 1",
+     "source": "https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem"
+    },
+    "Natural language query": {
+     "query": "Any consistent formal system F within which a certain amount of elementary arithmetic can be carried out is incomplete [...]",
+     "source": "https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "formal consistentystem f within certain amount elementary arithmetic incompete carried",
+     "source": "https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#First_incompleteness_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "gödels-incompleteness-theorem-2",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Gödel's Incompleteness Theorem 2",
+     "source": "https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] For any consistent system F within which a certain amount of elementary arithmetic can be carried out, the consistency of F cannot be proved in F itself",
+     "source": "https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "system consiste f within certain amount elementary arithmetic carried f cnsistency cannot proved f",
+     "source": "https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems#Second_incompleteness_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "law-of-quadratic-reciprocity",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Law of Quadratic Reciprocity",
+     "source": "https://en.wikipedia.org/wiki/Quadratic_reciprocity#Statement_of_the_theorem"
+    },
+    "Natural language query": {
+     "query": "Define q^* = (-1)^((q - 1)/2) * q. Then the congruence x^2 ~= p mod q is solvable if and only if x^2 ~= q^* mod p is solvable",
+     "source": "https://en.wikipedia.org/wiki/Quadratic_reciprocity#Statement_of_the_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "q^* defin= (-1)^((q - 1)/2) * q congruence ~= x^2 p mod q solvable = x^2 q^* mod p solvable",
+     "source": "https://en.wikipedia.org/wiki/Quadratic_reciprocity#Statement_of_the_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-impossibility-of-trisecting-the-angle",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Impossibility of Trisecting the Angle",
+     "source": "https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility"
+    },
+    "Natural language query": {
+     "query": "The angle pi/3 radians ([...] 60°) is constructible. [...] It is impossible to construct a 20° angle. This implies that a 60° angle cannot be trisected, and thus that an arbitrary angle cannot be trisected",
+     "source": "https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility"
+    },
+    "Noisy natural language query": {
+     "query": "pi/3 angleadians ( 60°) constructible impossible construct 20° implis angle 60° angle cannot triseted arbirar thus angle cannot triected",
+     "source": "https://en.wikipedia.org/wiki/Angle_trisection#Proof_of_impossibility"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-impossibility-of-doubling-the-cube",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Impossibility of Doubling the Cube",
+     "source": "https://en.wikipedia.org/wiki/Doubling_the_cube"
+    },
+    "Natural language query": {
+     "query": "Doubling a unit cube requires the construction of a line segment of length x, where x^3 = 2, x = 2^(1/3) [...] is not a constructible number",
+     "source": "https://en.wikipedia.org/wiki/Doubling_the_cube"
+    },
+    "Noisy natural language query": {
+     "query": "unit doublincube requires construction line segment length x = x^3 2 x= 2^(1/3) number constructible",
+     "source": "https://en.wikipedia.org/wiki/Doubling_the_cube"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-volume-of-a-sphere",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Volume of a Sphere",
+     "source": "https://en.wikipedia.org/wiki/Sphere#Enclosed_volume"
+    },
+    "Natural language query": {
+     "query": "In three dimensions, the volume inside a sphere is V = 4/3*pi*r^3 where r is the radius [...]",
+     "source": "https://en.wikipedia.org/wiki/Sphere#Enclosed_volume"
+    },
+    "Noisy natural language query": {
+     "query": "dimensions three vume inside sphere v = 4/3*pi*r^3 r radius",
+     "source": "https://en.wikipedia.org/wiki/Sphere#Enclosed_volume"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-area-of-a-circle",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Area of a Circle",
+     "source": "https://en.wikipedia.org/wiki/Area_of_a_circle"
+    },
+    "Natural language query": {
+     "query": "[...] area is half the circumference times the radius [...], A = 1/2 * 2*pi*r*r, for a circle",
+     "source": "https://en.wikipedia.org/wiki/Area_of_a_circle"
+    },
+    "Noisy natural language query": {
+     "query": "half area circumfence times radius = 1/2 * 2*pi*r*r circle",
+     "source": "https://en.wikipedia.org/wiki/Area_of_a_circle"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "eulers-generalisation-of-fermats-little-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Euler's Generalisation of Fermat's Little Theorem",
+     "source": "https://en.wikipedia.org/wiki/Euler%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] If n and a are coprime positive integers, then a^(phi(n)) is congruent to 1 modulo n",
+     "source": "https://en.wikipedia.org/wiki/Euler%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "oprime n positive tegers a^(phi(n)) congruent 1 modulo n",
+     "source": "https://en.wikipedia.org/wiki/Euler%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-infinitude-of-primes",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Infinitude of Primes",
+     "source": "https://en.wikipedia.org/wiki/Euclid%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] There are infinitely many prime numbers",
+     "source": "https://en.wikipedia.org/wiki/Euclid%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "may nfinitely prime nuers",
+     "source": "https://en.wikipedia.org/wiki/Euclid%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-independence-of-the-parallel-postulate",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Independence of the Parallel Postulate",
+     "source": "https://en.wikipedia.org/wiki/Parallel_postulate"
+    },
+    "Natural language query": {
+     "query": "[...] The parallel postulate is independent of other axioms of Euclidean geometry",
+     "source": "https://en.wikipedia.org/wiki/Parallel_postulate"
+    },
+    "Noisy natural language query": {
+     "query": "osulate parallel indendent axioms euclidean geometry",
+     "source": "https://en.wikipedia.org/wiki/Parallel_postulate"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "polyhedron-formula",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Polyhedron Formula",
+     "source": "https://en.wikipedia.org/wiki/Euler_characteristic#Polyhedra"
+    },
+    "Natural language query": {
+     "query": "Any convex polyhedron's surface has Euler characteristic X = V - E + F = 2",
+     "source": "https://en.wikipedia.org/wiki/Euler_characteristic#Polyhedra"
+    },
+    "Noisy natural language query": {
+     "query": "polyhedron's coex surface euler characteristic x = v - + e f = 2",
+     "source": "https://en.wikipedia.org/wiki/Euler_characteristic#Polyhedra"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "eulers-summation-of-1-122-132-.",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Euler's Summation of 1 + (1/2)^2 + (1/3)^2 + ...",
+     "source": "https://en.wikipedia.org/wiki/Basel_problem"
+    },
+    "Natural language query": {
+     "query": "[...] the precise summation of the reciprocals of the squares of the natural numbers [...] is [...] pi^2 / 6",
+     "source": "https://en.wikipedia.org/wiki/Basel_problem"
+    },
+    "Noisy natural language query": {
+     "query": "ummation precise riprocals squares natural numbers pi^2 / 6",
+     "source": "https://en.wikipedia.org/wiki/Basel_problem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "fundamental-theorem-of-integral-calculus",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Fundamental Theorem of Integral Calculus",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus"
+    },
+    "Natural language query": {
+     "query": "[...] differentiating a function [...] [and] [...] integrating a function [...] can be thought of as inverses of each other",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus"
+    },
+    "Noisy natural language query": {
+     "query": "untion differentiati integrating function thought inverses",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_calculus"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "demoivres-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "DeMoivre's Theorem",
+     "source": "https://en.wikipedia.org/wiki/De_Moivre%27s_formula"
+    },
+    "Natural language query": {
+     "query": "for any real number x and integer n (cos x + i sin x)^n = cos nx + i sin nx",
+     "source": "https://en.wikipedia.org/wiki/De_Moivre%27s_formula"
+    },
+    "Noisy natural language query": {
+     "query": "number real xnteger n (cos x + sin = x)^n cos nx + sin nx",
+     "source": "https://en.wikipedia.org/wiki/De_Moivre%27s_formula"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "liouvilles-theorem-and-the-construction-of-transcendental-numbers",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Liouville's Theorem and the Construction of Transcendental Numbers",
+     "source": "https://en.wikipedia.org/wiki/Liouville_number#Liouville_numbers_and_transcendence"
+    },
+    "Natural language query": {
+     "query": "irrational but does not have this property, so it cannot be algebraic and must be transcendental",
+     "source": "https://en.wikipedia.org/wiki/Liouville_number#Liouville_numbers_and_transcendence"
+    },
+    "Noisy natural language query": {
+     "query": "roerty irrational caot algebraic must transcendental",
+     "source": "https://en.wikipedia.org/wiki/Liouville_number#Liouville_numbers_and_transcendence"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "lagranges-four-square-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Lagrange's Four-Square Theorem",
+     "source": "https://en.wikipedia.org/wiki/Lagrange%27s_four-square_theorem"
+    },
+    "Natural language query": {
+     "query": "every nonnegative integer can be represented as a sum of four non-negative integer squares",
+     "source": "https://en.wikipedia.org/wiki/Lagrange%27s_four-square_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "onnegative every ieger represented sum four non-negative integer squares",
+     "source": "https://en.wikipedia.org/wiki/Lagrange%27s_four-square_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "all-primes-1-mod-4-equal-the-sum-of-two-squares",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "All Primes (1 mod 4) Equal the Sum of Two Squares",
+     "source": "https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] contains no factor p^k, where prime p =* 3 (mod 4) and k is odd",
+     "source": "https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "factor contains p prime p =* 3 (mod 4) odd k",
+     "source": "https://en.wikipedia.org/wiki/Sum_of_two_squares_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "greens-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Green's theorem",
+     "source": "https://en.wikipedia.org/wiki/Green%27s_theorem#References"
+    },
+    "Natural language query": {
+     "query": "[...] line integral around a simple closed curve C to a double integral over the plane region D [...] bounded by C",
+     "source": "https://en.wikipedia.org/wiki/Green%27s_theorem#References"
+    },
+    "Noisy natural language query": {
+     "query": "integral line arnd simple closed curve c double integral region plane bouned c",
+     "source": "https://en.wikipedia.org/wiki/Green%27s_theorem#References"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-non-denumerability-of-the-continuum",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Non-Denumerability of the Continuum",
+     "source": "https://en.wikipedia.org/wiki/Cantor%27s_diagonal_argument"
+    },
+    "Natural language query": {
+     "query": "[...] infinite sets which cannot be put into one-to-one correspondence with the infinite set of natural numbers [...]",
+     "source": "https://en.wikipedia.org/wiki/Cantor%27s_diagonal_argument"
+    },
+    "Noisy natural language query": {
+     "query": "sets infinite cann put one-to-one correspondence infinite set natural number",
+     "source": "https://en.wikipedia.org/wiki/Cantor%27s_diagonal_argument"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "formula-for-pythagorean-triples",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Formula for Pythagorean Triples",
+     "source": "https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple"
+    },
+    "Natural language query": {
+     "query": "[...] fundamental formula for generating Pythagorean triples given an arbitrary pair of integers m and n with m > n > 0",
+     "source": "https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple"
+    },
+    "Noisy natural language query": {
+     "query": "formula fundameal generating pythagorean triples given arbitrary pair intgers > n n > 0",
+     "source": "https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-undecidability-of-the-continuum-hypothesis",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Undecidability of the Continuum Hypothesis",
+     "source": "https://en.wikipedia.org/wiki/Continuum_hypothesis"
+    },
+    "Natural language query": {
+     "query": "There is no set whose cardinality is strictly between that of the integers and the real numbers",
+     "source": "https://en.wikipedia.org/wiki/Continuum_hypothesis"
+    },
+    "Noisy natural language query": {
+     "query": "whse set cardinalitytrictly integers real numbers",
+     "source": "https://en.wikipedia.org/wiki/Continuum_hypothesis"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "schroeder-bernstein-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Schroeder-Bernstein Theorem",
+     "source": "https://en.wikipedia.org/wiki/Schr%C3%B6der%E2%80%93Bernstein_theorem"
+    },
+    "Natural language query": {
+     "query": "there exist injective functions f: A -> B and g: B -> A between the sets A and B, then there exists a bijective function h: A → B",
+     "source": "https://en.wikipedia.org/wiki/Schr%C3%B6der%E2%80%93Bernstein_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "injective ext functions f -> b g b -> b sets exists bijective functionh b →",
+     "source": "https://en.wikipedia.org/wiki/Schr%C3%B6der%E2%80%93Bernstein_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "leibnitzs-series-for-pi",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Leibnitz's Series for Pi",
+     "source": "https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80"
+    },
+    "Natural language query": {
+     "query": "pi [...] as an alternating series",
+     "source": "https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80"
+    },
+    "Noisy natural language query": {
+     "query": "altrnting pi series",
+     "source": "https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "sum-of-the-angles-of-a-triangle",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Sum of the Angles of a Triangle",
+     "source": "https://en.wikipedia.org/wiki/Triangle#Angles"
+    },
+    "Natural language query": {
+     "query": "[...] sum of the measures of the interior angles of a triangle in Euclidean space is always 180 degrees",
+     "source": "https://en.wikipedia.org/wiki/Triangle#Angles"
+    },
+    "Noisy natural language query": {
+     "query": "measures sum interr angles triangle euclidean space always 180 degrees",
+     "source": "https://en.wikipedia.org/wiki/Triangle#Angles"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "ramseys-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Ramsey's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Ramsey_theory"
+    },
+    "Natural language query": {
+     "query": "how big must some structure be to guarantee that a particular property holds?",
+     "source": "https://en.wikipedia.org/wiki/Ramsey_theory"
+    },
+    "Noisy natural language query": {
+     "query": "mut big structure guantee particular property holds?",
+     "source": "https://en.wikipedia.org/wiki/Ramsey_theory"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "divergence-of-the-harmonic-series",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Divergence of the Harmonic Series",
+     "source": "https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)"
+    },
+    "Natural language query": {
+     "query": "the infinite series formed by summing all positive unit fractions",
+     "source": "https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)"
+    },
+    "Noisy natural language query": {
+     "query": "seies infinite formesumming positive unit fractions",
+     "source": "https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "taylors-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Taylor's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Taylor_series"
+    },
+    "Natural language query": {
+     "query": "infinite sum of terms that are expressed in terms of the function's derivatives at a single point",
+     "source": "https://en.wikipedia.org/wiki/Taylor_series"
+    },
+    "Noisy natural language query": {
+     "query": "um infinite terms pressed terms function's derivatives single point",
+     "source": "https://en.wikipedia.org/wiki/Taylor_series"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "brouwer-fixed-point-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Brouwer Fixed Point Theorem",
+     "source": "https://en.wikipedia.org/wiki/Brouwer_fixed-point_theorem"
+    },
+    "Natural language query": {
+     "query": "for any continuous function f [...] there is a point x_0 such that f(x_0) = x_0",
+     "source": "https://en.wikipedia.org/wiki/Brouwer_fixed-point_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "fnction continuous point x_0 f(x_0) = x_0",
+     "source": "https://en.wikipedia.org/wiki/Brouwer_fixed-point_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-solution-of-a-cubic",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Solution of a Cubic",
+     "source": "https://en.wikipedia.org/wiki/Cubic_equation"
+    },
+    "Natural language query": {
+     "query": "If all of the coefficients a, b, c, and d of the cubic equation are real numbers, then it has at least one real root [...]",
+     "source": "https://en.wikipedia.org/wiki/Cubic_equation"
+    },
+    "Noisy natural language query": {
+     "query": "b coefficients c bic equation real numbers least one root real",
+     "source": "https://en.wikipedia.org/wiki/Cubic_equation"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "arithmetic-mean-geometric-mean",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Arithmetic Mean / Geometric Mean",
+     "source": "https://en.wikipedia.org/wiki/AM%E2%80%93GM_inequality"
+    },
+    "Natural language query": {
+     "query": "the arithmetic mean of a list of non-negative real numbers is greater than or equal to the geometric mean of the same list",
+     "source": "https://en.wikipedia.org/wiki/AM%E2%80%93GM_inequality"
+    },
+    "Noisy natural language query": {
+     "query": "mean arithmetic lt non-negative real numbers greater equal geometric list man",
+     "source": "https://en.wikipedia.org/wiki/AM%E2%80%93GM_inequality"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "solutions-to-pells-equation",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Solutions to Pell's Equation",
+     "source": "https://en.wikipedia.org/wiki/Pell's_equation"
+    },
+    "Natural language query": {
+     "query": "as long as n is not a perfect square, [x^2 - ny^2 = 1] has infinitely many distinct integer solutions",
+     "source": "https://en.wikipedia.org/wiki/Pell's_equation"
+    },
+    "Noisy natural language query": {
+     "query": "n long perfect uare x^2 - ny^2 = 1 many infinitely distinct integer solutons",
+     "source": "https://en.wikipedia.org/wiki/Pell's_equation"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "minkowskis-fundamental-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Minkowski's Fundamental Theorem",
+     "source": "https://en.wikipedia.org/wiki/Minkowski%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "every convex set in R^n which is symmetric to the origin and has volume greater than 2^n contains a non-zero integer point",
+     "source": "https://en.wikipedia.org/wiki/Minkowski%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "convex every set^n symmetric origin volume greater 2^n non-zero contains iteger point",
+     "source": "https://en.wikipedia.org/wiki/Minkowski%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "sum-of-the-reciprocals-of-the-triangular-numbers",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Sum of the Reciprocals of the Triangular Numbers",
+     "source": "https://en.wikipedia.org/wiki/Triangular_number"
+    },
+    "Natural language query": {
+     "query": "nth number is the number of dots in the triangular arrangement with n dots on each side",
+     "source": "https://en.wikipedia.org/wiki/Triangular_number"
+    },
+    "Noisy natural language query": {
+     "query": "umber nth number ds triangular arrangement n dots side",
+     "source": "https://en.wikipedia.org/wiki/Triangular_number"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-binomial-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Binomial Theorem",
+     "source": "https://en.wikipedia.org/wiki/Binomial_theorem"
+    },
+    "Natural language query": {
+     "query": "The binomial coefficient binom(n, k) appears as the kth entry in the nth row of Pascal's triangle",
+     "source": "https://en.wikipedia.org/wiki/Binomial_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "coefficient binoml binom(n k) appears kth entry nth row triangle pascal's",
+     "source": "https://en.wikipedia.org/wiki/Binomial_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-partition-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Partition Theorem",
+     "source": "https://en.wikipedia.org/wiki/Partition_function_(number_theory)"
+    },
+    "Natural language query": {
+     "query": "number of possible partitions of a non-negative integer n",
+     "source": "https://en.wikipedia.org/wiki/Partition_function_(number_theory)"
+    },
+    "Noisy natural language query": {
+     "query": "osible number partitns non-negative integer n",
+     "source": "https://en.wikipedia.org/wiki/Partition_function_(number_theory)"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-solution-of-the-general-quartic-equation",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Solution of the General Quartic Equation",
+     "source": "https://en.wikipedia.org/wiki/Quartic_equation"
+    },
+    "Natural language query": {
+     "query": "highest order polynomial equation that can be solved by radicals in the general case",
+     "source": "https://en.wikipedia.org/wiki/Quartic_equation"
+    },
+    "Noisy natural language query": {
+     "query": "oder highest polynoal equation solved radicals general case",
+     "source": "https://en.wikipedia.org/wiki/Quartic_equation"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-central-limit-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Central Limit Theorem",
+     "source": "https://en.wikipedia.org/wiki/Central_limit_theorem"
+    },
+    "Natural language query": {
+     "query": "the limit as n -> \\inf of the distribution of (\\bar{X}_n - \\mu) * sqrt(n) is a normal distribution with mean 0 and variance \\sigma^2",
+     "source": "https://en.wikipedia.org/wiki/Central_limit_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "n limit -> \\i distribution (\\bar{x}_n - \\mu) * normal sqrt(n) distributon mean 0 variance \\sigma^2",
+     "source": "https://en.wikipedia.org/wiki/Central_limit_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "dirichlets-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Dirichlet's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Dirichlet%27s_theorem_on_arithmetic_progressions"
+    },
+    "Natural language query": {
+     "query": "for any two positive coprime integers a and d, there are [...] infinitely many primes that are congruent to a mod d",
+     "source": "https://en.wikipedia.org/wiki/Dirichlet%27s_theorem_on_arithmetic_progressions"
+    },
+    "Noisy natural language query": {
+     "query": "ositive two coprimintegers infinitely many primes congruent mod",
+     "source": "https://en.wikipedia.org/wiki/Dirichlet%27s_theorem_on_arithmetic_progressions"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "cayley-hamilton-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Cayley-Hamilton Theorem",
+     "source": "https://en.wikipedia.org/wiki/Cayley%E2%80%93Hamilton_theorem"
+    },
+    "Natural language query": {
+     "query": "every square matrix over a commutative ring satisfies its own characteristic equation",
+     "source": "https://en.wikipedia.org/wiki/Cayley%E2%80%93Hamilton_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "suare every matrix mmutative ring satisfies characteristic equation",
+     "source": "https://en.wikipedia.org/wiki/Cayley%E2%80%93Hamilton_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "wilsons-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Wilson's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Wilson%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] any integer n > 1 is a prime number [iff], (n - 1)! + 1 is divisible by n",
+     "source": "https://en.wikipedia.org/wiki/Wilson%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "n integer > 1 pme number iff (n - + 1)! 1 divisible n",
+     "source": "https://en.wikipedia.org/wiki/Wilson%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-number-of-subsets-of-a-set",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Number of Subsets of a Set",
+     "source": "https://en.wikipedia.org/wiki/Power_set#Properties"
+    },
+    "Natural language query": {
+     "query": "If S is a finite set with |S| = n, then the number of all the subsets of S is [...] 2^n",
+     "source": "https://en.wikipedia.org/wiki/Power_set#Properties"
+    },
+    "Noisy natural language query": {
+     "query": "st finite |s| = n nber subsets 2^n",
+     "source": "https://en.wikipedia.org/wiki/Power_set#Properties"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "pi-is-transcendental",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Pi is Transcendental",
+     "source": "https://en.wikipedia.org/wiki/Transcendental_number"
+    },
+    "Natural language query": {
+     "query": "The best-known [numbers that are not algebraic] are pi and e",
+     "source": "https://en.wikipedia.org/wiki/Transcendental_number"
+    },
+    "Noisy natural language query": {
+     "query": "nmbrs best-known algeaic pi e",
+     "source": "https://en.wikipedia.org/wiki/Transcendental_number"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-koenigsberg-bridges-problem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Koenigsberg Bridges Problem",
+     "source": "https://en.wikipedia.org/wiki/Eulerian_path#Properties"
+    },
+    "Natural language query": {
+     "query": "[...] undirected graph [and] exactly zero or two vertices have odd degree, and all of its vertices with nonzero degree belong to a single connected component",
+     "source": "https://en.wikipedia.org/wiki/Eulerian_path#Properties"
+    },
+    "Noisy natural language query": {
+     "query": "graph undirect exactly zero two vertices odd degree vertices degree nonzro belong single connected comonent",
+     "source": "https://en.wikipedia.org/wiki/Eulerian_path#Properties"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "product-of-segments-of-chords",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Product of Segments of Chords",
+     "source": "https://en.wikipedia.org/wiki/Intersecting_chords_theorem"
+    },
+    "Natural language query": {
+     "query": "products of the lengths of the line segments on each chord are equal",
+     "source": "https://en.wikipedia.org/wiki/Intersecting_chords_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "enths products line gments chord equal",
+     "source": "https://en.wikipedia.org/wiki/Intersecting_chords_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-hermite-lindemann-transcendence-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Hermite-Lindemann Transcendence Theorem",
+     "source": "https://en.wikipedia.org/wiki/Lindemann%E2%80%93Weierstrass_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] the extension field Q(e^\\alpha_1, ..., e^\\alpha_n) has transcendence degree n over Q",
+     "source": "https://en.wikipedia.org/wiki/Lindemann%E2%80%93Weierstrass_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "feld extension q(e^lpha_1 e^\\alpha_n) transcendence degree n q",
+     "source": "https://en.wikipedia.org/wiki/Lindemann%E2%80%93Weierstrass_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "herons-formula",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Heron's formula",
+     "source": "https://en.wikipedia.org/wiki/Heron%27s_formula"
+    },
+    "Natural language query": {
+     "query": "the area of a triangle in terms of the three side lengths a, b, c",
+     "source": "https://en.wikipedia.org/wiki/Heron%27s_formula"
+    },
+    "Noisy natural language query": {
+     "query": "tiangle area terms ree side lengths b c",
+     "source": "https://en.wikipedia.org/wiki/Heron%27s_formula"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "formula-for-the-number-of-combinations",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Formula for the Number of Combinations",
+     "source": "https://en.wikipedia.org/wiki/Combination"
+    },
+    "Natural language query": {
+     "query": "a k-combination of a set S is a subset of k distinct elements of S",
+     "source": "https://en.wikipedia.org/wiki/Combination"
+    },
+    "Noisy natural language query": {
+     "query": "etk-combination subs k distinct elements",
+     "source": "https://en.wikipedia.org/wiki/Combination"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-laws-of-large-numbers",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Laws of Large Numbers",
+     "source": "https://en.wikipedia.org/wiki/Law_of_large_numbers"
+    },
+    "Natural language query": {
+     "query": "average of the results obtained from a large number of independent random samples converges to the true value",
+     "source": "https://en.wikipedia.org/wiki/Law_of_large_numbers"
+    },
+    "Noisy natural language query": {
+     "query": "results average oained large number independent random samples converges vaue true",
+     "source": "https://en.wikipedia.org/wiki/Law_of_large_numbers"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "bezouts-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Bezout's Theorem",
+     "source": "https://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity"
+    },
+    "Natural language query": {
+     "query": "Let a and b be integers with greatest common divisor d. Then there exist integers x and y such that ax + by = d",
+     "source": "https://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity"
+    },
+    "Noisy natural language query": {
+     "query": "b let integers grtest common divisor exist integers x + ax =",
+     "source": "https://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "theorem-of-ceva",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Theorem of Ceva",
+     "source": "https://en.wikipedia.org/wiki/Ceva%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] triangle ABC, let the lines AO, BO, CO be drawn from the vertices to a common point O to meet opposite sides at D, E, F",
+     "source": "https://en.wikipedia.org/wiki/Ceva%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "abc triangle t lines ao bo co drawn vertices point common meet oppositesides e f",
+     "source": "https://en.wikipedia.org/wiki/Ceva%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "lhôpitals-rule",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "L'Hôpital's Rule",
+     "source": "https://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule"
+    },
+    "Natural language query": {
+     "query": "evaluating limits of indeterminate forms using derivatives",
+     "source": "https://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule"
+    },
+    "Noisy natural language query": {
+     "query": "imts evaluating inderminate forms using derivatives",
+     "source": "https://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "isosceles-triangle-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Isosceles Triangle Theorem",
+     "source": "https://en.wikipedia.org/wiki/Isosceles_triangle"
+    },
+    "Natural language query": {
+     "query": "triangle that has two sides of equal length and two angles of equal measure",
+     "source": "https://en.wikipedia.org/wiki/Isosceles_triangle"
+    },
+    "Noisy natural language query": {
+     "query": "wo triangle sides ual length two angles equal measure",
+     "source": "https://en.wikipedia.org/wiki/Isosceles_triangle"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "sum-of-a-geometric-series",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Sum of a Geometric Series",
+     "source": "https://en.wikipedia.org/wiki/Geometric_series#Definition_and_examples"
+    },
+    "Natural language query": {
+     "query": "When summing infinitely many terms, the [series in question] can either be convergent or divergent",
+     "source": "https://en.wikipedia.org/wiki/Geometric_series#Definition_and_examples"
+    },
+    "Noisy natural language query": {
+     "query": "nfinitely summing ny terms series question either convergent divergent",
+     "source": "https://en.wikipedia.org/wiki/Geometric_series#Definition_and_examples"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "e-is-transcendental",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "e is Transcendental",
+     "source": "https://en.wikipedia.org/wiki/Transcendental_number"
+    },
+    "Natural language query": {
+     "query": "The best-known [numbers that are not algebraic] are [e and] pi",
+     "source": "https://en.wikipedia.org/wiki/Transcendental_number"
+    },
+    "Noisy natural language query": {
+     "query": "nmbrs best-known algeaic e pi",
+     "source": "https://en.wikipedia.org/wiki/Transcendental_number"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "sum-of-an-arithmetic-series",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Sum of an Arithmetic Series",
+     "source": "https://en.wikipedia.org/wiki/Arithmetic_progression#Sum"
+    },
+    "Natural language query": {
+     "query": "taking the number n of terms being added [...], multiplying by the sum of the first and last number in the progression [...], and dividing by 2",
+     "source": "https://en.wikipedia.org/wiki/Arithmetic_progression#Sum"
+    },
+    "Noisy natural language query": {
+     "query": "number taking n rms added multiplying sum first last progression number diiding 2",
+     "source": "https://en.wikipedia.org/wiki/Arithmetic_progression#Sum"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "perfect-number-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Perfect Number Theorem",
+     "source": "https://en.wikipedia.org/wiki/Euclid%E2%80%93Euler_theorem"
+    },
+    "Natural language query": {
+     "query": "an even number is perfect [iff] it has the form 2^(p – 1) * (2^p - 1), where 2^p - 1 is a prime number",
+     "source": "https://en.wikipedia.org/wiki/Euclid%E2%80%93Euler_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "number even rfect iff form 2^(p – 1) * - (2^p 1) 2^p - 1 number prime",
+     "source": "https://en.wikipedia.org/wiki/Euclid%E2%80%93Euler_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "sylows-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Sylow's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Sylow_theorems"
+    },
+    "Natural language query": {
+     "query": "for every prime factor p of the order of a finite group G, there exists a [...] p-subgroup of G of order p^n",
+     "source": "https://en.wikipedia.org/wiki/Sylow_theorems"
+    },
+    "Noisy natural language query": {
+     "query": "prime every fact p order finite group g exists g p-subgroup order p^n",
+     "source": "https://en.wikipedia.org/wiki/Sylow_theorems"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "ascending-or-descending-sequences",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Ascending or Descending Sequences",
+     "source": "https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Szekeres_theorem"
+    },
+    "Natural language query": {
+     "query": "given r, s, [...] contains a monotonically increasing subsequence of length r or a monotonically decreasing subsequence of length s",
+     "source": "https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Szekeres_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "r given contains notonically increasing subsequence length r monotonically ubsequence decreasing length",
+     "source": "https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Szekeres_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-principle-of-mathematical-induction",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Principle of Mathematical Induction",
+     "source": "https://en.wikipedia.org/wiki/Mathematical_induction"
+    },
+    "Natural language query": {
+     "query": "first proving a simple case, then showing if we assume the claim is true for a given case, then the next case is also true",
+     "source": "https://en.wikipedia.org/wiki/Mathematical_induction"
+    },
+    "Noisy natural language query": {
+     "query": "proving first sple case showing assume claim true given next case case alo true",
+     "source": "https://en.wikipedia.org/wiki/Mathematical_induction"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-mean-value-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Mean Value Theorem",
+     "source": "https://en.wikipedia.org/wiki/Mean_value_theorem"
+    },
+    "Natural language query": {
+     "query": "for a given planar arc between two endpoints, at least one point at which the tangent to the arc is parallel to the secant through its endpoints",
+     "source": "https://en.wikipedia.org/wiki/Mean_value_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "planar given arcwo endpoints least one point tangent parallel arc secant edpoints",
+     "source": "https://en.wikipedia.org/wiki/Mean_value_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "fourier-series",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Fourier Series",
+     "source": "https://en.wikipedia.org/wiki/Fourier_series"
+    },
+    "Natural language query": {
+     "query": "[...] function as a sum of sines and cosines [...] for example smooth functions, have series that converge to the original function",
+     "source": "https://en.wikipedia.org/wiki/Fourier_series"
+    },
+    "Noisy natural language query": {
+     "query": "sum function sinecosines example smooth functions series converge function riginal",
+     "source": "https://en.wikipedia.org/wiki/Fourier_series"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "sum-of-kth-powers",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Sum of kth powers",
+     "source": "https://en.wikipedia.org/wiki/Faulhaber%27s_formula"
+    },
+    "Natural language query": {
+     "query": "[...] expresses the sum of the p-th powers of the first n positive integers [...] as a polynomial in n",
+     "source": "https://en.wikipedia.org/wiki/Faulhaber%27s_formula"
+    },
+    "Noisy natural language query": {
+     "query": "sum expresses p-thowers first n positive integers polynomial n",
+     "source": "https://en.wikipedia.org/wiki/Faulhaber%27s_formula"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-cauchy-schwarz-inequality",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Cauchy-Schwarz Inequality",
+     "source": "https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality"
+    },
+    "Natural language query": {
+     "query": "[...] upper bound on the inner product between two vectors in an inner product space in terms of the product of the vector norms",
+     "source": "https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality"
+    },
+    "Noisy natural language query": {
+     "query": "bound upper inneproduct two vectors inner product space product terms vectr norms",
+     "source": "https://en.wikipedia.org/wiki/Cauchy%E2%80%93Schwarz_inequality"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-intermediate-value-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Intermediate Value Theorem",
+     "source": "https://en.wikipedia.org/wiki/Intermediate_value_theorem"
+    },
+    "Natural language query": {
+     "query": "if f is a continuous function whose domain contains the interval [a, b], then it takes on any given value between f(a) and f(b)",
+     "source": "https://en.wikipedia.org/wiki/Intermediate_value_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "continuous f funion whose domain contains interval b takes value given f(a f(b)",
+     "source": "https://en.wikipedia.org/wiki/Intermediate_value_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "fundamental-theorem-of-arithmetic",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Fundamental Theorem of Arithmetic",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic#Proof"
+    },
+    "Natural language query": {
+     "query": "states that every integer greater than 1 can be represented uniquely as a product of prime numbers, up to the order of the factors",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic#Proof"
+    },
+    "Noisy natural language query": {
+     "query": "every states inter greater 1 represented uniquely product prime order numbes factors",
+     "source": "https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic#Proof"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "divergence-of-the-prime-reciprocal-series",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Divergence of the Prime Reciprocal Series",
+     "source": "https://en.wikipedia.org/wiki/Divergence_of_the_sum_of_the_reciprocals_of_the_primes"
+    },
+    "Natural language query": {
+     "query": "sum of the reciprocals of all prime numbers diverges",
+     "source": "https://en.wikipedia.org/wiki/Divergence_of_the_sum_of_the_reciprocals_of_the_primes"
+    },
+    "Noisy natural language query": {
+     "query": "rcirocals sum prime nbers diverges",
+     "source": "https://en.wikipedia.org/wiki/Divergence_of_the_sum_of_the_reciprocals_of_the_primes"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "dissection-of-cubes-j.e.-littlewoods-elegant-proof",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Dissection of Cubes (J.E. Littlewood's “elegant” proof)",
+     "source": "https://leanprover-community.github.io/mathlib4_docs/Archive/Wiedijk100Theorems/CubingACube.html#Theorems100.%C2%AB82%C2%BB.cannot_cube_a_cube"
+    },
+    "Natural language query": {
+     "query": "Dissection of Cubes: A cube cannot be cubed.",
+     "source": "https://leanprover-community.github.io/mathlib4_docs/Archive/Wiedijk100Theorems/CubingACube.html#Theorems100.%C2%AB82%C2%BB.cannot_cube_a_cube"
+    },
+    "Noisy natural language query": {
+     "query": "cbe dissection cube cnot cubed",
+     "source": "https://leanprover-community.github.io/mathlib4_docs/Archive/Wiedijk100Theorems/CubingACube.html#Theorems100.%C2%AB82%C2%BB.cannot_cube_a_cube"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-friendship-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Friendship Theorem",
+     "source": "https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem"
+    },
+    "Natural language query": {
+     "query": "[...] finite graphs with the property that every two vertices have exactly one neighbor in common [...]",
+     "source": "https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "graphs finite propty every two vertices exactly one neighbor common",
+     "source": "https://en.wikipedia.org/wiki/Friendship_graph#Friendship_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "divisibility-by-three-rule",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Divisibility by Three Rule",
+     "source": "https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230"
+    },
+    "Natural language query": {
+     "query": "[...] sum of the digits must be divisible by 3 [...]",
+     "source": "https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230"
+    },
+    "Noisy natural language query": {
+     "query": "dgis sum must divisib 3",
+     "source": "https://en.wikipedia.org/wiki/Divisibility_rule#Divisibility_rules_for_numbers_1%E2%88%9230"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "desarguess-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Desargues's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Desargues%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "Two triangles are in perspective axially [iff] they are in perspective centrally.",
+     "source": "https://en.wikipedia.org/wiki/Desargues%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "trangles two perspecve axially iff perspective centrally",
+     "source": "https://en.wikipedia.org/wiki/Desargues%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "derangements-formula",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Derangements Formula",
+     "source": "https://en.wikipedia.org/wiki/Derangement"
+    },
+    "Natural language query": {
+     "query": "[...] permutation of the elements of a set in which no element appears in its original position",
+     "source": "https://en.wikipedia.org/wiki/Derangement"
+    },
+    "Noisy natural language query": {
+     "query": "elments permutation t element appears original position",
+     "source": "https://en.wikipedia.org/wiki/Derangement"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-factor-and-remainder-theorems",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Factor and Remainder Theorems",
+     "source": "https://en.wikipedia.org/wiki/Polynomial_remainder_theorem"
+    },
+    "Natural language query": {
+     "query": "f(x) is [...] f(r) and (x - r) [times a lower-degree polynomial]",
+     "source": "https://en.wikipedia.org/wiki/Polynomial_remainder_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "fr) f(x) (x - r) tis lower-degree polynomial",
+     "source": "https://en.wikipedia.org/wiki/Polynomial_remainder_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "stirlings-formula",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Stirling's Formula",
+     "source": "https://en.wikipedia.org/wiki/Stirling%27s_approximation"
+    },
+    "Natural language query": {
+     "query": "asymptotic approximation for factorials [...] accurate results even for small values of n",
+     "source": "https://en.wikipedia.org/wiki/Stirling%27s_approximation"
+    },
+    "Noisy natural language query": {
+     "query": "pproximation asymptic factorials accurate results even small values n",
+     "source": "https://en.wikipedia.org/wiki/Stirling%27s_approximation"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "picks-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Pick's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Pick%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "formula for the area of a simple polygon with integer vertex coordinates",
+     "source": "https://en.wikipedia.org/wiki/Pick%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "ara formula simple pygon integer vertex coordinates",
+     "source": "https://en.wikipedia.org/wiki/Pick%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-birthday-problem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Birthday Problem",
+     "source": "https://en.wikipedia.org/wiki/Birthday_problem"
+    },
+    "Natural language query": {
+     "query": "same birthday [...] 23 people are needed for that probability to exceed 50%",
+     "source": "https://en.wikipedia.org/wiki/Birthday_problem"
+    },
+    "Noisy natural language query": {
+     "query": "23birthday people need probability exceed 50%",
+     "source": "https://en.wikipedia.org/wiki/Birthday_problem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "the-law-of-cosines",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "The Law of Cosines",
+     "source": "https://en.wikipedia.org/wiki/Law_of_cosines"
+    },
+    "Natural language query": {
+     "query": "relates the lengths of the sides of a triangle to the cosine of one of its angles",
+     "source": "https://en.wikipedia.org/wiki/Law_of_cosines"
+    },
+    "Noisy natural language query": {
+     "query": "legths relates sidesriangle cosine one angles",
+     "source": "https://en.wikipedia.org/wiki/Law_of_cosines"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "ptolemys-theorem",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Ptolemy's Theorem",
+     "source": "https://en.wikipedia.org/wiki/Ptolemy%27s_theorem"
+    },
+    "Natural language query": {
+     "query": "product of [...] lengths of [...] diagonals [...] equal to [...] sum of [...] products of [...] lengths of [...] pairs of opposite sides",
+     "source": "https://en.wikipedia.org/wiki/Ptolemy%27s_theorem"
+    },
+    "Noisy natural language query": {
+     "query": "lengths product dionals equal sum products lengths pairs opposite sides",
+     "source": "https://en.wikipedia.org/wiki/Ptolemy%27s_theorem"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "principle-of-inclusionexclusion",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Principle of Inclusion/Exclusion",
+     "source": "https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle"
+    },
+    "Natural language query": {
+     "query": "[...] over-generous inclusion, followed by compensating exclusion [...]",
+     "source": "https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle"
+    },
+    "Noisy natural language query": {
+     "query": "iclsion over-generousollowed compensating exclusion",
+     "source": "https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "bertrands-postulate",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Bertrand's Postulate",
+     "source": "https://en.wikipedia.org/wiki/Bertrand%27s_postulate"
+    },
+    "Natural language query": {
+     "query": "[...] any integer n > 3, [...] exists at least one prime number p with n < p < 2n - 2",
+     "source": "https://en.wikipedia.org/wiki/Bertrand%27s_postulate"
+    },
+    "Noisy natural language query": {
+     "query": "n integer > exists least one prime number n p < p < 2n 2 -",
+     "source": "https://en.wikipedia.org/wiki/Bertrand%27s_postulate"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "descartes-rule-of-signs",
+    "Title query": "Changed CSV title",
+    "Natural language query": "Changed CSV text"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Descartes Rule of Signs",
+     "source": "https://en.wikipedia.org/wiki/Descartes%27_rule_of_signs"
+    },
+    "Natural language query": {
+     "query": "number of positive real roots is at most [...] number of sign changes in [...] sequence of [...] polynomial's coefficients",
+     "source": "https://en.wikipedia.org/wiki/Descartes%27_rule_of_signs"
+    },
+    "Noisy natural language query": {
+     "query": "positive number re roots number sign changes sequence polynomial's coefficiets",
+     "source": "https://en.wikipedia.org/wiki/Descartes%27_rule_of_signs"
+    }
+   }
+  },
+  {
+   "row": {
+    "ID": "new-target",
+    "Title query": "Extra title",
+    "Natural language query": "Extra natural",
+    "Natural language query source": "Extra source"
+   },
+   "expected": {
+    "Title query": {
+     "query": "Extra title",
+     "source": "Extra source"
+    },
+    "Natural language query": {
+     "query": "Extra natural",
+     "source": "Extra source"
+    }
+   }
+  }
+ ],
+ "reports": [
+  {
+   "report": {
+    "generated_at": "2026-09-16",
+    "llm_judge": true,
+    "all_candidates": true,
+    "thresholds": {
+     "strong_distance": 0.05,
+     "syntactic": 0.9,
+     "distance": 0.3,
+     "top_k": 10
+    },
+    "sections": {
+     "definitions": {
+      "aggregates": {
+       "documents": 2,
+       "judge_failures": 0
+      },
+      "self_retrieval": {
+       "self_retrieved": 2,
+       "documents": 2,
+       "mean_self_distance": 0
+      },
+      "synthetic_ground_truth": {
+       "documents_with_known_duplicate": 0
+      },
+      "entries": [
+       {
+        "entry": "Source_Entry",
+        "date": null,
+        "documents": 2,
+        "items": [
+         {
+          "id": "USER_HOME/afp/thys/Source/T.thy|1",
+          "entity_kname": "source_name",
+          "best_tier": "near-exact",
+          "remote_url": "https://example.org/source.thy",
+          "src": "definition source_name: \"True\"",
+          "candidates": [
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|exact_match",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "exact_match",
+            "tier": "near-exact",
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition exact_match: \"True\""
+           },
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|likely_match",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "likely_match",
+            "tier": "likely",
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition likely_match: \"True\""
+           },
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|possible_match",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "possible_match",
+            "tier": "possible",
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition possible_match: \"True\""
+           },
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|unclassified_match",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "unclassified_match",
+            "tier": null,
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition unclassified_match: \"True\""
+           }
+          ]
+         },
+         {
+          "id": "USER_HOME/afp/thys/Source/T.thy|1",
+          "entity_kname": "unclassified_source",
+          "best_tier": null,
+          "remote_url": "https://example.org/source.thy",
+          "src": "definition source_name: \"True\"",
+          "candidates": [
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|unclassified_only",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "unclassified_only",
+            "tier": null,
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition unclassified_only: \"True\""
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "possible": "# Duplicate analysis: Possible duplicates\n\nGenerated at 2026\\-09\\-16.\n\nThe selected AFP entries are compared with the indexed AFP and Isabelle library. Matches within the source entry are excluded. The tiers guide human review; semantic or syntactic similarity does not establish logical duplication.\n\nThis report includes **possible**, **likely**, and **near-exact** candidates. Unclassified neighbours are omitted. Candidate links open the source or library theory; the separate near-exact report includes candidate source excerpts for closer inspection.\n\nSource blocks are excerpts and may end mid-statement; follow the links for complete source.\n\nTiers:\n\n- `near-exact`: distance ≤ 0.05 or syntactic similarity ≥ 0.9.\n- `likely`: the LLM judged the pair to be a duplicate.\n- `possible`: distance ≤ 0.3.\n\n## Definitions\n\n1 of 2 analysed definitions have matches in this report (3 candidate pairs).\n\nCandidate tiers: 1 near-exact, 1 likely, 1 possible.\n\nFull-run positive control: 2 of 2 documents retrieved themselves at a distance of about 0 (mean self distance 0).\n\nMost frequent match locations in this report:\n\n- [Other](<https://example.org/Other.html>): 3 candidate pairs\n\n### Source\\_Entry (unknown date)\n\n1 of 2 definitions have at least one candidate in this report.\n\n#### [source\\_name](<https://example.org/source.thy>) — near-exact\n\n```isabelle\ndefinition source_name: \"True\"\n```\n\n- **near-exact** (definition) [exact\\_match](<https://example.org/T.thy#L1>) in [Other](<https://example.org/Other.html>) (distance 0.1000, syntactic 0.10)\n\n- **likely** (definition) [likely\\_match](<https://example.org/T.thy#L1>) in [Other](<https://example.org/Other.html>) (distance 0.1000, syntactic 0.10)\n\n- **possible** (definition) [possible\\_match](<https://example.org/T.thy#L1>) in [Other](<https://example.org/Other.html>) (distance 0.1000, syntactic 0.10)\n\n",
+   "near_exact": "# Duplicate analysis: Near-exact matches\n\nGenerated at 2026\\-09\\-16.\n\nThe selected AFP entries are compared with the indexed AFP and Isabelle library. Matches within the source entry are excluded. The tiers guide human review; semantic or syntactic similarity does not establish logical duplication.\n\nThis report contains only **near-exact** candidates.\n\nSource blocks are excerpts and may end mid-statement; follow the links for complete source.\n\nTiers:\n\n- `near-exact`: distance ≤ 0.05 or syntactic similarity ≥ 0.9.\n\n## Definitions\n\n1 of 2 analysed definitions have matches in this report (1 candidate pairs).\n\nCandidate tiers: 1 near-exact.\n\nFull-run positive control: 2 of 2 documents retrieved themselves at a distance of about 0 (mean self distance 0).\n\nMost frequent match locations in this report:\n\n- [Other](<https://example.org/Other.html>): 1 candidate pairs\n\n### Source\\_Entry (unknown date)\n\n1 of 2 definitions have at least one candidate in this report.\n\n#### [source\\_name](<https://example.org/source.thy>) — near-exact\n\n```isabelle\ndefinition source_name: \"True\"\n```\n\n- **near-exact** (definition) [exact\\_match](<https://example.org/T.thy#L1>) in [Other](<https://example.org/Other.html>) (distance 0.1000, syntactic 0.10)\n\n    ```isabelle\n    definition exact_match: \"True\"\n    ```\n\n"
+  },
+  {
+   "report": {
+    "generated_at": "2026-09-16",
+    "llm_judge": false,
+    "all_candidates": true,
+    "thresholds": {
+     "strong_distance": 0.05,
+     "syntactic": 0.9,
+     "distance": 0.3,
+     "top_k": 10
+    },
+    "sections": {
+     "definitions": {
+      "aggregates": {
+       "documents": 2,
+       "judge_failures": 1
+      },
+      "self_retrieval": {
+       "self_retrieved": 2,
+       "documents": 2,
+       "mean_self_distance": 0
+      },
+      "synthetic_ground_truth": {
+       "documents_with_known_duplicate": 2,
+       "documents_recovered": 1,
+       "recall": 0.5
+      },
+      "entries": [
+       {
+        "entry": "Source_Entry",
+        "date": null,
+        "documents": 2,
+        "items": [
+         {
+          "id": "USER_HOME/afp/thys/Source/T.thy|1",
+          "entity_kname": "source_name",
+          "best_tier": "near-exact",
+          "remote_url": "https://example.org/source.thy",
+          "src": "text \"a\"\n```\n# still source\n````\nend",
+          "candidates": [
+           {
+            "id": "ISABELLE_HOME/src/HOL/Analysis/Test_Theory.thy|1..2",
+            "entry": null,
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "a_[b]*|thm",
+            "tier": "near-exact",
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": "\"quoted\" <tag> & x_y\n# heading [fake](url) `code`",
+            "remote_url": "#",
+            "entry_url": "#",
+            "src": "definition exact_match: \"True\"",
+            "theory_url": "https://example.org/a (b)\".thy#L1",
+            "judge_error": "Failed <request> after retries"
+           },
+           {
+            "id": "custom/path/Example.thy|5",
+            "entry": null,
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "likely_match",
+            "tier": "likely",
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": null,
+            "entry_url": null,
+            "src": "definition likely_match: \"True\""
+           },
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|possible_match",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "possible_match",
+            "tier": "possible",
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition possible_match: \"True\""
+           },
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|unclassified_match",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "unclassified_match",
+            "tier": null,
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition unclassified_match: \"True\""
+           }
+          ]
+         },
+         {
+          "id": "USER_HOME/afp/thys/Source/T.thy|1",
+          "entity_kname": "unclassified_source",
+          "best_tier": null,
+          "remote_url": "https://example.org/source.thy",
+          "src": "definition source_name: \"True\"",
+          "candidates": [
+           {
+            "id": "USER_HOME/afp/thys/Other/T.thy|unclassified_only",
+            "entry": "Other",
+            "kind": "definitions",
+            "command": "definition",
+            "entity_kname": "unclassified_only",
+            "tier": null,
+            "distance": 0.1,
+            "syntactic_similarity": 0.1,
+            "verdict": null,
+            "justification": null,
+            "remote_url": "https://example.org/T.thy#L1",
+            "entry_url": "https://example.org/Other.html",
+            "src": "definition unclassified_only: \"True\""
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "cross": true
+   },
+   "possible": "# Duplicate analysis: Possible duplicates\n\nGenerated at 2026\\-09\\-16.\n\nThe selected AFP entries are compared with the indexed AFP and Isabelle library. Matches within the source entry are excluded. The tiers guide human review; semantic or syntactic similarity does not establish logical duplication.\n\nThis report includes **possible**, **likely**, and **near-exact** candidates. Unclassified neighbours are omitted. Candidate links open the source or library theory; the separate near-exact report includes candidate source excerpts for closer inspection.\n\nSource blocks are excerpts and may end mid-statement; follow the links for complete source.\n\nTiers:\n\n- `near-exact`: distance ≤ 0.05 or syntactic similarity ≥ 0.9.\n- `likely`: the LLM judged the pair to be a duplicate.\n- `possible`: distance ≤ 0.3.\n\nLLM judging was disabled. Tiers use only distance and syntactic similarity.\n\nCross-kind matching is enabled: each document was compared with both definitions and theorems. Synthetic-control recall is not comparable with a run without cross-kind matching.\n\n## Definitions\n\n1 of 2 analysed definitions have matches in this report (3 candidate pairs).\n\nCandidate tiers: 1 near-exact, 1 likely, 1 possible.\n\nWarning: 1 candidate pairs remain unjudged in the full run after LLM request failures. Their tiers use only distance and syntactic similarity. Rerunning retries these pairs.\n\nFull-run positive control: 2 of 2 documents retrieved themselves at a distance of about 0 (mean self distance 0).\n\nFull-run synthetic control: 1 of 2 documents with a syntactically near-identical counterpart in another entry were recovered within the top 10 (recall 0.50).\n\nMost frequent match locations in this report:\n\n- [Isabelle/src/HOL/Analysis/Test\\_Theory\\.thy](<https://example.org/a%20%28b%29%22.thy#L1>): 1 candidate pairs\n- custom/path/Example\\.thy: 1 candidate pairs\n- [Other](<https://example.org/Other.html>): 1 candidate pairs\n\n### Source\\_Entry (unknown date)\n\n1 of 2 definitions have at least one candidate in this report.\n\n#### [source\\_name](<https://example.org/source.thy>) — near-exact\n\n`````isabelle\ntext \"a\"\n```\n# still source\n````\nend\n`````\n\n- **near-exact** (definition) [a\\_\\[b\\]\\*\\|thm](<https://example.org/a%20%28b%29%22.thy#L1>) in [Isabelle/src/HOL/Analysis/Test\\_Theory\\.thy](<https://example.org/a%20%28b%29%22.thy#L1>) (distance 0.1000, syntactic 0.10)\n\n    \"quoted\" &lt;tag&gt; &amp; x\\_y \\# heading \\[fake\\]\\(url\\) \\`code\\`\n\n    **Unjudged: LLM request failed.** Failed &lt;request&gt; after retries\n\n- **likely** (definition) likely\\_match in custom/path/Example\\.thy (distance 0.1000, syntactic 0.10)\n\n- **possible** (definition) [possible\\_match](<https://example.org/T.thy#L1>) in [Other](<https://example.org/Other.html>) (distance 0.1000, syntactic 0.10)\n\n",
+   "near_exact": "# Duplicate analysis: Near-exact matches\n\nGenerated at 2026\\-09\\-16.\n\nThe selected AFP entries are compared with the indexed AFP and Isabelle library. Matches within the source entry are excluded. The tiers guide human review; semantic or syntactic similarity does not establish logical duplication.\n\nThis report contains only **near-exact** candidates.\n\nSource blocks are excerpts and may end mid-statement; follow the links for complete source.\n\nTiers:\n\n- `near-exact`: distance ≤ 0.05 or syntactic similarity ≥ 0.9.\n\nLLM judging was disabled. Tiers use only distance and syntactic similarity.\n\nCross-kind matching is enabled: each document was compared with both definitions and theorems. Synthetic-control recall is not comparable with a run without cross-kind matching.\n\n## Definitions\n\n1 of 2 analysed definitions have matches in this report (1 candidate pairs).\n\nCandidate tiers: 1 near-exact.\n\nWarning: 1 candidate pairs remain unjudged in the full run after LLM request failures. Their tiers use only distance and syntactic similarity. Rerunning retries these pairs.\n\nFull-run positive control: 2 of 2 documents retrieved themselves at a distance of about 0 (mean self distance 0).\n\nFull-run synthetic control: 1 of 2 documents with a syntactically near-identical counterpart in another entry were recovered within the top 10 (recall 0.50).\n\nMost frequent match locations in this report:\n\n- [Isabelle/src/HOL/Analysis/Test\\_Theory\\.thy](<https://example.org/a%20%28b%29%22.thy#L1>): 1 candidate pairs\n\n### Source\\_Entry (unknown date)\n\n1 of 2 definitions have at least one candidate in this report.\n\n#### [source\\_name](<https://example.org/source.thy>) — near-exact\n\n`````isabelle\ntext \"a\"\n```\n# still source\n````\nend\n`````\n\n- **near-exact** (definition) [a\\_\\[b\\]\\*\\|thm](<https://example.org/a%20%28b%29%22.thy#L1>) in [Isabelle/src/HOL/Analysis/Test\\_Theory\\.thy](<https://example.org/a%20%28b%29%22.thy#L1>) (distance 0.1000, syntactic 0.10)\n\n    \"quoted\" &lt;tag&gt; &amp; x\\_y \\# heading \\[fake\\]\\(url\\) \\`code\\`\n\n    **Unjudged: LLM request failed.** Failed &lt;request&gt; after retries\n\n    ```isabelle\n    definition exact_match: \"True\"\n    ```\n\n"
+  }
+ ],
+ "metrics": [
+  {
+   "results": [],
+   "targets": [
+    {
+     "id": "a"
+    }
+   ],
+   "expected": {
+    "top_k_accuracy": 0,
+    "normalized_discounted_cumulative_gain": 0.0,
+    "reciprocal_rank": 0,
+    "rank": 0
+   }
+  },
+  {
+   "results": [
+    {
+     "id": "a"
+    }
+   ],
+   "targets": [
+    {
+     "id": "a"
+    }
+   ],
+   "expected": {
+    "top_k_accuracy": 1,
+    "normalized_discounted_cumulative_gain": 1.0,
+    "reciprocal_rank": 1.0,
+    "rank": 1
+   }
+  },
+  {
+   "results": [
+    {
+     "id": "b"
+    },
+    {
+     "id": "a"
+    },
+    {
+     "id": "c"
+    }
+   ],
+   "targets": [
+    {
+     "id": "a"
+    },
+    {
+     "id": "c"
+    }
+   ],
+   "expected": {
+    "top_k_accuracy": 1,
+    "normalized_discounted_cumulative_gain": 0.6934264036172708,
+    "reciprocal_rank": 0.5,
+    "rank": 2
+   }
+  },
+  {
+   "results": [
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "b"
+    },
+    {
+     "id": "a"
+    }
+   ],
+   "targets": [
+    {
+     "id": "a"
+    }
+   ],
+   "expected": {
+    "top_k_accuracy": 0,
+    "normalized_discounted_cumulative_gain": 0.27894294565112987,
+    "reciprocal_rank": 0.09090909090909091,
+    "rank": 11
+   }
+  },
+  {
+   "results": [
+    {
+     "id": "a"
+    }
+   ],
+   "targets": [],
+   "expected": {
+    "top_k_accuracy": 0,
+    "normalized_discounted_cumulative_gain": 0,
+    "reciprocal_rank": 0,
+    "rank": 1
+   }
+  },
+  {
+   "results": [
+    {
+     "id": "a"
+    }
+   ],
+   "targets": [
+    {
+     "id": "a",
+     "missing": "x"
+    }
+   ],
+   "expected": {
+    "top_k_accuracy": 0,
+    "normalized_discounted_cumulative_gain": 0.0,
+    "reciprocal_rank": 0,
+    "rank": 1
+   }
+  }
+ ],
+ "classifications": [
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 0,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 0,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 0,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 0.9,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 0.9,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 0.9,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 1,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 1,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.01,
+    "syntactic_similarity": 1,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 0,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 0,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 0,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 0.9,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 0.9,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 0.9,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 1,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 1,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.05,
+    "syntactic_similarity": 1,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 0,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "likely"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 0,
+    "verdict": "VARIANT"
+   },
+   "tier": "possible"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 0,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "possible"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 0.9,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 0.9,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 0.9,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 1,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 1,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.2,
+    "syntactic_similarity": 1,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 0,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "likely"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 0,
+    "verdict": "VARIANT"
+   },
+   "tier": "possible"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 0,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "possible"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 0.9,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 0.9,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 0.9,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 1,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 1,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.3,
+    "syntactic_similarity": 1,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 0,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "likely"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 0,
+    "verdict": "VARIANT"
+   },
+   "tier": ""
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 0,
+    "verdict": "UNKNOWN"
+   },
+   "tier": ""
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 0.9,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 0.9,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 0.9,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 1,
+    "verdict": "DUPLICATE"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 1,
+    "verdict": "VARIANT"
+   },
+   "tier": "near-exact"
+  },
+  {
+   "candidate": {
+    "distance": 0.8,
+    "syntactic_similarity": 1,
+    "verdict": "UNKNOWN"
+   },
+   "tier": "near-exact"
+  }
+ ],
+ "verdicts": [
+  {
+   "input": "<BEGIN>VERDICT: duplicate\nSame.<END>",
+   "expected": [
+    "DUPLICATE",
+    "Same."
+   ]
+  },
+  {
+   "input": "VERDICT: variant X",
+   "expected": [
+    "VARIANT",
+    "X"
+   ]
+  },
+  {
+   "input": "VERDICT: UNKNOWN unrecognized",
+   "expected": [
+    "UNKNOWN",
+    "VERDICT: UNKNOWN unrecognized"
+   ]
+  },
+  {
+   "input": "No verdict",
+   "expected": [
+    "UNKNOWN",
+    "No verdict"
+   ]
+  },
+  {
+   "input": "VERDICT: alien",
+   "expected": [
+    "UNKNOWN",
+    "VERDICT: alien"
+   ]
+  }
+ ],
+ "normalized": [
+  {
+   "input": "lemma name [simp]: \"x + y = y + x\" proof done",
+   "expected": "\"x + y = y + x\""
+  },
+  {
+   "input": "definition name :: \"nat ⇒ nat\" where \"name = id\"",
+   "expected": "name :: \"nat ⇒ nat\" where \"name = id\""
+  },
+  {
+   "input": "lemma soundness_proof_of: \"α = α\"",
+   "expected": "\"α = α\""
+  },
+  {
+   "input": "lemma x: \"proof\"",
+   "expected": "\""
+  }
+ ],
+ "comparisons": [
+  {
+   "previous": {
+    "t1": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "id": "a"
+       }
+      ]
+     },
+     "queries": {
+      "Title query": {
+       "query": "q1",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 1.0,
+        "normalized_discounted_cumulative_gain": 0.5,
+        "rank": 1
+       }
+      },
+      "Natural language query": {
+       "query": "q2",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 0.5,
+        "normalized_discounted_cumulative_gain": 0.25,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t2": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "id": "b",
+        "x": "y"
+       }
+      ]
+     },
+     "queries": {
+      "Title query": {
+       "query": "q3",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 0.25,
+        "normalized_discounted_cumulative_gain": 0.125,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t3": {
+     "metadata": {
+      "skipped": true,
+      "skipped_reason": "target_document_not_found"
+     },
+     "queries": {}
+    },
+    "t5": {
+     "metadata": {
+      "skipped": true
+     },
+     "queries": {}
+    },
+    "summary": {}
+   },
+   "current": {
+    "t1": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "id": "a"
+       }
+      ],
+      "skipped_queries": {
+       "Noisy natural language query": "paper_noisy_query_missing"
+      }
+     },
+     "queries": {
+      "Title query": {
+       "query": "q1",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 0.3333333333333333,
+        "normalized_discounted_cumulative_gain": 0.16666666666666666,
+        "rank": 1
+       }
+      },
+      "Natural language query": {
+       "query": "q2 changed",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 1.0,
+        "normalized_discounted_cumulative_gain": 0.5,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t2": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "x": "y",
+        "id": "c"
+       }
+      ]
+     },
+     "queries": {
+      "Title query": {
+       "query": "q3",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 1.0,
+        "normalized_discounted_cumulative_gain": 0.5,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t4": {
+     "metadata": {},
+     "queries": {
+      "Title query": {
+       "query": "q4",
+       "metrics": {
+        "top_k_accuracy": 0,
+        "reciprocal_rank": 0.0,
+        "normalized_discounted_cumulative_gain": 0.0,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "summary": {}
+   },
+   "report": "# Benchmark comparison\n\nEvaluated queries: previous **3**, current **4**; matched by target, query type and exact input text, excluding known label changes: **1**.\n\nThe table recomputes both means on those matched queries. Deltas are current minus previous; positive is better.\n\n| Query type | N | Metric | Previous | Current | Delta |\n| --- | ---: | --- | ---: | ---: | ---: |\n| All queries | 1 | Hit@10 | 1.0000 | 1.0000 | +0.0000 |\n| All queries | 1 | MRR | 1.0000 | 0.3333 | -0.6667 |\n| All queries | 1 | NDCG | 0.5000 | 0.1667 | -0.3333 |\n| Title query | 1 | Hit@10 | 1.0000 | 1.0000 | +0.0000 |\n| Title query | 1 | MRR | 1.0000 | 0.3333 | -0.6667 |\n| Title query | 1 | NDCG | 0.5000 | 0.1667 | -0.3333 |\n\nOnly in previous: 0.\n\nOnly in current: 1.\n- t4 / Title query\n\nChanged input text (excluded): 1.\n- t1 / Natural language query\n\nChanged relevance labels (excluded): 1.\n- t2 / Title query\n\nPrevious skipped targets:\n- target_document_not_found: 1\n- unspecified: 1\n\nCurrent skipped targets:\n\nCurrent skipped individual queries:\n- t1 / Noisy natural language query: paper_noisy_query_missing\n\nLargest RR regressions:\n- t1 / Title query: -0.6667\n\nLargest RR improvements:\n\nLegacy results do not record relevance labels, so label equality cannot be verified for those runs. Matching queries does not control for corpus contents, models or prompts. Check the run manifests. Timing is omitted because cached durations and different hardware are not directly comparable.\n"
+  },
+  {
+   "previous": {
+    "t1": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "id": "a"
+       }
+      ],
+      "skipped_queries": {
+       "Noisy natural language query": "paper_noisy_query_missing"
+      }
+     },
+     "queries": {
+      "Title query": {
+       "query": "q1",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 0.3333333333333333,
+        "normalized_discounted_cumulative_gain": 0.16666666666666666,
+        "rank": 1
+       }
+      },
+      "Natural language query": {
+       "query": "q2 changed",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 1.0,
+        "normalized_discounted_cumulative_gain": 0.5,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t2": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "x": "y",
+        "id": "c"
+       }
+      ]
+     },
+     "queries": {
+      "Title query": {
+       "query": "q3",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 1.0,
+        "normalized_discounted_cumulative_gain": 0.5,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t4": {
+     "metadata": {},
+     "queries": {
+      "Title query": {
+       "query": "q4",
+       "metrics": {
+        "top_k_accuracy": 0,
+        "reciprocal_rank": 0.0,
+        "normalized_discounted_cumulative_gain": 0.0,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "summary": {}
+   },
+   "current": {
+    "t1": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "id": "a"
+       }
+      ]
+     },
+     "queries": {
+      "Title query": {
+       "query": "q1",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 1.0,
+        "normalized_discounted_cumulative_gain": 0.5,
+        "rank": 1
+       }
+      },
+      "Natural language query": {
+       "query": "q2",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 0.5,
+        "normalized_discounted_cumulative_gain": 0.25,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t2": {
+     "metadata": {
+      "target_identifier": [
+       {
+        "id": "b",
+        "x": "y"
+       }
+      ]
+     },
+     "queries": {
+      "Title query": {
+       "query": "q3",
+       "metrics": {
+        "top_k_accuracy": 1,
+        "reciprocal_rank": 0.25,
+        "normalized_discounted_cumulative_gain": 0.125,
+        "rank": 1
+       }
+      }
+     }
+    },
+    "t3": {
+     "metadata": {
+      "skipped": true,
+      "skipped_reason": "target_document_not_found"
+     },
+     "queries": {}
+    },
+    "t5": {
+     "metadata": {
+      "skipped": true
+     },
+     "queries": {}
+    },
+    "summary": {}
+   },
+   "report": "# Benchmark comparison\n\nEvaluated queries: previous **4**, current **3**; matched by target, query type and exact input text, excluding known label changes: **1**.\n\nThe table recomputes both means on those matched queries. Deltas are current minus previous; positive is better.\n\n| Query type | N | Metric | Previous | Current | Delta |\n| --- | ---: | --- | ---: | ---: | ---: |\n| All queries | 1 | Hit@10 | 1.0000 | 1.0000 | +0.0000 |\n| All queries | 1 | MRR | 0.3333 | 1.0000 | +0.6667 |\n| All queries | 1 | NDCG | 0.1667 | 0.5000 | +0.3333 |\n| Title query | 1 | Hit@10 | 1.0000 | 1.0000 | +0.0000 |\n| Title query | 1 | MRR | 0.3333 | 1.0000 | +0.6667 |\n| Title query | 1 | NDCG | 0.1667 | 0.5000 | +0.3333 |\n\nOnly in previous: 1.\n- t4 / Title query\n\nOnly in current: 0.\n\nChanged input text (excluded): 1.\n- t1 / Natural language query\n\nChanged relevance labels (excluded): 1.\n- t2 / Title query\n\nPrevious skipped targets:\n\nPrevious skipped individual queries:\n- t1 / Noisy natural language query: paper_noisy_query_missing\n\nCurrent skipped targets:\n- target_document_not_found: 1\n- unspecified: 1\n\nLargest RR regressions:\n\nLargest RR improvements:\n- t1 / Title query: +0.6667\n\nLegacy results do not record relevance labels, so label equality cannot be verified for those runs. Matching queries does not control for corpus contents, models or prompts. Check the run manifests. Timing is omitted because cached durations and different hardware are not directly comparable.\n"
+  },
+  {
+   "previous_file": "benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+   "current_file": "benchmark/results/R_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+   "report": "# Benchmark comparison\n\nEvaluated queries: previous **255**, current **255**; matched by target, query type and exact input text, excluding known label changes: **255**.\n\nThe table recomputes both means on those matched queries. Deltas are current minus previous; positive is better.\n\n| Query type | N | Metric | Previous | Current | Delta |\n| --- | ---: | --- | ---: | ---: | ---: |\n| All queries | 255 | Hit@10 | 0.7725 | 0.7373 | -0.0353 |\n| All queries | 255 | MRR | 0.5463 | 0.4962 | -0.0501 |\n| All queries | 255 | NDCG | 0.5577 | 0.5108 | -0.0470 |\n| Natural language query | 85 | Hit@10 | 0.8235 | 0.8471 | +0.0235 |\n| Natural language query | 85 | MRR | 0.5659 | 0.5530 | -0.0129 |\n| Natural language query | 85 | NDCG | 0.5910 | 0.5778 | -0.0132 |\n| Noisy natural language query | 85 | Hit@10 | 0.6588 | 0.5882 | -0.0706 |\n| Noisy natural language query | 85 | MRR | 0.4531 | 0.4048 | -0.0484 |\n| Noisy natural language query | 85 | NDCG | 0.4722 | 0.4200 | -0.0522 |\n| Title query | 85 | Hit@10 | 0.8353 | 0.7765 | -0.0588 |\n| Title query | 85 | MRR | 0.6199 | 0.5307 | -0.0892 |\n| Title query | 85 | NDCG | 0.6100 | 0.5345 | -0.0755 |\n\nOnly in previous: 0.\n\nOnly in current: 0.\n\nChanged input text (excluded): 0.\n\nChanged relevance labels (excluded): 0.\n\nPrevious skipped targets:\n- target_document_not_found: 2\n- target_identifier_missing: 7\n\nCurrent skipped targets:\n- target_document_not_found: 2\n- target_identifier_missing: 7\n\nLargest RR regressions:\n- dirichlets-theorem / Title query: -1.0000\n- schroeder-bernstein-theorem / Title query: -0.9500\n- bertrands-postulate / Title query: -0.9286\n- leibnitzs-series-for-pi / Noisy natural language query: -0.9231\n- taylors-theorem / Noisy natural language query: -0.8750\n- ptolemys-theorem / Title query: -0.8000\n- brouwer-fixed-point-theorem / Title query: -0.7500\n- dirichlets-theorem / Noisy natural language query: -0.7500\n- gödels-incompleteness-theorem-2 / Natural language query: -0.6667\n- the-number-of-subsets-of-a-set / Title query: -0.6667\n\nLargest RR improvements:\n- the-binomial-theorem / Natural language query: +0.8333\n- pythagorean-theorem / Noisy natural language query: +0.8000\n- the-principle-of-mathematical-induction / Noisy natural language query: +0.6667\n- the-partition-theorem / Title query: +0.5000\n- the-hermite-lindemann-transcendence-theorem / Title query: +0.5000\n- sum-of-a-geometric-series / Noisy natural language query: +0.5000\n- stirlings-formula / Natural language query: +0.5000\n- polyhedron-formula / Title query: +0.5000\n- perfect-number-theorem / Noisy natural language query: +0.5000\n- law-of-quadratic-reciprocity / Title query: +0.5000\n\nLegacy results do not record relevance labels, so label equality cannot be verified for those runs. Matching queries does not control for corpus contents, models or prompts. Check the run manifests. Timing is omitted because cached durations and different hardware are not directly comparable.\n"
+  },
+  {
+   "previous_file": "benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json",
+   "current_file": "benchmark/results/20260916T112455.618611Z_UR",
+   "report": "# Benchmark comparison\n\nEvaluated queries: previous **255**, current **259**; matched by target, query type and exact input text, excluding known label changes: **255**.\n\nThe table recomputes both means on those matched queries. Deltas are current minus previous; positive is better.\n\n| Query type | N | Metric | Previous | Current | Delta |\n| --- | ---: | --- | ---: | ---: | ---: |\n| All queries | 255 | Hit@10 | 0.7725 | 0.8627 | +0.0902 |\n| All queries | 255 | MRR | 0.5463 | 0.6128 | +0.0665 |\n| All queries | 255 | NDCG | 0.5577 | 0.5994 | +0.0417 |\n| Natural language query | 85 | Hit@10 | 0.8235 | 0.8706 | +0.0471 |\n| Natural language query | 85 | MRR | 0.5659 | 0.6172 | +0.0514 |\n| Natural language query | 85 | NDCG | 0.5910 | 0.6145 | +0.0235 |\n| Noisy natural language query | 85 | Hit@10 | 0.6588 | 0.8000 | +0.1412 |\n| Noisy natural language query | 85 | MRR | 0.4531 | 0.5732 | +0.1201 |\n| Noisy natural language query | 85 | NDCG | 0.4722 | 0.5714 | +0.0992 |\n| Title query | 85 | Hit@10 | 0.8353 | 0.9176 | +0.0824 |\n| Title query | 85 | MRR | 0.6199 | 0.6480 | +0.0281 |\n| Title query | 85 | NDCG | 0.6100 | 0.6123 | +0.0023 |\n\nOnly in previous: 0.\n\nOnly in current: 4.\n- cramers-rule / Natural language query\n- cramers-rule / Title query\n- rational-approximation-via-pells-equation / Natural language query\n- rational-approximation-via-pells-equation / Title query\n\nChanged input text (excluded): 0.\n\nChanged relevance labels (excluded): 0.\n\nPrevious skipped targets:\n- target_document_not_found: 2\n- target_identifier_missing: 7\n\nCurrent skipped targets:\n- target_document_not_found: 1\n- target_identifier_missing: 7\n\nCurrent skipped individual queries:\n- cramers-rule / Noisy natural language query: paper_noisy_query_missing\n- rational-approximation-via-pells-equation / Noisy natural language query: paper_noisy_query_missing\n\nLargest RR regressions:\n- polyhedron-formula / Noisy natural language query: -1.0000\n- taylors-theorem / Noisy natural language query: -0.9714\n- the-binomial-theorem / Noisy natural language query: -0.9688\n- the-solution-of-the-general-quartic-equation / Title query: -0.9091\n- bezouts-theorem / Title query: -0.8889\n- gödels-incompleteness-theorem-1 / Title query: -0.8333\n- prime-number-theorem / Title query: -0.8000\n- the-number-of-subsets-of-a-set / Title query: -0.8000\n- the-solution-of-a-cubic / Natural language query: -0.8000\n- fundamental-theorem-of-integral-calculus / Natural language query: -0.7500\n\nLargest RR improvements:\n- wilsons-theorem / Natural language query: +1.0000\n- the-friendship-theorem / Title query: +1.0000\n- the-factor-and-remainder-theorems / Title query: +1.0000\n- the-birthday-problem / Title query: +1.0000\n- the-birthday-problem / Noisy natural language query: +1.0000\n- the-birthday-problem / Natural language query: +1.0000\n- ptolemys-theorem / Noisy natural language query: +1.0000\n- lhôpitals-rule / Noisy natural language query: +1.0000\n- dissection-of-cubes-j.e.-littlewoods-elegant-proof / Noisy natural language query: +1.0000\n- desarguess-theorem / Natural language query: +1.0000\n\nLegacy results do not record relevance labels, so label equality cannot be verified for those runs. Matching queries does not control for corpus contents, models or prompts. Check the run manifests. Timing is omitted because cached durations and different hardware are not directly comparable.\n"
+  }
+ ]
+}

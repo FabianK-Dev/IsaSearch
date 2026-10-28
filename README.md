@@ -296,7 +296,7 @@ Once the definitions corpus exists, the web UI offers a **Search in: Theorems / 
 
 The application only ever *attaches* to the definitions corpus, it never builds it: starting the web server must not kick off a multi-hour informalization run. If the corpus is missing or empty, definition search is simply not offered — the selector stays hidden, `/capabilities` reports `{"definition_search": false}` and `/search?kind=definitions` answers with a 503 explaining how to build it. A partially built corpus is served without the definitions that have no description yet, so a server can keep running while the corpus is being rebuilt.
 
-If `prompts/<folder>/retrieve_definitions.txt` and `search_refine_definitions.txt` exist, they are used for definition searches instead of the theorem-flavoured `retrieve.txt` and `search_refine.txt`; deleting them falls back to the theorem prompts. The theorem search and the benchmark are unaffected either way.
+If `isabelle/prompts/<folder>/retrieve_definitions.txt` and `search_refine_definitions.txt` exist, they are used for definition searches instead of the theorem-flavoured `retrieve.txt` and `search_refine.txt`; deleting them falls back to the theorem prompts. The theorem search and the benchmark are unaffected either way.
 
 Please keep in mind that semantic similarity is not logical duplication: the tiers are a triage aid for a human reviewer, not a verdict. The same holds for the LLM verdicts, which is why the report always contains the model's justification. Also note that meaningful results require an index of the whole AFP — with only the two sessions that are enabled for testing, almost nothing can be found.
 
@@ -450,7 +450,7 @@ To run the benchmark, use `python3 -m benchmark.benchmark` inside the root folde
 
 With `"add_metadata": false`, the benchmark uses the configured corpus paths directly. Metadata strategies use the corresponding `-with-metadata` paths, which must already contain a built corpus. `run_full_benchmark.sh` evaluates all six strategies and requires both corpora to exist.
 
-Query refinement still calls the LLM and writes its output cache, and the benchmark writes results under `benchmark/results/`. Pause the web application while benchmarking because both use `.cache/llm_output_cache.json` (under the configured `cache_folder`); leave Solr running.
+Query refinement still calls the LLM and writes its output cache, and the benchmark writes results under `isabelle/benchmark/results/`. Pause the web application while benchmarking because both use `.cache/llm_output_cache.json` (under the configured `cache_folder`); leave Solr running.
 
 #### Strategies and saved runs
 
@@ -462,7 +462,7 @@ The single benchmark command evaluates the strategy selected in `config.json`; i
 | `R`: expanded query only | `true` | `false` |
 | `UR`: original + expanded query | `true` | `true` |
 
-Each new run writes a new directory, for example `benchmark/results/20260916T120000.123456Z_UR/`, containing:
+Each new run writes a new directory, for example `isabelle/benchmark/results/20260916T120000.123456Z_UR/`, containing:
 
 - `results.json`: per-query metrics, input and expanded queries, target identifiers, skipped targets and aggregate metrics.
 - `manifest.json`: effective configuration with the API key redacted, model names (including the embedding model), Git revisions and tracked-change flags, hashes of the Python sources and benchmark CSV, exact prompt templates, corpus artifact hashes and cached fingerprint, loaded corpus counts, collection metadata, the source and hash of the replayed paper queries, timestamps and dependency versions.
@@ -472,7 +472,7 @@ Commit the whole run directory. Keep the corpus artifacts and ChromaDB storage o
 Existing results can be archived without rerunning the benchmark. Run this **on the server**, from the repository root, while its configuration and corpus still match the completed run:
 
 ```bash
-python3 -m benchmark.runs benchmark/results/UR_beaker_gemma4_beaker_gemma4.json \
+python3 -m benchmark.runs isabelle/benchmark/results/UR_beaker_gemma4_beaker_gemma4.json \
   --note "Completed on bunsen; settings captured afterwards, unchanged since evaluation"
 ```
 
@@ -480,15 +480,15 @@ This preserves the original result bytes in a new run directory. Its manifest is
 
 #### Comparing with the paper
 
-The benchmark reuses all 255 saved paper inputs verbatim, including the 85 noisy queries. Their source is the UR result referenced by `benchmark/results/paper-baselines.json`, verified against its recorded SHA-256; all six paper strategies used the same inputs. It no longer generates random noise or downloads NLTK resources for queries. For historical targets, the saved title and natural-language inputs also take precedence over later wording changes in the CSV. Target identifiers still come from the current CSV so moved or renamed theorems can be located.
+The benchmark reuses all 255 saved paper inputs verbatim, including the 85 noisy queries. Their source is the UR result referenced by `isabelle/benchmark/results/paper-baselines.json`, verified against its recorded SHA-256; all six paper strategies used the same inputs. It no longer generates random noise or downloads NLTK resources for queries. For historical targets, the saved title and natural-language inputs also take precedence over later wording changes in the CSV. Target identifiers still come from the current CSV so moved or renamed theorems can be located.
 
 Targets without a saved paper noisy query still receive their title and natural-language searches. Their noisy query is explicitly skipped with `paper_noisy_query_missing` in the result metadata and comparison report. Expect 255 matched inputs when all 85 paper targets remain available, plus two queries per additional available target such as Cramer's rule. The Pell rational-approximation row now has its own ID (`rational-approximation-via-pells-equation`); it previously shared `solutions-to-pells-equation` with the infinite-solutions row and their results overwrote each other. The historical ID stays with the infinite-solutions query saved in the paper results.
 
-The original flat JSON files in `benchmark/results/` are retained as historical results. The [paper baseline index](benchmark/results/README.md) lists all six strategies and their verified provenance. Compare like strategies first. For a new UR run, pass its directory (replace `RUN_DIRECTORY` below with the printed path):
+The original flat JSON files in `isabelle/benchmark/results/` are retained as historical results. The [paper baseline index](isabelle/benchmark/results/README.md) lists all six strategies and their verified provenance. Compare like strategies first. For a new UR run, pass its directory (replace `RUN_DIRECTORY` below with the printed path):
 
 ```bash
 python3 -m benchmark.compare \
-  benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
+  isabelle/benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
   RUN_DIRECTORY > RUN_DIRECTORY/comparison-paper-UR.md
 ```
 

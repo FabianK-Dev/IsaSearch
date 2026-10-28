@@ -25,7 +25,7 @@
     "solr_query_definitions": "command:definition OR command:abbreviation OR command:fun OR command:function OR command:primrec OR command:primcorec OR command:datatype OR command:codatatype OR command:record OR command:type_synonym OR command:typedef OR command:inductive OR command:inductive_set OR command:coinductive OR command:coinductive_set OR command:lift_definition OR command:partial_function OR command:quotient_type OR command:quotient_definition OR command:axiomatization OR command:specification OR command:locale OR command:class OR command:consts OR command:domain OR command:fixrec OR command:nominal_datatype OR command:nominal_function OR command:nominal_primrec OR command:AOT_define OR command:AOT_axiom OR command:AOT_act_axiom OR command:concrete_definition OR command:sepref_definition OR command:locset_definition OR command:corec OR command:corecursive OR command:datatype_record OR command:pcpodef OR command:cpodef OR command:domaindef",
     "cache_folder": ".cache",
     "artifacts_folder": "artifacts/beaker_gemma4",
-    "prompts_folder": "prompts/qwen3-gemma",
+    "prompts_folder": "isabelle/prompts/qwen3-gemma",
     "chroma_db_path": "chroma_storages/beaker_gemma4-qwen3-embedding-4b",
     "chroma_db_embedder": "sentence-transformers/multi-qa-distilbert-cos-v1",
     "llm_backend": "openai",

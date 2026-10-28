@@ -9,7 +9,7 @@ benchmark.py: This file initializes all required components, i.e. Solr, prompts,
 - LLM: Loads the configured LLM to refine user queries
 - LLM cache: Loads an existing LLM output cache or creates a new one, if enabled.
 
-Finally, for each metric the average will be calculated. All benchmark results will be saved to the results/ folder.
+Finally, for each metric the average will be calculated. All benchmark results will be saved to the isabelle/benchmark/results/ folder.
 """
 
 import json
@@ -56,7 +56,7 @@ model = components["model"]
 llm_output_cache = components["llm_output_cache"]
 
 print("Loading benchmark CSV...")
-benchmark_df = pd.read_csv("./benchmark/benchmark.csv")
+benchmark_df = pd.read_csv("./isabelle/benchmark/benchmark.csv")
 benchmark_df = benchmark_df.reset_index()
 
 print("Recording benchmark configuration and corpus fingerprints...")

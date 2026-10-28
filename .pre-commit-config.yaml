@@ -60,7 +60,7 @@ repos:
         entry: check-json
         language: python
         types: [json]
-        exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
+        exclude: '.cache/.*|artifacts/.*|isabelle/benchmark/results/.*'
     -   id: check-shebang-scripts-are-executable
         name: check that scripts with shebangs are executable
         description: ensures that (non-binary) files with a shebang are executable.
@@ -74,7 +74,7 @@ repos:
     #     description: sets a standard for formatting json files.
     #     entry: pretty-format-json
     #     language: python
-    #     exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
+    #     exclude: '.cache/.*|artifacts/.*|isabelle/benchmark/results/.*'
     #     types: [json]
     -   id: check-merge-conflict
         name: check for merge conflicts
@@ -149,7 +149,7 @@ repos:
         description: ensures that a file is either empty, or ends with one newline.
         entry: end-of-file-fixer
         language: python
-        exclude: '.cache/.*|artifacts/.*|benchmark/results/.*'
+        exclude: '.cache/.*|artifacts/.*|isabelle/benchmark/results/.*'
         types: [text]
         stages: [pre-commit, pre-push, manual]
         minimum_pre_commit_version: 3.2.0

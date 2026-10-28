@@ -1,9 +1,5 @@
 title = IsaSearch
 module = lib/isasearch.jar
-resources = \
-  ../benchmark/benchmark.csv:benchmark/ \
-  ../benchmark/results/paper-baselines.json:benchmark/results/ \
-  ../benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json:benchmark/results/
 requirements = \
   env:ISABELLE_SCALA_JAR \
   env:SOLR_JARS
@@ -18,6 +14,8 @@ sources = \
   src/duplicates.scala \
   src/duplicate_report.scala \
   src/benchmark.scala \
+  src/compare.scala \
   src/tools.scala \
-  src/tests.scala
+  src/tests.scala \
+  src/integration_tests.scala
 services = isabelle.isasearch.Tools

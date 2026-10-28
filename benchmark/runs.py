@@ -107,7 +107,7 @@ def capture_manifest(config, strategy, *, after_run=False, note=""):
                 descriptions_artifact_path(config, "document_descriptions.json")
             ),
         },
-        "benchmark_csv_sha256": file_hash("benchmark/benchmark.csv"),
+        "benchmark_csv_sha256": file_hash("isabelle/benchmark/benchmark.csv"),
         "prompts": {
             path.name: path.read_text()
             for path in sorted(Path(config["prompts_folder"]).glob("*.txt"))
@@ -117,7 +117,7 @@ def capture_manifest(config, strategy, *, after_run=False, note=""):
     }
 
 
-def save_run(results, manifest, output_root="benchmark/results", *, source=None):
+def save_run(results, manifest, output_root="isabelle/benchmark/results", *, source=None):
     """Keep the legacy result schema intact, with provenance in a sibling manifest."""
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     folder = Path(output_root) / f"{stamp}_{manifest['strategy']}"
@@ -144,7 +144,7 @@ def main():
     )
     parser.add_argument("--config", type=Path, default=Path("config.json"))
     parser.add_argument("--note", default="")
-    parser.add_argument("--output-root", default="benchmark/results")
+    parser.add_argument("--output-root", default="isabelle/benchmark/results")
     args = parser.parse_args()
     config, strategy = benchmark_configuration(json.loads(args.config.read_text()))
     results = json.loads(args.result.read_text())

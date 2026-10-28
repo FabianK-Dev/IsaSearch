@@ -5,7 +5,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-PAPER_INDEX = Path(__file__).parent / "results" / "paper-baselines.json"
+PAPER_INDEX = (
+    Path(__file__).parents[1] / "isabelle/benchmark/results/paper-baselines.json"
+)
 TITLE_QUERY = "Title query"
 NATURAL_QUERY = "Natural language query"
 NOISY_QUERY = "Noisy natural language query"

@@ -168,7 +168,9 @@ object Corpus_Build {
     progress.echo("AFP: " + afp.implode + "; sessions: " + selected.mkString(", "))
     val excluded = strings(config.values, "isabelle_excluded_sessions")
     if (excluded.nonEmpty) progress.echo("Excluded sessions: " + excluded.mkString(", "))
-    val prompt_base = config.path("prompts_folder", "../prompts/qwen3-gemma")
+    val prompt_base =
+      if (config.string("prompts_folder").isEmpty) component + Path.explode("prompts/qwen3-gemma")
+      else config.path("prompts_folder", "")
     val prompt_dir =
       if (config.boolean("add_metadata")) Path.explode(prompt_base.implode + "-with-metadata")
       else prompt_base

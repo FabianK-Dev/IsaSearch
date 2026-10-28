@@ -10,7 +10,11 @@ import isabelle._
 
 
 object Tests {
-  def run(args: List[String]): Unit = {
+  // Reference outputs of the former Python implementation, frozen in tests/goldens.json.
+  def goldens: Path = Data.component + Path.explode("tests/goldens.json")
+
+  // Interchange directories in sources are imported, searched, packaged, and corrupted.
+  def run(sources: List[String]): Unit = {
     import Data._
 
 
@@ -26,8 +30,8 @@ object Tests {
 
     /* Python golden outputs */
 
-    args.headOption.foreach { path =>
-      val golden = read(Path.explode(path))
+    {
+      val golden = read(goldens)
       for (item <- list(golden("similarity")).map(obj)) {
         val got = Duplicates.sequence_ratio(str(item, "a"), str(item, "b"))
         assert(
@@ -74,6 +78,13 @@ object Tests {
             .map(_.name)
             .getOrElse("") == str(item, "tier")
         )
+      for (item <- list(golden("comparisons")).map(obj)) {
+        def results(name: String): Obj =
+          if (item.contains(name)) object_at(item, name)
+          else Benchmark_Comparison.load(component + Path.explode(str(item, name + "_file")))
+        val got = Benchmark_Comparison.report(results("previous"), results("current"))
+        assert(got == str(item, "report"), "Comparison parity:\n" + got)
+      }
     }
 
 
@@ -107,7 +118,7 @@ object Tests {
 
     /* index import, readers, packaging, and failed imports */
 
-    for ((source, n) <- args.drop(1).zipWithIndex) {
+    for ((source, n) <- sources.zipWithIndex) {
       val name = "test-" + n + "-" + UUID.random_string()
       val root = Index.import_index(Path.explode(source), name)
       using(new Index.Snapshot(root)) { snapshot =>

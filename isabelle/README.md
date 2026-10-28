@@ -16,12 +16,12 @@ isabelle scala_build
 isabelle isasearch_search -?
 ```
 
-Keep the source component in this repository: its build bundles the existing
-`benchmark/benchmark.csv`, `benchmark/results/paper-baselines.json`, and its
-canonical UR result from the parent directory, which remain the sources of truth.
-Compilation uses `etc/build.props`; registered Scala tools use
-a FindFacts-style launcher to include Isabelle's Solr classpath. No sbt, Maven,
-Python, or extra JVM libraries are needed at Scala runtime.
+The component is self-contained. It holds the benchmark dataset
+(`benchmark/benchmark.csv`), the paper's baseline results with their verified
+index (`benchmark/results`), the prompts (`prompts`), and frozen reference
+outputs for its tests (`tests/goldens.json`). Compilation uses `etc/build.props`;
+registered Scala tools use a FindFacts-style launcher to include Isabelle's Solr
+classpath. No sbt, Maven, Python, or extra JVM libraries are needed.
 
 AFP registration is needed only for building new content. Register an AFP 2026
 installation with `isabelle components -u /path/to/afp` (registering its `thys`
@@ -77,8 +77,8 @@ retained vectors, independently of Lucene's scores.
 ## Configure inference and search
 
 Copy `etc/config.example.json` and adjust URLs and model names. Relative paths
-are resolved against that configuration file. Its example prompt path assumes
-it stays in `etc`; use an absolute prompt path when moving it elsewhere.
+are resolved against that configuration file. Prompts default to the component's
+`prompts/qwen3-gemma`; set `prompts_folder` to use another folder.
 
 For search without a generative LLM, leave `llm_backend` as `none`. An embedding
 service is still required. A user-managed CPU embedding server can expose an
@@ -149,9 +149,9 @@ isabelle isasearch_index -c /path/to/metadata-config.json -i metadata Example-Su
 ```
 
 Building requires a document LLM and embedder. Set `add_metadata` to false or true
-in the respective configurations. Keep `prompts_folder` set to the base folder:
-metadata builds append `-with-metadata`, matching the Python benchmark workflow
-(for example, `qwen3-gemma` becomes `qwen3-gemma-with-metadata`). Select explicit
+in the respective configurations. `prompts_folder` names the base folder:
+metadata builds append `-with-metadata` (for example, `qwen3-gemma` becomes
+`qwen3-gemma-with-metadata`). Select explicit
 session arguments or `isabelle_sessions`; `all-AFP` and `all` use Isabelle session discovery.
 `isabelle_excluded_sessions` removes sessions. `solr_query` and
 `solr_query_definitions` override command selection; defaults are in
@@ -256,8 +256,7 @@ Failed judge requests are retried; exhausted failures remain unjudged, carry
 later run retries them. Other candidate pairs still finish. A self-retrieval
 failure rate above 5% exits unsuccessfully after saving the evidence.
 Distances are metric-specific; thresholds must be interpreted with the selected
-index's metric. Saved Scala JSON also works with `python -m src.duplicate_report`
-to regenerate both Markdown views without an index or inference server.
+index's metric.
 
 ## Benchmarks
 
@@ -285,8 +284,19 @@ are retained in result metadata. Set `benchmark_add_top_results` for top-ten det
 Every invocation creates a new `benchmark-UUID/STRATEGY/` directory per strategy,
 with `results.json` and `manifest.json`. The manifest records index/dataset checksums,
 recipe, index provenance, sanitized configuration, query-input provenance, timestamps,
-cache policy, and actual query timings. Pass a strategy directory directly to
-`python -m benchmark.compare` to compare it with a Python run or paper baseline.
+cache policy, and actual query timings. Compare a run with a paper baseline or
+another run on identical query texts:
+
+```sh
+isabelle isasearch_compare \
+  isabelle/benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
+  /path/to/results/benchmark-UUID/UR
+```
+
+Either argument is a result file or a strategy directory. The Markdown report
+recomputes Hit@10, MRR, and NDCG on the queries both runs share with the same input
+text and relevance labels, and lists the excluded and skipped queries and the
+largest reciprocal-rank changes.
 Legacy duration includes replayed cached generation time for comparison;
 `elapsed_duration` records measured execution and `cache_hit` identifies replay.
 Set `enable_llm_output_cache=false` for uncached model execution.
@@ -295,19 +305,29 @@ Set `enable_llm_output_cache=false` for uncached model execution.
 
 ```sh
 isabelle scala_build
-python -m unittest tests.test_scala_component -v
+isabelle isasearch_test
+isabelle isasearch_integration_test
 ```
 
-Python is used only for exporter and cross-language development tests. Tests use
-real temporary Chroma collections and deterministic local HTTP stubs; the AFP
-integration uses the registered `Example-Submission` session. No real model is
-contacted. User settings and components are isolated in temporary directories.
+`isasearch_test` checks the portable algorithms against `tests/goldens.json`:
+reference outputs of the former Python implementation for SequenceMatcher ratios,
+replayed paper queries, metrics, duplicate classification, verdict parsing,
+statement normalization, both duplicate report views, and benchmark comparisons.
+Interchange directories given as arguments are imported, searched, packaged, and
+corrupted.
+
+`isasearch_integration_test` runs the command-line tools in isolated Isabelle user
+directories against a deterministic local inference stub: interchange import,
+search over all inference backends with retries and failures, the HTTP API,
+packaged indexes, query caching, benchmarks, and duplicate analysis with judge
+failures. With a registered AFP it also builds, seeds, updates, and prunes corpora
+from `Example-Submission`. No real model is contacted.
 
 Application choices use enums in `src/domain.scala`; parsing and serialization
 happen at CLI, configuration, and JSON boundaries. Protocol field names remain
 strings. Isabelle supplies JSON, TOML, options, session discovery, HTTP serving,
 Solr (including its multiline CSV reader), and File_Store. Compatibility
 algorithms absent from the bundled API (SequenceMatcher) are local. Saved query
-inputs, scoring, and both report views are covered by Python golden comparisons.
+inputs, scoring, both report views, and comparisons are covered by the goldens.
 Scala sources follow the
 manual layout of Isabelle and FindFacts; see [the style guide](STYLE.md).
