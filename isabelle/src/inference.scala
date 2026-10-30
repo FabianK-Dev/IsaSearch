@@ -35,9 +35,18 @@ object Inference {
       .connectTimeout(Duration.ofSeconds(config.positive("inference_connect_timeout", 10))).nn
       .build().nn
 
+    // A key file (Isabelle path syntax, e.g. $ISASEARCH_HOME_USER/api_key) keeps the key out of
+    // the environment of other processes; it takes precedence over a variable and a literal.
     def key: String = {
+      val file = config.string("openai_api_key_file")
       val env = config.string("openai_api_key_env")
-      if (env.nonEmpty)
+      if (file.nonEmpty) {
+        val path = config.path("openai_api_key_file", "")
+        if (!path.is_file) throw Failure("Missing API key file: " + path.implode)
+        proper_string(Library.trim_line(File.read(path)))
+          .getOrElse(throw Failure("Empty API key file: " + path.implode))
+      }
+      else if (env.nonEmpty)
         proper_string(System.getenv(env))
           .getOrElse(throw Failure("Missing API key environment variable: " + env))
       else config.string("openai_api_key")

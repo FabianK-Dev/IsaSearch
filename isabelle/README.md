@@ -96,7 +96,10 @@ isabelle isasearch_search -c /path/to/config.json -i migrated -k definitions 'a 
 isabelle isasearch_server -c /path/to/config.json -i migrated -p 5001
 ```
 
-Omit `openai_api_key_env` for a server that does not require authentication.
+Instead of an environment variable, `openai_api_key_file` names a private file with
+the key, e.g. `$ISASEARCH_HOME_USER/api_key` (`chmod 600`); it takes precedence over
+`openai_api_key_env`. Configuration paths use Isabelle syntax: variables and `~` are
+expanded. Omit both for a server that does not require authentication.
 Credentials stay on the server and are not included in indexes or data components.
 The API binds to loopback; use an authenticated reverse proxy for remote access.
 
@@ -148,6 +151,18 @@ a configured URL. Search and API startup never build a corpus.
 isabelle isasearch_index -c /path/to/build-config.json -i plain Example-Submission
 isabelle isasearch_index -c /path/to/metadata-config.json -i metadata Example-Submission
 ```
+
+One call can build several indexes in order, each from a pair `-c FILE -i NAME`:
+
+```sh
+isabelle isasearch_index -c /path/to/build-config.json -i plain \
+  -c /path/to/metadata-config.json -i metadata Example-Submission
+```
+
+Indexes whose configurations request the same Isabelle build (sessions,
+`isabelle_timeout_scale`, `isabelle_session_options`, `isabelle_build_jobs`) share
+it, and with it the FindFacts index. Each call also logs its progress to
+`$ISASEARCH_HOME_USER/logs/index-TIME-NAMES.log`.
 
 Building requires a document LLM and embedder. Set `add_metadata` to false or true
 in the respective configurations. `prompts_folder` names the base folder:

@@ -11,11 +11,10 @@ with the sampling parameters of the Python artifacts `artifacts/beaker_gemma4`.
   their timeouts with two parallel builds on 8 cores. `HOL-Metis_Examples` keys
   its read-only SMT certificates by the unscaled solver timeout and is built with
   `timeout_scale=1`.
-- `run.sh` builds the plain index, then the metadata index from the same session
-  builds and FindFacts index. Logs go to `$ISASEARCH_HOME_USER/logs`.
+- The model servers' key is read from `$ISASEARCH_HOME_USER/api_key`, a private
+  file (`chmod 600`) that is not part of the repository.
 
-Seed the description store once from the Python artifacts, with the plain
-configuration:
+Seed the description store once from the Python artifacts:
 
 ```sh
 isabelle isasearch_seed -c plain.json \
@@ -23,12 +22,12 @@ isabelle isasearch_seed -c plain.json \
   artifacts/beaker_gemma4/definition_descriptions.json
 ```
 
-The full build takes days. Start it from a shell inside tmux (`tmux new-session -s
-isasearch`), with `isabelle` on `PATH` and `ISASEARCH_API_KEY` exported:
+Build both indexes from one session build. The full build takes days, so run it
+in tmux; its progress is also logged to `$ISASEARCH_HOME_USER/logs`:
 
 ```sh
-./run.sh
+isabelle isasearch_index -c plain.json -i plain -c metadata.json -i metadata
 ```
 
-A stopped run resumes when started again: built sessions, the FindFacts index and
-stored descriptions and embeddings are reused.
+A stopped build resumes when started again: built sessions, the FindFacts index
+and stored descriptions and embeddings are reused.

@@ -178,18 +178,52 @@ object Corpus_Build {
 
   /** build configuration **/
 
+  // Builds the indexes in order. Indexes that request the same session build share it, and
+  // with it the FindFacts index, e.g. the plain and the metadata variant of one corpus.
   def run(
-    config: Config,
-    name: String,
+    builds: List[(Config, String)],
     supplied: List[String],
     no_build: Boolean,
     progress: Progress
-  ): Path = {
+  ): List[Path] = {
+    val names = builds.map(_._2)
+    if (names.distinct.size < names.size) error("Duplicate index names: " + commas(names))
     val afp = afp_root
-    val options = Options.init() + ("timeout_scale=" + config.number("isabelle_timeout_scale", 1))
-    val selected = sessions(config, options, afp, supplied)
+    var shared = Map.empty[Build_Request, (String, Built)]
+    for ((config, name) <- builds) yield {
+      val request = Build_Request(
+        sessions(config, Options.init(), afp, supplied),
+        config.number("isabelle_timeout_scale", 1),
+        session_options(config),
+        config.positive("isabelle_build_jobs", 1),
+        no_build
+      )
+      def build(): Built =
+        shared.get(request) match {
+          case Some((previous, built)) =>
+            progress.echo("Using the session builds of index " + previous)
+            built
+          case None =>
+            val built = build_sessions(request, afp, progress)
+            shared += request -> (name, built)
+            built
+        }
+      run_index(config, name, request, build, afp, progress)
+    }
+  }
+
+  private def run_index(
+    config: Config,
+    name: String,
+    request: Build_Request,
+    build: () => Built,
+    afp: Path,
+    progress: Progress
+  ): Path = {
+    val selected = request.sessions
     if (selected.isEmpty) error("No sessions remain after exclusions")
-    progress.echo("AFP: " + afp.implode + "; sessions: " + selected.mkString(", "))
+    progress.echo("Index " + name + " from AFP " + afp.implode + "; sessions: " +
+      selected.mkString(", "))
     val excluded = strings(config.values, "isabelle_excluded_sessions")
     if (excluded.nonEmpty) progress.echo("Excluded sessions: " + excluded.mkString(", "))
     for ((session, specs) <- session_options(config).toList.sortBy(_._1))
@@ -229,18 +263,7 @@ object Corpus_Build {
       val lock = proper_value(channel.tryLock())
         .getOrElse(error("Another corpus build is running for " + name))
       try {
-        build_locked(
-          config,
-          name,
-          selected,
-          no_build,
-          progress,
-          afp,
-          options,
-          recipe,
-          inference,
-          workspace
-        )
+        build_locked(config, name, request, build, progress, afp, recipe, inference, workspace)
       }
       finally { lock.release() }
     }
@@ -421,33 +444,37 @@ object Corpus_Build {
 
   /** session builds **/
 
+  // What determines the Isabelle build of an index.
+  sealed case class Build_Request(
+    sessions: List[String],
+    timeout_scale: Double,
+    session_options: Map[String, List[String]],
+    jobs: Int,
+    no_build: Boolean
+  ) {
+    def options: Options = Options.init() + ("timeout_scale=" + timeout_scale)
+  }
+
   sealed case class Built(sessions: List[String], unbuilt: Obj, ids: Obj)
 
   // A session that fails, or is cancelled after a failed ancestor, is left out and reported;
   // the remaining sessions are indexed. Build ids identify the builds that were indexed.
-  def build_sessions(
-    config: Config,
-    options: Options,
-    afp: Path,
-    selected: List[String],
-    no_build: Boolean,
-    progress: Progress
-  ): Built = {
-    val updates = session_options(config).view.mapValues(_.map(Options.Spec.make)).toMap
+  def build_sessions(request: Build_Request, afp: Path, progress: Progress): Built = {
+    val updates = request.session_options.view.mapValues(_.map(Options.Spec.make)).toMap
     val results = Build.build(
-      options,
-      selection = Sessions.Selection(sessions = selected),
+      request.options,
+      selection = Sessions.Selection(sessions = request.sessions),
       afp_root = Some(afp),
-      max_jobs = Some(config.positive("isabelle_build_jobs", 1)),
-      no_build = no_build,
+      max_jobs = Some(request.jobs),
+      no_build = request.no_build,
       augment_options = name => updates.getOrElse(name, Nil),
       progress = progress
     )
     val ok = results.sessions_ok.toSet
-    val (built, unbuilt) = selected.partition(ok)
+    val (built, unbuilt) = request.sessions.partition(ok)
     val reasons = unbuilt.map { session =>
       session ->
-        (if (no_build) "not built"
+        (if (request.no_build) "not built"
          else if (results.sessions(session) && results.cancelled(session)) "cancelled"
          else "failed")
     }
@@ -538,11 +565,10 @@ object Corpus_Build {
   private def build_locked(
     config: Config,
     name: String,
-    selected: List[String],
-    no_build: Boolean,
+    request: Build_Request,
+    build: () => Built,
     progress: Progress,
     afp: Path,
-    options: Options,
     recipe: Obj,
     inference: Inference.Client,
     workspace: Path
@@ -557,12 +583,12 @@ object Corpus_Build {
       val sources = provenance(afp, progress)
       inference.generate("Reply with OK.", role = Model_Role.Document, health = true)
       inference.embed(List("IsaSearch embedding readiness check"), preparation.space)
-      val built = build_sessions(config, options, afp, selected, no_build, progress)
+      val built = build()
       val defaults = read(component + Path.explode("etc/corpus_defaults.json"))
       val queries = Index.kinds.map { kind =>
         kind -> config.string(kind.query_key, str(defaults, kind.query_key))
       }
-      export_sources(options, afp, built, queries, exported, progress)
+      export_sources(request.options, afp, built, queries, exported, progress)
       val corpora = Index.kinds.flatMap { kind =>
         read_sources(exported, kind) { blocks =>
           write_corpus(blocks, kind, preparation, executor, config, name, recipe, output, progress)

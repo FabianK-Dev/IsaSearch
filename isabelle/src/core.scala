@@ -213,8 +213,10 @@ case class Config(values: Data.Obj, base: Path = Path.current) {
     n
   }
 
+  // Isabelle path syntax: variables such as $ISASEARCH_HOME_USER or ~ are expanded, and
+  // relative paths are resolved against the directory of the configuration file.
   def path(k: String, default: String): Path = {
-    val p = Path.explode(string(k, default))
+    val p = Path.explode(string(k, default)).expand
     if (p.is_absolute) p else base + p
   }
 

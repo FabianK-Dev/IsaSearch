@@ -4,7 +4,7 @@
   "openai_embedding_model": "Qwen3-Embedding-4B",
   "openai_embedding_batch_size": 32,
   "openai_embedding_max_characters": 8000,
-  "openai_api_key_env": "ISASEARCH_API_KEY",
+  "openai_api_key_file": "$ISASEARCH_HOME_USER/api_key",
   "llm_backend": "openai",
   "openai_base_url": "http://10.153.73.66:8082/v1",
   "openai_document_model": "beaker_gemma4",

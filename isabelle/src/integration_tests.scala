@@ -546,8 +546,9 @@ object Integration_Tests {
           config = config - key
           write(cfg, config)
         }
-        def run(tool: String, args: List[String], ok: Boolean = true): Process_Result =
-          env.run(tool, List("-c", cfg.implode, "-i", "afp-test") ::: args, ok = ok)
+        def run(tool: String, args: List[String], ok: Boolean = true,
+            index: String = "afp-test"): Process_Result =
+          env.run(tool, List("-c", cfg.implode, "-i", index) ::: args, ok = ok)
         def found(): List[Obj] =
           list(env.json(run("search", List("truth")))("results")).map(obj)
         def described(): Int = stub.completions().size
@@ -633,7 +634,7 @@ object Integration_Tests {
         File.write(failing + Path.basic("Failing.thy"),
           "theory Failing imports Main begin\nlemma \"False\" by simp\nend\n")
         File.write(copied + Path.explode("thys/ROOTS"), "Example-Submission\nFailing\n")
-        val partial = run("index", List("-i", "afp-partial", "Example-Submission", "Failing"))
+        val partial = run("index", List("Example-Submission", "Failing"), index = "afp-partial")
         check(output(partial).contains("Not indexed, failed (1): Failing"), "failed session")
         check(output(partial).contains("FindFacts index is current"), "shared FindFacts index")
         val partial_provenance = object_at(manifest("afp-partial"), "provenance")
@@ -645,7 +646,7 @@ object Integration_Tests {
         // Inspect actual LLM requests to ensure metadata reaches the model.
         val calls_before = stub.calls.size
         configure("add_metadata" -> true)
-        check(output(run("index", List("-i", "afp-metadata-test", "-n", "Example-Submission")))
+        check(output(run("index", List("-n", "Example-Submission"), index = "afp-metadata-test"))
           .contains("FindFacts index is current"), "FindFacts index shared by metadata build")
         val prompts = stub.completions(since = calls_before).map(stub.prompt)
         check(prompts.size == 2 && prompts.forall(p =>
@@ -669,18 +670,40 @@ object Integration_Tests {
 
         // Session options apply to their session: quick_and_dirty admits the proof of Failing.
         configure("isabelle_session_options" -> Map("No_Such_Session" -> List("quick_and_dirty")))
-        check(errors(run("index", List("-i", "afp-partial", "Example-Submission"), ok = false))
+        check(errors(run("index", List("Example-Submission"), ok = false, index = "afp-partial"))
           .contains("Unknown Isabelle session in isabelle_session_options: No_Such_Session"),
           "unknown session in session options")
         configure("isabelle_session_options" -> Map("Failing" -> List("quick_and_dirty")))
         File.write(failing + Path.basic("Failing.thy"),
           "theory Failing imports Main begin\nlemma \"False\" sorry\nend\n")
-        run("index", List("-i", "afp-partial", "Example-Submission", "Failing"))
+        run("index", List("Example-Submission", "Failing"), index = "afp-partial")
         val admitted_provenance = object_at(manifest("afp-partial"), "provenance")
         check(same(admitted_provenance("sessions"), List("Example-Submission", "Failing")) &&
           same(admitted_provenance("unbuilt_sessions"), Map.empty[String, String]),
           "session options")
         unset("isabelle_session_options")
+
+        // One call builds several indexes from one session build and keeps a log; the second
+        // configuration reads the API key from a file instead of the environment.
+        val key_file = root + Path.basic("api_key")
+        File.write(key_file, "test-key\n")
+        val second = root + Path.basic("second.json")
+        write(second, config - "openai_api_key_env" ++
+          Map("openai_api_key_file" -> key_file.implode, "add_metadata" -> true))
+        check(errors(env.run("index", List("-c", cfg.implode, "-c", second.implode, "-i", "x"),
+          ok = false)).contains("Pair each configuration"), "unpaired configuration")
+        val logs = env.user + Path.explode("isasearch/logs")
+        val logs_before = if (logs.is_dir) File.read_dir(logs) else Nil
+        val both = output(env.run("index", List("-c", cfg.implode, "-i", "afp-test",
+          "-c", second.implode, "-i", "afp-second", "Example-Submission")))
+        check(both.contains("Using the session builds of index afp-test") &&
+          both.contains("FindFacts index is current"), "shared session builds")
+        check(bool(object_at(list(manifest("afp-second")("corpora")).map(obj).head, "recipe"),
+          "add_metadata"), "second index")
+        val new_logs = File.read_dir(logs).filterNot(logs_before.contains)
+        check(new_logs.size == 1 &&
+          File.read(logs + Path.basic(new_logs.head)).contains("Published index afp-second"),
+          "index log")
 
         val theory = copied + Path.explode("thys/Example-Submission/Submission.thy")
         val original = File.read(theory)

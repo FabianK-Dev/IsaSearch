@@ -32,13 +32,30 @@ object Tool_Entries {
 
 class Tools extends Isabelle_Scala_Tools(Tool_Entries.names.map(Tool_Entries.tool): _*)
 
+
+/* progress */
+
+// Console progress that also appends every message to a log file, without the transient
+// status lines of running theories.
+class Logged_Progress(log: Path, verbose: Boolean) extends Console_Progress(verbose = verbose) {
+  Isabelle_System.make_directory(log.dir)
+
+  override def status_output(msgs: Progress.Output): Unit = synchronized {
+    super.status_output(msgs)
+    val text = output_text(msgs.filterNot(_.status), terminate = true)
+    if (text.nonEmpty) File.append(log, text)
+  }
+}
+
 object Main {
+  private val log_date = Date.Format("uuuuMMdd-HHmmss")
+
   def main(argv: Array[String]): Unit = Command_Line.tool {
     import Data._
     if (argv.isEmpty) error("Missing IsaSearch tool name")
     val tool = Tool_Command.parse(argv.head)
-    var config_path: Option[Path] = None
-    var index = Options.init().string("isasearch_index")
+    var config_paths = List.empty[Path]
+    var index_names = List.empty[String]
     var metadata_index = ""
     var out = home + Path.basic("reports")
     var input: Option[Path] = None
@@ -57,7 +74,8 @@ object Main {
 Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
 
   -c FILE   JSON configuration (paths relative to this file)
-  -i NAME   built index name (default local)
+  -i NAME   built index name (default local); index: repeat -c FILE -i NAME
+            to build several indexes from one session build
   -m NAME   benchmark index built with metadata
   -D DIR    output directory (reports or component parent)
   -f PATH   interchange directory (import) or benchmark CSV
@@ -81,8 +99,8 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
 """
     val getopts = Getopts(
       usage,
-      "c:" -> (s => config_path = Some(Path.explode(s))),
-      "i:" -> (s => index = safe_name(s)),
+      "c:" -> (s => config_paths = config_paths :+ Path.explode(s)),
+      "i:" -> (s => index_names = index_names :+ safe_name(s)),
       "m:" -> (s => metadata_index = safe_name(s)),
       "D:" -> (s => out = Path.explode(s)),
       "f:" -> (s => input = Some(Path.explode(s))),
@@ -106,12 +124,27 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       "v" -> (_ => verbose = true)
     )
     val args = getopts(argv.tail.toList)
-    val config = config_path.map(p => Config(read(p), p.absolute.dir)).getOrElse(Config(Map.empty))
-    val progress = new Console_Progress(verbose = verbose)
+    // Only isasearch_index pairs repeated -c and -i options; elsewhere the last one counts.
+    def load(p: Path): Config = Config(read(p), p.absolute.dir)
+    val config = config_paths.lastOption.map(load).getOrElse(Config(Map.empty))
+    val index = index_names.lastOption.getOrElse(Options.init().string("isasearch_index"))
+    // Index builds run for days: their progress is also kept in a log file.
+    val names = if (index_names.isEmpty) List(index) else index_names
+    val log = home + Path.explode("logs") +
+      Path.basic(("index" :: log_date(Date.now()) :: names).mkString("-") + ".log")
+    val progress =
+      if (tool == Tool_Command.Index) new Logged_Progress(log, verbose = verbose)
+      else new Console_Progress(verbose = verbose)
     tool match {
       case Tool_Command.Import =>
         Index.import_index(input.getOrElse(error("Use -f EXPORT_DIR")), index, progress)
-      case Tool_Command.Index => Corpus_Build.run(config, index, args, no_build, progress)
+      case Tool_Command.Index =>
+        val builds =
+          if (index_names.isEmpty && config_paths.size <= 1) List(config -> index)
+          else if (config_paths.size == index_names.size) config_paths.map(load).zip(index_names)
+          else error("Pair each configuration -c FILE with an index name -i NAME")
+        progress.echo("Log: " + log.implode)
+        Corpus_Build.run(builds, args, no_build, progress)
       case Tool_Command.Seed => Seed.run(config, args.map(Path.explode), progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
       case Tool_Command.Test => Tests.run(args)
