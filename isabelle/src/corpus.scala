@@ -13,6 +13,8 @@ import isabelle.find_facts.{Find_Facts, Solr}
 import java.nio.file.Files
 import java.util.concurrent.{Callable, Executors}
 
+import scala.annotation.tailrec
+
 
 object Corpus_Build {
   import Data._
@@ -457,24 +459,57 @@ object Corpus_Build {
 
   sealed case class Built(sessions: List[String], unbuilt: Obj, ids: Obj)
 
+  // Builds of sessions whose PIDE exports are missing, before they are left out.
+  val export_rounds = 3
+
+  // FindFacts reads every theory through its PIDE exports, starting with the document id.
+  def missing_exports(store: Store, session: String): Boolean =
+    using(store.open_database(session)) { db =>
+      Export.read_entry_names(db, session).groupBy(_.theory).exists { case (_, entries) =>
+        !entries.exists(_.name == Export.DOCUMENT_ID)
+      }
+    }
+
   // A session that fails, or is cancelled after a failed ancestor, is left out and reported;
   // the remaining sessions are indexed. Build ids identify the builds that were indexed.
   def build_sessions(request: Build_Request, afp: Path, progress: Progress): Built = {
     val updates = request.session_options.view.mapValues(_.map(Options.Spec.make)).toMap
-    val results = Build.build(
-      request.options,
-      selection = Sessions.Selection(sessions = request.sessions),
-      afp_root = Some(afp),
-      max_jobs = Some(request.jobs),
-      no_build = request.no_build,
-      augment_options = name => updates.getOrElse(name, Nil),
-      progress = progress
-    )
-    val ok = results.sessions_ok.toSet
+    def build(): Build.Results =
+      Build.build(
+        request.options,
+        selection = Sessions.Selection(sessions = request.sessions),
+        afp_root = Some(afp),
+        max_jobs = Some(request.jobs),
+        no_build = request.no_build,
+        augment_options = name => updates.getOrElse(name, Nil),
+        progress = progress
+      )
+
+    // A build can lose the PIDE exports of all theories of a session (a race between prover
+    // exit and session stop in Isabelle2026's Session.nodes_status_buffer), and FindFacts
+    // cannot index such a session. It is built again, which rebuilds its descendants.
+    @tailrec def complete(results: Build.Results, round: Int): (Build.Results, Set[String]) = {
+      val incomplete =
+        request.sessions.filter(results.sessions_ok.toSet)
+          .filter(missing_exports(results.store, _)).toSet
+      if (incomplete.isEmpty || request.no_build || round == export_rounds) (results, incomplete)
+      else {
+        progress.echo_warning("Building again, missing PIDE exports (" + incomplete.size +
+          "): " + commas(incomplete.toList.sorted))
+        val server = results.store.maybe_open_database_server()
+        try { incomplete.foreach(results.store.clean_output(server, _)) }
+        finally { server.foreach(_.close()) }
+        complete(build(), round + 1)
+      }
+    }
+    val (results, incomplete) = complete(build(), 1)
+
+    val ok = results.sessions_ok.toSet -- incomplete
     val (built, unbuilt) = request.sessions.partition(ok)
     val reasons = unbuilt.map { session =>
       session ->
-        (if (request.no_build) "not built"
+        (if (incomplete(session)) "missing PIDE exports"
+         else if (request.no_build) "not built"
          else if (results.sessions(session) && results.cancelled(session)) "cancelled"
          else "failed")
     }

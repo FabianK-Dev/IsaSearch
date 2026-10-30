@@ -190,6 +190,13 @@ the others are indexed, and the manifest lists the sessions in `provenance` unde
 `sessions` and `unbuilt_sessions`. `-n` skips building: only sessions whose
 build is already current are indexed.
 
+Isabelle2026 occasionally builds a session without the PIDE exports of its theories
+(a race between prover exit and session stop), and FindFacts then skips all its
+theories ("No snapshot for theory"). A build checks every built session for these
+exports and builds the incomplete ones again, which rebuilds their descendants, up
+to three builds in all; a session that still lacks them, or lacks them under `-n`,
+is left out as `missing PIDE exports`.
+
 All builds of a user share one FindFacts database (`isasearch`). It is re-indexed
 only when the indexed sessions or their builds change; otherwise a build reports
 that the index is current and reuses it, so a metadata build after a plain build

@@ -705,6 +705,19 @@ object Integration_Tests {
           File.read(logs + Path.basic(new_logs.head)).contains("Published index afp-second"),
           "index log")
 
+        // A session whose build lost its PIDE exports is built again; -n leaves it out.
+        val session_db = env.user + Path.basic("heaps") +
+          Path.basic(Store(Options.init()).ml_settings.ml_identifier) +
+          Store.log_db("Example-Submission")
+        using(SQLite.open_database(session_db))(
+          _.execute_statement("DELETE FROM isabelle_exports WHERE name LIKE 'PIDE/%'"))
+        check(output(run("index", List("-n", "Example-Submission"), ok = false))
+          .contains("Not indexed, missing PIDE exports (1): Example-Submission"),
+          "missing PIDE exports reported")
+        check(output(run("index", List("Example-Submission")))
+          .contains("Building again, missing PIDE exports (1): Example-Submission") &&
+          found().size == 2, "missing PIDE exports rebuilt")
+
         val theory = copied + Path.explode("thys/Example-Submission/Submission.thy")
         val original = File.read(theory)
         val body = original.take(original.lastIndexOf("end"))
