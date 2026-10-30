@@ -162,7 +162,10 @@ isabelle isasearch_index -c /path/to/build-config.json -i plain \
 Indexes whose configurations request the same Isabelle build (sessions,
 `isabelle_timeout_scale`, `isabelle_session_options`, `isabelle_build_jobs`) share
 it, and with it the FindFacts index. Each call also logs its progress to
-`$ISASEARCH_HOME_USER/logs/index-TIME-NAMES.log`.
+`$ISASEARCH_HOME_USER/logs/index-TIME-NAMES.log`. While describing, every batch
+reports the documents prepared out of all of its kind, the reused and generated
+descriptions, the rate and the time left, followed by the first new description of
+the batch (with `-v`, all of them).
 
 Building requires a document LLM and embedder. Set `add_metadata` to false or true
 in the respective configurations. `prompts_folder` names the base folder:

@@ -380,8 +380,28 @@ object Corpus_Build {
 
   /** corpus output **/
 
+  // Progress of a batch: documents out of all of this kind, how many descriptions were reused
+  // from the store or generated, and the time left at the current rate.
+  private def batch_message(
+    kind: Corpus_Kind,
+    prepared: Int,
+    total: Int,
+    reused: Int,
+    start: Time
+  ): String = {
+    val elapsed = (Time.now() - start).seconds
+    val rate = if (elapsed > 0) prepared / elapsed else 0.0
+    val left =
+      if (rate > 0 && prepared < total) ", about " + Time.seconds((total - prepared) / rate)
+        .message_hms + " left" else ""
+    "Prepared " + prepared + " of " + total + " " + kind + " (" + reused + " reused, " +
+      (prepared - reused) + " generated; " + Library.format("%.1f", rate) + " per second" +
+      left + ")"
+  }
+
   private def write_corpus(
     blocks: Iterator[Obj],
+    total: Int,
     kind: Corpus_Kind,
     preparation: Preparation,
     executor: java.util.concurrent.ExecutorService,
@@ -396,6 +416,7 @@ object Corpus_Build {
     val seen = scala.collection.mutable.HashSet.empty[String]
     val identities = scala.collection.mutable.HashSet.empty[String]
     var reused = 0
+    val start = Time.now()
     using(Files.newBufferedWriter((directory + Path.basic(Index_Format.documents)).java_path)) { docs =>
       using(Files.newOutputStream((directory + Path.basic(Index_Format.vectors)).java_path)) { vectors =>
         blocks.grouped(config.positive("openai_embedding_batch_size", 32)).foreach { batch =>
@@ -421,8 +442,12 @@ object Corpus_Build {
             docs.newLine()
             vectors.write(bytes(vector))
           }
-          progress.echo("Prepared " + seen.size + " " + kind + " (" + reused +
-            " stored descriptions reused)")
+          progress.echo(batch_message(kind, seen.size, total, reused, start))
+          // A sample of what the model writes: the first new description of the batch, or all
+          // of them in verbose mode.
+          for (((doc, _), i) <- described.zip(stored).filterNot(_._2).zipWithIndex)
+            progress.echo("Described " + str(doc, "id") + ":\n" + str(doc, "llm_description"),
+              verbose = i > 0)
         }
       }
     }
@@ -588,11 +613,15 @@ object Corpus_Build {
   private def sources(target: Path, kind: Corpus_Kind): Path =
     target + Path.basic(kind.name + ".jsonl")
 
-  private def read_sources[A](target: Path, kind: Corpus_Kind)(f: Iterator[Obj] => A): A =
-    using(Files.newBufferedReader(sources(target, kind).java_path).nn) { in =>
+  // The blocks of a kind are streamed; their number is counted beforehand for progress.
+  private def read_sources[A](target: Path, kind: Corpus_Kind)(f: (Iterator[Obj], Int) => A): A = {
+    val path = sources(target, kind).java_path
+    val total = using(Files.lines(path).nn)(_.count().toInt)
+    using(Files.newBufferedReader(path).nn) { in =>
       f(Iterator.continually(in.readLine()).takeWhile(_ != null).map(line =>
-        obj(JSON.parse(line.nn))))
+        obj(JSON.parse(line.nn))), total)
     }
+  }
 
 
   /** build and publication **/
@@ -625,8 +654,9 @@ object Corpus_Build {
       }
       export_sources(request.options, afp, built, queries, exported, progress)
       val corpora = Index.kinds.flatMap { kind =>
-        read_sources(exported, kind) { blocks =>
-          write_corpus(blocks, kind, preparation, executor, config, name, recipe, output, progress)
+        read_sources(exported, kind) { (blocks, total) =>
+          write_corpus(blocks, total, kind, preparation, executor, config, name, recipe, output,
+            progress)
         }
       }
       write(

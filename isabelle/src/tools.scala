@@ -143,7 +143,7 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
           if (index_names.isEmpty && config_paths.size <= 1) List(config -> index)
           else if (config_paths.size == index_names.size) config_paths.map(load).zip(index_names)
           else error("Pair each configuration -c FILE with an index name -i NAME")
-        progress.echo("Log: " + log.implode)
+        progress.echo("Log: " + log.expand.implode)
         Corpus_Build.run(builds, args, no_build, progress)
       case Tool_Command.Seed => Seed.run(config, args.map(Path.explode), progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)

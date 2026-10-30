@@ -676,7 +676,8 @@ object Integration_Tests {
         configure("isabelle_session_options" -> Map("Failing" -> List("quick_and_dirty")))
         File.write(failing + Path.basic("Failing.thy"),
           "theory Failing imports Main begin\nlemma \"False\" sorry\nend\n")
-        run("index", List("Example-Submission", "Failing"), index = "afp-partial")
+        check(output(run("index", List("Example-Submission", "Failing"), index = "afp-partial"))
+          .contains("\nDescribed "), "sample of new descriptions")
         val admitted_provenance = object_at(manifest("afp-partial"), "provenance")
         check(same(admitted_provenance("sessions"), List("Example-Submission", "Failing")) &&
           same(admitted_provenance("unbuilt_sessions"), Map.empty[String, String]),
@@ -696,7 +697,8 @@ object Integration_Tests {
         val logs_before = if (logs.is_dir) File.read_dir(logs) else Nil
         val both = output(env.run("index", List("-c", cfg.implode, "-i", "afp-test",
           "-c", second.implode, "-i", "afp-second", "Example-Submission")))
-        check(both.contains("Using the session builds of index afp-test") &&
+        check(both.contains("Prepared 2 of 2 theorems (2 reused, 0 generated;") &&
+          both.contains("Using the session builds of index afp-test") &&
           both.contains("FindFacts index is current"), "shared session builds")
         check(bool(object_at(list(manifest("afp-second")("corpora")).map(obj).head, "recipe"),
           "add_metadata"), "second index")
