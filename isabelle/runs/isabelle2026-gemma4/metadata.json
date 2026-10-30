@@ -1,0 +1,37 @@
+{
+  "embedding_backend": "openai",
+  "openai_embedding_base_url": "http://10.153.73.66:8081/v1",
+  "openai_embedding_model": "Qwen3-Embedding-4B",
+  "openai_embedding_batch_size": 32,
+  "openai_embedding_max_characters": 8000,
+  "openai_api_key_env": "ISASEARCH_API_KEY",
+  "llm_backend": "openai",
+  "openai_base_url": "http://10.153.73.66:8082/v1",
+  "openai_document_model": "beaker_gemma4",
+  "openai_query_model": "beaker_gemma4",
+  "openai_extra_body": {
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "isabelle_sessions": ["all"],
+  "isabelle_excluded_sessions": [],
+  "isabelle_session_options": {"HOL-Metis_Examples": ["timeout_scale=1"]},
+  "isabelle_build_jobs": 2,
+  "isabelle_timeout_scale": 3,
+  "add_metadata": true,
+  "distance_metric": "cosine",
+  "llm_concurrency": 8,
+  "llm_request_timeout": 600,
+  "theorem_max_length": 3000,
+  "metadata_max_length": 300,
+  "enable_llm_output_cache": true,
+  "sampling_parameters": {
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": -1,
+    "min_p": 0,
+    "max_tokens": 512,
+    "stop": []
+  }
+}

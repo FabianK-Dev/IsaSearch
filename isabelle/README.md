@@ -18,7 +18,8 @@ isabelle isasearch_search -?
 
 The component is self-contained. It holds the benchmark dataset
 (`benchmark/benchmark.csv`), the paper's baseline results with their verified
-index (`benchmark/results`), the prompts (`prompts`), and frozen reference
+index (`benchmark/results`), the prompts (`prompts`), the configurations of index
+runs (`runs`, e.g. `runs/isabelle2026-gemma4`), and frozen reference
 outputs for its tests (`tests/goldens.json`). Compilation uses `etc/build.props`;
 registered Scala tools use a FindFacts-style launcher to include Isabelle's Solr
 classpath. No sbt, Maven, Python, or extra JVM libraries are needed.
