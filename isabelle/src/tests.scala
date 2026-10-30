@@ -116,6 +116,16 @@ object Tests {
     }
 
 
+    /* AFP entry metadata */
+
+    Isabelle_System.with_tmp_dir("isasearch-afp") { afp =>
+      val entries = Isabelle_System.make_directory(afp + Path.explode("metadata/entries"))
+      File.write(entries + Path.basic("CoreC++.toml"), "title = \"Core C++\"\n")
+      assert(str(Corpus_Build.metadata(afp, "CoreC++"), "title") == "Core C++",
+        "AFP entry names beyond index names")
+    }
+
+
     /* index import, readers, packaging, and failed imports */
 
     for ((source, n) <- sources.zipWithIndex) {

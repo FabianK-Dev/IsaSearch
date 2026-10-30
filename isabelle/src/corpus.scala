@@ -91,7 +91,8 @@ object Corpus_Build {
 
   def metadata(root: Path, entry: String): Obj = {
     if (entry.isEmpty) return Map.empty
-    val file = root + Path.explode("metadata/entries/" + safe_name(entry) + ".toml")
+    // Entry names are AFP directory names, e.g. CoreC++: Path.basic accepts exactly one element.
+    val file = root + Path.explode("metadata/entries") + Path.basic(entry).ext("toml")
     if (!file.is_file) return Map.empty
     val table = TOML.parse(File.read(file))
     Map(
