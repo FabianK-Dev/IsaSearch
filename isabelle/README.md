@@ -162,7 +162,13 @@ The pipeline builds Isabelle sessions, extracts blocks through FindFacts,
 informalizes selected source, then embeds description plus source. Prompts come
 from `prompts_folder`; document/query models are independent. Metadata variants
 are fixed at build time. `isabelle_build_jobs` (default 1) sets how many sessions
-build in parallel; `isabelle_timeout_scale` scales their timeouts. A session that
+build in parallel; `isabelle_timeout_scale` scales their timeouts.
+`isabelle_session_options` maps session names to option updates in the syntax of
+`isabelle build -o`, applied after the session's ROOT options. For a whole AFP
+build, `isabelle_timeout_scale: 3` keeps slow sessions within their timeouts, but
+it also scales the SMT solver timeout that keys the read-only certificates of
+`HOL-Metis_Examples`, so that session needs
+`"isabelle_session_options": {"HOL-Metis_Examples": ["timeout_scale=1"]}`. A session that
 fails to build, or is cancelled after a failed ancestor, is reported and left out;
 the others are indexed, and the manifest lists the sessions in `provenance` under
 `sessions` and `unbuilt_sessions`. `-n` skips building: only sessions whose

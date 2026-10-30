@@ -53,9 +53,23 @@ object Corpus_Build {
       case name =>
         if (!structure.defined(name)) error("Unknown Isabelle session: " + name) else List(name)
     }
+    for (name <- session_options(config).keys if !structure.defined(name))
+      error("Unknown Isabelle session in isabelle_session_options: " + name)
     val excluded = strings(config.values, "isabelle_excluded_sessions").toSet
     expanded.distinct.filterNot(excluded)
   }
+
+  // Option updates for particular sessions, in the syntax of isabelle build -o. They apply
+  // after the session's ROOT options, e.g. timeout_scale=1 for a session whose SMT
+  // certificates are keyed by the unscaled solver timeout.
+  def session_options(config: Config): Map[String, List[String]] =
+    object_at(config.values, "isabelle_session_options").map { case (session, specs) =>
+      session -> list(specs).map {
+        case spec: String => spec
+        case _ =>
+          error("Expected option strings for session " + session + " in isabelle_session_options")
+      }
+    }
 
 
   /** source provenance **/
@@ -178,6 +192,8 @@ object Corpus_Build {
     progress.echo("AFP: " + afp.implode + "; sessions: " + selected.mkString(", "))
     val excluded = strings(config.values, "isabelle_excluded_sessions")
     if (excluded.nonEmpty) progress.echo("Excluded sessions: " + excluded.mkString(", "))
+    for ((session, specs) <- session_options(config).toList.sortBy(_._1))
+      progress.echo("Session options for " + session + ": " + specs.mkString(", "))
     val prompt_base =
       if (config.string("prompts_folder").isEmpty) component + Path.explode("prompts/qwen3-gemma")
       else config.path("prompts_folder", "")
@@ -417,12 +433,14 @@ object Corpus_Build {
     no_build: Boolean,
     progress: Progress
   ): Built = {
+    val updates = session_options(config).view.mapValues(_.map(Options.Spec.make)).toMap
     val results = Build.build(
       options,
       selection = Sessions.Selection(sessions = selected),
       afp_root = Some(afp),
       max_jobs = Some(config.positive("isabelle_build_jobs", 1)),
       no_build = no_build,
+      augment_options = name => updates.getOrElse(name, Nil),
       progress = progress
     )
     val ok = results.sessions_ok.toSet

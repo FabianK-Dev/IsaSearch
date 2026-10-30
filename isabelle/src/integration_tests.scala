@@ -667,6 +667,21 @@ object Integration_Tests {
         }
         unset("add_metadata")
 
+        // Session options apply to their session: quick_and_dirty admits the proof of Failing.
+        configure("isabelle_session_options" -> Map("No_Such_Session" -> List("quick_and_dirty")))
+        check(errors(run("index", List("-i", "afp-partial", "Example-Submission"), ok = false))
+          .contains("Unknown Isabelle session in isabelle_session_options: No_Such_Session"),
+          "unknown session in session options")
+        configure("isabelle_session_options" -> Map("Failing" -> List("quick_and_dirty")))
+        File.write(failing + Path.basic("Failing.thy"),
+          "theory Failing imports Main begin\nlemma \"False\" sorry\nend\n")
+        run("index", List("-i", "afp-partial", "Example-Submission", "Failing"))
+        val admitted_provenance = object_at(manifest("afp-partial"), "provenance")
+        check(same(admitted_provenance("sessions"), List("Example-Submission", "Failing")) &&
+          same(admitted_provenance("unbuilt_sessions"), Map.empty[String, String]),
+          "session options")
+        unset("isabelle_session_options")
+
         val theory = copied + Path.explode("thys/Example-Submission/Submission.thy")
         val original = File.read(theory)
         val body = original.take(original.lastIndexOf("end"))
