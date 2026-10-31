@@ -94,8 +94,23 @@ session gets its PIDE exports. Whether this happens depends on the timing of the
 prover exit, the 0.1 s polling and the shutdown in `Build_Job`, which fits the
 observed rate and the absence of any pattern among the affected sessions.
 
-This is derived from the code and the state of the build databases; I have not
-forced the interleaving to reproduce it deterministically.
+## Reproduction
+
+Small sessions are hit often. On the idle machine above, the AFP entry
+`Lifting_the_Exponent` (one theory, parent `HOL-Number_Theory`), copied to a
+directory `$R` with its session renamed to `LTE_Test`, lost the PIDE exports in
+one of three consecutive builds:
+
+```sh
+for i in 1 2 3; do
+  isabelle build -c -d "$R" LTE_Test
+  sqlite3 "$(isabelle getenv -b ISABELLE_HEAPS)/$(isabelle getenv -b ML_IDENTIFIER)/log/LTE_Test.db" \
+    "SELECT COUNT(*) FROM isabelle_exports WHERE name = 'PIDE/document_id'"
+done
+```
+
+The builds succeed each time (about 4 s); the count is `1`, `0`, `1`. Within the
+whole AFP build, this session lost its exports in all four of its builds.
 
 ## Suggested fix
 
@@ -130,6 +145,7 @@ theory and look for one without `Export.DOCUMENT_ID`.
 Building an affected session again restores its exports (unless the race hits
 again), but it produces a new heap, so all descendants are rebuilt as well. In
 the build above that means 144 sessions: the 67 affected sessions and 77
-descendants (`HOL-Algebra` alone has 49). IsaSearch now checks every built
+descendants (`HOL-Algebra` alone has 49). Of the rebuilt sessions, 8 lost their
+exports again, and `Lifting_the_Exponent` once more in a third build. IsaSearch now checks every built
 session for its PIDE exports, builds incomplete sessions again (up to three builds
 in all), and leaves out those that remain incomplete.
