@@ -103,6 +103,7 @@ object Integration_Tests {
     @volatile var completion_text = "<BEGIN>VERDICT: DUPLICATE\nSame statement.<END>"
     @volatile var fail_input_contains = ""
     @volatile var fail_completion_contains = ""
+    @volatile var truncate_completion_contains = ""
     @volatile var empty_completions = 0
     private val log = scala.collection.mutable.ListBuffer.empty[(String, Obj)]
 
@@ -152,10 +153,15 @@ object Integration_Tests {
             if (text != "Reply with OK." && take(() => empty_completions,
                 () => empty_completions -= 1) || completion_mode == "empty") "<BEGIN> <END>"
             else completion_text
+          val truncated =
+            truncate_completion_contains.nonEmpty && text.contains(truncate_completion_contains)
+          val reason = if (truncated) "length" else "stop"
           if (path.endsWith("chat/completions"))
             Some(Map("choices" -> List(Map("message" -> Map("content" -> output),
-              "finish_reason" -> "stop"))))
-          else Some(Map("response" -> output, "content" -> output, "done_reason" -> "stop"))
+              "finish_reason" -> reason))))
+          else
+            Some(Map("response" -> output, "content" -> output, "done_reason" -> reason,
+              "truncated" -> truncated))
         }
       }
 
@@ -338,6 +344,10 @@ object Integration_Tests {
         stub.completion_mode = "empty"
         env.run("search", search("-r", "test"), ok = false)
         stub.completion_mode = "ok"
+        // Only corpus descriptions accept a completion cut off at max_tokens.
+        stub.truncate_completion_contains = "truncated query"
+        env.run("search", search("-r", "truncated query"), ok = false)
+        stub.truncate_completion_contains = ""
         stub.llm_up = false
         env.run("search", search("-r", "test"), ok = false)
         stub.llm_up = true
@@ -719,6 +729,45 @@ object Integration_Tests {
         check(output(run("index", List("Example-Submission")))
           .contains("Building again, missing PIDE exports (1): Example-Submission") &&
           found().size == 2, "missing PIDE exports rebuilt")
+
+        // As in Python, a description cut off at max_tokens on every attempt is kept and
+        // reported, and a document whose description fails is left out until the next build.
+        val truncation = Isabelle_System.make_directory(copied + Path.explode("thys/Truncation"))
+        File.write(truncation + Path.basic("ROOT"),
+          "chapter AFP\n\nsession Truncation = HOL +\n  theories Truncation\n")
+        def truncation_theory(lemmas: String*): Unit =
+          File.write(truncation + Path.basic("Truncation.thy"),
+            "theory Truncation imports Main begin\n" +
+              lemmas.map(name => "lemma " + name + ": \"True\" by simp\n").mkString + "end\n")
+        truncation_theory("truncated_fact", "refused_fact")
+        File.write(copied + Path.explode("thys/ROOTS"), "Example-Submission\nFailing\nTruncation\n")
+        def theorems(): Obj =
+          list(manifest("afp-truncation")("corpora")).map(obj)
+            .find(corpus => str(corpus, "kind") == "theorems").getOrElse(error("No theorems"))
+        stub.truncate_completion_contains = "truncated_fact"
+        stub.fail_completion_contains = "refused_fact"
+        val partial_description = output(run("index", List("Truncation"), index = "afp-truncation"))
+        check(partial_description.contains("Truncated description of") &&
+          partial_description.contains("Not described") &&
+          partial_description.contains("1 truncated, 1 not described"),
+          "truncated and undescribed documents reported")
+        check(num(theorems(), "count", 0) == 1 &&
+          strings(theorems(), "truncated_descriptions").size == 1 &&
+          strings(theorems(), "undescribed_documents").size == 1,
+          "truncated and undescribed documents recorded")
+        stub.fail_completion_contains = ""
+        run("index", List("Truncation"), index = "afp-truncation")
+        check(num(theorems(), "count", 0) == 2 &&
+          strings(theorems(), "truncated_descriptions").size == 1 &&
+          strings(theorems(), "undescribed_documents").isEmpty,
+          "undescribed document described by the next build, truncated description kept")
+        // A batch without any description stops the build: the server does not answer.
+        truncation_theory("unanswered_fact")
+        stub.fail_completion_contains = "unanswered_fact"
+        check(errors(run("index", List("Truncation"), ok = false, index = "afp-truncation"))
+          .contains("No document of a batch described"), "batch without descriptions")
+        stub.fail_completion_contains = ""
+        stub.truncate_completion_contains = ""
 
         val theory = copied + Path.explode("thys/Example-Submission/Submission.thy")
         val original = File.read(theory)

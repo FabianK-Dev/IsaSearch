@@ -125,7 +125,13 @@ and `embedding_attempts` (3), `openai_embedding_batch_size` (32),
 `capability_refresh_seconds` (30). Imported indexes retain their own truncation
 contract. `embedding_reference_tolerance` defaults to 0.001 relative squared
 error. HTTP 429 and transient server/transport errors are retried with bounded
-backoff. Failed, empty, or truncated completions are not cached.
+backoff. Failed, empty, or truncated completions are not cached, with one
+exception: as in the Python implementation, a corpus description that is cut off at
+`max_tokens` on every attempt is kept, stored as truncated, and reported. A document
+whose description still fails after its retries is left out of the index, reported,
+and described by the next build; a batch in which no description succeeds stops the
+build. Corpus entries of the manifest list these documents under
+`truncated_descriptions` and `undescribed_documents`.
 
 ## HTTP API
 
@@ -256,7 +262,7 @@ unrecorded model, and entries without prompt or marked description, are skipped
 and counted. Existing store entries are kept. The configuration must describe how the
 artifacts were generated (sampling parameters and provider extensions); this cannot
 be checked from the artifacts. Python kept descriptions that were cut off at
-`max_tokens`, which builds would reject; seeded entries are accepted as stored.
+`max_tokens`; seeded entries are accepted as stored, without being marked truncated.
 Artifacts are streamed and read without Python. After seeding, they are no longer
 needed; each build reports how many stored descriptions it reused.
 

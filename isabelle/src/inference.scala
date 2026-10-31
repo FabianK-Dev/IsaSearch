@@ -21,7 +21,14 @@ object Inference {
 
   case class Failure(message: String) extends RuntimeException(message)
 
-  case class Completion(text: String, duration: Double, elapsed: Double, cached: Boolean)
+  // A truncated completion was cut off at max_tokens on every attempt.
+  case class Completion(
+    text: String,
+    duration: Double,
+    elapsed: Double,
+    cached: Boolean,
+    truncated: Boolean = false
+  )
 
 
   /** inference client **/
@@ -252,27 +259,24 @@ object Inference {
       }
     }
 
-    private def completion_text(response: Obj): String = {
-      val text = llm_backend match {
+    // The text of a completion, and whether it was cut off at max_tokens.
+    private def completion_text(response: Obj): (String, Boolean) = {
+      val (text, truncated) = llm_backend match {
         case Inference_Backend.OpenAI =>
           val choice = list(response.getOrElse("choices", Nil)).headOption
             .map(obj)
             .getOrElse(throw Failure("Missing completion choices"))
-          if (str(choice, "finish_reason") == "length")
-            throw Failure("Truncated completion; increase max_tokens")
-          str(object_at(choice, "message"), "content")
+          (str(object_at(choice, "message"), "content"), str(choice, "finish_reason") == "length")
         case Inference_Backend.Ollama =>
-          if (str(response, "done_reason") == "length")
-            throw Failure("Truncated completion; increase max_tokens")
-          str(response, "response")
+          (str(response, "response"), str(response, "done_reason") == "length")
         case _ =>
-          if (bool(response, "truncated"))
-            throw Failure("Truncated completion; increase max_tokens")
-          str(response, "content")
+          (str(response, "content"), bool(response, "truncated"))
       }
       if (marked(text).isEmpty)
-        throw Failure("Empty LLM completion; check model and thinking settings")
-      text
+        throw Failure(
+          if (truncated) "Truncated completion without content; increase max_tokens"
+          else "Empty LLM completion; check model and thinking settings")
+      (text, truncated)
     }
 
     private def output_path(role: Model_Role, body: Obj): Path =
@@ -292,7 +296,8 @@ object Inference {
       prompt: String,
       role: Model_Role = Model_Role.Query,
       health: Boolean = false,
-      cached: Boolean = config.boolean("enable_llm_output_cache", true)
+      cached: Boolean = config.boolean("enable_llm_output_cache", true),
+      accept_truncated: Boolean = false
     ): Completion = {
       val (url, body) = request(prompt, role, health)
       val start = System.nanoTime()
@@ -304,11 +309,15 @@ object Inference {
           str(saved, "text"),
           num(saved, "duration", 0),
           (System.nanoTime() - start) / 1e9,
-          true
+          true,
+          truncated = bool(saved, "truncated")
         )
       }
       val attempts = if (health) 1 else config.positive("llm_attempts", 3)
       var text = ""
+      // As in Python, a completion cut off at max_tokens on every attempt is still accepted
+      // where its text is better than none (corpus descriptions), and reported as truncated.
+      var truncated_text = ""
       var failure: Option[Failure] = None
       var attempt = 0
       while (attempt < attempts && text.isEmpty) {
@@ -320,7 +329,12 @@ object Inference {
           else body.updated("temperature", 0.3)
         try {
           val response = call(url, retry_body, 1, health = health)
-          text = completion_text(response)
+          completion_text(response) match {
+            case (complete, false) => text = complete
+            case (partial, true) =>
+              truncated_text = partial
+              failure = Some(Failure("Truncated completion; increase max_tokens"))
+          }
         }
         catch {
           case exn: Failure => failure = Some(exn)
@@ -330,10 +344,15 @@ object Inference {
         if (text.isEmpty && attempt < attempts)
           Thread.sleep(math.min(30000L, 1000L << (attempt - 1)))
       }
+      val truncated = text.isEmpty && accept_truncated && truncated_text.nonEmpty
+      if (truncated) text = truncated_text
       if (text.isEmpty) throw failure.getOrElse(Failure("Empty LLM completion"))
       val elapsed = (System.nanoTime() - start) / 1e9
-      if (useCache) write(cache, Map("text" -> text, "duration" -> elapsed))
-      Completion(text, elapsed, elapsed, false)
+      if (useCache) {
+        write(cache, Map("text" -> text, "duration" -> elapsed) ++
+          (if (truncated) Map("truncated" -> true) else Map.empty))
+      }
+      Completion(text, elapsed, elapsed, false, truncated = truncated)
     }
 
 

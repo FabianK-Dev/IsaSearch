@@ -41,6 +41,10 @@ distance). Vector values are finite little-endian IEEE-754 float32; cosine zero
 vectors are invalid. The binary file has exactly count × dimension × 4 bytes.
 There is no header or padding. SHA-256 hashes cover the exact bytes of each file.
 An absent corpus is omitted; each present corpus has positive count/dimension.
+Corpora built by the Isabelle component may list document IDs under
+`truncated_descriptions` (descriptions cut off at `max_tokens`) and
+`undescribed_documents` (left out because no description could be generated);
+readers ignore both.
 
 Each JSONL record requires `id`, `kind`, `src`, `llm_description`,
 `embedding_input`, and `checksum` (unsigned Adler32 of UTF-8 source). IDs are

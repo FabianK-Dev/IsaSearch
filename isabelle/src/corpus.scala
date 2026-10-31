@@ -274,6 +274,10 @@ object Corpus_Build {
 
   /** resumable inference **/
 
+  // A document with its description, from the store or generated now; a truncated description
+  // was cut off at max_tokens on every attempt.
+  private sealed case class Described(document: Obj, stored: Boolean, truncated: Boolean)
+
   // Descriptions and vectors are kept in the stores of Inference.Client, keyed by their
   // inputs; records are rebuilt from the current blocks, so positions and links stay current.
   private class Preparation(
@@ -318,13 +322,14 @@ object Corpus_Build {
     }
 
     // The document, and whether its description came from the store.
-    def describe(block: Obj, kind: Corpus_Kind): (Obj, Boolean) = {
+    def describe(block: Obj, kind: Corpus_Kind): Described = {
       val src = str(block, "src")
       val relative = afp_relative(str(block, "file"), afp)
       val entry_name = relative.map(_.takeWhile(_ != '/')).getOrElse("")
       val meta = metadata_cache.getOrElseUpdate(entry_name, metadata(afp, entry_name))
       val text = prompt(block, kind, meta)
-      val completion = inference.generate(text, role = Model_Role.Document, cached = true)
+      val completion =
+        inference.generate(text, role = Model_Role.Document, cached = true, accept_truncated = true)
       val checksum = new java.util.zip.Adler32()
       checksum.update(UTF8.bytes(src))
       val description = marked(completion.text)
@@ -342,7 +347,7 @@ object Corpus_Build {
           "zlib.adler32_checksum" -> checksum.getValue
         )
       )
-      (document, completion.cached)
+      Described(document, completion.cached, completion.truncated)
     }
 
     def vectors(documents: Seq[Obj]): List[Array[Float]] =
@@ -381,22 +386,27 @@ object Corpus_Build {
   /** corpus output **/
 
   // Progress of a batch: documents out of all of this kind, how many descriptions were reused
-  // from the store or generated, and the time left at the current rate.
+  // from the store or generated, truncated or failed, and the time left at the current rate.
   private def batch_message(
     kind: Corpus_Kind,
     prepared: Int,
+    undescribed: Int,
+    truncated: Int,
     total: Int,
     reused: Int,
     start: Time
   ): String = {
+    val processed = prepared + undescribed
     val elapsed = (Time.now() - start).seconds
-    val rate = if (elapsed > 0) prepared / elapsed else 0.0
+    val rate = if (elapsed > 0) processed / elapsed else 0.0
     val left =
-      if (rate > 0 && prepared < total) ", about " + Time.seconds((total - prepared) / rate)
+      if (rate > 0 && processed < total) ", about " + Time.seconds((total - processed) / rate)
         .message_hms + " left" else ""
-    "Prepared " + prepared + " of " + total + " " + kind + " (" + reused + " reused, " +
-      (prepared - reused) + " generated; " + Library.format("%.1f", rate) + " per second" +
-      left + ")"
+    "Prepared " + processed + " of " + total + " " + kind + " (" + reused + " reused, " +
+      (prepared - reused) + " generated" +
+      (if (truncated > 0) ", " + truncated + " truncated" else "") +
+      (if (undescribed > 0) ", " + undescribed + " not described" else "") +
+      "; " + Library.format("%.1f", rate) + " per second" + left + ")"
   }
 
   private def write_corpus(
@@ -416,24 +426,45 @@ object Corpus_Build {
     val seen = scala.collection.mutable.HashSet.empty[String]
     val identities = scala.collection.mutable.HashSet.empty[String]
     var reused = 0
+    val truncated = scala.collection.mutable.ListBuffer.empty[String]
+    val undescribed = scala.collection.mutable.ListBuffer.empty[String]
     val start = Time.now()
     using(Files.newBufferedWriter((directory + Path.basic(Index_Format.documents)).java_path)) { docs =>
       using(Files.newOutputStream((directory + Path.basic(Index_Format.vectors)).java_path)) { vectors =>
         blocks.grouped(config.positive("openai_embedding_batch_size", 32)).foreach { batch =>
           val tasks = batch.map { block =>
-            executor.submit(new Callable[(Obj, Boolean)] {
-              def call(): (Obj, Boolean) = preparation.describe(block, kind)
+            block -> executor.submit(new Callable[Described] {
+              def call(): Described = preparation.describe(block, kind)
             }).nn
           }
-          val (described, stored) = tasks.map { task =>
-            try { task.get().nn }
+          val results = tasks.map { case (block, task) =>
+            try { Right(task.get().nn) }
             catch {
               case exn: java.util.concurrent.ExecutionException =>
-                throw proper_value(exn.getCause).getOrElse(exn)
+                proper_value(exn.getCause).getOrElse(exn) match {
+                  case failure: Inference.Failure => Left(str(block, "id") -> failure.getMessage)
+                  case cause => throw cause
+                }
             }
-          }.unzip
-          reused += stored.count(b => b)
-          for ((doc, vector) <- described.zip(preparation.vectors(described))) {
+          }
+          // As in Python, a document whose description fails after its retries is left out and
+          // tried again by the next build. A batch without any description means that the
+          // server does not answer at all.
+          val described = results.collect { case Right(d) => d }
+          val failed = results.collect { case Left(f) => f }
+          if (described.isEmpty && failed.nonEmpty)
+            throw Inference.Failure("No document of a batch described: " + failed.head._2)
+          for ((id, message) <- failed) {
+            undescribed += id
+            progress.echo_warning("Not described " + id + ": " + message)
+          }
+          for (d <- described if d.truncated) {
+            truncated += str(d.document, "id")
+            progress.echo_warning("Truncated description of " + str(d.document, "id"))
+          }
+          reused += described.count(_.stored)
+          val documents = described.map(_.document)
+          for ((doc, vector) <- documents.zip(preparation.vectors(documents))) {
             if (!seen.add(str(doc, "id"))) error("Duplicate source ID")
             identities += identity(doc)
             if (dimension == 0) dimension = vector.length
@@ -442,12 +473,14 @@ object Corpus_Build {
             docs.newLine()
             vectors.write(bytes(vector))
           }
-          progress.echo(batch_message(kind, seen.size, total, reused, start))
+          progress.echo(batch_message(kind, seen.size, undescribed.size, truncated.size, total,
+            reused, start))
           // A sample of what the model writes: the first new description of the batch, or all
           // of them in verbose mode.
-          for (((doc, _), i) <- described.zip(stored).filterNot(_._2).zipWithIndex)
-            progress.echo("Described " + str(doc, "id") + ":\n" + str(doc, "llm_description"),
-              verbose = i > 0)
+          for ((d, i) <- described.filterNot(_.stored).zipWithIndex) {
+            progress.echo("Described " + str(d.document, "id") + ":\n" +
+              str(d.document, "llm_description"), verbose = i > 0)
+          }
         }
       }
     }
@@ -461,6 +494,8 @@ object Corpus_Build {
           "dimension" -> dimension,
           "metric" -> preparation.space.metric.name,
           "recipe" -> recipe,
+          "truncated_descriptions" -> truncated.toList.sorted,
+          "undescribed_documents" -> undescribed.toList.sorted,
           "files" -> Index_Format.data_files
             .map(f => f -> file_hash(directory + Path.basic(f)))
             .toMap
