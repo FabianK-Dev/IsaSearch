@@ -249,7 +249,7 @@ object Corpus_Build {
     val recipe: Obj = Map(
       "model" -> inference.embedding_model,
       "backend" -> config.string("embedding_backend", "openai"),
-      "max_characters" -> config.positive("openai_embedding_max_characters", 8000),
+      "max_characters" -> max_characters(config),
       "add_metadata" -> config.boolean("add_metadata"),
       "document_model" -> inference.model(Model_Role.Document),
       "prompts" -> prompts
@@ -274,6 +274,13 @@ object Corpus_Build {
 
   /** resumable inference **/
 
+  // The embedding contract of corpus builds: client-side character limit and distance metric.
+  def max_characters(config: Config): Int =
+    config.positive("openai_embedding_max_characters", 8000)
+
+  def metric(config: Config): Distance_Metric =
+    Distance_Metric.parse(config.string("distance_metric", Distance_Metric.Cosine.name))
+
   // A document with its description, from the store or generated now; a truncated description
   // was cut off at max_tokens on every attempt.
   private sealed case class Described(document: Obj, stored: Boolean, truncated: Boolean)
@@ -286,10 +293,7 @@ object Corpus_Build {
     recipe: Obj,
     inference: Inference.Client
   ) {
-    val space = Embedding_Space(
-      recipe,
-      Distance_Metric.parse(config.string("distance_metric", Distance_Metric.Cosine.name))
-    )
+    val space = Embedding_Space(recipe, metric(config))
     private val metadata_cache = scala.collection.concurrent.TrieMap.empty[String, Obj]
     private val prompts = object_at(recipe, "prompts")
 

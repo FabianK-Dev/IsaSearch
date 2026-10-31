@@ -92,7 +92,7 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -v        verbose progress
 
 Import: -f EXPORT_DIR. Index: SESSION ... (or isabelle_sessions in config).
-Seed: ARTIFACT ... (description artifacts of the Python implementation).
+Seed: ARTIFACT ... (description artifacts) or EXPORT_DIR ... (index exports, vectors).
 Search: QUERY. Index_build: -D component output directory.
 Benchmark never builds indexes; supply the required prebuilt variants.
 Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark runs).

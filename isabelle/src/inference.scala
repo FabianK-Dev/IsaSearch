@@ -112,7 +112,7 @@ object Inference {
     def embedding_model: String =
       config.string("openai_embedding_model", config.string("embedding_model"))
 
-    private def embedding_backend: Inference_Backend =
+    def embedding_backend: Inference_Backend =
       Inference_Backend.parse(config.string("embedding_backend", Inference_Backend.OpenAI.name))
 
     private def embedding_input(text: String, space: Embedding_Space): String =
@@ -175,16 +175,30 @@ object Inference {
     }
 
     // Embeds only texts without a stored vector, so an interrupted build resumes.
-    def embed_stored(texts: List[String], space: Embedding_Space): List[Array[Float]] = {
-      val paths = texts.map { text =>
-        val key = canonical(Map(
-          "backend" -> embedding_backend.name,
-          "model" -> embedding_model,
-          "extra_body" -> object_at(config.values, "embedding_extra_body"),
-          "input" -> embedding_input(text, space)
-        ))
-        stored("embeddings", hash(key), "f32")
+    private def embedding_path(text: String, space: Embedding_Space): Path = {
+      val key = canonical(Map(
+        "backend" -> embedding_backend.name,
+        "model" -> embedding_model,
+        "extra_body" -> object_at(config.values, "embedding_extra_body"),
+        "input" -> embedding_input(text, space)
+      ))
+      stored("embeddings", hash(key), "f32")
+    }
+
+    // Stores a vector computed elsewhere for this backend and model, e.g. by the Python
+    // implementation, unless the store already has one.
+    def store_embedding(text: String, space: Embedding_Space, vector: Array[Float]): Boolean = {
+      val path = embedding_path(text, space)
+      if (path.is_file) false
+      else {
+        space.validate(vector)
+        write_bytes(path, Bytes(bytes(vector)))
+        true
       }
+    }
+
+    def embed_stored(texts: List[String], space: Embedding_Space): List[Array[Float]] = {
+      val paths = texts.map(embedding_path(_, space))
       val missing = texts.zip(paths).filterNot(_._2.is_file).distinctBy(_._2)
       embed(missing.map(_._1), space).zip(missing).foreach { case (vector, (_, path)) =>
         write_bytes(path, Bytes(bytes(vector)))

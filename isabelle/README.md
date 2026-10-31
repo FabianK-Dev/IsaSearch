@@ -266,6 +266,14 @@ be checked from the artifacts. Python kept descriptions that were cut off at
 Artifacts are streamed and read without Python. After seeding, they are no longer
 needed; each build reports how many stored descriptions it reused.
 
+Vectors seed the embedding store from an index export (see
+[Migrate the running Python index](#migrate-the-running-python-index)): pass the
+export directory to `isasearch_seed`, alone or together with artifacts. Each vector
+is stored under the key a build of this configuration looks up for the document's
+exact embedding input. Corpora embedded by another backend or model, or with
+another `openai_embedding_max_characters`, are skipped and reported. Seeding can
+run while a build is running; the build reuses seeded vectors from its next batch.
+
 Pruning more than half of a previously indexed corpus requires the explicit
 configuration `allow_large_prune: true`. Review session selection first. Empty
 corpora are omitted; an entirely empty index is rejected.
