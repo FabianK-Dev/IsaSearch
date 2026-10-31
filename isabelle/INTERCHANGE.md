@@ -41,6 +41,10 @@ distance). Vector values are finite little-endian IEEE-754 float32; cosine zero
 vectors are invalid. The binary file has exactly count × dimension × 4 bytes.
 There is no header or padding. SHA-256 hashes cover the exact bytes of each file.
 An absent corpus is omitted; each present corpus has positive count/dimension.
+`content` is `documents` (or absent) for a complete export. An export with
+`content: "vectors"` (`python -m src.export_index --vectors-only`) records only
+`id`, `kind` and `embedding_input` with each vector: it seeds embedding stores
+(`isasearch_seed`) and cannot be imported.
 Corpora built by the Isabelle component may list document IDs under
 `truncated_descriptions` (descriptions cut off at `max_tokens`) and
 `undescribed_documents` (left out because no description could be generated);

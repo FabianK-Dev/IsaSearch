@@ -15,7 +15,8 @@ with the sampling parameters of the Python artifacts `artifacts/beaker_gemma4`.
 
 Seed the stores once from the Python deployment: descriptions from its artifacts,
 vectors from an export of its Chroma index (`python -m src.export_index -c
-config.json -o EXPORT_DIR` with the deployment's configuration and environment):
+config.json -o EXPORT_DIR --vectors-only`, with the deployment's configuration and
+environment):
 
 ```sh
 isabelle isasearch_seed -c plain.json \

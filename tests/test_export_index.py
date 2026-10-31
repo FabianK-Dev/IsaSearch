@@ -1,6 +1,7 @@
 """Tests of the exporter that migrates a Python index to the Isabelle component."""
 
 import json
+import struct
 import tempfile
 import unittest
 import zlib
@@ -138,6 +139,48 @@ class ExporterTests(unittest.TestCase):
                     "theorems",
                     spec["recipe"],
                 )
+
+    def test_vectors_only_export_needs_no_caches(self):
+        with tempfile.TemporaryDirectory(prefix="isasearch-export-") as temporary:
+            root = Path(temporary)
+            _, embedding_map = fixture(root)
+            collection = chromadb.PersistentClient(
+                path=str(root / "chroma")
+            ).get_collection("theorems", embedding_function=None)
+            spec = export_collection(
+                collection,
+                {},
+                {},
+                lambda ids: self.fail("Solr is not needed"),
+                root / "vectors",
+                "theorems",
+                {"model": "fixture"},
+                vectors_only=True,
+            )
+            records = [
+                json.loads(line)
+                for line in (root / "vectors/documents.jsonl").read_text().splitlines()
+            ]
+            raw = (root / "vectors/vectors.f32").read_bytes()
+            vectors = [
+                list(
+                    struct.unpack_from(
+                        f"<{spec['dimension']}f", raw, 4 * spec["dimension"] * i
+                    )
+                )
+                for i in range(spec["count"])
+            ]
+            exported = {r["embedding_input"]: v for r, v in zip(records, vectors)}
+            expected = {
+                text: vector
+                for text, vector in embedding_map.items()
+                if "theorems" in text
+            }
+            self.assertEqual(set(exported), set(expected))
+            for text, vector in expected.items():
+                for value, reference in zip(exported[text], vector):
+                    self.assertAlmostEqual(value, reference, places=6)
+            self.assertEqual(set(records[0]), {"id", "kind", "embedding_input"})
 
 
 if __name__ == "__main__":

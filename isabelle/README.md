@@ -267,8 +267,11 @@ Artifacts are streamed and read without Python. After seeding, they are no longe
 needed; each build reports how many stored descriptions it reused.
 
 Vectors seed the embedding store from an index export (see
-[Migrate the running Python index](#migrate-the-running-python-index)): pass the
-export directory to `isasearch_seed`, alone or together with artifacts. Each vector
+[Migrate the running Python index](#migrate-the-running-python-index)), or from a
+vectors only export, which skips the cross-checks against source caches,
+descriptions and Solr: `python -m src.export_index -c config.json -o DIR
+--vectors-only`. Pass the export directory to `isasearch_seed`, alone or together
+with artifacts. Each vector
 is stored under the key a build of this configuration looks up for the document's
 exact embedding input. Corpora embedded by another backend or model, or with
 another `openai_embedding_max_characters`, are skipped and reported. Seeding can

@@ -134,6 +134,8 @@ object Index {
 
   def import_index(source: Path, name: String, progress: Progress = new Progress): Path = {
     val manifest = read(source + Path.basic(Index_Format.manifest))
+    if (str(manifest, "content", "documents") != "documents")
+      error("Export of " + str(manifest, "content") + " only: seed it with isasearch_seed")
     val corpora = specs(manifest)
     val parent = Isabelle_System.make_directory(location(name))
     val staging = parent + Path.basic("staging-" + UUID.random_string())

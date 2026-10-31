@@ -52,9 +52,20 @@ def metric_of(collection):
 
 
 def export_collection(
-    collection, documents, descriptions, source_lookup, directory, kind, recipe
+    collection,
+    documents,
+    descriptions,
+    source_lookup,
+    directory,
+    kind,
+    recipe,
+    vectors_only=False,
 ):
-    """Public, independently testable streaming export; never calls an embedder."""
+    """Public, independently testable streaming export; never calls an embedder.
+
+    A vectors only export keeps each stored embedding input with its vector, without
+    checking it against source caches, descriptions and Solr: it seeds embedding stores.
+    """
     directory = Path(directory)
     directory.mkdir()
     count = collection.count()
@@ -73,12 +84,19 @@ def export_collection(
                 limit=256,
                 include=["embeddings", "documents", "metadatas"],
             )
-            sources = source_lookup(batch["ids"])
+            sources = {} if vectors_only else source_lookup(batch["ids"])
             for i, identifier in enumerate(batch["ids"]):
                 if identifier in seen:
                     raise ValueError("Collection changed during export: duplicate ID")
                 seen.add(identifier)
-                if (
+                if vectors_only:
+                    text = batch["documents"][i]
+                    if not isinstance(text, str):
+                        raise TypeError(
+                            f"Missing exact embedding input for {identifier}"
+                        )
+                    doc = {"id": identifier, "kind": kind, "embedding_input": text}
+                elif (
                     identifier not in documents
                     or identifier not in descriptions
                     or identifier not in sources
@@ -86,44 +104,47 @@ def export_collection(
                     raise ValueError(
                         f"Missing source/cache/description for {identifier}"
                     )
-                doc = {**documents[identifier], **sources[identifier]}
-                source = doc["src"]
-                if documents[identifier]["src"] != source:
-                    raise ValueError(f"Stale source cache for {identifier}")
-                checksum = zlib.adler32(source.encode("utf-8"))
-                metadata = batch["metadatas"][i] or {}
-                if metadata.get("source", identifier) != identifier:
-                    raise ValueError(f"Vector/source ID mismatch: {identifier}")
-                if metadata.get("checksum", checksum) != checksum:
-                    raise ValueError(f"Stale embedding for {identifier}")
-                description = descriptions[identifier]
-                if description.get("zlib.adler32_checksum", checksum) != checksum:
-                    raise ValueError(f"Stale description for {identifier}")
-                text = batch["documents"][i]
-                if not isinstance(text, str):
-                    raise TypeError(f"Missing exact embedding input for {identifier}")
-                expected = recipe["prompts"]["embed"].format(
-                    doc_src=marked(description["llm_description"]).strip()
-                    + "\n\n"
-                    + source.strip()
-                )
-                if text != expected:
-                    raise ValueError(
-                        f"Embedding input disagrees with description/source/prompt: {identifier}"
+                else:
+                    doc = {**documents[identifier], **sources[identifier]}
+                    source = doc["src"]
+                    if documents[identifier]["src"] != source:
+                        raise ValueError(f"Stale source cache for {identifier}")
+                    checksum = zlib.adler32(source.encode("utf-8"))
+                    metadata = batch["metadatas"][i] or {}
+                    if metadata.get("source", identifier) != identifier:
+                        raise ValueError(f"Vector/source ID mismatch: {identifier}")
+                    if metadata.get("checksum", checksum) != checksum:
+                        raise ValueError(f"Stale embedding for {identifier}")
+                    description = descriptions[identifier]
+                    if description.get("zlib.adler32_checksum", checksum) != checksum:
+                        raise ValueError(f"Stale description for {identifier}")
+                    text = batch["documents"][i]
+                    if not isinstance(text, str):
+                        raise TypeError(
+                            f"Missing exact embedding input for {identifier}"
+                        )
+                    expected = recipe["prompts"]["embed"].format(
+                        doc_src=marked(description["llm_description"]).strip()
+                        + "\n\n"
+                        + source.strip()
                     )
-                doc.update(
-                    id=identifier,
-                    kind=kind,
-                    checksum=checksum,
-                    llm_description=marked(description["llm_description"]),
-                    embedding_input=text,
-                    description_artifact=description,
-                    entry=identifier.split("/thys/", 1)[1].split("/", 1)[0]
-                    if "/thys/" in identifier
-                    else doc.get("entry", ""),
-                )
-                for key in ("html", "xml"):
-                    doc.pop(key, None)
+                    if text != expected:
+                        raise ValueError(
+                            f"Embedding input disagrees with description/source/prompt: {identifier}"
+                        )
+                    doc.update(
+                        id=identifier,
+                        kind=kind,
+                        checksum=checksum,
+                        llm_description=marked(description["llm_description"]),
+                        embedding_input=text,
+                        description_artifact=description,
+                        entry=identifier.split("/thys/", 1)[1].split("/", 1)[0]
+                        if "/thys/" in identifier
+                        else doc.get("entry", ""),
+                    )
+                    for key in ("html", "xml"):
+                        doc.pop(key, None)
                 vector = [float(x) for x in batch["embeddings"][i]]
                 dimension = dimension or len(vector)
                 if (
@@ -156,7 +177,7 @@ def export_collection(
     }
 
 
-def export(config_path, output, kinds=None):
+def export(config_path, output, kinds=None, vectors_only=False):
     import chromadb
     import requests
     from chromadb.utils.embedding_functions import register_embedding_function
@@ -307,12 +328,17 @@ def export(config_path, output, kinds=None):
             corpora.append(
                 export_collection(
                     collection,
-                    read_json(base / config["cache_folder"] / cache),
-                    read_json(base / config["artifacts_folder"] / artifact),
+                    {}
+                    if vectors_only
+                    else read_json(base / config["cache_folder"] / cache),
+                    {}
+                    if vectors_only
+                    else read_json(base / config["artifacts_folder"] / artifact),
                     lookup,
                     temp / kind,
                     kind,
                     recipe,
+                    vectors_only,
                 )
             )
         if not corpora:
@@ -320,6 +346,8 @@ def export(config_path, output, kinds=None):
         manifest = {
             "format": "isasearch",
             "version": 1,
+            # A vectors only export seeds embedding stores and cannot be imported.
+            "content": "vectors" if vectors_only else "documents",
             "corpora": corpora,
             "provenance": {
                 "source": "python",
@@ -340,8 +368,13 @@ def main():
     parser.add_argument("-c", "--config", default="config.json")
     parser.add_argument("-o", "--output", required=True)
     parser.add_argument("--kind", choices=KINDS, action="append")
+    parser.add_argument(
+        "--vectors-only",
+        action="store_true",
+        help="export only embedding inputs and vectors, to seed embedding stores",
+    )
     args = parser.parse_args()
-    export(args.config, args.output, args.kind)
+    export(args.config, args.output, args.kind, args.vectors_only)
     print(f"Exported index to {args.output}")
 
 
