@@ -617,7 +617,7 @@ object Integration_Tests {
               "prompts" -> Map("embed" -> "{doc_src}", "retrieve" -> "{search_query}"))))))
         Isabelle_System.rm_tree(env.user + Path.explode("isasearch/embeddings"))
         check(run("seed", List(export_dir.implode)).out
-          .contains(inputs.size + " vectors stored"), "seeded vectors")
+          .contains(inputs.size.toString + " vectors stored"), "seeded vectors")
         val calls_before_seeded = stub.calls.size
         run("index", List("-n", "Example-Submission"))
         check(inputs.nonEmpty && embedded(calls_before_seeded).isEmpty,
