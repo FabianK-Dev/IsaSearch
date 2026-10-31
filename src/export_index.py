@@ -286,8 +286,13 @@ def export(config_path, output, kinds=None):
             # Persisted OpenAI model metadata is stronger evidence than the current config.
             ef = (getattr(collection, "configuration", {}) or {}).get(
                 "embedding_function"
-            ) or {}
-            saved = ef.get("config", {})
+            )
+            # Chroma rebuilds a registered embedding function; otherwise it reports its config.
+            saved = (
+                ef.get_config()
+                if hasattr(ef, "get_config")
+                else (ef or {}).get("config", {})
+            )
             if saved.get("model_name", recipe["model"]) != recipe["model"]:
                 raise ValueError(
                     f"Configured embedder differs from persisted model in {name}"
