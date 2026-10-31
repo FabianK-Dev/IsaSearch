@@ -159,6 +159,13 @@ def export_collection(
 def export(config_path, output, kinds=None):
     import chromadb
     import requests
+    from chromadb.utils.embedding_functions import register_embedding_function
+
+    from src.embeddings import OpenAIEmbeddingFunction
+
+    # Collections of the deployment persist the name of its embedding function, which Chroma
+    # resolves when a collection is opened, although the export never embeds.
+    register_embedding_function(OpenAIEmbeddingFunction)
 
     config_path = Path(config_path).resolve()
     config = read_json(config_path)
