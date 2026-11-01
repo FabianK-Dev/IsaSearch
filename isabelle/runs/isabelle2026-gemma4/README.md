@@ -10,6 +10,11 @@ with the sampling parameters of the Python artifacts `artifacts/beaker_gemma4`.
   their timeouts with two parallel builds on 8 cores. `HOL-Metis_Examples` keys
   its read-only SMT certificates by the unscaled solver timeout and is built with
   `timeout_scale=1`.
+- `embedding_reference_tolerance: 0.005` admits the vectors seeded from the Python
+  index: its definition vectors differ from the embedding server's current output by
+  a relative squared error of 0.0017 to 0.0029 (cosine 0.9985 or above), against
+  0.0004 to 0.0007 between two requests of the same text. A different model,
+  pooling or preprocessing still fails the check at search start.
 - The model servers' key is read from `$ISASEARCH_HOME_USER/api_key`, a private
   file (`chmod 600`) that is not part of the repository.
 
