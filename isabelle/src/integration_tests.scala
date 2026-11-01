@@ -207,11 +207,13 @@ object Integration_Tests {
   )
 
   // Three documents per corpus in entries A, B, C; returns the vector of each embedding input.
+  // A long source makes the first record exceed the 32766 bytes of a Solr doc value.
   def fixture(
     root: Path,
     metric: Distance_Metric = Distance_Metric.Cosine,
     dimension: Int = 3,
-    metadata: Boolean = false
+    metadata: Boolean = false,
+    long_source: Boolean = false
   ): (Path, Map[String, List[Double]]) = {
     val exported = Isabelle_System.make_directory(root + Path.basic("export"))
     var embeddings = Map.empty[String, List[Double]]
@@ -220,7 +222,8 @@ object Integration_Tests {
       val documents = List("A", "B", "C").zipWithIndex.map { case (e, i) =>
         val id = "AFP/thys/" + e + "/T.thy|" + kind.name + i
         val command = if (kind == Corpus_Kind.Theorems) "lemma" else "definition"
-        val source = command + " x" + i + ": \"a + b = b + a\""
+        val padding = if (long_source && i == 0) " (* " + "x" * 40000 + " *)" else ""
+        val source = command + " x" + i + ": \"a + b = b + a\"" + padding
         val description = "Commutativity ∀α 😀 " + kind.name + " " + i
         val text = description + "\n\n" + source
         val (x, y) = List((1.0, 0.0), (0.99, 0.01), (0.0, 1.0))(i)
@@ -274,7 +277,7 @@ object Integration_Tests {
       val (plain, vectors) = fixture(root + Path.basic("plain"))
       val (metadata, _) = fixture(root + Path.basic("metadata"), metadata = true)
       val (l2, _) = fixture(root + Path.basic("l2"), metric = Distance_Metric.Squared_Euclidean)
-      val (large, _) = fixture(root + Path.basic("large"), dimension = 2048)
+      val (large, _) = fixture(root + Path.basic("large"), dimension = 2048, long_source = true)
       progress.echo("Component tests on imported fixtures ...")
       env.run("test", List(plain, l2, large).map(_.implode))
       env.run("import", List("-f", plain.implode, "-i", "plain"))

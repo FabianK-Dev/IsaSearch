@@ -67,8 +67,10 @@ object Index {
   class Schema(dim: Int, metric: Distance_Metric) extends Solr.Data("isasearch") {
     val id = Solr.Field("id", Solr.Type.string).make_unique_key
     val entry = Solr.Field("entry", Solr.Type.string)
-    val record = Solr.Field("record", Solr.Type.string, List("indexed" -> "false"))
-    val raw = Solr.Field("raw_vector", Solr.Type.bytes, List("indexed" -> "false"))
+    // Records are read as stored fields only: doc values would limit them to 32766 bytes.
+    val record =
+      Solr.Field("record", Solr.Type.string, Solr.Column_Wise(false) ::: Solr.Indexed(false))
+    val raw = Solr.Field("raw_vector", Solr.Type.bytes, Solr.Indexed(false))
     val vector = Solr.Field(
       "vector",
       Solr.Type(
@@ -79,7 +81,7 @@ object Index {
           "similarityFunction" -> metric.solr_name
         )
       ),
-      List("stored" -> "false")
+      Solr.Stored(false)
     )
     val fields = Solr.Fields(id, entry, record, raw, vector)
 
