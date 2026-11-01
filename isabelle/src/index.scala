@@ -12,6 +12,7 @@ import isabelle.find_facts.Solr
 import java.io.{BufferedInputStream, DataInputStream}
 import java.nio.file.{Files, StandardCopyOption}
 import org.apache.lucene.store.FSDirectory
+import org.apache.lucene.document.Document
 import org.apache.lucene.index.DirectoryReader
 import org.apache.lucene.search.{
   IndexSearcher,
@@ -282,19 +283,23 @@ object Index {
       dir.close()
     }
 
-    private def stored(n: Int) = reader.storedFields().nn.document(n).nn
+    private def stored(n: Int, fields: String*) =
+      reader.storedFields().nn.document(n, java.util.Set.of(fields*)).nn
+
+    private def raw_vector(doc: Document): Array[Float] = {
+      val b = proper_value(doc.getBinaryValue("raw_vector")).getOrElse(error("Missing vector"))
+      floats(b.bytes.nn.slice(b.offset, b.offset + b.length))
+    }
 
     private def hits(top: TopDocs | Null): List[ScoreDoc] =
       top.nn.scoreDocs.nn.toList.map(_.nn)
 
-    def record(n: Int): Obj =
-      obj(JSON.parse(proper_value(stored(n).get("record")).getOrElse(error("Missing record"))))
-
-    def vector(n: Int): Array[Float] = {
-      val b =
-        proper_value(stored(n).getBinaryValue("raw_vector")).getOrElse(error("Missing vector"))
-      floats(b.bytes.nn.slice(b.offset, b.offset + b.length))
+    def record(n: Int): Obj = {
+      val json = proper_value(stored(n, "record").get("record")).getOrElse(error("Missing record"))
+      obj(JSON.parse(json))
     }
+
+    def vector(n: Int): Array[Float] = raw_vector(stored(n, "raw_vector"))
 
     def all: Iterator[(Int, Obj)] = (0 until reader.maxDoc()).iterator.map(i => i -> record(i))
 
@@ -302,9 +307,11 @@ object Index {
       hits(searcher.search(new TermQuery(new Term("id", id)), 1)).headOption
         .map(hit => hit.doc -> record(hit.doc))
 
-    def search(v: Array[Float], limit: Int, exclude: String = ""): List[Obj] = {
+    // The HNSW graph misses some nearest neighbours: up to `candidates` approximate hits are
+    // ranked by exact distance, and only the best `limit` records are read.
+    def search(v: Array[Float], limit: Int, candidates: Int, exclude: String = ""): List[Obj] = {
       validate(v, spec.dimension, spec.metric)
-      val k = math.min(limit, spec.count)
+      val k = math.min(math.max(limit, candidates), spec.count)
       val query =
         if (exclude.isEmpty) new KnnFloatVectorQuery("vector", v, k)
         else {
@@ -316,9 +323,12 @@ object Index {
         }
       hits(searcher.search(query, k))
         .map { hit =>
-          record(hit.doc).updated("distance", distance(v, vector(hit.doc), spec.metric))
+          val doc = stored(hit.doc, "id", "raw_vector")
+          (distance(v, raw_vector(doc), spec.metric), doc.get("id").nn, hit.doc)
         }
-        .sortBy(r => (num(r, "distance", 0), str(r, "id")))
+        .sortBy { case (d, id, _) => (d, id) }
+        .take(limit)
+        .map { case (d, _, n) => record(n).updated("distance", d) }
     }
   }
 

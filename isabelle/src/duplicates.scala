@@ -264,11 +264,11 @@ object Duplicates {
         val e = str(doc, "entry")
         val vector = engine.inference.embed(List(str(doc, "embedding_input")), corpus.spec).head
         val self_hits =
-          corpus.search(vector, math.min(corpus.spec.count, settings.top_k + self_search_extra))
+          corpus.search(vector, settings.top_k + self_search_extra, engine.candidates)
         val self_pos = self_hits.indexWhere(r => str(r, "id") == id)
         val candidates = (if (cross) targets else List(kind))
           .flatMap { target =>
-            engine.snapshot(target).search(vector, settings.top_k, exclude = e)
+            engine.snapshot(target).search(vector, settings.top_k, engine.candidates, e)
           }
           .sortBy(d => (num(d, "distance", 0), str(d, "id")))
           .take(settings.top_k)

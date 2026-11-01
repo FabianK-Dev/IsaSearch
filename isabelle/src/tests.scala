@@ -138,7 +138,7 @@ object Tests {
             assert(docs.size == corpus.spec.count)
             for ((id, doc) <- docs) {
               val vector = corpus.vector(id)
-              val hits = corpus.search(vector, corpus.spec.count)
+              val hits = corpus.search(vector, corpus.spec.count, 1)
               val own = hits.find(h => str(h, "id") == str(doc, "id")).get
               assert(num(own, "distance", 1) < 1e-6, "Self retrieval")
               assert(second(kind).get(str(doc, "id")).nonEmpty, "Concurrent read-only snapshot")
@@ -149,8 +149,12 @@ object Tests {
                 assert(math.abs(num(h, "distance", 0) - exact(str(h, "id"))) < 1e-6)
               )
               assert(
+                corpus.search(vector, 2, corpus.spec.count) == hits.take(2),
+                "Limit applied after exact ranking of all candidates"
+              )
+              assert(
                 corpus
-                  .search(vector, corpus.spec.count, str(doc, "entry"))
+                  .search(vector, corpus.spec.count, 1, str(doc, "entry"))
                   .forall(h => str(h, "entry") != str(doc, "entry"))
               )
             }

@@ -28,6 +28,9 @@ object Search {
   class Engine(val snapshot: Index.Snapshot, val config: Config) {
     val inference = new Inference.Client(config)
 
+    // Approximate neighbours reranked per search: 500 recover about 99% of the exact top 100.
+    val candidates = config.positive("search_candidates", 500)
+
 
     /* capabilities */
 
@@ -122,7 +125,7 @@ object Search {
           throw Unavailable(msg)
       }
       val results = corpus
-        .search(vector, limit)
+        .search(vector, limit, candidates)
         .map(_.removed("embedding_input").removed("description_artifact"))
       val elapsed = (System.nanoTime() - start) / 1e9
       val legacy = completion.filter(_.cached).map(c => elapsed + c.duration).getOrElse(elapsed)

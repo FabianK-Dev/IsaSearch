@@ -124,7 +124,9 @@ and `embedding_attempts` (3), `openai_embedding_batch_size` (32),
 `openai_embedding_max_characters` (8000 for newly built indexes), and
 `capability_refresh_seconds` (30). Imported indexes retain their own truncation
 contract. `embedding_reference_tolerance` defaults to 0.001 relative squared
-error. HTTP 429 and transient server/transport errors are retried with bounded
+error. Searches and duplicate lookups rank `search_candidates` (500) approximate
+nearest neighbours by exact distance before applying their limit, because the
+HNSW graph alone misses some of the nearest documents. HTTP 429 and transient server/transport errors are retried with bounded
 backoff. Failed, empty, or truncated completions are not cached, with one
 exception: as in the Python implementation, a corpus description that is cut off at
 `max_tokens` on every attempt is kept, stored as truncated, and reported. A document
