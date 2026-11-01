@@ -217,6 +217,21 @@
   "autostart" intent down to connect_solr explicitly, which keeps the decision per entry point
   rather than global.
 
+- [ ] **Let the Isabelle component build an index without progress output.**
+  `isabelle isasearch_index` prints a `Prepared N of TOTAL ...` line after every batch of 32
+  documents, plus a description sample, and appends both to its log. While documents are read
+  back from the stores (about 825 per second on the server) that is some 25 lines per second over
+  the 515,000 documents of the AFP, and in tmux the output seemed to cost noticeable time. Once
+  the build is stable it will run automatically, so nobody reads that output anyway.
+
+  Sketch: a `-q` option that leaves out the per-batch progress and the samples. It keeps the
+  phase lines (`Index ...`, `FindFacts index is current ...`), warnings, errors and the final
+  summary of each corpus. Truncated and undescribed documents are already recorded in the
+  manifest, so nothing is lost. Measure first: compare a run against one with its output sent
+  to `/dev/null`, to see whether the printing or the store reads limit the rate. If the
+  terminal is the cost, printing at most every few seconds instead of every batch may be enough
+  without an option.
+
 ## Indexing
 
 - [ ] **Incremental FindFacts indexing.** Every index build starts from zero, and that is the
