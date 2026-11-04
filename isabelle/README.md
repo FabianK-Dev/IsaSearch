@@ -71,9 +71,12 @@ production migration still needs an export from the deployed server.
 
 See [the interchange specification](INTERCHANGE.md). Imports validate into a new
 generation and publish only after all corpora succeed. Failed imports preserve
-the previous generation. Native Solr approximate ranking may differ from Chroma;
-reported cosine distance and squared Euclidean distance are computed from the
-retained vectors, independently of Lucene's scores.
+the previous generation. Before publishing, every corpus is merged into a single
+Lucene segment, so that a search walks one HNSW graph rather than one per imported
+batch. Builds publish through the same import, and a generation published without
+this merge stays slow until it is imported or built again. Native Solr approximate
+ranking may differ from Chroma; reported cosine distance and squared Euclidean
+distance are computed from the retained vectors, independently of Lucene's scores.
 
 ## Configure inference and search
 

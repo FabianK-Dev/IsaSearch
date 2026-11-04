@@ -11,9 +11,13 @@ import isabelle._
 import isabelle.find_facts.Solr
 import java.io.{BufferedInputStream, DataInputStream}
 import java.nio.file.{Files, StandardCopyOption}
+import java.util.concurrent.Executors
+import org.apache.lucene.codecs.KnnVectorsFormat
+import org.apache.lucene.codecs.lucene912.Lucene912Codec
+import org.apache.lucene.codecs.lucene99.Lucene99HnswVectorsFormat
 import org.apache.lucene.store.FSDirectory
 import org.apache.lucene.document.Document
-import org.apache.lucene.index.DirectoryReader
+import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig}
 import org.apache.lucene.search.{
   IndexSearcher,
   KnnFloatVectorQuery,
@@ -65,6 +69,11 @@ object Index {
 
   /** Solr schema **/
 
+  object Schema {
+    val hnsw_max_connections: Int = Lucene99HnswVectorsFormat.DEFAULT_MAX_CONN
+    val hnsw_beam_width: Int = Lucene99HnswVectorsFormat.DEFAULT_BEAM_WIDTH
+  }
+
   class Schema(dim: Int, metric: Distance_Metric) extends Solr.Data("isasearch") {
     val id = Solr.Field("id", Solr.Type.string).make_unique_key
     val entry = Solr.Field("entry", Solr.Type.string)
@@ -79,7 +88,9 @@ object Index {
         "DenseVectorField",
         List(
           "vectorDimension" -> dim.toString,
-          "similarityFunction" -> metric.solr_name
+          "similarityFunction" -> metric.solr_name,
+          "hnswMaxConnections" -> Schema.hnsw_max_connections.toString,
+          "hnswBeamWidth" -> Schema.hnsw_beam_width.toString
         )
       ),
       Solr.Stored(false)
@@ -91,6 +102,37 @@ object Index {
         XML.Elem(m, body :+ Solr.Class("codecFactory", "SchemaCodecFactory"))
       case x => x
     }
+  }
+
+
+  /** Lucene segments **/
+
+  def lucene_index(root: Path, kind: Corpus_Kind): Path =
+    root + Path.explode("solr/" + kind + "/data/index")
+
+  // A search visits the HNSW graph of every segment, and each batch of an import commits a
+  // segment of its own. A generation is read-only once published, so its segments are merged
+  // into one beforehand, with the HNSW parameters of the schema.
+  def merge_segments(index: Path): Unit = {
+    val workers = Multithreading.max_threads()
+    val executor = Executors.newFixedThreadPool(workers).nn
+    try {
+      val vectors = new Lucene99HnswVectorsFormat(
+        Schema.hnsw_max_connections, Schema.hnsw_beam_width, workers, executor)
+      val codec = new Lucene912Codec {
+        override def getKnnVectorsFormatForField(field: String): KnnVectorsFormat = vectors
+      }
+      val config = new IndexWriterConfig()
+        .setOpenMode(IndexWriterConfig.OpenMode.APPEND).nn
+        .setCodec(codec).nn
+      using(FSDirectory.open(index.java_path).nn) { dir =>
+        using(new IndexWriter(dir, config)) { writer =>
+          writer.forceMerge(1)
+          writer.commit()
+        }
+      }
+    }
+    finally { executor.shutdown() }
   }
 
 
@@ -206,6 +248,8 @@ object Index {
             if (seen.size != spec.count || in.read() != -1) error("Document/vector count mismatch")
           }
         }
+        progress.echo("Merging the segments of " + spec.kind + " ...")
+        merge_segments(lucene_index(staging, spec.kind))
       }
       write(staging + Path.basic(Index_Format.manifest), manifest)
       val result = publish(name, staging)
@@ -268,8 +312,7 @@ object Index {
   /** read-only search **/
 
   class Corpus(val root: Path, val spec: Spec) extends AutoCloseable {
-    private val dir =
-      FSDirectory.open((root + Path.explode("solr/" + spec.kind + "/data/index")).java_path).nn
+    private val dir = FSDirectory.open(lucene_index(root, spec.kind).java_path).nn
     private val reader = DirectoryReader.open(dir).nn
     if (reader.numDocs() != spec.count) {
       reader.close()
@@ -277,6 +320,8 @@ object Index {
       error("Index document count disagrees with manifest")
     }
     private val searcher = new IndexSearcher(reader)
+
+    def segments: Int = reader.leaves().nn.size
 
     def close(): Unit = {
       reader.close()

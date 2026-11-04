@@ -8,6 +8,11 @@ package isabelle.isasearch
 
 import isabelle._
 
+import isabelle.find_facts.Solr
+import org.apache.lucene.index.DirectoryReader
+import org.apache.lucene.search.{IndexSearcher, KnnFloatVectorQuery}
+import org.apache.lucene.store.FSDirectory
+
 
 object Tests {
   // Reference outputs of the former Python implementation, frozen in tests/goldens.json.
@@ -126,6 +131,37 @@ object Tests {
     }
 
 
+    /* segment merging */
+
+    Isabelle_System.with_tmp_dir("isasearch-merge") { tmp =>
+      val schema = new Index.Schema(2, Distance_Metric.Cosine)
+      val vectors = List(Array(1f, 0f), Array(0.6f, 0.8f), Array(0f, 1f))
+      using(Solr.init(tmp + Path.basic("solr")).init_database("theorems", schema)) { db =>
+        for ((vector, i) <- vectors.zipWithIndex) db.transaction {
+          db.execute_batch_insert(List((doc: Solr.Document) => {
+            doc.string(schema.id) = "d" + i
+            doc.string(schema.entry) = "E"
+            doc.string(schema.record) = "{}"
+            doc.bytes(schema.raw) = Bytes(Data.bytes(vector))
+            doc.double(schema.vector) = vector.toList.map(_.toDouble)
+          }))
+        }
+      }
+      val index = Index.lucene_index(tmp, Corpus_Kind.Theorems)
+      def segments_nearest(): (Int, String) =
+        using(FSDirectory.open(index.java_path).nn) { dir =>
+          using(DirectoryReader.open(dir).nn) { reader =>
+            val query = new KnnFloatVectorQuery("vector", Array(0.7f, 0.7f), 1)
+            val hit = new IndexSearcher(reader).search(query, 1).nn.scoreDocs.nn(0).nn
+            (reader.leaves().nn.size, reader.storedFields().nn.document(hit.doc).nn.get("id").nn)
+          }
+        }
+      assert(segments_nearest() == (3, "d1"), "One segment per committed batch")
+      Index.merge_segments(index)
+      assert(segments_nearest() == (1, "d1"), "Segments merged into one, vectors retained")
+    }
+
+
     /* index import, readers, packaging, and failed imports */
 
     for ((source, n) <- sources.zipWithIndex) {
@@ -134,6 +170,7 @@ object Tests {
       using(new Index.Snapshot(root)) { snapshot =>
         using(new Index.Snapshot(root)) { second =>
           for ((kind, corpus) <- snapshot.corpora) {
+            assert(corpus.segments == 1, "Imported corpus merged into one segment")
             val docs = corpus.all.toList
             assert(docs.size == corpus.spec.count)
             for ((id, doc) <- docs) {
