@@ -21,6 +21,27 @@
 - [x] Flask
 - [x] UI with Bootstrap
 
+- [ ] **Serve theory pages from the Isabelle component.** The website of `isasearch_server`
+  links results to the online Isabelle library and AFP pages, so a local server still needs the
+  network to show a theory. Isabelle has the pieces: `HTTP.Browser_Info` serves theory pages from
+  a File_Store database by path, and every result already carries that path in `url_path`
+  (e.g. `AFP/Mersenne_Primes/Lucas_Lehmer.html`). The FindFacts web server works the same way.
+
+  Sketch, in two steps:
+  1. Distribution theories. A release ships their pages in `$ISABELLE_BROWSER_INFO_LIBRARY`
+     (`lib/browser_info.db`, 178 MB on the server; a development checkout has none). Mount
+     `HTTP.Browser_Info` on it in `Search.server`, report in `/capabilities` whether it exists,
+     and let the page link non-AFP results to `browser_info/` + `url_path`, keeping the online
+     links otherwise. No change to builds or indexes.
+  2. AFP theories. `Corpus_Build.export_sources` calls `Find_Facts.find_facts_index` with
+     `browser_info = false`; with `true` FindFacts renders the HTML of every indexed session
+     into a `browser_info.db` next to its Solr core. Make that a configuration option, because
+     it renders all ~1,160 sessions whenever the FindFacts index is rebuilt. Generations are
+     self-contained and relocatable, so the database belongs into each generation (interchange
+     format, import, packaging) rather than being read from FindFacts' working directory at
+     serve time. Measure the time and size on a few sessions first; the size is probably a few
+     GB.
+
 ## Optional
 - [x] Docker image
 - [x] ~~Pytests~~
