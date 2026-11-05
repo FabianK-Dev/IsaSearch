@@ -146,7 +146,6 @@ object Tests {
             doc.string(schema.id) = "d" + i
             doc.string(schema.entry) = "E"
             doc.string(schema.record) = "{}"
-            doc.bytes(schema.raw) = Bytes(Data.bytes(vector))
             doc.double(schema.vector) = vector.toList.map(_.toDouble)
           }))
         }
@@ -175,6 +174,16 @@ object Tests {
         using(new Index.Snapshot(root)) { second =>
           for ((kind, corpus) <- snapshot.corpora) {
             assert(corpus.segments == 1, "Imported corpus merged into one segment")
+            val input = Path.explode(source) + Path.basic(kind.name)
+            val source_vectors =
+              Data.floats(Bytes.read(input + Path.basic(Index_Format.vectors)).make_array)
+                .grouped(corpus.spec.dimension).map(_.toList)
+            for ((line, vector) <- split_lines(File.read(input + Path.basic(Index_Format.documents)))
+                .filter(_.nonEmpty).zip(source_vectors))
+              assert(
+                corpus.vector(corpus.get(str(obj(JSON.parse(line)), "id")).get._1).toList == vector,
+                "Vectors read back exactly as imported"
+              )
             val docs = corpus.all.toList
             assert(docs.size == corpus.spec.count)
             for ((id, doc) <- docs) {

@@ -71,9 +71,9 @@ inputs match the supplied embed prompt, descriptions and source. Older model
 settings that Chroma did not persist cannot be recovered from vectors; reference
 validation at query startup detects incompatible services.
 
-The imported Solr generation retains serialized records and the original raw
-float32 vectors alongside a dense-vector field. Solr/Lucene approximate retrieval
-selects candidates; distances are recomputed from raw vectors. The interchange
+The imported Solr generation retains serialized records and the original float32
+vectors in its dense-vector field. Solr/Lucene approximate retrieval selects
+candidates; distances are recomputed from these vectors. The interchange
 is independent of Chroma's and Solr's private disk formats. Packaged native indexes
 use Isabelle File_Store and target the bundled Solr/Lucene version; rebuild or
 reimport when upgrading an incompatible Isabelle release.

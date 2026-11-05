@@ -16,8 +16,13 @@ import org.apache.lucene.codecs.KnnVectorsFormat
 import org.apache.lucene.codecs.lucene912.Lucene912Codec
 import org.apache.lucene.codecs.lucene99.Lucene99HnswVectorsFormat
 import org.apache.lucene.store.FSDirectory
-import org.apache.lucene.document.Document
-import org.apache.lucene.index.{DirectoryReader, IndexWriter, IndexWriterConfig}
+import org.apache.lucene.index.{
+  DirectoryReader,
+  DocValues,
+  IndexWriter,
+  IndexWriterConfig,
+  ReaderUtil
+}
 import org.apache.lucene.search.{
   IndexSearcher,
   KnnFloatVectorQuery,
@@ -81,7 +86,6 @@ object Index {
     // Records are read as stored fields only: doc values would limit them to 32766 bytes.
     val record =
       Solr.Field("record", Solr.Type.string, Solr.Column_Wise(false) ::: Solr.Indexed(false))
-    val raw = Solr.Field("raw_vector", Solr.Type.bytes, Solr.Indexed(false))
     val vector = Solr.Field(
       "vector",
       Solr.Type(
@@ -96,7 +100,7 @@ object Index {
       ),
       Solr.Stored(false)
     )
-    val fields = Solr.Fields(id, entry, record, raw, vector)
+    val fields = Solr.Fields(id, entry, record, vector)
 
     // Segments are merged once, by merge_segments: a background merge of HNSW graphs can outlast
     // the time Solr allows for closing a core.
@@ -247,7 +251,6 @@ object Index {
                     doc.string(schema.id) = id
                     doc.string(schema.entry) = str(record, "entry", entry(id))
                     doc.string(schema.record) = JSON.Format(record)
-                    doc.bytes(schema.raw) = Bytes(raw)
                     doc.double(schema.vector) = vector.toList.map(_.toDouble)
                   }
                 }
@@ -344,9 +347,24 @@ object Index {
     private def stored(n: Int, fields: String*) =
       reader.storedFields().nn.document(n, java.util.Set.of(fields*)).nn
 
-    private def raw_vector(doc: Document): Array[Float] = {
-      val b = proper_value(doc.getBinaryValue("raw_vector")).getOrElse(error("Missing vector"))
-      floats(b.bytes.nn.slice(b.offset, b.offset + b.length))
+    // IDs and vectors of documents come from doc values and vector values, which the HNSW search
+    // reads as well, rather than from the large stored fields. Both are read per segment in
+    // document order.
+    private def vectors(docs: List[Int]): List[(Int, String, Array[Float])] = {
+      val leaves = reader.leaves().nn
+      docs.sorted.groupBy(ReaderUtil.subIndex(_, leaves)).toList.sortBy(_._1).flatMap {
+        case (i, ns) =>
+          val leaf = leaves.get(i).nn
+          val values =
+            proper_value(leaf.reader().nn.getFloatVectorValues("vector"))
+              .getOrElse(error("Missing vectors"))
+          val ids = DocValues.getSorted(leaf.reader(), "id").nn
+          ns.map { n =>
+            val d = n - leaf.docBase
+            if (values.advance(d) != d || !ids.advanceExact(d)) error("Missing vector or ID")
+            (n, ids.lookupOrd(ids.ordValue()).nn.utf8ToString().nn, values.vectorValue().nn.clone())
+          }
+      }
     }
 
     private def hits(top: TopDocs | Null): List[ScoreDoc] =
@@ -357,7 +375,7 @@ object Index {
       obj(JSON.parse(json))
     }
 
-    def vector(n: Int): Array[Float] = raw_vector(stored(n, "raw_vector"))
+    def vector(n: Int): Array[Float] = vectors(List(n)).head._3
 
     def all: Iterator[(Int, Obj)] = (0 until reader.maxDoc()).iterator.map(i => i -> record(i))
 
@@ -379,11 +397,8 @@ object Index {
             .build()
           new KnnFloatVectorQuery("vector", v, k, filter)
         }
-      hits(searcher.search(query, k))
-        .map { hit =>
-          val doc = stored(hit.doc, "id", "raw_vector")
-          (distance(v, raw_vector(doc), spec.metric), doc.get("id").nn, hit.doc)
-        }
+      vectors(hits(searcher.search(query, k)).map(_.doc))
+        .map { case (n, id, vector) => (distance(v, vector, spec.metric), id, n) }
         .sortBy { case (d, id, _) => (d, id) }
         .take(limit)
         .map { case (d, _, n) => record(n).updated("distance", d) }
