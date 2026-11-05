@@ -57,12 +57,13 @@ TIP="$(hg -R "$AFP" id -i -r tip)"
 BUILT="$(state built)"
 
 if [ "$TIP" != "$BUILT" ] || "$FORCE"; then
+  # Paths of the AFP root; a failing hg ends the run instead of reading as no change.
+  CHANGED="$(hg -R "$AFP" status --rev "$BUILT" --rev "$TIP" path:thys path:metadata)"
   read -r FAILED FAILED_AT <<<"$(state failed)"
   if [ "${FAILED:-}" = "$TIP" ] && [ $(($(date +%s) - ${FAILED_AT:-0})) -lt $RETRY_SECONDS ] &&
     ! "$FORCE"; then
     :
-  elif [ -z "$(hg -R "$AFP" status --rev "$BUILT" --rev "$TIP" thys metadata)" ] &&
-    ! "$FORCE"; then
+  elif [ -z "$CHANGED" ] && ! "$FORCE"; then
     hg -R "$AFP" update -q -r "$TIP"
     echo "$TIP" >"$STATE/built"
   else
