@@ -157,6 +157,8 @@ enum Tool_Command(val name: String) extends Named_Value {
   case Import extends Tool_Command("import")
   case Index extends Tool_Command("index")
   case Package_Index extends Tool_Command("index_build")
+  case Export extends Tool_Command("export")
+  case Prune extends Tool_Command("prune")
   case Search extends Tool_Command("search")
   case Serve extends Tool_Command("server")
   case Duplicates extends Tool_Command("duplicates")

@@ -268,8 +268,9 @@ the stores, while a changed prompt, model, or sampling parameter regenerates exa
 the documents whose request changes. Plain and metadata indexes can be built at the
 same time. A per-index lock prevents competing builds of one index. Index
 generations publish atomically; existing readers retain their opened generation.
-Old generations and store entries are never deleted automatically; remove them
-manually once no readers or builds need them.
+Old generations and store entries are never deleted automatically; remove
+generations with `isasearch_prune` and store entries by hand once no readers or
+builds need them.
 
 Pruning more than half of a previously indexed corpus requires the explicit
 configuration `allow_large_prune: true`. Review session selection first. Empty
@@ -288,7 +289,25 @@ bundled index, place the generated `plain.db` under the code component's
 `lib/indexes/`. Users select it with `-i plain`. Distribution archives are
 immutable: first use extracts into the writable user directory, then opens
 read-only Lucene readers. No generative model is needed to extract or use a
-prebuilt corpus. Configuration and inference caches are not packaged.
+prebuilt corpus. Configuration and inference caches are not packaged. A `File_Store`
+entry holds at most 2 GB, so this does not work for the whole AFP, whose vector
+files are larger.
+
+```sh
+isabelle isasearch_export -i plain -D /path/to/directory
+isabelle isasearch_import -f /path/to/directory/isasearch-plain -i plain
+```
+
+`isasearch_export` writes the current generation of an index as an interchange
+directory `isasearch-NAME`: the stored records and their original vectors in
+document order, and the manifest of the generation with new file checksums. It
+does not depend on the bundled Lucene version, and `isasearch_import` reads it
+back on any machine. The run `runs/isabelle2026-gemma4` publishes such exports as
+GitHub releases; see its README.
+
+`isasearch_prune -i NAME` removes the generations of an index other than its
+current one. A server that still has an old generation open keeps reading it
+until it stops.
 
 ## Duplicate analysis
 

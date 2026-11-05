@@ -9,7 +9,7 @@ package isabelle.isasearch
 import isabelle._
 
 import isabelle.find_facts.Solr
-import java.io.{BufferedInputStream, DataInputStream}
+import java.io.{BufferedInputStream, BufferedOutputStream, DataInputStream}
 import java.nio.file.{Files, StandardCopyOption}
 import java.util.concurrent.Executors
 import org.apache.lucene.codecs.KnnVectorsFormat
@@ -278,6 +278,51 @@ object Index {
   }
 
 
+  /** interchange export **/
+
+  // The current generation as an interchange directory isasearch-NAME below target, which
+  // import_index reads back: the stored records and their vectors in document order, and
+  // the manifest of the generation with the checksums of the new files.
+  def export_index(name: String, target: Path, progress: Progress = new Progress): Path = {
+    val output = target + Path.basic("isasearch-" + safe_name(name))
+    if (output.is_dir || output.is_file) error("Export directory exists: " + output.implode)
+    try {
+      using(new Snapshot(current(name))) { snapshot =>
+        val corpora = specs(snapshot.manifest).map { spec =>
+          val directory = Isabelle_System.make_directory(output + Path.basic(spec.kind.name))
+          snapshot(spec.kind).write_interchange(directory)
+          progress.echo("Exported " + spec.count + " " + spec.kind)
+          spec.json.updated("files", Index_Format.data_files
+            .map(file => file -> file_hash(directory + Path.basic(file))).toMap)
+        }
+        write(output + Path.basic(Index_Format.manifest),
+          snapshot.manifest.updated("corpora", corpora))
+      }
+      output
+    }
+    catch {
+      case exn: Throwable =>
+        Isabelle_System.rm_tree(output)
+        throw exn
+    }
+  }
+
+
+  /** old generations **/
+
+  // Generations other than the current one; a reader that still has one open keeps its files
+  // until it closes them.
+  def prune(name: String): List[Path] = {
+    val keep = current(name)
+    val removed = File.read_dir(location(name))
+      .filter(_.startsWith("generation-"))
+      .map(location(name) + Path.basic(_))
+      .filter(_ != keep)
+    removed.foreach(Isabelle_System.rm_tree)
+    removed
+  }
+
+
   /** distributed indexes **/
 
   def resolve(name: String): Unit = {
@@ -374,6 +419,28 @@ object Index {
     }
 
     def vector(n: Int): Array[Float] = vectors(List(n)).head._3
+
+    // The interchange data files of this corpus, in document order.
+    def write_interchange(directory: Path): Unit = {
+      if (reader.hasDeletions) error("Index has deleted documents: " + spec.kind)
+      using(Files.newBufferedWriter((directory + Path.basic(Index_Format.documents)).java_path,
+          UTF8.charset).nn) { documents =>
+        using(new BufferedOutputStream(
+            Files.newOutputStream((directory + Path.basic(Index_Format.vectors)).java_path))) {
+          vectors_out =>
+            for {
+              chunk <- (0 until reader.maxDoc()).grouped(1024)
+              (n, _, vector) <- vectors(chunk.toList)
+            } {
+              val json =
+                proper_value(stored(n, "record").get("record")).getOrElse(error("Missing record"))
+              documents.write(json)
+              documents.write("\n")
+              vectors_out.write(bytes(vector))
+            }
+        }
+      }
+    }
 
     def all: Iterator[(Int, Obj)] = (0 until reader.maxDoc()).iterator.map(i => i -> record(i))
 

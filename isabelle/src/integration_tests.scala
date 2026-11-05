@@ -336,6 +336,31 @@ object Integration_Tests {
         env.run("search", search("relocated"))
         check(file_hash(archive) == archive_hash, "packaged index unchanged")
 
+        progress.echo("Interchange export and pruning ...")
+        val exports = (root + Path.basic("exports")).implode
+        val exported =
+          Path.explode(env.run("export", List("-i", "plain", "-D", exports)).out_lines.last)
+        for (kind <- Index.kinds) {
+          def data(dir: Path, file: String): Path = dir + Path.basic(kind.name) + Path.basic(file)
+          def records(dir: Path): List[JSON.T] =
+            split_lines(File.read(data(dir, Index_Format.documents))).filter(_.nonEmpty)
+              .map(JSON.parse(_))
+          check(Bytes.read(data(exported, Index_Format.vectors)) ==
+            Bytes.read(data(plain, Index_Format.vectors)), "exported vectors: " + kind)
+          check(records(exported).size == records(plain).size &&
+            records(exported).zip(records(plain)).forall(same), "exported records: " + kind)
+        }
+        env.run("export", List("-i", "plain", "-D", exports), ok = false)
+        env.run("import", List("-f", exported.implode, "-i", "reimported"))
+        env.run("search", List("-c", config_path.implode, "-i", "reimported", "commutativity"))
+        val generations = env.user + Path.explode("isasearch/indexes/plain")
+        def count(): Int = File.read_dir(generations).count(_.startsWith("generation-"))
+        env.run("import", List("-f", plain.implode, "-i", "plain"))
+        check(count() > 1, "several generations before pruning")
+        env.run("prune", List("-i", "plain"))
+        check(count() == 1, "one generation after pruning")
+        env.run("search", search("pruned"))
+
         progress.echo("Inference backends and failures ...")
         for (backend <- List("openai", "ollama", "llamacpp")) {
           configure("llm_backend" -> backend,

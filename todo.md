@@ -48,24 +48,22 @@
      context of 4096 although a query has a few dozen tokens; a context of 2048 fails the check
      with HTTP 400. Let the build record a few short reference inputs with their vectors in the
      manifest and validate against those.
-  3. Ship the interchange format rather than the packaged `File_Store` database: it is
-     independent of the bundled Lucene version, carries checksums and provenance, and
-     `isasearch_import` reads it. A version 2 adds `dtype` (`float32` or `float16`) for the
-     vectors: float16 halves them, an error of about 1e-4 in cosine, far below the drift of a
-     quantized embedder, and the import widens them to float32, so the Lucene field, the
-     reranking and the reported distances stay as they are. Each corpus then fits one asset
-     (theorems 389,754 × 2560 × 2 bytes, about 2.0 GB and just below 2 GiB; definitions about
-     0.64 GB). The import should also read
-     zstd-compressed `documents.jsonl` directly. This needs an `isasearch_export` that writes a
-     published generation as interchange; builds only write it on the way to an import. Measure
-     how long the import, which builds the HNSW graph, takes on a laptop. The packaged database
-     is no fallback as it stands: `isasearch_index_build` fails on this index with an
-     `IllegalArgumentException`, because its Lucene vector files (3.99 GB for theorems, 1.28 GB
-     for definitions) exceed what one `File_Store` entry holds.
-  4. Publish: the assets, `SHA256SUMS`, and release notes with the manifest provenance, the
-     drift and benchmark results with the hardware they were measured on, and the commands to
-     download, import, start the embedder and serve. Link the official GGUF and record its hash
-     rather than uploading it. A NOTICE covers the AFP and Isabelle sources in the documents
+  3. Done (2026-11-05), without a new format version: `isasearch_export` writes the current
+     generation as interchange (records and float32 vectors, 46 s for the AFP), and the release
+     packs it with `tar | zstd -10` (8.2 GB to 5.0 GB) and splits it into parts below 2 GiB.
+     Importing it again took 36.5 minutes on the M2 Pro while other work ran, and the
+     re-imported index answers with the same top 20 and distances. The packaged database is no
+     alternative: `isasearch_index_build` fails on this index with an `IllegalArgumentException`,
+     because its Lucene vector files (3.99 GB for theorems, 1.28 GB for definitions) exceed
+     what one `File_Store` entry holds. Still open, to make releases cheaper for users:
+     - A faster import. It commits every 256 documents on one thread (about 2,000 commits for
+       the AFP); larger transactions and parallel parsing should shorten it several times.
+     - Float16 vectors (an interchange version 2 with `dtype`, widened to float32 on import):
+       they would shrink the download from 5.0 GB to about 3.3 GB.
+  4. Publish. Done: `isabelle/runs/isabelle2026-gemma4/update` releases every new state of the
+     index with its parts, the manifest, `SHA256SUMS` and notes on download and import. Still
+     open: the drift and benchmark results and the laptop setup in the notes, the hash of the
+     official GGUF, and a NOTICE that covers the AFP and Isabelle sources in the documents
      (BSD/LGPL per entry) and the Gemma-generated descriptions (check Gemma's terms for
      redistributing outputs); `Qwen3-Embedding` is Apache-2.0.
 
@@ -204,14 +202,15 @@
   published one, `Index.publish` switches `current.json` in one step, and a failed build or
   import never publishes, so the served index stays intact. Descriptions and embeddings are
   reused by checksum, so a small AFP update stays cheap. Two pieces are missing:
-  - **A trigger.** Poll the AFP for new changesets (or watch it) rather than rebuilding on a
-    timer, so a quiet week costs nothing.
+  - **A trigger.** Done: `isabelle/runs/isabelle2026-gemma4/update`, run hourly by cron on the
+    server, builds when new AFP changesets touch `thys` or `metadata`, prunes old generations
+    and releases the index on GitHub.
   - **Picking up the new generation.** `isasearch_server` opens the index once at startup
     (`Index.current` in `isabelle/src/tools.scala`), so a new generation is served only after a
     restart. Either restart the server after a publish, or let `Search.Engine` notice a changed
     `current.json` and switch snapshots between requests, closing the old one once no search
-    uses it. Old generations then need removing too: every build leaves one behind (about 6 GB
-    for the AFP).
+    uses it. `isasearch_prune` removes old generations; a server must not have one open that it
+    still needs.
 
 ## Build ergonomics
 

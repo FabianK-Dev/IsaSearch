@@ -32,6 +32,44 @@ isabelle isasearch_index -c plain.json -i plain
 A stopped build resumes when started again: built sessions, the FindFacts index
 and stored descriptions and embeddings are reused.
 
+## Automatic updates
+
+`update` keeps the index current with the AFP 2026 and releases every new state of it
+on GitHub. The registered AFP (`AFP_BASE`, a clean clone of `afp-2026`) moves to its
+newest changeset, and the index is built again when the changesets since the last
+build touch `thys` or `metadata`; changesets that touch only the website are recorded
+without a build. A successful build removes the older generations (`isasearch_prune`).
+The new index is exported (`isasearch_export`), compressed and split into parts below
+GitHub's limit of 2 GiB per asset, and released as
+`index-plain-DATE-afp-REVISION` on `FabianK-Dev/IsaSearch`, with the export's manifest
+and `SHA256SUMS`, unless its data equals that of the last release. The release names
+the commit of the component that built it, so the checkout must be pushed and without
+local changes. Releases are kept.
+
+Runs never overlap. A failed build is retried after 24 hours or as soon as the AFP
+moves again; a failed release is retried by the next run, and its draft is deleted.
+State lives in `$ISASEARCH_HOME_USER/update` (`built` and `released` are AFP
+revisions); runs that do anything log to `$ISASEARCH_HOME_USER/logs/update-*.log`, next
+to the logs of the builds. `update -f` builds even without new changesets.
+
+The release needs a GitHub token in `$ISASEARCH_HOME_USER/github_token` (`chmod 600`).
+The repository belongs to another account, which fine-grained tokens cannot reach, so
+it is a classic token with the `public_repo` scope of an account with push access.
+Without it, `update` builds and skips the release. On the server, cron runs it every
+hour:
+
+```
+PATH=/home/adm-mgrgh/.local/bin:/usr/local/bin:/usr/bin:/bin
+17 * * * * /home/adm-mgrgh/IsaSearch-component/isabelle/runs/isabelle2026-gemma4/update
+```
+
+To use a release, download all parts, then unpack and import them:
+
+```sh
+cat isasearch-plain-*.tar.zst.* | zstd -d | tar -x
+isabelle isasearch_import -f isasearch-plain -i plain
+```
+
 ## Search on a laptop
 
 `laptop.json` searches this index without a generative model. The searching tools start

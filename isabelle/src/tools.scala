@@ -77,7 +77,7 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -i NAME   built index name (default local); index: repeat -c FILE -i NAME
             to build several indexes from one session build
   -m NAME   benchmark index built with metadata
-  -D DIR    output directory (reports or component parent)
+  -D DIR    output directory (reports, component or export parent)
   -f PATH   interchange directory (import) or benchmark CSV
   -p PORT   API port (default 5001; loopback only)
   -r        expand the query (search only; default off)
@@ -93,6 +93,8 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
 
 Import: -f EXPORT_DIR. Index: SESSION ... (or isabelle_sessions in config).
 Search: QUERY. Index_build: -D component output directory.
+Export: -D DIR writes the current generation to DIR/isasearch-NAME.
+Prune: removes the generations other than the current one.
 Benchmark never builds indexes; supply the required prebuilt variants.
 Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark runs).
 """
@@ -147,6 +149,8 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
         progress.echo("Log: " + log.expand.implode)
         Corpus_Build.run(builds, args, no_build, progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
+      case Tool_Command.Export => progress.echo(Index.export_index(index, out, progress).implode)
+      case Tool_Command.Prune => Index.prune(index).foreach(p => progress.echo("Removed " + p))
       case Tool_Command.Test => Tests.run(args)
       case Tool_Command.Integration_Test => Integration_Tests.run(progress)
       case Tool_Command.Compare =>
