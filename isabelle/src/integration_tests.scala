@@ -105,6 +105,7 @@ object Integration_Tests {
     @volatile var fail_completion_contains = ""
     @volatile var truncate_completion_contains = ""
     @volatile var empty_completions = 0
+    @volatile var health_failures = 0
     private val log = scala.collection.mutable.ListBuffer.empty[(String, Obj)]
 
     def calls: List[(String, Obj)] = synchronized { log.toList }
@@ -172,18 +173,25 @@ object Integration_Tests {
       val exchange = http.nn
       try {
         val path = exchange.getRequestURI.nn.getPath.nn
-        val body = obj(JSON.parse(Bytes.read_stream(exchange.getRequestBody.nn).text))
-        synchronized { log += path -> body }
-        val authorized =
-          proper_string(exchange.getRequestHeaders.nn.getFirst("Authorization"))
-            .contains("Bearer test-key")
-        (if (authorized) payload(path, body) else None) match {
-          case Some(result) =>
-            val bytes = UTF8.bytes(JSON.Format(result))
-            exchange.getResponseHeaders.nn.set("Content-Type", "application/json")
-            exchange.sendResponseHeaders(200, bytes.length.toLong)
-            using(exchange.getResponseBody.nn)(_.write(bytes))
-          case None => exchange.sendResponseHeaders(if (authorized) 503 else 401, -1)
+        // Like llama-server's health check: unauthenticated, unavailable while loading.
+        if (path == "/health") {
+          val loading = take(() => health_failures, () => health_failures -= 1)
+          exchange.sendResponseHeaders(if (loading) 503 else 200, -1)
+        }
+        else {
+          val body = obj(JSON.parse(Bytes.read_stream(exchange.getRequestBody.nn).text))
+          synchronized { log += path -> body }
+          val authorized =
+            proper_string(exchange.getRequestHeaders.nn.getFirst("Authorization"))
+              .contains("Bearer test-key")
+          (if (authorized) payload(path, body) else None) match {
+            case Some(result) =>
+              val bytes = UTF8.bytes(JSON.Format(result))
+              exchange.getResponseHeaders.nn.set("Content-Type", "application/json")
+              exchange.sendResponseHeaders(200, bytes.length.toLong)
+              using(exchange.getResponseBody.nn)(_.write(bytes))
+            case None => exchange.sendResponseHeaders(if (authorized) 503 else 401, -1)
+          }
         }
       }
       catch { case scala.util.control.NonFatal(_) => }
@@ -191,7 +199,9 @@ object Integration_Tests {
     })
     server.start()
 
-    def url: String = "http://127.0.0.1:" + server.getAddress.nn.getPort
+    def port: Int = server.getAddress.nn.getPort
+
+    def url: String = "http://127.0.0.1:" + port
 
     def close(): Unit = server.stop(0)
   }
@@ -310,6 +320,9 @@ object Integration_Tests {
         env.run("search", search("-r", "commutativity"), ok = false)
         http_api(env, stub, config_path)
 
+        progress.echo("Local embedding server ...")
+        embedding_server(env, stub, root, config)
+
         progress.echo("Packaged index ...")
         val packaged = Path.explode(env.run("index_build",
           List("-i", "plain", "-D", (root + Path.basic("packages")).implode))
@@ -393,6 +406,49 @@ object Integration_Tests {
       }
       finally { stub.close() }
     }
+
+  // A fake llama-server records its arguments and waits; the stub answers on its port.
+  def embedding_server(env: Environment, stub: Stub, root: Path, config: Obj): Unit = {
+    val arguments = root + Path.basic("llama-server.args")
+    val pid = root + Path.basic("llama-server.pid")
+    def executable(name: String, script: String): Path = {
+      val path = root + Path.basic(name)
+      File.write(path, "#!/usr/bin/env bash\n" + script)
+      File.set_executable(path)
+      path
+    }
+    val fake = executable("llama-server",
+      "printf '%s\\n' \"$@\" > " + File.bash_path(arguments) + "\n" +
+        "echo $$ > " + File.bash_path(pid) + "\nexec sleep 300\n")
+    val failing = executable("failing-server", "echo 'cannot load model' >&2\nexit 3\n")
+    val server: Obj = Map("executable" -> fake.implode, "hf_repo" -> "test/fixture-GGUF:Q8_0",
+      "pooling" -> "last", "port" -> stub.port, "arguments" -> List("-t", "2"))
+    val config_path = root + Path.basic("embedding-server.json")
+    def search(server: Obj, base: Obj = config.removed("openai_embedding_base_url"),
+        ok: Boolean = true): Process_Result = {
+      write(config_path, base ++ Map(Embedding_Server.key -> server))
+      env.run("search", List("-c", config_path.implode, "-i", "plain", "commutativity"), ok = ok)
+    }
+
+    stub.health_failures = 2
+    check(env.json(search(server)).contains("results"), "search through embedding server")
+    check(stub.health_failures == 0, "embedding server awaited")
+    val args = split_lines(File.read(arguments)).filter(_.nonEmpty)
+    check(List(List("-hf", "test/fixture-GGUF:Q8_0"), List("--alias", "fixture"),
+        List("--port", stub.port.toString), List("-np", "1"), List("--pooling", "last"))
+        .forall(args.containsSlice(_)) && args.takeRight(2) == List("-t", "2"),
+      "llama-server arguments: " + args.mkString(" "))
+    val handle = ProcessHandle.of(Value.Long.parse(Library.trim_line(File.read(pid)))).nn
+    check(!handle.isPresent || !handle.get.nn.isAlive, "embedding server stopped")
+
+    // On a free port, so that only the exit of the server ends its startup.
+    val failure =
+      search(server ++ Map("executable" -> failing.implode, "port" -> 0), ok = false)
+    check(cat_lines(failure.out_lines ::: failure.err_lines).contains("cannot load model"),
+      "embedding server startup failure")
+    search(server.removed("hf_repo"), ok = false)
+    search(server, base = config, ok = false)
+  }
 
   def http_api(env: Environment, stub: Stub, config_path: Path): Unit = {
     val server = env.process("server", List("-c", config_path.implode, "-i", "plain", "-p", "0"))

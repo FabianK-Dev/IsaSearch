@@ -34,20 +34,28 @@ and stored descriptions and embeddings are reused.
 
 ## Search on a laptop
 
-`laptop.json` searches this index without a generative model, with the Q8_0 quantization
-of the official `Qwen/Qwen3-Embedding-4B-GGUF` served by llama.cpp on the same machine:
+`laptop.json` searches this index without a generative model. The searching tools start
+llama.cpp's `llama-server` with the Q8_0 quantization of the official
+`Qwen/Qwen3-Embedding-4B-GGUF` on the same machine, on the GPU if llama.cpp supports one
+there and on the CPU otherwise. llama.cpp must be installed; the first start downloads the
+model (4.3 GB) into llama.cpp's cache:
+
+```sh
+isabelle isasearch_server -c laptop.json -i plain
+```
+
+The context of one slot of 4096 tokens holds the inputs of the reference check at search
+start, which re-embeds stored documents (up to 2,443 tokens here). To run an embedding
+server by hand instead, replace `llamacpp_embedding_server` by `openai_embedding_base_url`
+and start it with the same settings:
 
 ```sh
 llama-server -hf Qwen/Qwen3-Embedding-4B-GGUF:Q8_0 --embedding --pooling last \
   --alias Qwen3-Embedding-4B -c 4096 -ub 4096 -np 1 --port 8080
-isabelle isasearch_server -c laptop.json -i plain
 ```
 
-`--alias` gives the model name of the manifest. The single slot of 4096 tokens holds the
-inputs of the reference check at search start, which re-embeds stored documents (up to
-2,443 tokens here); with the default slots, llama-server divides the context among them
-and rejects these inputs. Ollama was not measured; its `qwen3-embedding:4b` is Q4_K_M, so
-Q8_0 needs `qwen3-embedding:4b-q8_0`.
+Ollama was not measured; its `qwen3-embedding:4b` is Q4_K_M, so Q8_0 needs
+`qwen3-embedding:4b-q8_0`.
 
 Measured on 2026-11-05 against the generation of that day (389,754 theorems, 125,139
 definitions), on an Apple M2 Pro with 32 GB and llama.cpp b11669 (nixpkgs `llama-cpp`

@@ -3,7 +3,8 @@
 An Isabelle2026 component for semantic search, corpus construction, duplicate
 analysis and the paper's benchmarks. It exposes the search website, an HTTP API and
 command-line tools. Scala runtime dependencies come exclusively from Isabelle,
-including its bundled Solr/Lucene. It neither starts nor installs model servers.
+including its bundled Solr/Lucene. It installs no model servers; on request, the searching
+tools start an installed llama.cpp server for query embeddings.
 
 ## Register and compile
 
@@ -75,6 +76,40 @@ isabelle isasearch_search -c /path/to/config.json -i plain 'a finite union of co
 isabelle isasearch_search -c /path/to/config.json -i plain -k definitions 'a partial order'
 isabelle isasearch_server -c /path/to/config.json -i plain -p 5001
 ```
+
+### Local embedding server
+
+Searches can start their embedder themselves instead of using a running endpoint. With an
+object `llamacpp_embedding_server` in the configuration, `isasearch_search`,
+`isasearch_server`, `isasearch_duplicates` and `isasearch_benchmark` start `llama-server`
+from llama.cpp on 127.0.0.1, wait until its `/health` reports ready, send their embedding
+requests there and stop it when they exit. Its output goes to
+`$ISASEARCH_HOME_USER/logs/llama-server-TIME.log`. llama.cpp must be installed (e.g.
+`brew install llama.cpp`, or a release binary from its GitHub page); llama.cpp offloads to
+a GPU (Metal, CUDA, Vulkan) when its build supports one and computes on the CPU otherwise.
+Index builds do not start a server.
+
+```json
+"openai_embedding_model": "Qwen3-Embedding-4B",
+"llamacpp_embedding_server": {
+  "hf_repo": "Qwen/Qwen3-Embedding-4B-GGUF:Q8_0",
+  "pooling": "last"
+}
+```
+
+| Key | Meaning |
+| --- | --- |
+| `hf_repo` | Hugging Face model `user/repo:quant`; llama.cpp downloads it into its cache on first use |
+| `model_file` | a local GGUF file instead (Isabelle path syntax) |
+| `pooling` | pooling of the model, e.g. `last` for Qwen3-Embedding; default: from the GGUF |
+| `context` | context in tokens, one slot (default 4096); must hold the reference inputs |
+| `port` | port on 127.0.0.1 (default: a free one) |
+| `executable` | the server program (default `llama-server`) |
+| `arguments` | further llama-server arguments, e.g. `["-ngl", "0"]` for CPU only |
+| `startup_timeout` | seconds until ready, including a first download (default 1800) |
+
+The server answers under `openai_embedding_model`, which must be the model of the index,
+and replaces `openai_embedding_base_url`; configuring both is an error.
 
 Instead of an environment variable, `openai_api_key_file` names a private file with
 the key, e.g. `$ISASEARCH_HOME_USER/api_key` (`chmod 600`); it takes precedence over
@@ -344,7 +379,8 @@ corrupted.
 `isasearch_integration_test` runs the command-line tools in isolated Isabelle user
 directories against a deterministic local inference stub: interchange import,
 search over all inference backends with retries and failures, the HTTP API and
-the website with its assets, packaged indexes, query caching, benchmarks, and duplicate analysis with judge
+the website with its assets, a started embedding server (with a fake `llama-server`),
+packaged indexes, query caching, benchmarks, and duplicate analysis with judge
 failures. With a registered AFP it also builds, updates, and prunes corpora
 from `Example-Submission`. No real model is contacted.
 

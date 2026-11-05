@@ -7,6 +7,7 @@ sources = \
   src/domain.scala \
   src/core.scala \
   src/inference.scala \
+  src/embedding_server.scala \
   src/index.scala \
   src/corpus.scala \
   src/search.scala \

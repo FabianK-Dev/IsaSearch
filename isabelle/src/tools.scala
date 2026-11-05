@@ -142,6 +142,8 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
           if (index_names.isEmpty && config_paths.size <= 1) List(config -> index)
           else if (config_paths.size == index_names.size) config_paths.map(load).zip(index_names)
           else error("Pair each configuration -c FILE with an index name -i NAME")
+        if (builds.exists(build => Embedding_Server.requested(build._1)))
+          error(Embedding_Server.key + " serves searches; builds use openai_embedding_base_url")
         progress.echo("Log: " + log.expand.implode)
         Corpus_Build.run(builds, args, no_build, progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
@@ -154,39 +156,43 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
         }
       case Tool_Command.Benchmark =>
         val csv = input.getOrElse(Benchmark.default_csv)
-        Benchmark
-          .run(config, index, metadata_index, csv, strategies, out, progress)
-          .foreach(p => progress.echo(p.implode))
+        Embedding_Server(config) { config =>
+          Benchmark
+            .run(config, index, metadata_index, csv, strategies, out, progress)
+            .foreach(p => progress.echo(p.implode))
+        }
       case Tool_Command.Search | Tool_Command.Serve | Tool_Command.Duplicates =>
-        using(new Index.Snapshot(Index.current(index))) { snapshot =>
-          val engine = new Search.Engine(snapshot, config)
-          tool match {
-            case Tool_Command.Search =>
-              progress.echo(
-                JSON.Format(
-                  engine.search(
-                    args.mkString(" "),
-                    selected_kinds.getOrElse(List(Corpus_Kind.Theorems)) match {
-                      case List(single) => single
-                      case _ => error("Search requires exactly one corpus kind")
-                    },
-                    if (refine) Query_Mode.Combined else Query_Mode.Original
+        Embedding_Server(config) { config =>
+          using(new Index.Snapshot(Index.current(index))) { snapshot =>
+            val engine = new Search.Engine(snapshot, config)
+            tool match {
+              case Tool_Command.Search =>
+                progress.echo(
+                  JSON.Format(
+                    engine.search(
+                      args.mkString(" "),
+                      selected_kinds.getOrElse(List(Corpus_Kind.Theorems)) match {
+                        case List(single) => single
+                        case _ => error("Search requires exactly one corpus kind")
+                      },
+                      if (refine) Query_Mode.Combined else Query_Mode.Original
+                    )
                   )
                 )
-              )
-            case Tool_Command.Serve =>
-              val server = Search.server(engine, port)
-              server.start()
-              progress.echo("IsaSearch API: " + server.url)
-              try { new java.util.concurrent.CountDownLatch(1).await() }
-              finally { server.stop() }
-            case _ =>
-              val kinds = selected_kinds.getOrElse(List(Corpus_Kind.Definitions))
-              if (newest < 1 || kinds.isEmpty || kinds.exists(k => !Index.kinds.contains(k)))
-                error("Invalid duplicate selection")
-              progress.echo(
-                Duplicates.run(engine, entries, newest, kinds, cross, judge, all, out).implode
-              )
+              case Tool_Command.Serve =>
+                val server = Search.server(engine, port)
+                server.start()
+                progress.echo("IsaSearch API: " + server.url)
+                try { new java.util.concurrent.CountDownLatch(1).await() }
+                finally { server.stop() }
+              case _ =>
+                val kinds = selected_kinds.getOrElse(List(Corpus_Kind.Definitions))
+                if (newest < 1 || kinds.isEmpty || kinds.exists(k => !Index.kinds.contains(k)))
+                  error("Invalid duplicate selection")
+                progress.echo(
+                  Duplicates.run(engine, entries, newest, kinds, cross, judge, all, out).implode
+                )
+            }
           }
         }
     }

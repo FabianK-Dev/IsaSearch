@@ -1,7 +1,10 @@
 {
   "embedding_backend": "openai",
-  "openai_embedding_base_url": "http://127.0.0.1:8080/v1",
   "openai_embedding_model": "Qwen3-Embedding-4B",
   "embedding_reference_tolerance": 0.005,
-  "llm_backend": "none"
+  "llm_backend": "none",
+  "llamacpp_embedding_server": {
+    "hf_repo": "Qwen/Qwen3-Embedding-4B-GGUF:Q8_0",
+    "pooling": "last"
+  }
 }
