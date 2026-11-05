@@ -56,11 +56,12 @@ The release needs a GitHub token in `$ISASEARCH_HOME_USER/github_token` (`chmod 
 The repository belongs to another account, which fine-grained tokens cannot reach, so
 it is a classic token with the `public_repo` scope of an account with push access.
 Without it, `update` builds and skips the release. On the server, cron runs it every
-hour:
+hour; a run's own log has its output, and errors before that log starts (e.g. a failed
+`hg pull`) go to `update-errors.log`:
 
 ```
 PATH=/home/adm-mgrgh/.local/bin:/usr/local/bin:/usr/bin:/bin
-17 * * * * /home/adm-mgrgh/IsaSearch-component/isabelle/runs/isabelle2026-gemma4/update
+17 * * * * /home/adm-mgrgh/IsaSearch-component/isabelle/runs/isabelle2026-gemma4/update > /dev/null 2>> /home/adm-mgrgh/.isabelle/Isabelle2026/isasearch/logs/update-errors.log
 ```
 
 To use a release, download all parts, then unpack and import them:
