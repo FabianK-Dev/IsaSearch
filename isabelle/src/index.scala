@@ -29,6 +29,7 @@ import org.apache.lucene.search.{
   MatchAllDocsQuery
 }
 import org.apache.lucene.index.Term
+import org.apache.solr.index.NoMergePolicyFactory
 
 
 object Index {
@@ -97,9 +98,21 @@ object Index {
     )
     val fields = Solr.Fields(id, entry, record, raw, vector)
 
+    // Segments are merged once, by merge_segments: a background merge of HNSW graphs can outlast
+    // the time Solr allows for closing a core.
     override def solr_config: XML.Body = super.solr_config.map {
       case XML.Elem(m, body) =>
-        XML.Elem(m, body :+ Solr.Class("codecFactory", "SchemaCodecFactory"))
+        val no_merges = XML.Elem(
+          Markup("mergePolicyFactory", List("class" -> classOf[NoMergePolicyFactory].getName.nn)),
+          Nil
+        )
+        XML.Elem(
+          m,
+          body ::: List(
+            Solr.Class("codecFactory", "SchemaCodecFactory"),
+            XML.elem("indexConfig", List(no_merges))
+          )
+        )
       case x => x
     }
   }
@@ -111,8 +124,8 @@ object Index {
     root + Path.explode("solr/" + kind + "/data/index")
 
   // A search visits the HNSW graph of every segment, and each batch of an import commits a
-  // segment of its own. A generation is read-only once published, so its segments are merged
-  // into one beforehand, with the HNSW parameters of the schema.
+  // segment of its own, which Solr leaves unmerged. A generation is read-only once published, so
+  // its segments are merged into one beforehand, with the HNSW parameters of the schema.
   def merge_segments(index: Path): Unit = {
     val workers = Multithreading.max_threads()
     val executor = Executors.newFixedThreadPool(workers).nn

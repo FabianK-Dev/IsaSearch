@@ -135,7 +135,11 @@ object Tests {
 
     Isabelle_System.with_tmp_dir("isasearch-merge") { tmp =>
       val schema = new Index.Schema(2, Distance_Metric.Cosine)
-      val vectors = List(Array(1f, 0f), Array(0.6f, 0.8f), Array(0f, 1f))
+      // More commits than a tier of Lucene's default merge policy holds.
+      val vectors = (0 until 12).toList.map { i =>
+        val angle = i * math.Pi / 22
+        Array(math.cos(angle).toFloat, math.sin(angle).toFloat)
+      }
       using(Solr.init(tmp + Path.basic("solr")).init_database("theorems", schema)) { db =>
         for ((vector, i) <- vectors.zipWithIndex) db.transaction {
           db.execute_batch_insert(List((doc: Solr.Document) => {
@@ -151,14 +155,14 @@ object Tests {
       def segments_nearest(): (Int, String) =
         using(FSDirectory.open(index.java_path).nn) { dir =>
           using(DirectoryReader.open(dir).nn) { reader =>
-            val query = new KnnFloatVectorQuery("vector", Array(0.7f, 0.7f), 1)
+            val query = new KnnFloatVectorQuery("vector", vectors(4), 1)
             val hit = new IndexSearcher(reader).search(query, 1).nn.scoreDocs.nn(0).nn
             (reader.leaves().nn.size, reader.storedFields().nn.document(hit.doc).nn.get("id").nn)
           }
         }
-      assert(segments_nearest() == (3, "d1"), "One segment per committed batch")
+      assert(segments_nearest() == (12, "d4"), "Solr leaves the committed segments unmerged")
       Index.merge_segments(index)
-      assert(segments_nearest() == (1, "d1"), "Segments merged into one, vectors retained")
+      assert(segments_nearest() == (1, "d4"), "Segments merged into one, vectors retained")
     }
 
 
