@@ -612,43 +612,6 @@ object Integration_Tests {
         val descriptions = stub.completions()
         check(descriptions.size == 2, "resumption regenerated unchanged descriptions")
 
-        // Python description artifacts seed an empty store, which a build then reuses.
-        val artifact = root + Path.basic("document_descriptions.json")
-        write(artifact, descriptions.zipWithIndex.map { case (body, n) =>
-          n.toString -> Map("llm_description" -> stub.completion_text,
-            "zlib.adler32_checksum" -> 0, "model" -> "fixture", "prompt" -> stub.prompt(body))
-        }.toMap)
-        Isabelle_System.rm_tree(env.user + Path.explode("isasearch/llm_cache"))
-        check(run("seed", List(artifact.implode)).out.contains("2 stored"), "seeded store")
-        run("index", List("-n", "Example-Submission"))
-        check(described() == 2, "seeded descriptions generated again")
-
-        // The vectors of an index export seed an empty embedding store, which a build reuses.
-        val readiness = "IsaSearch embedding readiness check"
-        def embedded(since: Int): List[String] =
-          stub.calls.drop(since).collect { case (path, body) if path.endsWith("embeddings") =>
-            strings(body, "input") }.flatten.distinct.filterNot(_ == readiness)
-        val inputs = embedded(0)
-        val export_dir = root + Path.basic("export")
-        val export_theorems = Isabelle_System.make_directory(export_dir + Path.basic("theorems"))
-        File.write(export_theorems + Path.basic(Index_Format.documents),
-          inputs.map(t => JSON.Format(Map("embedding_input" -> t))).mkString("", "\n", "\n"))
-        Bytes.write(export_theorems + Path.basic(Index_Format.vectors),
-          Bytes(inputs.toArray.flatMap(_ => bytes(Array(1.0f, 0.0f, 0.0f)))))
-        write(export_dir + Path.basic(Index_Format.manifest), Map(
-          "format" -> Index_Format.name, "version" -> Index_Format.version,
-          "corpora" -> List(Map("kind" -> "theorems", "count" -> inputs.size, "dimension" -> 3,
-            "metric" -> "cosine", "recipe" -> Map("model" -> "fixture", "backend" -> "openai",
-              "max_characters" -> 8000, "add_metadata" -> false,
-              "prompts" -> Map("embed" -> "{doc_src}", "retrieve" -> "{search_query}"))))))
-        Isabelle_System.rm_tree(env.user + Path.explode("isasearch/embeddings"))
-        check(run("seed", List(export_dir.implode)).out
-          .contains(inputs.size.toString + " vectors stored"), "seeded vectors")
-        val calls_before_seeded = stub.calls.size
-        run("index", List("-n", "Example-Submission"))
-        check(inputs.nonEmpty && embedded(calls_before_seeded).isEmpty,
-          "seeded vectors embedded again")
-
         val results = found()
         check(results.size == 2 && results.forall(d => str(d, "entry") == "Example-Submission"),
           "searchable entry")
@@ -782,8 +745,8 @@ object Integration_Tests {
           .contains("Building again, missing PIDE exports (1): Example-Submission") &&
           found().size == 2, "missing PIDE exports rebuilt")
 
-        // As in Python, a description cut off at max_tokens on every attempt is kept and
-        // reported, and a document whose description fails is left out until the next build.
+        // A description cut off at max_tokens on every attempt is kept and reported, and a
+        // document whose description fails is left out until the next build.
         val truncation = Isabelle_System.make_directory(copied + Path.explode("thys/Truncation"))
         File.write(truncation + Path.basic("ROOT"),
           "chapter AFP\n\nsession Truncation = HOL +\n  theories Truncation\n")

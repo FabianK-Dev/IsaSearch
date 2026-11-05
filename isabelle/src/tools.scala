@@ -92,7 +92,6 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -v        verbose progress
 
 Import: -f EXPORT_DIR. Index: SESSION ... (or isabelle_sessions in config).
-Seed: ARTIFACT ... (description artifacts) or EXPORT_DIR ... (index exports, vectors).
 Search: QUERY. Index_build: -D component output directory.
 Benchmark never builds indexes; supply the required prebuilt variants.
 Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark runs).
@@ -145,7 +144,6 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
           else error("Pair each configuration -c FILE with an index name -i NAME")
         progress.echo("Log: " + log.expand.implode)
         Corpus_Build.run(builds, args, no_build, progress)
-      case Tool_Command.Seed => Seed.run(config, args.map(Path.explode), progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
       case Tool_Command.Test => Tests.run(args)
       case Tool_Command.Integration_Test => Integration_Tests.run(progress)

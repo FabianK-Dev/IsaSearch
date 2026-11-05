@@ -185,18 +185,6 @@ object Inference {
       stored("embeddings", hash(key), "f32")
     }
 
-    // Stores a vector computed elsewhere for this backend and model, e.g. by the Python
-    // implementation, unless the store already has one.
-    def store_embedding(text: String, space: Embedding_Space, vector: Array[Float]): Boolean = {
-      val path = embedding_path(text, space)
-      if (path.is_file) false
-      else {
-        space.validate(vector)
-        write_bytes(path, Bytes(bytes(vector)))
-        true
-      }
-    }
-
     def embed_stored(texts: List[String], space: Embedding_Space): List[Array[Float]] = {
       val paths = texts.map(embedding_path(_, space))
       val missing = texts.zip(paths).filterNot(_._2.is_file).distinctBy(_._2)
@@ -296,16 +284,6 @@ object Inference {
     private def output_path(role: Model_Role, body: Obj): Path =
       stored("llm_cache", hash(canonical(Map("model" -> model(role), "body" -> body))), "json")
 
-    // Stores an output produced elsewhere for the request this client would send.
-    def store_output(prompt: String, role: Model_Role, text: String, source: String): Boolean = {
-      val path = output_path(role, request(prompt, role, false)._2)
-      if (path.is_file) false
-      else {
-        write(path, Map("text" -> text, "source" -> source))
-        true
-      }
-    }
-
     def generate(
       prompt: String,
       role: Model_Role = Model_Role.Query,
@@ -329,13 +307,13 @@ object Inference {
       }
       val attempts = if (health) 1 else config.positive("llm_attempts", 3)
       var text = ""
-      // As in Python, a completion cut off at max_tokens on every attempt is still accepted
-      // where its text is better than none (corpus descriptions), and reported as truncated.
+      // A completion cut off at max_tokens on every attempt is still accepted where its text
+      // is better than none (corpus descriptions), and reported as truncated.
       var truncated_text = ""
       var failure: Option[Failure] = None
       var attempt = 0
       while (attempt < attempts && text.isEmpty) {
-        // Python's generate_with_retries changes temperature after a failed completion.
+        // A retry after a failed completion changes the temperature.
         val retry_body =
           if (attempt == 0) body
           else if (llm_backend == Inference_Backend.Ollama)

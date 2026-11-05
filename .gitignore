@@ -1,30 +1,16 @@
 # Folders
-.cache
-.venv
 .vscode
-chroma_storages/*
-assets_extracted/
 
-# The deployment reads ISASEARCH_API_KEY from a .env file next to compose.yaml
-.env
-
-# Downloaded
-Isabelle*/
-!isabelle/
-!isabelle/**
+# Built by isabelle scala_build
 isabelle/lib/*.jar
 isabelle/lib/*.shasum
-afp*/
 
 # Files
 .directory
 *.zip
-*.pyc
 *.log
 .~lock.*.csv#
-*.ipynb
 .no_backup_tag
-benchmark/*.html
 
 # LaTeX
 ## The following file extensions are suggested by https://github.com/github/gitignore/blob/main/TeX.gitignore
@@ -358,10 +344,7 @@ TSWLatexianTemp*
 #*Notes.bib
 \#/
 .idea
-If
-this
 
-/artifacts/
 .DS_Store
 
 # Native component desktop metadata

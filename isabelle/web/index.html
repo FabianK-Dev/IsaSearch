@@ -119,9 +119,7 @@ bijections have inverses, bubblesort, ..."></textarea>
         let firstSearch = true;
 
         // Definition search is only available if the server has a definitions corpus, so the
-        // selector stays hidden until the server says otherwise. Query expansion and embeddings
-        // count as available unless the server reports them as unavailable: the Python server
-        // reports neither.
+        // selector stays hidden until the server says otherwise.
         fetch("/capabilities")
         .then(response => response.json())
         .then(res => {
@@ -129,7 +127,7 @@ bijections have inverses, bubblesort, ..."></textarea>
                 document.getElementById("kindSelector").style.display = "block";
             }
 
-            if (res.query_expansion === false) {
+            if (!res.query_expansion) {
                 const check = document.getElementById("disableRefineCheck");
                 const note = document.getElementById("refineUnavailable");
                 check.checked = true;
@@ -138,7 +136,7 @@ bijections have inverses, bubblesort, ..."></textarea>
                 note.style.display = "block";
             }
 
-            if (res.embedding_available === false) {
+            if (!res.embedding_available) {
                 const alert = document.getElementById("embeddingError");
                 alert.innerText = "Search is unavailable: " + res.embedding_error;
                 alert.style.display = "block";
@@ -146,9 +144,9 @@ bijections have inverses, bubblesort, ..."></textarea>
         })
         .catch(err => console.log(err));
 
-        // Servers mark a missing link as either "" or "#".
+        // Links that do not apply to a result are empty.
         function addLink(parent, url, text) {
-            if (!url || url === "#")
+            if (!url)
                 return;
 
             const link = document.createElement("a");

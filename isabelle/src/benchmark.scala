@@ -1,6 +1,6 @@
 /*  Title:      IsaSearch/isabelle/src/benchmark.scala
 
-Benchmark execution with the paper's saved query inputs and Python-compatible scoring.
+Benchmark execution with the paper's saved query inputs and its scoring.
 */
 
 package isabelle.isasearch

@@ -451,7 +451,7 @@ object Corpus_Build {
                 }
             }
           }
-          // As in Python, a document whose description fails after its retries is left out and
+          // A document whose description fails after its retries is left out and
           // tried again by the next build. A batch without any description means that the
           // server does not answer at all.
           val described = results.collect { case Right(d) => d }

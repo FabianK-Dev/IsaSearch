@@ -1,8 +1,7 @@
 # IsaSearch for Isabelle/Scala
 
 An Isabelle2026 component for semantic search, corpus construction, duplicate
-analysis and the paper's benchmarks. The Python implementation remains available
-in the parent project. This component exposes the search website, an HTTP API and
+analysis and the paper's benchmarks. It exposes the search website, an HTTP API and
 command-line tools. Scala runtime dependencies come exclusively from Isabelle,
 including its bundled Solr/Lucene. It neither starts nor installs model servers.
 
@@ -22,7 +21,7 @@ index (`benchmark/results`), the prompts (`prompts`), the configurations of inde
 runs (`runs`, e.g. `runs/isabelle2026-gemma4`), and frozen reference
 outputs for its tests (`tests/goldens.json`). Compilation uses `etc/build.props`;
 registered Scala tools use a FindFacts-style launcher to include Isabelle's Solr
-classpath. No sbt, Maven, Python, or extra JVM libraries are needed.
+classpath. No sbt, Maven, or extra JVM libraries are needed.
 
 AFP registration is needed only for building new content. Register an AFP 2026
 installation with `isabelle components -u /path/to/afp` (registering its `thys`
@@ -44,39 +43,17 @@ and working-directory revision (`hg id`, marked `+` for local changes) under
 release tarball, or when its working directory has local changes. Benchmark
 manifests and duplicate reports copy this as `index_provenance`.
 
-## Migrate the running Python index
+## Index generations
 
-Stop corpus updates for the entire export. Searches may continue. Use the Python
-environment from the deployment and its actual configuration:
-
-```sh
-python -m src.export_index -c config.json -o /data/isasearch-export
-isabelle isasearch_import -f /data/isasearch-export -i migrated
-```
-
-The exporter reads Chroma's public collection API, existing source caches,
-description artifacts, and Solr metadata. It does not import inference backends
-or regenerate descriptions or vectors. Solr must be reachable. Missing or stale
-records, changed embedding inputs, invalid vectors, or collection changes fail
-the export. The destination must not already exist. Use `--kind theorems` or
-`--kind definitions` to restrict it.
-
-The export includes actual collection metrics and dimensions, exact stored
-embedding inputs, float32 vectors, prompts, model identity, source checksums,
-descriptions and source metadata. Historical configuration must still describe
-the collection; persisted model/truncation settings are checked where Chroma
-provides them. For legacy collections without that evidence, the export records
-the supplied configuration and query startup checks reference vectors. A full
-production migration still needs an export from the deployed server.
-
-See [the interchange specification](INTERCHANGE.md). Imports validate into a new
-generation and publish only after all corpora succeed. Failed imports preserve
-the previous generation. Before publishing, every corpus is merged into a single
-Lucene segment, so that a search walks one HNSW graph rather than one per imported
-batch. Builds publish through the same import, and a generation published without
-this merge stays slow until it is imported or built again. Native Solr approximate
-ranking may differ from Chroma; reported cosine distance and squared Euclidean
-distance are computed from the retained vectors, independently of Lucene's scores.
+Builds write their corpora in the [interchange format](INTERCHANGE.md) and publish
+them through the import that `isabelle isasearch_import -f DIR -i NAME` offers for
+any interchange directory. Imports validate into a new generation and publish only
+after all corpora succeed. Failed imports preserve the previous generation. Before
+publishing, every corpus is merged into a single Lucene segment, so that a search
+walks one HNSW graph rather than one per imported batch; a generation published
+without this merge stays slow until it is imported or built again. Reported cosine
+distance and squared Euclidean distance are computed from the retained vectors,
+independently of Lucene's scores.
 
 ## Configure inference and search
 
@@ -94,9 +71,9 @@ A mismatch is an error rather than silently returning invalid similarities.
 
 ```sh
 export ISASEARCH_API_KEY='your-server-key'
-isabelle isasearch_search -c /path/to/config.json -i migrated 'a finite union of countable sets'
-isabelle isasearch_search -c /path/to/config.json -i migrated -k definitions 'a partial order'
-isabelle isasearch_server -c /path/to/config.json -i migrated -p 5001
+isabelle isasearch_search -c /path/to/config.json -i plain 'a finite union of countable sets'
+isabelle isasearch_search -c /path/to/config.json -i plain -k definitions 'a partial order'
+isabelle isasearch_server -c /path/to/config.json -i plain -p 5001
 ```
 
 Instead of an environment variable, `openai_api_key_file` names a private file with
@@ -117,9 +94,7 @@ Set `llm_backend` and `embedding_backend` independently. Generation uses
 `ollama_options`, and `llamacpp_extra_body`. Embedding extensions use
 `embedding_extra_body`. Mandatory model/input/stream fields take precedence.
 Ollama sends `truncate=false`; recorded client-side character truncation governs
-embedding inputs. It never downloads a model. Python's in-process
-sentence-transformers backend must be served through an HTTP embedding endpoint
-for Scala use.
+embedding inputs. It never downloads a model.
 
 Common limits have configuration owners: `llm_request_timeout` (600 seconds),
 `inference_connect_timeout` (10), `inference_health_timeout` (10), `llm_attempts`
@@ -131,7 +106,7 @@ error. Searches and duplicate lookups rank `search_candidates` (500) approximate
 nearest neighbours by exact distance before applying their limit, because the
 HNSW graph alone misses some of the nearest documents. HTTP 429 and transient server/transport errors are retried with bounded
 backoff. Failed, empty, or truncated completions are not cached, with one
-exception: as in the Python implementation, a corpus description that is cut off at
+exception: a corpus description that is cut off at
 `max_tokens` on every attempt is kept, stored as truncated, and reported. A document
 whose description still fails after its retries is left out of the index, reported,
 and described by the next build; a batch in which no description succeeds stops the
@@ -142,7 +117,7 @@ build. Corpus entries of the manifest list these documents under
 
 `isabelle isasearch_server` also serves the search page at its root, e.g.
 `http://localhost:5001/` for `-p 5001`. The page and its libraries live in `web`
-and are shared with the Python server; the libraries are vendored in
+and the libraries are vendored in
 `web/vendor`, so the page works without network access. Controls follow
 `/capabilities`: definition search appears with a definitions corpus, query
 refinement is disabled while query expansion is unavailable, and an unavailable
@@ -261,38 +236,6 @@ generations publish atomically; existing readers retain their opened generation.
 Old generations and store entries are never deleted automatically; remove them
 manually once no readers or builds need them.
 
-### Seed descriptions from Python artifacts
-
-Descriptions that the Python implementation generated can seed the store, so that a
-build does not describe those documents again:
-
-```sh
-isabelle isasearch_seed -c /path/to/build-config.json \
-  artifacts/MODEL/document_descriptions.json artifacts/MODEL/definition_descriptions.json
-```
-
-Use the build configuration: each stored description is keyed by the request this
-configuration sends for the artifact's recorded prompt, so a build reuses it exactly
-when it renders the same prompt for the same document model. Entries of another or
-unrecorded model, and entries without prompt or marked description, are skipped
-and counted. Existing store entries are kept. The configuration must describe how the
-artifacts were generated (sampling parameters and provider extensions); this cannot
-be checked from the artifacts. Python kept descriptions that were cut off at
-`max_tokens`; seeded entries are accepted as stored, without being marked truncated.
-Artifacts are streamed and read without Python. After seeding, they are no longer
-needed; each build reports how many stored descriptions it reused.
-
-Vectors seed the embedding store from an index export (see
-[Migrate the running Python index](#migrate-the-running-python-index)), or from a
-vectors only export, which skips the cross-checks against source caches,
-descriptions and Solr: `python -m src.export_index -c config.json -o DIR
---vectors-only`. Pass the export directory to `isasearch_seed`, alone or together
-with artifacts. Each vector
-is stored under the key a build of this configuration looks up for the document's
-exact embedding input. Corpora embedded by another backend or model, or with
-another `openai_embedding_max_characters`, are skipped and reported. Seeding can
-run while a build is running; the build reuses seeded vectors from its next batch.
-
 Pruning more than half of a previously indexed corpus requires the explicit
 configuration `allow_large_prune: true`. Review session selection first. Empty
 corpora are omitted; an entirely empty index is rejected.
@@ -300,14 +243,14 @@ corpora are omitted; an entirely empty index is rejected.
 ## Distribute indexes
 
 ```sh
-isabelle isasearch_index_build -i migrated -D /path/to/components
-isabelle components -u /path/to/components/isasearch_migrated-YYYYMMDD
+isabelle isasearch_index_build -i plain -D /path/to/components
+isabelle components -u /path/to/components/isasearch_plain-YYYYMMDD
 ```
 
 The tool creates an Isabelle data component with a compressed `File_Store`
 database and settings. Ship this directory alongside the code component. For a
-bundled index, place the generated `migrated.db` under the code component's
-`lib/indexes/`. Users select it with `-i migrated`. Distribution archives are
+bundled index, place the generated `plain.db` under the code component's
+`lib/indexes/`. Users select it with `-i plain`. Distribution archives are
 immutable: first use extracts into the writable user directory, then opens
 read-only Lucene readers. No generative model is needed to extract or use a
 prebuilt corpus. Configuration and inference caches are not packaged.
@@ -315,8 +258,8 @@ prebuilt corpus. Configuration and inference caches are not packaged.
 ## Duplicate analysis
 
 ```sh
-isabelle isasearch_duplicates -c /path/to/config.json -i migrated -k all -x -e Example-Submission
-isabelle isasearch_duplicates -c /path/to/config.json -i migrated -k definitions -N 10 -J
+isabelle isasearch_duplicates -c /path/to/config.json -i plain -k all -x -e Example-Submission
+isabelle isasearch_duplicates -c /path/to/config.json -i plain -k definitions -N 10 -J
 ```
 
 Use repeated `-e` for explicit entries, `-N` for newest entries by indexed dates,
@@ -327,7 +270,7 @@ compatible embedding contracts. Same-entry results are excluded; self-retrieval
 checks and syntactic evidence are reported independently. Without a usable query
 LLM, reports contain vector/syntactic evidence only.
 
-Defaults match Python: `dedup_top_k=10`, `dedup_distance_threshold=0.3`,
+Defaults: `dedup_top_k=10`, `dedup_distance_threshold=0.3`,
 `dedup_strong_distance_threshold=0.05`, `dedup_syntactic_threshold=0.9`, and
 `dedup_max_judged_per_item=3`. Reports are saved under the user reports directory
 or `-D`: one JSON file containing the evidence, a `_possible.md` view of all
@@ -351,14 +294,14 @@ Indexes must already exist. Strategies are `baseline` (original), `R`
 (expanded), `UR` (concatenated), and their metadata variants `M`, `MR`, `MUR`.
 Comma-separated strategies are supported. Manifest metadata flags and expansion
 availability are validated before execution. No configuration files are rewritten
-and no corpus caches are deleted. Scraping remains in the Python implementation.
+and no corpus caches are deleted.
 
 The runner handles multiline CSV and JSON targets, skip annotations, missing
-targets, title/natural/noisy queries, and Python's Hit@10, NDCG, reciprocal rank,
+targets, title/natural/noisy queries, and the paper's Hit@10, NDCG, reciprocal rank,
 rank, and sample counts. It preserves the existing JSON structure and labels.
 Historical targets replay all three saved paper inputs verbatim, including the
-noisy query, verified against the UR checksum in `paper-baselines.json`. This
-matches Python's `benchmark.queries`; it does not generate new noise. Additional
+noisy query, verified against the UR checksum in `paper-baselines.json`. It does
+not generate new noise. Additional
 targets use the CSV title and natural-language queries and record
 `paper_noisy_query_missing` for the noisy query. Current CSV target identifiers
 are retained in result metadata. Set `benchmark_add_top_results` for top-ten details.
@@ -392,7 +335,7 @@ isabelle isasearch_integration_test
 ```
 
 `isasearch_test` checks the portable algorithms against `tests/goldens.json`:
-reference outputs of the former Python implementation for SequenceMatcher ratios,
+frozen reference outputs of the original implementation for SequenceMatcher ratios,
 replayed paper queries, metrics, duplicate classification, verdict parsing,
 statement normalization, both duplicate report views, and benchmark comparisons.
 Interchange directories given as arguments are imported, searched, packaged, and
@@ -402,7 +345,7 @@ corrupted.
 directories against a deterministic local inference stub: interchange import,
 search over all inference backends with retries and failures, the HTTP API and
 the website with its assets, packaged indexes, query caching, benchmarks, and duplicate analysis with judge
-failures. With a registered AFP it also builds, seeds, updates, and prunes corpora
+failures. With a registered AFP it also builds, updates, and prunes corpora
 from `Example-Submission`. No real model is contacted.
 
 Application choices use enums in `src/domain.scala`; parsing and serialization
