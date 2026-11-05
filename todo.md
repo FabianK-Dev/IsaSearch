@@ -23,6 +23,72 @@
      serve time. Measure the time and size on a few sessions first; the size is probably a few
      GB.
 
+- [ ] **Release the index on GitHub for laptops without a GPU.** Searching a prebuilt index needs
+  only the index data and an embedder for the queries (`llm_backend: none` already works). The
+  data is the obstacle: about 515,000 documents with 2560-dimensional float32 vectors of
+  `Qwen3-Embedding-4B`, about 5.3 GB of vectors and about 6 GB per generation. The query embedder
+  is not: the Q8_0 GGUF of the same model ranks as the server does and embeds a query in half a
+  second on a laptop CPU (measurements in `isabelle/runs/isabelle2026-gemma4/README.md`).
+
+  The channel is GitHub Releases of this repository, e.g. a tag
+  `index-isabelle2026-afp2026-plain-v1`. Plain git rejects files above 100 MB and Git LFS meters
+  storage and bandwidth; release assets may have up to 2 GiB each, with no limit on the total
+  size or on downloads. Zenodo could mirror the release for a DOI that the paper cites.
+
+  Sketch, in order:
+  1. Done (2026-11-05): drift and benchmark of F16, Q8_0, Q6_K and Q4_K_M on an M2 Pro, in
+     `isabelle/runs/isabelle2026-gemma4/README.md`. Q8_0 drifts no more than the server's own
+     embedder, keeps the tolerance of 0.005 and ranks as the server does; Q6_K and Q4_K_M exceed
+     the tolerance although their rankings stay close. `runs/isabelle2026-gemma4/laptop.json`
+     searches with Q8_0 on localhost. Not measured: an x86 laptop and Ollama.
+  2. Make the reference check cheap. `Search.Engine.refresh` re-embeds the first two documents
+     of every corpus, inputs of up to 8000 characters, at most every 30 seconds and inside a
+     user's search. On the M2 Pro CPU a document takes 1.3 to 2.5 s; on a 4-core laptop of 2019
+     it would be up to a minute. Its longest input here has 2,443 tokens, so the embedder needs a
+     context of 4096 although a query has a few dozen tokens; a context of 2048 fails the check
+     with HTTP 400. Let the build record a few short reference inputs with their vectors in the
+     manifest and validate against those.
+  3. Ship the interchange format rather than the packaged `File_Store` database: it is
+     independent of the bundled Lucene version, carries checksums and provenance, and
+     `isasearch_import` reads it. A version 2 adds `dtype` (`float32` or `float16`) for the
+     vectors: float16 halves them, an error of about 1e-4 in cosine, far below the drift of a
+     quantized embedder, and the import widens them to float32, so the Lucene field, the
+     reranking and the reported distances stay as they are. Each corpus then fits one asset
+     (theorems 389,754 × 2560 × 2 bytes, about 2.0 GB and just below 2 GiB; definitions about
+     0.64 GB). The import should also read
+     zstd-compressed `documents.jsonl` directly. This needs an `isasearch_export` that writes a
+     published generation as interchange; builds only write it on the way to an import. Measure
+     how long the import, which builds the HNSW graph, takes on a laptop. The packaged database
+     is no fallback as it stands: `isasearch_index_build` fails on this index with an
+     `IllegalArgumentException`, because its Lucene vector files (3.99 GB for theorems, 1.28 GB
+     for definitions) exceed what one `File_Store` entry holds.
+  4. Publish: the assets, `SHA256SUMS`, and release notes with the manifest provenance, the
+     drift and benchmark results with the hardware they were measured on, and the commands to
+     download, import, start the embedder and serve. Link the official GGUF and record its hash
+     rather than uploading it. A NOTICE covers the AFP and Isabelle sources in the documents
+     (BSD/LGPL per entry) and the Gemma-generated descriptions (check Gemma's terms for
+     redistributing outputs); `Qwen3-Embedding` is Apache-2.0.
+
+  Later, if the measurements ask for it:
+  - Lucene 9.12 offers `Lucene99HnswScalarQuantizedVectorsFormat`: the graph search reads int8
+    vectors (about 1.3 GB instead of 5.3 GB in memory), the reranking still the float32 ones
+    from disk. Compare its recall with the current format.
+  - A small query encoder for older and 8 GB laptops, e.g. Intel machines without a GPU, where
+    the 4B model needs some 2 s per query and about 4.8 GB. Train a student (a small BERT of
+    ~30M parameters, or `Qwen3-Embedding-0.6B` with a projection to 2560 dimensions) to
+    reproduce the 4B model's query vectors, so the document vectors and the index stay as they
+    are (LEAF, arXiv 2509.12539: 97.7% of its teacher on BEIR). The targets are cheap: the
+    stored descriptions read like queries, so embedding them with the `retrieve` prompt on the
+    server gives 515,000 training pairs without generating anything. The small student trains
+    in hours on the model server (Ryzen AI Max+ 395, 128 GB); the 0.6B one would take days. It
+    runs behind the same `/v1/embeddings` endpoint as a GGUF, at a few milliseconds per query.
+    Accept it only if the benchmark stays close to the 4B model; named theorems (title queries)
+    are the likely weakness, which BM25 over descriptions and lemma names would cover. The
+    fallback is re-embedding the corpus with `Qwen3-Embedding-0.6B` (1024 dimensions, about
+    1 GB of vectors), about 90% of the 4B model on MTEB retrieval.
+  - `isasearch_fetch -r TAG -i NAME`, which downloads the assets, checks them against the
+    manifest and imports them in one step.
+
 ## Informalization
 
 - [ ] **Do not cut the statement at a fixed number of characters.** The describe prompt
