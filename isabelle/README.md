@@ -1,8 +1,8 @@
 # IsaSearch for Isabelle/Scala
 
 An Isabelle2026 component for semantic search, corpus construction, duplicate
-analysis and the paper's benchmarks. The Python implementation and browser UI
-remain available in the parent project. This component exposes an HTTP API and
+analysis and the paper's benchmarks. The Python implementation remains available
+in the parent project. This component exposes the search website, an HTTP API and
 command-line tools. Scala runtime dependencies come exclusively from Isabelle,
 including its bundled Solr/Lucene. It neither starts nor installs model servers.
 
@@ -137,6 +137,17 @@ whose description still fails after its retries is left out of the index, report
 and described by the next build; a batch in which no description succeeds stops the
 build. Corpus entries of the manifest list these documents under
 `truncated_descriptions` and `undescribed_documents`.
+
+## Website
+
+`isabelle isasearch_server` also serves the search page at its root, e.g.
+`http://localhost:5001/` for `-p 5001`. The page and its libraries live in `web`
+and are shared with the Python server; the libraries are vendored in
+`web/vendor`, so the page works without network access. Controls follow
+`/capabilities`: definition search appears with a definitions corpus, query
+refinement is disabled while query expansion is unavailable, and an unavailable
+embedding service is reported above the search form. Theory, entry and file
+links appear where results have them.
 
 ## HTTP API
 
@@ -389,8 +400,8 @@ corrupted.
 
 `isasearch_integration_test` runs the command-line tools in isolated Isabelle user
 directories against a deterministic local inference stub: interchange import,
-search over all inference backends with retries and failures, the HTTP API,
-packaged indexes, query caching, benchmarks, and duplicate analysis with judge
+search over all inference backends with retries and failures, the HTTP API and
+the website with its assets, packaged indexes, query caching, benchmarks, and duplicate analysis with judge
 failures. With a registered AFP it also builds, seeds, updates, and prunes corpora
 from `Example-Submission`. No real model is contacted.
 

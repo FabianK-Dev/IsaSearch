@@ -197,10 +197,35 @@ object Search {
       }
     }
 
+  /** website **/
+
+  // The page and its vendored libraries, read from the component on every request.
+  def web_dir: Path = component + Path.basic("web")
+
+  def web_mime_type(file: Path): String =
+    file.get_ext match {
+      case "html" => HTTP.Content.mime_type_html
+      case "css" => HTTP.Content.mime_type_css
+      case "js" => HTTP.Content.mime_type_js
+      case "woff2" => "font/woff2"
+      case _ => HTTP.Content.mime_type_text
+    }
+
+  // Bound at the root, the website receives every request the API services do not.
+  val website: HTTP.Service =
+    new HTTP.Service("") {
+      def apply(request: HTTP.Request): Option[HTTP.Response] =
+        (if (request.toplevel) Some(Path.basic("index.html")) else request.uri_path)
+          .map(web_dir + _)
+          .filter(_.is_file)
+          .map(file => HTTP.Response(Bytes.read(file), web_mime_type(file)))
+    }
+
   def server(engine: Engine, port: Int): HTTP.Server = HTTP.server(
     port,
     name = "",
     services = List(
+      website,
       service("capabilities")(_ => engine.capabilities),
       service("search") { args =>
         engine.search(

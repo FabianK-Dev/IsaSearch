@@ -418,6 +418,29 @@ object Integration_Tests {
         (response.statusCode(), obj(JSON.parse(response.body().nn)))
       }
 
+      def fetch(request: String): (Int, String, String) = {
+        val response = client.send(
+          HttpRequest.newBuilder(URI.create(api + request)).nn.GET().nn.build(),
+          HttpResponse.BodyHandlers.ofString()).nn
+        val content_type = response.headers().nn.firstValue("Content-Type").nn.orElse("").nn
+        (response.statusCode(), content_type, response.body().nn)
+      }
+
+      val (page_code, page_type, page) = fetch("/")
+      check(page_code == 200 && page_type.startsWith("text/html") && page.contains("<title>"),
+        "website page")
+      val katex_css = "vendor/latex.js/css/katex.css"
+      val assets =
+        """(?:src|href)="(vendor/[^"]+)"""".r.findAllMatchIn(page).map(_.group(1)).toList :::
+          """url\('\.\./(fonts/[^']+)'\)""".r.findAllMatchIn(fetch("/" + katex_css)._3)
+            .map("vendor/latex.js/" + _.group(1)).toList
+      check(assets.contains(katex_css) && assets.exists(_.endsWith(".woff2")), "website assets")
+      for (asset <- assets) check(fetch("/" + asset)._1 == 200, "website asset " + asset)
+      check(fetch("/vendor/bootstrap/bootstrap.bundle.min.js")._2.startsWith("text/javascript"),
+        "script type")
+      for (missing <- List("/missing.html", "/%2e%2e/etc/build.props"))
+        check(fetch(missing)._1 == 404, "no website file " + missing)
+
       val (_, capabilities) = get("/capabilities")
       check(bool(capabilities, "embedding_available") && !bool(capabilities, "query_expansion"),
         "capabilities")

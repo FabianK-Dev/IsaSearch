@@ -13,6 +13,8 @@ Finally, Flask and package 'waitress' is used to serve both the REST API and sta
 Note: To simplify matters, from now on "theorem" will be used representatively for theorems, lemmas, corollaries and propositions in comment and docstrings.
 """
 
+import os
+
 from flask import Flask, request, send_from_directory
 
 from src.bootstrap import load_config, boot_components, DEFINITIONS_LOAD
@@ -51,17 +53,20 @@ if KIND_DEFINITIONS in corpora:
 print("Preparing Flask app...")
 app = Flask(__name__)
 
+# The web UI is shared with the Isabelle component, which serves the same directory.
+WEB_DIR = os.path.join(os.path.dirname(app.root_path), "isabelle", "web")
+
 
 # Serve the front end, i.e. index.html at /
 @app.route("/")
 def web():
-    return send_from_directory("html", "index.html")
+    return send_from_directory(WEB_DIR, "index.html")
 
 
-# Serve other static files, e.g. images, stylesheets, etc.
+# Serve other static files, e.g. the vendored stylesheets and scripts
 @app.route("/<path:filename>")
 def static_files(filename):
-    return send_from_directory("html", filename)
+    return send_from_directory(WEB_DIR, filename)
 
 
 # Report which optional features this server offers, so that the web UI can hide what is unavailable.

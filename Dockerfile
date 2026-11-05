@@ -33,6 +33,7 @@ RUN set -eu; \
 COPY benchmark /app/benchmark
 COPY isabelle/benchmark /app/isabelle/benchmark
 COPY isabelle/prompts /app/isabelle/prompts
+COPY isabelle/web /app/isabelle/web
 COPY src /app/src
 COPY tests /app/tests
 COPY config.json /app/config.json
