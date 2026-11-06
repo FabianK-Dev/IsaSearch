@@ -100,7 +100,41 @@
   below on descriptions, notation queries, entry-level search, goal queries and generated facts;
   theorems and definitions in one call (item under "Search") would save agents a second call.
 
+  Second round (2026-11-06, about 35 queries against the filters): `available: "loaded"` found
+  `card_Un_Int` (rank 6 before) and `sum_list_mono` (missed before), but as a default it would
+  hide 5 of 16 known answers (HOL-Library, HOL-Computational_Algebra, AFP) without a sign that
+  better hits exist; better keep `"any"` and rank loaded hits up within a margin (about 0.03-0.05:
+  `IVT` lost to an AFP restatement by 0.05), and with an explicit `"loaded"` name the closest
+  hit it dropped when that is much closer. `mentions` matches source text, so it misses
+  constants written with notation (`sum_list` vs `∑x←xs`; `\<Sum>` works) and qualified names
+  match nothing. The skill now records these, a distance scale, the converse trap and the items
+  below on `context`, names and example theories.
+
 ## Search
+
+- [ ] **Derive `context` from the fact, not from the first declared constant.**
+  `Search.qualifier` (`isabelle/src/search.scala`) takes the qualifier of the first of `consts`,
+  then `typs`, then `thms`. For package commands that is an internal constant: `datatype 'a tree`
+  (HOL-Library.Tree) gets `raw_prod.tree.sum2.prod.Product_Type`, `typedef 'a multiset` gets
+  `typerep_multiset_inst`, every `class` gets `class`. Take the qualifier only where the
+  command stands inside a `locale`/`context`/`class` block (the kname of its main entity), and
+  report none for top-level package commands.
+
+- [ ] **Show a hit's useful names first.** The tool's `names` lists `consts`, `typs`, then
+  `thms` and keeps 20, so a `datatype` hit shows BNF internals (`alg_tree`, `mor_tree`,
+  `Rep_tree_IITN_tree`, `typerep_..._inst`) and cuts its constructors, `tree.induct` and
+  `tree.simps` (`more_names` 87-206). Order by use: the declared type and constants, then
+  facts the user states or uses (`.induct`, `.simps`, `.intros`, map/set/rel), internal names
+  (`_IITN_`, `pre_`, `alg_`, `mor_`, `typerep`, `term_of`, `narrowing`, `random`,
+  `full_exhaustive`) last or not at all.
+
+- [ ] **Keep examples and unfinished statements out of the way.** Definition queries rank
+  example theories above the library: the group of `HOL-ex.MonoidGroup` above the HOL-Algebra
+  and HOL-New_Algebra locales, `BinTree` of `HOL-Nitpick_Examples.Refute_Nits` above
+  `HOL-Library.Tree`. Statements ending in `oops` (no `names`) are hits too, e.g.
+  `saturate_sat_preserving` of Ordered_Resolution_Prover. Mark example sessions (`HOL-ex`,
+  `HOL-Examples`, `*_Examples`) and unproven statements in the records, rank them down or let
+  a filter leave them out.
 
 - [ ] **Search theorems and definitions together.** A search covers exactly one corpus:
   `Search.Engine.search` takes a single `Corpus_Kind` (`isabelle/src/search.scala`), the
