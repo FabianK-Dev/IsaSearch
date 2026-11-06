@@ -39,8 +39,9 @@
   1. Done (2026-11-05): drift and benchmark of F16, Q8_0, Q6_K and Q4_K_M on an M2 Pro, in
      `isabelle/runs/isabelle2026-gemma4/README.md`. Q8_0 drifts no more than the server's own
      embedder, keeps the tolerance of 0.005 and ranks as the server does; Q6_K and Q4_K_M exceed
-     the tolerance although their rankings stay close. `runs/isabelle2026-gemma4/laptop.json`
-     searches with Q8_0 on localhost. Not measured: an x86 laptop and Ollama.
+     the tolerance although their rankings stay close. The component's default configuration
+     `isabelle/etc/search.json` searches with Q8_0 on localhost. Not measured: an x86 laptop
+     and Ollama.
   2. Make the reference check cheap. `Search.Engine.refresh` re-embeds the first two documents
      of every corpus, inputs of up to 8000 characters, at most every 30 seconds and inside a
      user's search. On the M2 Pro CPU a document takes 1.3 to 2.5 s; on a 4-core laptop of 2019
@@ -58,6 +59,7 @@
      what one `File_Store` entry holds. Still open, to make releases cheaper for users:
      - A faster import. It commits every 256 documents on one thread (about 2,000 commits for
        the AFP); larger transactions and parallel parsing should shorten it several times.
+       Shipping the generation itself avoids the import altogether (next item).
      - Float16 vectors (an interchange version 2 with `dtype`, widened to float32 on import):
        they would shrink the download from 5.0 GB to about 3.3 GB.
   4. Publish. Done: `isabelle/runs/isabelle2026-gemma4/update` releases every new state of the
@@ -86,6 +88,111 @@
     1 GB of vectors), about 90% of the 4B model on MTEB retrieval.
   - `isasearch_fetch -r TAG -i NAME`, which downloads the assets, checks them against the
     manifest and imports them in one step.
+
+- [ ] **Ship the index ready to search, without the long import.** A user of a release today
+  unpacks the interchange export and runs `isasearch_import`, which rebuilds both Lucene indexes,
+  HNSW graphs included, from records and vectors: 36.5 minutes on the M2 Pro. Yet a generation
+  is already a self-contained, relocatable directory (`manifest.json` and a Solr home
+  `solr/` with the `theorems` and `definitions` cores, 5.7 GB on disk, less than the 8.2 GB of
+  the export), and the published generation is never written again. Ship that directory as it
+  is, and installing becomes unpacking plus a `current.json` switch, seconds instead of half an
+  hour.
+
+  Sketch:
+  - `isasearch_export` (or a sibling) packs the current generation's directory instead of
+    writing interchange; the release pipeline (`runs/isabelle2026-gemma4/update`) packs and
+    splits it as now. Check the zstd ratio: HNSW graphs and float32 vectors may compress worse
+    than the JSON records.
+  - An install command (`isasearch_install -f DIR -i NAME`, and later `isasearch_fetch`)
+    moves the unpacked generation into `$ISASEARCH_HOME_USER/indexes/NAME`, checks it, and
+    publishes it with `Index.publish`. The check: the manifest's file hashes, and that the
+    Lucene format is one the bundled Solr/Lucene reads. The release is per Isabelle version, so
+    the Lucene version matches; record it in the manifest so that a mismatch fails clearly.
+  - Keep the interchange export as the portable format for other Lucene versions and other
+    tools, and as the fallback when a direct install is refused. A faster `isasearch_import`
+    (see "Release the index on GitHub") then matters less.
+
+- [ ] **Offer the search as an extension of PIDE AI.** Kevin Kappelmann's
+  [isabelle-pide-ai](https://github.com/kappelmann/isabelle-pide-ai) lets AI agents work with
+  Isabelle over MCP or commands, and it is an Isabelle/Scala component like ours. Other
+  components extend it without changes on his side: a component lists `env:ISABELLE_PIDE_AI_JAR`
+  among the `requirements` of its `build.props`, registers its `PIDE_AI_Tool` classes under
+  `services`, and ships its own agent skill (PIDE AI's `pide-ai` skill tells agents to load the
+  skills of extensions). Its `Tool_Extensions/src/sledgehammer_tool.scala` is the template. So
+  the clean route is an extension component in this repository with an `isasearch` tool and a
+  `SKILL.md`, running `Search.Engine` inside the PIDE AI server.
+
+  Missing:
+  - A common Isabelle version. PIDE AI has branches `Isabelle2025-2` and `main`, which needs a
+    development Isabelle (`ISABELLE_VERSION`, a revision of October 2026); there is no
+    `Isabelle2026` branch yet, and this component targets Isabelle2026. Ask Kevin.
+  - Getting the index onto the user's machine in one step: a live release (token, NOTICE),
+    `isasearch_fetch`, and shipping the index ready to search (item above).
+  - A long-lived engine. `Search.Engine` and `Embedding_Server.start`/`close` exist, but the
+    tools wrap them in a scope (`Embedding_Server.apply`). A PIDE AI service would open the index
+    and start llama-server on the first search, and close both when the server stops. Our
+    `etc/settings` should export the jar (`ISASEARCH_JAR`) so the extension can require it.
+  - Results for agents: a compact list (fact name, theory, AFP entry, statement, short
+    description, kind, score) instead of the website's records, and theorems and definitions in
+    one search (item under "Search"). The gain over the CLI: the tool sees the agent's running
+    session, so it can mark which hits are usable there and which need an AFP import.
+  - The skill: when semantic search helps and when `find_theorems` or PIDE AI's `find_entities`
+    is the better tool, how to phrase queries, and that hits may need imports.
+  - Resources to state up front: 16 GB of RAM (llama-server about 5 GB, the index 5.7 GB
+    memory-mapped) and a 4.3 GB model download on first use.
+
+  Possible today without code: a skill that tells the agent to start `isabelle
+  isasearch_server` once and query `/search` with curl, about 0.5 s per query. Single
+  `isasearch_search` calls work too but take some 15 s each, since each starts llama-server.
+
+## Search
+
+- [ ] **Search theorems and definitions together.** A search covers exactly one corpus:
+  `Search.Engine.search` takes a single `Corpus_Kind` (`isabelle/src/search.scala`), the
+  `/search` service reads one `kind` parameter, the website offers a Theorems/Definitions radio
+  choice (`isabelle/web/index.html`), and `isasearch_search -k` rejects more than one kind
+  (`isabelle/src/tools.scala`). A user who does not know whether the answer is a lemma or a
+  definition has to search twice.
+
+  Sketch: accept several kinds (`kind=theorems,definitions`, `-k all`, checkboxes on the
+  website), search every selected corpus and merge the hits into one list ranked by score, each
+  result marked with its kind. The open question is whether the scores are comparable: each
+  corpus embeds the query with its own retrieve prompt (`Index.prompt(corpus.spec,
+  Prompt.Retrieve)`), so the same query gets two different vectors and the cosine scores of the
+  two corpora may sit at different levels. Check that on the benchmark queries before merging
+  by raw score; otherwise normalize per corpus or interleave by rank. Query refinement also uses
+  a prompt per corpus (`Prompt.Expand`), so a combined search either refines once per corpus
+  or needs one shared refinement prompt.
+
+- [ ] **Expand queries with a small local model.** The default `etc/search.json` sets
+  `llm_backend: none`, so a laptop search cannot expand its query; only the server has a query
+  LLM (Gemma 4). Expansion still pays off: the paper's run with Phi-3.5-mini at Q4_0 (3.8B, a
+  laptop-sized model) raised Hit@10 from 0.635 to 0.773 and MRR from 0.439 to 0.546 for about
+  1.4 s per query, and on the current corpus the original plus expanded query (`UR`) with Gemma
+  4 reached Hit@10 0.863 and MRR 0.613 against 0.811 and 0.577 without expansion (September
+  index against the one of November, so only roughly comparable). Most of the gain is on noisy
+  queries.
+
+  It has to be easy to turn on and off, since it costs a download, memory and seconds per
+  query:
+  - Per search, this exists: `-r`, `refine_query=true` and the website's checkbox, which
+    `/capabilities` greys out while expansion is unavailable.
+  - Per installation, one config entry should switch it, e.g. a `llamacpp_query_server` object
+    next to `llamacpp_embedding_server` with the same keys (`hf_repo` or `model_file`, context,
+    arguments). Without it, nothing is downloaded or started and the search runs as today. Start
+    that server on the first expanded query rather than at startup, so a user who never expands
+    pays nothing. `Embedding_Server` should become one managed llama.cpp server per role
+    instead of a second copy.
+
+  Measure first, on the laptop with the `UR` benchmark strategy: one or two models of 1 to 4B
+  parameters (e.g. Qwen3-1.7B and 4B, a small Gemma 4), with their latency on the CPU and on
+  Metal. An expansion generates some 100 to 200 tokens, so a 4B model probably needs 10 to 20 s
+  on an Intel CPU without a GPU; cap `max_tokens` accordingly. The expand prompt asks for a
+  paraphrase plus an Isabelle statement; a small model may do better with only the paraphrase.
+
+  Cheapest of all for Intel laptops: train the small query encoder (see "Release the index on
+  GitHub") to map a raw query to the teacher's embedding of query plus expansion, so expansion
+  costs nothing per query.
 
 ## Informalization
 
