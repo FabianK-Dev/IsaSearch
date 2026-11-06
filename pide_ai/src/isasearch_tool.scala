@@ -7,8 +7,8 @@ package isabelle.isasearch.pide_ai
 
 
 import isabelle._
-import isabelle.pide.ai.{JSON_Object, JSON_Schema, PIDE_AI_Server, PIDE_AI_Session, PIDE_AI_Tool,
-  PIDE_AI_Tool_Result, PIDE_AI_Tool_Schema, PIDE_AI_Tools, Task}
+import isabelle.pide.ai.{JSON_Object, JSON_Schema, PIDE_AI_Client_Context, PIDE_AI_Server,
+  PIDE_AI_Session, PIDE_AI_Tool, PIDE_AI_Tool_Result, PIDE_AI_Tool_Schema, PIDE_AI_Tools, Task}
 import isabelle.isasearch.{Corpus_Kind, Data, Text_Preparation}
 
 import java.net.{URI, URLEncoder}
@@ -176,7 +176,8 @@ class IsaSearch_Tool extends PIDE_AI_Tool("isasearch") with PIDE_AI_Tool.Read_On
   def handle(
     server: PIDE_AI_Server,
     args: JSON.Object.T,
-    progress: Progress
+    progress: Progress,
+    context: PIDE_AI_Client_Context
   ): PIDE_AI_Tool_Result =
     PIDE_AI_Tool_Result.result {
       val running = session(server, args)
