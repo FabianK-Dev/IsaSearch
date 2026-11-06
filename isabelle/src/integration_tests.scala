@@ -249,8 +249,9 @@ object Integration_Tests {
         // its source two lines below the indexed start line.
         val file = sources.map { dir =>
           val name = e + "/" + kind.name + ".thy"
-          File.write(Isabelle_System.make_directory(dir + Path.basic(e)) + Path.basic(kind.name).thy,
-            "theory T imports Main begin\n\n" + "\n" * i + source + "\n\nend\n")
+          val theory = Isabelle_System.make_directory(dir + Path.basic(e)) +
+            Path.basic(kind.name).thy
+          File.write(theory, "theory T imports Main begin\n\n" + "\n" * i + source + "\n\nend\n")
           "file" -> ("ISASEARCH_TEST_SOURCES/" + name)
         }
         val record = Map(
@@ -570,22 +571,33 @@ object Integration_Tests {
     query_stub.close()
   }
 
+  // The URL that a started server reports.
+  def api_url(server: Bash.Process): String = {
+    var url = ""
+    val output = new StringBuilder
+    while (url.isEmpty) {
+      val line = proper_value(server.stdout.readLine())
+        .getOrElse(error("API server stopped:\n" + output))
+      output ++= line + "\n"
+      url = Library.try_unprefix("IsaSearch API: ", line).map(Library.trim_string)
+        .getOrElse("")
+    }
+    url
+  }
+
   def http_api(env: Environment, stub: Stub, config_path: Path, plain: Path): Unit = {
     val server = env.process("server", List("-c", config_path.implode, "-i", "plain", "-p", "0"))
     try {
-      val api = {
-        var url = ""
-        val output = new StringBuilder
-        while (url.isEmpty) {
-          val line = proper_value(server.stdout.readLine())
-            .getOrElse(error("API server stopped:\n" + output))
-          output ++= line + "\n"
-          url = Library.try_unprefix("IsaSearch API: ", line).map(Library.trim_string)
-            .getOrElse("")
-        }
-        url
-      }
+      val api = api_url(server)
       val client = HttpClient.newHttpClient().nn
+
+      // The status of a POST request to a server, with or without the header of the website.
+      def post(base: String, request: String, header: Boolean): Int = {
+        val builder = HttpRequest.newBuilder(URI.create(base + request)).nn
+        if (header) builder.header(Search.post_header, "open")
+        client.send(builder.POST(HttpRequest.BodyPublishers.noBody()).nn.build(),
+          HttpResponse.BodyHandlers.ofString()).nn.statusCode()
+      }
 
       def get(request: String): (Int, Obj) = {
         val response = client.send(
@@ -651,6 +663,29 @@ object Integration_Tests {
       check(get("/search?query=unavailable")._1 == 503, "unavailable embedding service")
       check(!bool(get("/capabilities")._2, "embedding_available"), "refreshed capabilities")
       stub.mode = "ok"
+
+      // Both editors are enabled by default. An editor opens only what a POST with the
+      // website's header asks for; no editor is started here.
+      check(list(get("/capabilities")._2.getOrElse("editors", Nil)).map(e => str(obj(e), "name"))
+        == List("jedit", "vscode"), "editors by default")
+      val request = "/open?editor=vscode&kind=theorems&id=" +
+        java.net.URLEncoder.encode(str(hit, "id"), "UTF-8")
+      check(post(api, request, header = false) == 403, "open without the header")
+      check(post(api, request.replace("editor=vscode", "editor=emacs").nn, header = true) == 400,
+        "open in an unknown editor")
+      check(get(request)._1 == 405, "open by GET")
+      // A server for other machines turns editors off.
+      val shared = env.process("server",
+        List("-c", config_path.implode, "-i", "plain", "-o", "isasearch_editors=", "-p", "0"))
+      try {
+        val shared_api = api_url(shared)
+        val editors = list(obj(JSON.parse(client.send(
+          HttpRequest.newBuilder(URI.create(shared_api + "/capabilities")).nn.GET().nn.build(),
+          HttpResponse.BodyHandlers.ofString()).nn.body().nn)).getOrElse("editors", Nil))
+        check(editors.isEmpty, "no editors when turned off")
+        check(post(shared_api, request, header = true) != 200, "no open service without editors")
+      }
+      finally { shared.terminate() }
     }
     finally { server.terminate() }
   }

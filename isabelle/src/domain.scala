@@ -164,6 +164,29 @@ object Export_Format {
 }
 
 
+/** editors **/
+
+// The Isabelle front-ends that the website opens the local file of a result in, at a line:
+// each reuses its running window (Isabelle/jEdit only with an edit server, i.e. the JVM
+// property isabelle.jedit_server as in Isabelle's application bundles) or starts a new one.
+enum Isabelle_Editor(val name: String, val title: String) extends Named_Value {
+  case JEdit extends Isabelle_Editor("jedit", "Isabelle/jEdit")
+  case VSCode extends Isabelle_Editor("vscode", "Isabelle/VSCode")
+
+  def command(isabelle: String, file: String, line: Option[Int]): String = this match {
+    case JEdit => isabelle + " jedit -n " + file + line.map(n => " +line:" + n).getOrElse("")
+    case VSCode => isabelle + " vscode -n -- --goto " + file + line.map(n => ":" + n).getOrElse("")
+  }
+}
+
+object Isabelle_Editor {
+  def parse(name: String): Isabelle_Editor = Named_Value.parse(values.toList, name, "editor")
+
+  def list(s: String): List[Isabelle_Editor] = space_explode(',', s).map(Library.trim_string)
+    .filter(_.nonEmpty).map(parse).distinct
+}
+
+
 /** command-line tools **/
 
 enum Tool_Command(val name: String) extends Named_Value {

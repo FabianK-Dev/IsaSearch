@@ -209,7 +209,7 @@ links appear where results have them.
 
 - `GET /capabilities` returns `generation` (the generation served), `corpora`,
   `definition_search`, `embedding_available`, `embedding_error`, `query_expansion`,
-  and `query_expansion_error`.
+  `query_expansion_error`, and `editors` (name and title of each enabled editor).
 - `GET /search?query=...&kind=theorems&refine_query=false` returns `results`,
   `duration`, `refined_query`, plus `elapsed_duration` and `cache_hit`.
   Results retain source fields, descriptions, links, and distances. Exact
@@ -222,6 +222,18 @@ links appear where results have them.
   occurrence of the source nearest to `start_line`, and missing if the file no longer
   contains it. The website links both; its local link opens
   `GET /source?kind=...&id=...`, the local file with line numbers and the source marked.
+- `POST /open?editor=...&kind=...&id=...` with the header `X-IsaSearch` opens the local
+  file of a document at its line in an Isabelle editor on the server's machine:
+  `jedit` (Isabelle/jEdit) or `vscode` (Isabelle/VSCode). It is served for the editors
+  that the Isabelle option `isasearch_editors` enables (comma separated, by default
+  `jedit,vscode`), and the website shows an "Open in Isabelle/jEdit" and an "Open in
+  Isabelle/VSCode" link for each local file. A server for other machines, behind a
+  reverse proxy, sets `isasearch_editors = ""`: it must not start editors where it runs. A running
+  Isabelle/VSCode is reused; a running Isabelle/jEdit only if it has an edit server, which
+  Isabelle's application bundles enable and a source checkout enables with
+  `JEDIT_JAVA_SYSTEM_OPTIONS="$JEDIT_JAVA_SYSTEM_OPTIONS -Disabelle.jedit_server=NAME"`
+  in `$ISABELLE_HOME_USER/etc/settings`; otherwise each request starts a new jEdit. The
+  header keeps pages of other origins from sending the request.
 - `kind` is `theorems` or `definitions`. Query expansion defaults to off. Enabling
   it concatenates the original and expanded queries. An explicit request fails
   with HTTP 503 if the configured query LLM is unavailable; it never silently

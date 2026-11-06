@@ -42,7 +42,9 @@ The server serves the website at <http://localhost:5001>. The first search start
 under a second.
 
 Results link to the AFP repository and the Isabelle library online. With a registered AFP
-(`isabelle components -u /path/to/afp`), they also link to its theory files on your machine.
+(`isabelle components -u /path/to/afp`), they also link to its theory files on your machine,
+and the website opens them in Isabelle/jEdit or Isabelle/VSCode at the right line (see
+[`isabelle/README.md`](isabelle/README.md#http-api) for reusing a running jEdit).
 
 ## Optional
 

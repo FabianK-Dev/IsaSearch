@@ -236,7 +236,12 @@ object Search {
 
   /** HTTP services **/
 
-  def service(name: String)(action: Map[String, String] => Obj): HTTP.Service =
+  // A POST service requires the header X-IsaSearch: a page of another origin cannot send it
+  // without a CORS preflight, which this server does not answer.
+  val post_header = "X-IsaSearch"
+
+  def service(name: String, post: Boolean = false)(action: Map[String, String] => Obj)
+      : HTTP.Service =
     new HTTP.Service(name) {
       def apply(request: HTTP.Request): Option[HTTP.Response] = None
 
@@ -251,7 +256,10 @@ object Search {
           val uri = exchange.getRequestURI.nn
           if (uri.getPath != "/" + this.name)
             respond(404, Map("error" -> "Unknown endpoint"))
-          else if (exchange.getRequestMethod != "GET") respond(405, Map("error" -> "Use GET"))
+          else if (exchange.getRequestMethod != (if (post) "POST" else "GET"))
+            respond(405, Map("error" -> ("Use " + (if (post) "POST" else "GET"))))
+          else if (post && exchange.getRequestHeaders.nn.getFirst(post_header) == null)
+            respond(403, Map("error" -> ("Missing header " + post_header)))
           else respond(200, action(parameters(uri.getRawQuery)))
         }
         catch {
@@ -325,24 +333,56 @@ object Search {
       }
     }
 
-  def server(engine: Engine, port: Int): HTTP.Server = HTTP.server(
-    port,
-    name = "",
-    services = List(
-      website,
-      source(engine),
-      service("capabilities")(_ => engine.capabilities),
-      service("search") { args =>
-        engine.search(
-          args.getOrElse("query", ""),
-          kind = try { Corpus_Kind.parse(args.getOrElse("kind", Corpus_Kind.Theorems.name)) }
-          catch { case ERROR(msg) => throw Bad_Request(msg) },
-          mode =
-            if (boolean(args.getOrElse("refine_query", "false"))) Query_Mode.Combined
-            else Query_Mode.Original,
-          limit = args.getOrElse("limit", "100").toInt
-        )
-      }
+  /** editors **/
+
+  // Opens the local file of a document in an Isabelle editor at the line of its source; a
+  // newly started editor outlives this server.
+  def open_in_editor(
+    engine: Engine,
+    editors: List[Isabelle_Editor],
+    args: Map[String, String]
+  ): Obj = {
+    val editor =
+      try { Isabelle_Editor.parse(args.getOrElse("editor", "")) }
+      catch { case ERROR(msg) => throw Bad_Request(msg) }
+    if (!editors.contains(editor)) throw Bad_Request("Editor not enabled: " + editor)
+    val kind =
+      try { Corpus_Kind.parse(args.getOrElse("kind", Corpus_Kind.Theorems.name)) }
+      catch { case ERROR(msg) => throw Bad_Request(msg) }
+    val id = args.getOrElse("id", "")
+    val record = engine.use(_.corpora.get(kind).flatMap(_.get(id)).map(_._2))
+      .getOrElse(throw Bad_Request("Unknown document: " + id))
+    val path = Local_Sources.file(record)
+      .getOrElse(throw Bad_Request("No local file for " + id))
+    val line = Local_Sources.line(Local_Sources.text(path), record)
+    val command = editor.command(File.bash_path(Path.explode("$ISABELLE_HOME/bin/isabelle")),
+      File.bash_path(path), line)
+    Isabelle_System.bash("nohup " + command + " > /dev/null 2>&1 &").check
+    Map("editor" -> editor.name, "file" -> File.platform_path(path)) ++ line.map("line" -> _)
+  }
+
+  def server(engine: Engine, port: Int, editors: List[Isabelle_Editor] = Nil): HTTP.Server =
+    HTTP.server(
+      port,
+      name = "",
+      services = List(
+        website,
+        source(engine),
+        service("capabilities")(_ =>
+          engine.capabilities.updated("editors", editors.map(e => Map("name" -> e.name,
+            "title" -> e.title)))),
+        service("search") { args =>
+          engine.search(
+            args.getOrElse("query", ""),
+            kind = try { Corpus_Kind.parse(args.getOrElse("kind", Corpus_Kind.Theorems.name)) }
+            catch { case ERROR(msg) => throw Bad_Request(msg) },
+            mode =
+              if (boolean(args.getOrElse("refine_query", "false"))) Query_Mode.Combined
+              else Query_Mode.Original,
+            limit = args.getOrElse("limit", "100").toInt
+          )
+        }
+      ) ::: (if (editors.isEmpty) Nil
+             else List(service("open", post = true)(open_in_editor(engine, editors, _))))
     )
-  )
 }

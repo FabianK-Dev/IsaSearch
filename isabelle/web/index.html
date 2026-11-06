@@ -29,13 +29,13 @@
                             <a class="nav-link active" aria-current="page" href="#">Search</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" target="_blank" rel="noopener">Paper</a>
+                            <a class="nav-link" href="https://files.sketis.net/Isabelle_Workshop_2026/Isabelle_2026_paper8.pdf" target="_blank" rel="noopener">Paper</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="https://github.com/FabianK-Dev/IsaSearch" target="_blank" rel="noopener">Repository</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" target="_blank" rel="noopener">API</a>
+                            <a class="nav-link" href="https://github.com/FabianK-Dev/IsaSearch/blob/main/isabelle/README.md#http-api" target="_blank" rel="noopener" title="The HTTP API of this server: search from scripts and other tools">API</a>
                         </li>
                     </ul>
                 </div>
@@ -117,12 +117,16 @@ bijections have inverses, bubblesort, ..."></textarea>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         let firstSearch = true;
+        // The editors in which the server opens local files (option isasearch_editors).
+        let editors = [];
 
         // Definition search is only available if the server has a definitions corpus, so the
         // selector stays hidden until the server says otherwise.
         fetch("/capabilities")
         .then(response => response.json())
         .then(res => {
+            editors = res.editors || [];
+
             if (res.definition_search) {
                 document.getElementById("kindSelector").style.display = "block";
             }
@@ -154,6 +158,24 @@ bijections have inverses, bubblesort, ..."></textarea>
             link.target = "_blank";
             link.rel = "noopener";
             link.innerText = text;
+            parent.prepend(link, " | ");
+        }
+
+        // Asks the server to open the local file of a result in an editor at its line.
+        function addEditorLink(parent, el, editor) {
+            const link = document.createElement("a");
+            link.href = "javascript:void(0)";
+            link.innerText = "Open in " + editor.title + (el.local_line ? "" : " (changed)");
+            link.addEventListener("click", () => {
+                fetch("open?editor=" + encodeURIComponent(editor.name) +
+                    "&kind=" + encodeURIComponent(el.kind) + "&id=" + encodeURIComponent(el.id),
+                    { method: "POST", headers: { "X-IsaSearch": "open" } })
+                .then(response => response.json().then(body => {
+                    if (!response.ok)
+                        alert("Could not open the file in " + editor.title + ": " + body.error);
+                }))
+                .catch(err => alert("Could not open the file in " + editor.title + ": " + err));
+            });
             parent.prepend(link, " | ");
         }
 
@@ -236,7 +258,9 @@ bijections have inverses, bubblesort, ..."></textarea>
                                     "source?kind=" + encodeURIComponent(el.kind) +
                                     "&id=" + encodeURIComponent(el.id) +
                                     (el.local_line ? "#L" + el.local_line : ""),
-                                    el.local_line ? "Open local file" : "Open local file (changed)");
+                                    el.local_line ? "View local file" : "View local file (changed)");
+                                for (const editor of editors.slice().reverse())
+                                    addEditorLink(metadata, el, editor);
                             }
 
                             if (node.src_code.split("\n").length > 5) {

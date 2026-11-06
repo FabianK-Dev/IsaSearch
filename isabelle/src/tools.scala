@@ -31,13 +31,13 @@ object Main {
     import Data._
     if (argv.isEmpty) error("Missing IsaSearch tool name")
     val tool = Tool_Command.parse(argv.head)
-    val options = Options.init()
+    var options = Options.init()
     var config_paths = List.empty[Path]
     var index_names = List.empty[String]
     var metadata_index = ""
     var out = home + Path.basic("reports")
     var input: Option[Path] = None
-    var port = options.int("isasearch_port")
+    var port: Option[Int] = None
     var refine = false
     var no_build = false
     var cross = false
@@ -61,7 +61,8 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -D DIR    output directory (reports, component or export parent)
   -f PATH   exported index directory (import) or benchmark CSV
   -F FORMAT export format: generation (default) or interchange
-  -p PORT   API port (default 5001; loopback only)
+  -o OPTION override Isabelle system OPTION (via NAME=VAL or NAME)
+  -p PORT   API port (default option isasearch_port: 5001; loopback only)
   -r        expand the query (search only; default off)
   -n        use existing Isabelle session build databases (index)
   -k KINDS  theorems, definitions, or all (comma separated for duplicates)
@@ -92,7 +93,8 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       "D:" -> (s => out = Path.explode(s)),
       "f:" -> (s => input = Some(Path.explode(s))),
       "F:" -> (s => export_format = Export_Format.parse(s)),
-      "p:" -> (s => port = Value.Int.parse(s)),
+      "o:" -> (s => options = options + s),
+      "p:" -> (s => port = Some(Value.Int.parse(s))),
       "r" -> (_ => refine = true),
       "n" -> (_ => no_build = true),
       "k:" -> (s =>
@@ -168,7 +170,9 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       case Tool_Command.Serve =>
         using(new Llama_Server.Servers(config)) { servers =>
           using(new Index.Live(index)) { source =>
-            val server = Search.server(new Search.Engine(source, servers), port)
+            val server = Search.server(new Search.Engine(source, servers),
+              port.getOrElse(options.int("isasearch_port")),
+              editors = Isabelle_Editor.list(options.string("isasearch_editors")))
             server.start()
             progress.echo("IsaSearch API: " + server.url)
             try { new java.util.concurrent.CountDownLatch(1).await() }

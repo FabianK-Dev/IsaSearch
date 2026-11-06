@@ -3,5 +3,7 @@ section "IsaSearch"
 option isasearch_index : string = "plain"
   -- "index of the tools without -i; releases are imported as plain"
 option isasearch_port : int = 5001
+option isasearch_editors : string = "jedit,vscode"
+  -- "editors in which the website opens local files on the server's machine: jedit, vscode (comma separated; empty: none)"
 option isasearch_config : string = "$ISASEARCH_HOME/etc/search.json"
   -- "configuration of searching tools without -c (empty: none)"
