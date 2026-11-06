@@ -1,36 +1,13 @@
 /*  Title:      IsaSearch/isabelle/src/tools.scala
 
-Isabelle tool registration and command-line entry points.
+Command-line entry points of the isasearch_* tools (lib/Tools), which run in a JVM of their own
+with Solr's classpath (lib/scripts/isasearch).
 */
 
 package isabelle.isasearch
 
 
 import isabelle._
-
-
-object Tool_Entries {
-  val names = Tool_Command.values.toList
-
-  def tool(command: Tool_Command): Isabelle_Tool = Isabelle_Tool(
-    "isasearch_" + command.name,
-    "IsaSearch " + command.name.replace('_', ' '),
-    Scala_Project.here,
-    args => {
-      val script = "bash " + File.bash_path(Data.component + Path.explode("lib/Tools/isasearch")) +
-        " " + Bash.strings(command.name :: args)
-      val result = Isabelle_System.bash(
-        script,
-        progress_stdout = line => Output.writeln(line, stdout = true, include_empty = true),
-        progress_stderr = line => Output.writeln(line, include_empty = true)
-      )
-      if (!result.ok) sys.exit(result.rc)
-    }
-  )
-}
-
-
-class Tools extends Isabelle_Scala_Tools(Tool_Entries.names.map(Tool_Entries.tool): _*)
 
 
 /* progress */
@@ -69,6 +46,7 @@ object Main {
     var verbose = false
     var newest = 10
     var selected_kinds: Option[List[Corpus_Kind]] = None
+    var export_format = Export_Format.Generation
     var entries = List.empty[String]
     var strategies = List(Benchmark_Strategy.Baseline)
     val usage = """
@@ -81,7 +59,8 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
             -c FILE -i NAME to build several indexes from one session build
   -m NAME   benchmark index built with metadata
   -D DIR    output directory (reports, component or export parent)
-  -f PATH   interchange directory (import) or benchmark CSV
+  -f PATH   exported index directory (import) or benchmark CSV
+  -F FORMAT export format: generation (default) or interchange
   -p PORT   API port (default 5001; loopback only)
   -r        expand the query (search only; default off)
   -n        use existing Isabelle session build databases (index)
@@ -94,9 +73,13 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -s LIST   benchmark strategies: baseline,R,UR,M,MR,MUR or all
   -v        verbose progress
 
-Import: -f EXPORT_DIR. Index: SESSION ... (or isabelle_sessions in config).
+Import: -f DIR, an exported generation (installed as it is, moving DIR when it
+  is on the same file system) or interchange data (indexed anew).
+Index: SESSION ... (or isabelle_sessions in config).
 Search: QUERY. Index_build: -D component output directory.
-Export: -D DIR writes the current generation to DIR/isasearch-NAME.
+Export: -D DIR writes the current generation to DIR/isasearch-NAME, ready to
+  search, or as interchange data for other Lucene versions and tools.
+Server: follows the index to every newly published generation.
 Prune: removes the generations other than the current one.
 Benchmark never builds indexes; supply the required prebuilt variants.
 Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark runs).
@@ -108,6 +91,7 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       "m:" -> (s => metadata_index = safe_name(s)),
       "D:" -> (s => out = Path.explode(s)),
       "f:" -> (s => input = Some(Path.explode(s))),
+      "F:" -> (s => export_format = Export_Format.parse(s)),
       "p:" -> (s => port = Value.Int.parse(s)),
       "r" -> (_ => refine = true),
       "n" -> (_ => no_build = true),
@@ -147,12 +131,13 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
           if (index_names.isEmpty && config_paths.size <= 1) List(config -> index)
           else if (config_paths.size == index_names.size) config_paths.map(Config.load).zip(index_names)
           else error("Pair each configuration -c FILE with an index name -i NAME")
-        if (builds.exists(build => Embedding_Server.requested(build._1)))
-          error(Embedding_Server.key + " serves searches; builds use openai_embedding_base_url")
+        for ((build, _) <- builds; role <- Llama_Server.roles(build))
+          error(role.key + " serves searches; builds use " + role.endpoint)
         progress.echo("Log: " + log.expand.implode)
         Corpus_Build.run(builds, args, no_build, progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
-      case Tool_Command.Export => progress.echo(Index.export_index(index, out, progress).implode)
+      case Tool_Command.Export =>
+        progress.echo(Index.export_index(index, out, export_format, progress).implode)
       case Tool_Command.Prune => Index.prune(index).foreach(p => progress.echo("Removed " + p))
       case Tool_Command.Test => Tests.run(args)
       case Tool_Command.Integration_Test => Integration_Tests.run(progress)
@@ -163,43 +148,42 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
         }
       case Tool_Command.Benchmark =>
         val csv = input.getOrElse(Benchmark.default_csv)
-        Embedding_Server(config) { config =>
+        using(new Llama_Server.Servers(config)) { servers =>
           Benchmark
-            .run(config, index, metadata_index, csv, strategies, out, progress)
+            .run(servers, index, metadata_index, csv, strategies, out, progress)
             .foreach(p => progress.echo(p.implode))
         }
-      case Tool_Command.Search | Tool_Command.Serve | Tool_Command.Duplicates =>
-        Embedding_Server(config) { config =>
-          using(new Index.Snapshot(Index.current(index))) { snapshot =>
-            val engine = new Search.Engine(snapshot, config)
-            tool match {
-              case Tool_Command.Search =>
-                progress.echo(
-                  JSON.Format(
-                    engine.search(
-                      args.mkString(" "),
-                      selected_kinds.getOrElse(List(Corpus_Kind.Theorems)) match {
-                        case List(single) => single
-                        case _ => error("Search requires exactly one corpus kind")
-                      },
-                      if (refine) Query_Mode.Combined else Query_Mode.Original
-                    )
-                  )
-                )
-              case Tool_Command.Serve =>
-                val server = Search.server(engine, port)
-                server.start()
-                progress.echo("IsaSearch API: " + server.url)
-                try { new java.util.concurrent.CountDownLatch(1).await() }
-                finally { server.stop() }
-              case _ =>
-                val kinds = selected_kinds.getOrElse(List(Corpus_Kind.Definitions))
-                if (newest < 1 || kinds.isEmpty || kinds.exists(k => !Index.kinds.contains(k)))
-                  error("Invalid duplicate selection")
-                progress.echo(
-                  Duplicates.run(engine, entries, newest, kinds, cross, judge, all, out).implode
-                )
+      case Tool_Command.Search =>
+        using(new Llama_Server.Servers(config)) { servers =>
+          using(new Index.Pinned(Index.current(index))) { source =>
+            val kind = selected_kinds.getOrElse(List(Corpus_Kind.Theorems)) match {
+              case List(single) => single
+              case _ => error("Search requires exactly one corpus kind")
             }
+            val mode = if (refine) Query_Mode.Combined else Query_Mode.Original
+            val engine = new Search.Engine(source, servers)
+            progress.echo(JSON.Format(engine.search(args.mkString(" "), kind, mode)))
+          }
+        }
+      case Tool_Command.Serve =>
+        using(new Llama_Server.Servers(config)) { servers =>
+          using(new Index.Live(index)) { source =>
+            val server = Search.server(new Search.Engine(source, servers), port)
+            server.start()
+            progress.echo("IsaSearch API: " + server.url)
+            try { new java.util.concurrent.CountDownLatch(1).await() }
+            finally { server.stop() }
+          }
+        }
+      case Tool_Command.Duplicates =>
+        val kinds = selected_kinds.getOrElse(List(Corpus_Kind.Definitions))
+        if (newest < 1 || kinds.isEmpty || kinds.exists(k => !Index.kinds.contains(k)))
+          error("Invalid duplicate selection")
+        using(new Llama_Server.Servers(config)) { servers =>
+          using(new Index.Pinned(Index.current(index))) { source =>
+            val engine = new Search.Engine(source, servers)
+            progress.echo(Duplicates.run(engine, source.snapshot, entries, newest, kinds, cross,
+              judge, all, out).implode)
           }
         }
     }

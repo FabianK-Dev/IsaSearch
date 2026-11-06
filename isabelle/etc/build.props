@@ -1,5 +1,5 @@
 title = IsaSearch
-module = lib/isasearch.jar
+module = $ISASEARCH_JAR
 requirements = \
   env:ISABELLE_SCALA_JAR \
   env:SOLR_JARS
@@ -7,7 +7,7 @@ sources = \
   src/domain.scala \
   src/core.scala \
   src/inference.scala \
-  src/embedding_server.scala \
+  src/llama_server.scala \
   src/index.scala \
   src/corpus.scala \
   src/search.scala \
@@ -18,4 +18,3 @@ sources = \
   src/tools.scala \
   src/tests.scala \
   src/integration_tests.scala
-services = isabelle.isasearch.Tools

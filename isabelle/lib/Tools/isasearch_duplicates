@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: analyse duplicates of AFP entries with IsaSearch
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" duplicates "$@"

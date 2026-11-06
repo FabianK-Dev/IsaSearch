@@ -39,7 +39,7 @@ on GitHub. The registered AFP (`AFP_BASE`, a clean clone of `afp-2026`) moves to
 newest changeset, and the index is built again when the changesets since the last
 build touch `thys` or `metadata`; changesets that touch only the website are recorded
 without a build. A successful build removes the older generations (`isasearch_prune`).
-The new index is exported (`isasearch_export`), compressed and split into parts below
+The new generation is exported as it is (`isasearch_export`), compressed and split into parts below
 GitHub's limit of 2 GiB per asset, and released as
 `index-plain-DATE-afp-REVISION` on `FabianK-Dev/IsaSearch`, with the export's manifest
 and `SHA256SUMS`, unless its data equals that of the last release. The release names
@@ -50,7 +50,9 @@ Runs never overlap. A failed build is retried after 24 hours or as soon as the A
 moves again; a failed release is retried by the next run, and its draft is deleted.
 State lives in `$ISASEARCH_HOME_USER/update` (`built` and `released` are AFP
 revisions); runs that do anything log to `$ISASEARCH_HOME_USER/logs/update-*.log`, next
-to the logs of the builds. `update -f` builds even without new changesets.
+to the logs of the builds. `update -f` builds even without new changesets. `update -o DIR`
+packs the release as usual but writes its assets and notes to `DIR` instead of publishing
+them, without a token and without touching the release state: a release to try out.
 
 The release needs a GitHub token in `$ISASEARCH_HOME_USER/github_token` (`chmod 600`).
 The repository belongs to another account, which fine-grained tokens cannot reach, so
@@ -64,12 +66,22 @@ PATH=/home/adm-mgrgh/.local/bin:/usr/local/bin:/usr/bin:/bin
 17 * * * * /home/adm-mgrgh/IsaSearch-component/isabelle/runs/isabelle2026-gemma4/update > /dev/null 2>> /home/adm-mgrgh/.isabelle/Isabelle2026/isasearch/logs/update-errors.log
 ```
 
-To use a release, download all parts, then unpack and import them:
+To use a release, download all parts, then unpack and install them:
 
 ```sh
 cat isasearch-plain-*.tar.zst.* | zstd -d | tar -x
 isabelle isasearch_import -f isasearch-plain -i plain
 ```
+
+The parts hold the generation ready to search; the import checks its files against the
+manifest and moves the directory into place. Measured on 2026-11-06 on the M2 Pro with the
+generation of 2026-11-05 (5.7 GB): exporting took 5 s (copies, which APFS clones, and checksums), packing
+7 s (5.0 GB in three parts, as for the interchange export), unpacking 6 s and installing 5 s,
+against 36.5 minutes for importing the interchange export. The release of the server's
+generation of the same day, with reference embeddings and packed by `update -f -o` (1 h 50 min
+for the build, 5.3 GB in three parts), took 16 s to check against `SHA256SUMS`, 7 s to unpack
+and 5 s to install on the M2 Pro; a first search then took 7 s, JVM and embedder start
+included.
 
 ## Search on a laptop
 
@@ -84,10 +96,14 @@ model (4.3 GB) into llama.cpp's cache:
 isabelle isasearch_server
 ```
 
-The context of one slot of 4096 tokens holds the inputs of the reference check at search
-start, which re-embeds stored documents (up to 2,443 tokens here). To run an embedding
-server by hand instead, replace `llamacpp_embedding_server` by `openai_embedding_base_url`
-and start it with the same settings:
+At search start, and every 30 seconds in a server, the searching tools check the embedder
+against the reference embeddings of the index: three short queries whose vectors the build
+recorded with the embedder of the server. Indexes built before 2026-11-06 have none and are
+checked by re-embedding two stored documents per corpus instead (up to 2,443 tokens here),
+which the context of 4096 tokens has to hold; on the M2 Pro's CPU that added about 20 s to a
+search, the reference embeddings well below one. To run an embedding server by hand instead,
+replace `llamacpp_embedding_server` by `openai_embedding_base_url` and start it with the same
+settings:
 
 ```sh
 llama-server -hf Qwen/Qwen3-Embedding-4B-GGUF:Q8_0 --embedding --pooling last \
@@ -96,6 +112,22 @@ llama-server -hf Qwen/Qwen3-Embedding-4B-GGUF:Q8_0 --embedding --pooling last \
 
 Ollama was not measured; its `qwen3-embedding:4b` is Q4_K_M, so Q8_0 needs
 `qwen3-embedding:4b-q8_0`.
+
+## Query expansion on a laptop
+
+The model servers expand queries with `beaker_gemma4`, the QAT Gemma 4 26B-A4B at
+`UD-Q4_K_XL` (`gemma-4-26B-A4B-it-qat-UD-Q4_K_XL.gguf` of `unsloth/gemma-4-26B-A4B-it-qat-GGUF`).
+The default `etc/search.json` carries the same model as `llamacpp_query_server`, disabled;
+with `"enabled": true` in a copy, searches start it on the first expanded query, with the
+prompts of the index and the sampling parameters of `plain.json`.
+
+Measured on 2026-11-06 on the M2 Pro (Metal) with eight benchmark queries: the first start
+downloaded the model (14.2 GB) in under three minutes and loaded it in 11 s; an expansion then
+took about 4 s. Sent the same requests, the local model and `beaker_gemma4` gave identical
+expansions for two queries and expansions that agree in their first sentences for the other
+six (temperature 0 on different hardware), and the expanded searches found the same first hit
+for all eight and 9 or 10 of the same top 10. The running model occupied about 5.4 GB of
+resident memory beside the embedder (0.5 GB) and the memory-mapped index.
 
 Measured on 2026-11-05 against the generation of that day (389,754 theorems, 125,139
 definitions), on an Apple M2 Pro with 32 GB and llama.cpp b11669 (nixpkgs `llama-cpp`
@@ -123,7 +155,8 @@ vector, for the two reference documents and 100 random ones per corpus, which is
 - With a context of 4096, llama-server occupies 4.8 GB with Q8_0 and 3.2 GB with Q4_K_M
   (physical footprint; the memory-mapped model file comes on top as reclaimable cache).
   With the index (5.7 GB, memory-mapped) and the JVM, a laptop needs 16 GB.
-- Embedding a whole document takes 1.3 to 2.5 s on the CPU, so the reference check, which
-  embeds two documents per corpus every 30 seconds, adds seconds to a search.
+- Embedding a whole document takes 1.3 to 2.5 s on the CPU, so the reference check of an
+  index without reference embeddings, which embeds two documents per corpus every 30
+  seconds, adds seconds to a search.
 - The machine was not idle during the later CPU runs; Q8_0 measured again with a context of
   4096 gave 0.62 / 1.62 s.

@@ -1,0 +1,10 @@
+title = IsaSearch for PIDE AI
+module = $ISASEARCH_PIDE_AI_JAR
+requirements = \
+  env:ISABELLE_SCALA_JAR \
+  env:ISASEARCH_JAR \
+  env:ISABELLE_PIDE_AI_JAR
+sources = \
+  src/isasearch_tool.scala
+services = \
+  isabelle.isasearch.pide_ai.IsaSearch_Tools

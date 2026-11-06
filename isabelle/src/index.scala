@@ -34,6 +34,7 @@ import org.apache.lucene.search.{
   MatchAllDocsQuery
 }
 import org.apache.lucene.index.Term
+import org.apache.lucene.util.Version
 import org.apache.solr.index.NoMergePolicyFactory
 
 
@@ -61,16 +62,40 @@ object Index {
     List(Prompt.Embed, Prompt.Retrieve).foreach { key =>
       if (str(prompts, key).isEmpty) error("Missing prompt: " + key)
     }
+    val references: List[(String, Array[Float])] =
+      list(json.getOrElse(Index_Format.references, Nil)).map { x =>
+        val reference = obj(x)
+        val vector = list(reference.getOrElse("vector", Nil)).map(number(_).toFloat).toArray
+        validate(vector, dimension, metric)
+        str(reference, "input") -> vector
+      }
   }
 
   // Avoid eager evaluation of a default error in lookups.
-  def prompt(spec: Spec, key: String): String = {
+  def prompt(prompts: Obj, kind: Corpus_Kind, key: String): String = {
     val name =
-      if (spec.kind == Corpus_Kind.Definitions && spec.prompts.contains(key + "_definitions"))
+      if (kind == Corpus_Kind.Definitions && prompts.contains(key + "_definitions"))
         key + "_definitions"
       else key
-    spec.prompts.get(name).map(_.asInstanceOf[String]).getOrElse(error("Missing prompt: " + name))
+    prompts.get(name).map(_.asInstanceOf[String]).getOrElse(error("Missing prompt: " + name))
   }
+
+  def prompt(spec: Spec, key: String): String = prompt(spec.prompts, spec.kind, key)
+
+
+  /** reference embeddings **/
+
+  // Queries whose embeddings a build records with every corpus, through the retrieve prompt as
+  // a search sends them. Searches embed them again to check that their embedder is the one of
+  // the index: short inputs keep that check cheap on a laptop CPU.
+  val reference_queries: List[String] = List(
+    "commutativity of addition",
+    "every natural number greater than one has a prime factor",
+    "the derivative of a polynomial")
+
+  def reference_inputs(prompts: Obj, kind: Corpus_Kind): List[String] =
+    reference_queries.map(query =>
+      template(prompt(prompts, kind, Prompt.Retrieve), Map("search_query" -> query)))
 
 
   /** Solr schema **/
@@ -192,10 +217,22 @@ object Index {
   }
 
 
-  /** interchange import **/
+  /** import **/
 
+  // A shipped generation is installed as it is; interchange data is indexed anew.
   def import_index(source: Path, name: String, progress: Progress = new Progress): Path = {
     val manifest = read(source + Path.basic(Index_Format.manifest))
+    if (manifest.contains(Index_Format.generation)) install_generation(source, manifest, name,
+      progress)
+    else import_interchange(source, manifest, name, progress)
+  }
+
+  private def import_interchange(
+    source: Path,
+    manifest: Obj,
+    name: String,
+    progress: Progress
+  ): Path = {
     val corpora = specs(manifest)
     val parent = Isabelle_System.make_directory(location(name))
     val staging = parent + Path.basic("staging-" + UUID.random_string())
@@ -278,31 +315,124 @@ object Index {
   }
 
 
-  /** interchange export **/
+  /** export **/
 
-  // The current generation as an interchange directory isasearch-NAME below target, which
-  // import_index reads back: the stored records and their vectors in document order, and
-  // the manifest of the generation with the checksums of the new files.
-  def export_index(name: String, target: Path, progress: Progress = new Progress): Path = {
+  def export_index(
+    name: String,
+    target: Path,
+    format: Export_Format = Export_Format.Generation,
+    progress: Progress = new Progress
+  ): Path = {
     val output = target + Path.basic("isasearch-" + safe_name(name))
     if (output.is_dir || output.is_file) error("Export directory exists: " + output.implode)
     try {
-      using(new Snapshot(current(name))) { snapshot =>
-        val corpora = specs(snapshot.manifest).map { spec =>
-          val directory = Isabelle_System.make_directory(output + Path.basic(spec.kind.name))
-          snapshot(spec.kind).write_interchange(directory)
-          progress.echo("Exported " + spec.count + " " + spec.kind)
-          spec.json.updated("files", Index_Format.data_files
-            .map(file => file -> file_hash(directory + Path.basic(file))).toMap)
-        }
-        write(output + Path.basic(Index_Format.manifest),
-          snapshot.manifest.updated("corpora", corpora))
+      format match {
+        case Export_Format.Generation => export_generation(name, output, progress)
+        case Export_Format.Interchange => export_interchange(name, output, progress)
       }
       output
     }
     catch {
       case exn: Throwable =>
         Isabelle_System.rm_tree(output)
+        throw exn
+    }
+  }
+
+  // The stored records and their vectors in document order, and the manifest of the
+  // generation with the checksums of the new files: what import_interchange reads back.
+  private def export_interchange(name: String, output: Path, progress: Progress): Unit =
+    using(new Snapshot(current(name))) { snapshot =>
+      val corpora = specs(snapshot.manifest).map { spec =>
+        val directory = Isabelle_System.make_directory(output + Path.basic(spec.kind.name))
+        snapshot(spec.kind).write_interchange(directory)
+        progress.echo("Exported " + spec.count + " " + spec.kind)
+        spec.json.updated("files", Index_Format.data_files
+          .map(file => file -> file_hash(directory + Path.basic(file))).toMap)
+      }
+      write(output + Path.basic(Index_Format.manifest),
+        snapshot.manifest.updated("corpora", corpora))
+    }
+
+
+  /** shipped generations **/
+
+  // A generation is never written again once published, and it is relocatable: its files are
+  // shipped as they are, with their checksums and the Lucene version that wrote them in the
+  // manifest. They are copied, so that nothing done to an export can reach the generation.
+  private def export_generation(name: String, output: Path, progress: Progress): Unit = {
+    val source = current(name)
+    using(new Snapshot(source)) { snapshot =>
+      val manifest = Path.basic(Index_Format.manifest)
+      val files =
+        for {
+          relative <- File.find_files(source, relative = true, include_dirs = true)
+          if !relative.is_current && relative != manifest
+        } yield {
+          val (from, to) = (source + relative, output + relative)
+          if (from.is_dir) { Isabelle_System.make_directory(to); None }
+          else {
+            Isabelle_System.make_directory(to.dir)
+            Files.copy(from.java_path, to.java_path, StandardCopyOption.COPY_ATTRIBUTES)
+            Some(relative.implode -> file_hash(to))
+          }
+        }
+      val hashes = files.flatten.sortBy(_._1)
+      write(output + manifest, snapshot.manifest.updated(Index_Format.generation,
+        Map("lucene" -> Version.LATEST.nn.toString, "files" -> hashes.toMap)))
+      progress.echo("Exported generation " + source.file_name + " (" + hashes.size + " files)")
+    }
+  }
+
+  // The files are checked against the manifest before the directory is moved into the index
+  // directory (copied if it is on another file system); a failed installation moves it back.
+  private def install_generation(
+    source: Path,
+    manifest: Obj,
+    name: String,
+    progress: Progress
+  ): Path = {
+    specs(manifest)
+    val generation = object_at(manifest, Index_Format.generation)
+    val latest = Version.LATEST.nn
+    val written =
+      try { Version.parse(str(generation, "lucene")).nn }
+      catch { case _: java.text.ParseException => error("Bad Lucene version of generation") }
+    if (written.major != latest.major || !latest.onOrAfter(written))
+      error("Index written by Lucene " + written + ", which Lucene " + latest +
+        " of this Isabelle does not read; import an interchange export instead")
+    val files = object_at(generation, "files")
+    if (files.isEmpty) error("Generation without files")
+    progress.echo("Checking " + files.size + " files of the generation ...")
+    for ((file, hash) <- files.toList.sortBy(_._1)) {
+      // Relative names of plain elements: nothing outside the directory, no variables.
+      if (!file.matches("[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*") ||
+          space_explode('/', file).exists(e => e == "." || e == "..") ||
+          file == Index_Format.manifest)
+        error("Bad generation file name: " + quote(file))
+      val path = source + Path.explode(file)
+      if (!path.is_file || file_hash(path) != hash.toString)
+        error("Checksum mismatch: " + file)
+    }
+    val parent = Isabelle_System.make_directory(location(name))
+    val staging = parent + Path.basic("staging-" + UUID.random_string())
+    val moved =
+      try { Files.move(source.java_path, staging.java_path); true }
+      catch {
+        case _: java.io.IOException =>
+          Isabelle_System.copy_dir(source, staging, direct = true)
+          false
+      }
+    try {
+      using(new Snapshot(staging)) { _ => () }
+      val result = publish(name, staging)
+      progress.echo("Published index " + name)
+      result
+    }
+    catch {
+      case exn: Throwable =>
+        if (moved) Files.move(staging.java_path, source.java_path)
+        else Isabelle_System.rm_tree(staging)
         throw exn
     }
   }
@@ -481,5 +611,76 @@ object Index {
       corpora.getOrElse(kind, error("Corpus unavailable: " + kind))
 
     def close(): Unit = corpora.values.foreach(_.close())
+  }
+
+
+  /** index sources **/
+
+  // The snapshots that searches read: one generation for the life of a tool, or the current
+  // generation of an index, which a long-running server follows as new ones are published.
+  trait Source extends AutoCloseable {
+    def use[A](body: Snapshot => A): A
+  }
+
+  class Pinned(root: Path) extends Source {
+    val snapshot = new Snapshot(root)
+
+    def use[A](body: Snapshot => A): A = body(snapshot)
+
+    def close(): Unit = snapshot.close()
+  }
+
+  // Every use reads the pointer of the index and opens a newly published generation; a replaced
+  // snapshot is closed when its last use ends. A generation that fails to open leaves the
+  // previous one in service.
+  class Live(name: String) extends Source {
+    private class Lease(val root: Path) {
+      val snapshot = new Snapshot(root)
+      var users = 0
+      var retired = false
+
+      def release(): Unit = if (retired && users == 0) snapshot.close()
+    }
+
+    private var lease = new Lease(current(name))
+    private var failed: Option[Path] = None
+    private var closed = false
+
+    def root: Path = synchronized { lease.root }
+
+    private def acquire(): Lease = synchronized {
+      if (closed) error("Index closed: " + name)
+      val root = current(name)
+      if (root != lease.root && !failed.contains(root)) {
+        try {
+          val next = new Lease(root)
+          lease.retired = true
+          lease.release()
+          lease = next
+          failed = None
+          Output.writeln("Index " + name + ": serving " + root.file_name)
+        }
+        catch {
+          case exn: Throwable if !Exn.is_interrupt(exn) =>
+            failed = Some(root)
+            Output.warning("Index " + name + ": keeping " + lease.root.file_name + ", since " +
+              root.file_name + " fails to open: " + Exn.message(exn))
+        }
+      }
+      lease.users += 1
+      lease
+    }
+
+    def use[A](body: Snapshot => A): A = {
+      val held = acquire()
+      try { body(held.snapshot) }
+      finally { synchronized { held.users -= 1; held.release() } }
+    }
+
+    def close(): Unit = synchronized {
+      closed = true
+      lease.retired = true
+      lease.release()
+    }
   }
 }

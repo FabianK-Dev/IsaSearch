@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: serve the IsaSearch website and HTTP API
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" server "$@"

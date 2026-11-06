@@ -148,6 +148,19 @@ object Index_Format {
   val documents = "documents.jsonl"
   val vectors = "vectors.f32"
   val data_files = List(documents, vectors)
+  // Optional per corpus: inputs with their vectors from the embedder of the index.
+  val references = "reference_embeddings"
+  // In shipped generations only: the Lucene version and the checksums of their files.
+  val generation = "generation"
+}
+
+enum Export_Format(val name: String) extends Named_Value {
+  case Generation extends Export_Format("generation")
+  case Interchange extends Export_Format("interchange")
+}
+
+object Export_Format {
+  def parse(name: String): Export_Format = Named_Value.parse(values.toList, name, "export format")
 }
 
 

@@ -231,6 +231,13 @@ bijections have inverses, bubblesort, ..."></textarea>
                             addLink(metadata, el.remote_url, "Open file");
                             addLink(metadata, el.entry_url, "Show entry");
                             addLink(metadata, el.theory_url, "Open theory");
+                            if (el.local_file) {
+                                addLink(metadata,
+                                    "source?kind=" + encodeURIComponent(el.kind) +
+                                    "&id=" + encodeURIComponent(el.id) +
+                                    (el.local_line ? "#L" + el.local_line : ""),
+                                    el.local_line ? "Open local file" : "Open local file (changed)");
+                            }
 
                             if (node.src_code.split("\n").length > 5) {
                                 node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n")

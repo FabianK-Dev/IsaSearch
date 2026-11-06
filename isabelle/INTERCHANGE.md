@@ -31,7 +31,10 @@ The manifest is UTF-8 JSON:
     "files": {
       "documents.jsonl": "sha256-hex-digest",
       "vectors.f32": "sha256-hex-digest"
-    }
+    },
+    "reference_embeddings": [
+      {"input": "commutativity of addition", "vector": [0.6, 0.8]}
+    ]
   }],
   "provenance": {"source": "scala"}
 }
@@ -63,7 +66,13 @@ only for distribution theories, while AFP documents carry `entry_url` and
 The recipe records actual prompt text, not a path to a mutable prompt directory.
 A zero `max_characters` means no client-side truncation; a positive value counts
 Unicode code points. Endpoint settings and credentials are not part of this file.
-Reference validation at query startup detects incompatible embedding services.
+
+`reference_embeddings` (optional) are short inputs with their vectors from the
+embedder of the index: builds record a few fixed queries through the `retrieve`
+prompt, as searches send them. Searches embed them again and compare the vectors
+within `embedding_reference_tolerance`, which detects an incompatible embedding
+service at little cost. Without them, searches embed two documents of each corpus
+instead, whose inputs are long.
 
 The imported Solr generation retains serialized records and the original float32
 vectors in its dense-vector field. Solr/Lucene approximate retrieval selects
@@ -71,3 +80,24 @@ candidates; distances are recomputed from these vectors. The interchange
 is independent of Solr's private disk format. Packaged native indexes
 use Isabelle File_Store and target the bundled Solr/Lucene version; rebuild or
 reimport when upgrading an incompatible Isabelle release.
+
+## Shipped generations
+
+`isasearch_export` writes a generation as it is by default: its `manifest.json`
+and its Solr home `solr/` with one core per corpus. The manifest is that of the
+generation (the interchange manifest it was imported from, whose `files` identify
+the corpus data across builds) with one more entry:
+
+```json
+"generation": {
+  "lucene": "9.12.2",
+  "files": {"solr/theorems/data/index/_0.cfs": "sha256-hex-digest"}
+}
+```
+
+`files` lists every file of the directory except the manifest, by relative path,
+and `lucene` the version that wrote the index. `isasearch_import` installs such a
+directory without indexing: it checks the files, requires a Lucene of the same
+major version that is not older, moves the directory into the index directory
+(copies it if it is on another file system), opens it, and publishes it. Another
+Lucene version needs the interchange export (`-F interchange`).

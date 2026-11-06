@@ -356,6 +356,13 @@ object Corpus_Build {
 
     def vectors(documents: Seq[Obj]): List[Array[Float]] =
       inference.embed_stored(documents.map(str(_, "embedding_input")).toList, space)
+
+    def references(kind: Corpus_Kind): List[Obj] = {
+      val inputs = Index.reference_inputs(prompts, kind)
+      inputs.zip(inference.embed_stored(inputs, space)).map { case (input, vector) =>
+        Map("input" -> input, "vector" -> vector.toList.map(_.toDouble))
+      }
+    }
   }
 
 
@@ -500,6 +507,7 @@ object Corpus_Build {
           "recipe" -> recipe,
           "truncated_descriptions" -> truncated.toList.sorted,
           "undescribed_documents" -> undescribed.toList.sorted,
+          Index_Format.references -> preparation.references(kind),
           "files" -> Index_Format.data_files
             .map(f => f -> file_hash(directory + Path.basic(f)))
             .toMap

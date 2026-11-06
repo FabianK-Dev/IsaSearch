@@ -52,6 +52,7 @@ object Integration_Tests {
         value <- proper_string(System.getenv(name))
       } result.put(name, value)
       result.put("USER_HOME", home.absolute.implode)
+      result.put("ISASEARCH_TEST_SOURCES", (root + Path.basic("sources")).absolute.implode)
       result.put("ISASEARCH_TEST_KEY", "test-key")
       result
     }
@@ -106,6 +107,7 @@ object Integration_Tests {
     @volatile var truncate_completion_contains = ""
     @volatile var empty_completions = 0
     @volatile var health_failures = 0
+    @volatile var ready: () => Boolean = () => true
     private val log = scala.collection.mutable.ListBuffer.empty[(String, Obj)]
 
     def calls: List[(String, Obj)] = synchronized { log.toList }
@@ -175,7 +177,7 @@ object Integration_Tests {
         val path = exchange.getRequestURI.nn.getPath.nn
         // Like llama-server's health check: unauthenticated, unavailable while loading.
         if (path == "/health") {
-          val loading = take(() => health_failures, () => health_failures -= 1)
+          val loading = take(() => health_failures, () => health_failures -= 1) || !ready()
           exchange.sendResponseHeaders(if (loading) 503 else 200, -1)
         }
         else {
@@ -223,7 +225,9 @@ object Integration_Tests {
     metric: Distance_Metric = Distance_Metric.Cosine,
     dimension: Int = 3,
     metadata: Boolean = false,
-    long_source: Boolean = false
+    long_source: Boolean = false,
+    references: Boolean = false,
+    sources: Option[Path] = None
   ): (Path, Map[String, List[Double]]) = {
     val exported = Isabelle_System.make_directory(root + Path.basic("export"))
     var embeddings = Map.empty[String, List[Double]]
@@ -237,10 +241,18 @@ object Integration_Tests {
         val description = "Commutativity ∀α 😀 " + kind.name + " " + i
         val text = description + "\n\n" + source
         val (x, y) = List((1.0, 0.0), (0.99, 0.01), (0.0, 1.0))(i)
-        val vector = (x :: y :: List.fill(dimension - 2)(0.0)).map(_.toFloat)
-        embeddings += text -> vector.map(_.toDouble)
+        val vector = unit(x, y, dimension)
+        embeddings += text -> vector.toList.map(_.toDouble)
         val checksum = new java.util.zip.Adler32()
         checksum.update(UTF8.bytes(source))
+        // Local sources: the file of the document, relative to $ISASEARCH_TEST_SOURCES, holds
+        // its source two lines below the indexed start line.
+        val file = sources.map { dir =>
+          val name = e + "/" + kind.name + ".thy"
+          File.write(Isabelle_System.make_directory(dir + Path.basic(e)) + Path.basic(kind.name).thy,
+            "theory T imports Main begin\n\n" + "\n" * i + source + "\n\nend\n")
+          "file" -> ("ISASEARCH_TEST_SOURCES/" + name)
+        }
         val record = Map(
           "id" -> id, "src" -> source, "entity_kname" -> ("T.x" + i + "|thm"), "entry" -> e,
           "entry_date" -> "2026-01-01", "command" -> command, "session" -> e,
@@ -249,11 +261,17 @@ object Integration_Tests {
           "embedding_input" -> text,
           "description_artifact" -> Map(
             "llm_description" -> (Prompt.Begin + description + Prompt.End),
-            "zlib.adler32_checksum" -> checksum.getValue))
-        (record, vector.toArray)
+            "zlib.adler32_checksum" -> checksum.getValue)) ++ file
+        (record, vector)
       }
       File.write(directory + Path.basic(Index_Format.documents),
         documents.map(d => JSON.Format(d._1)).mkString("", "\n", "\n"))
+      // The stub embeds unknown inputs, such as the reference queries, as the first axis.
+      val reference_embeddings =
+        if (!references) Map.empty
+        else Map(Index_Format.references ->
+          Index.reference_inputs(fixture_prompts, kind).map(input =>
+            Map("input" -> input, "vector" -> unit(1.0, 0.0, dimension).toList.map(_.toDouble))))
       Bytes.write(directory + Path.basic(Index_Format.vectors),
         Bytes(documents.flatMap(d => bytes(d._2)).toArray))
       Map(
@@ -265,12 +283,15 @@ object Integration_Tests {
           "add_metadata" -> metadata, "document_model" -> "fixture",
           "prompts" -> fixture_prompts),
         "files" -> Index_Format.data_files.map(f => f -> file_hash(directory + Path.basic(f)))
-          .toMap)
+          .toMap) ++ reference_embeddings
     }
     write(exported + Path.basic(Index_Format.manifest),
       Map("format" -> Index_Format.name, "version" -> Index_Format.version, "corpora" -> corpora))
     (exported, embeddings)
   }
+
+  def unit(x: Double, y: Double, dimension: Int): Array[Float] =
+    (x :: y :: List.fill(dimension - 2)(0.0)).map(_.toFloat).toArray
 
   def csv(path: Path, header: List[String], rows: List[Map[String, String]]): Unit = {
     def field(s: String): String = "\"" + s.replace("\"", "\"\"") + "\""
@@ -284,7 +305,8 @@ object Integration_Tests {
   def api_and_benchmark(progress: Progress): Unit =
     Isabelle_System.with_tmp_dir("isasearch-test") { root =>
       val env = new Environment(root)
-      val (plain, vectors) = fixture(root + Path.basic("plain"))
+      val (plain, vectors) = fixture(root + Path.basic("plain"), references = true,
+        sources = Some(root + Path.basic("sources")))
       val (metadata, _) = fixture(root + Path.basic("metadata"), metadata = true)
       val (l2, _) = fixture(root + Path.basic("l2"), metric = Distance_Metric.Squared_Euclidean)
       val (large, _) = fixture(root + Path.basic("large"), dimension = 2048, long_source = true)
@@ -316,12 +338,17 @@ object Integration_Tests {
         progress.echo("Search and HTTP API ...")
         check(env.json(env.run("search", search("commutativity"))).contains("results"),
           "search results")
+        // The recorded reference queries are embedded again, not the documents.
+        val embedded = stub.calls.collect {
+          case (path, body) if path.endsWith("embeddings") => strings(body, "input") }.flatten
+        check(embedded.contains("every natural number greater than one has a prime factor") &&
+          !embedded.exists(_.startsWith("Commutativity")), "reference embeddings checked")
         check(stub.completions(health = true).isEmpty, "search without LLM")
         env.run("search", search("-r", "commutativity"), ok = false)
-        http_api(env, stub, config_path)
+        http_api(env, stub, config_path, plain)
 
-        progress.echo("Local embedding server ...")
-        embedding_server(env, stub, root, config)
+        progress.echo("Local embedding and query servers ...")
+        llama_servers(env, stub, root, config)
 
         progress.echo("Packaged index ...")
         val packaged = Path.explode(env.run("index_build",
@@ -336,10 +363,10 @@ object Integration_Tests {
         env.run("search", search("relocated"))
         check(file_hash(archive) == archive_hash, "packaged index unchanged")
 
-        progress.echo("Interchange export and pruning ...")
+        progress.echo("Exports and pruning ...")
         val exports = (root + Path.basic("exports")).implode
-        val exported =
-          Path.explode(env.run("export", List("-i", "plain", "-D", exports)).out_lines.last)
+        val exported = Path.explode(env.run("export",
+          List("-F", "interchange", "-i", "plain", "-D", exports)).out_lines.last)
         for (kind <- Index.kinds) {
           def data(dir: Path, file: String): Path = dir + Path.basic(kind.name) + Path.basic(file)
           def records(dir: Path): List[JSON.T] =
@@ -350,9 +377,36 @@ object Integration_Tests {
           check(records(exported).size == records(plain).size &&
             records(exported).zip(records(plain)).forall(same), "exported records: " + kind)
         }
-        env.run("export", List("-i", "plain", "-D", exports), ok = false)
+        env.run("export", List("-F", "interchange", "-i", "plain", "-D", exports), ok = false)
         env.run("import", List("-f", exported.implode, "-i", "reimported"))
         env.run("search", List("-c", config_path.implode, "-i", "reimported", "commutativity"))
+
+        // A shipped generation is checked and moved into place as it is.
+        def ship(name: String): Path = {
+          val target = root + Path.basic("shipped-" + name)
+          Path.explode(env.run("export", List("-i", "plain", "-D", target.implode)).out_lines.last)
+        }
+        val shipped = ship("ok")
+        val shipped_manifest = read(shipped + Path.basic(Index_Format.manifest))
+        check(str(object_at(shipped_manifest, Index_Format.generation), "lucene").nonEmpty,
+          "Lucene version of a shipped generation")
+        env.run("import", List("-f", shipped.implode, "-i", "shipped"))
+        check(!shipped.is_dir, "shipped generation moved into place")
+        check(env.json(env.run("search", List("-c", config_path.implode, "-i", "shipped",
+          "commutativity"))).contains("results"), "search of a shipped generation")
+        val corrupt = ship("corrupt")
+        val segment = File.find_files(corrupt, _.file_name.startsWith("segments_")).head
+        File.append(segment, "x")
+        env.run("import", List("-f", corrupt.implode, "-i", "corrupt"), ok = false)
+        env.run("search", search("unaffected by a corrupt export"))
+        check(corrupt.is_dir &&
+          !(env.user + Path.explode("isasearch/indexes/corrupt/current.json")).is_file,
+          "corrupt generation refused and left in place")
+        val future = ship("future")
+        write(future + Path.basic(Index_Format.manifest), shipped_manifest.updated(
+          Index_Format.generation, object_at(shipped_manifest, Index_Format.generation)
+            .updated("lucene", "99.0.0")))
+        env.run("import", List("-f", future.implode, "-i", "future"), ok = false)
         val generations = env.user + Path.explode("isasearch/indexes/plain")
         def count(): Int = File.read_dir(generations).count(_.startsWith("generation-"))
         env.run("import", List("-f", plain.implode, "-i", "plain"))
@@ -432,39 +486,48 @@ object Integration_Tests {
       finally { stub.close() }
     }
 
-  // A fake llama-server records its arguments and waits; the stub answers on its port.
-  def embedding_server(env: Environment, stub: Stub, root: Path, config: Obj): Unit = {
-    val arguments = root + Path.basic("llama-server.args")
-    val pid = root + Path.basic("llama-server.pid")
+  // Fake llama-servers record their arguments and wait; the stub answers on their port.
+  def llama_servers(env: Environment, stub: Stub, root: Path, config: Obj): Unit = {
     def executable(name: String, script: String): Path = {
       val path = root + Path.basic(name)
       File.write(path, "#!/usr/bin/env bash\n" + script)
       File.set_executable(path)
       path
     }
-    val fake = executable("llama-server",
-      "printf '%s\\n' \"$@\" > " + File.bash_path(arguments) + "\n" +
-        "echo $$ > " + File.bash_path(pid) + "\nexec sleep 300\n")
+    def fake(role: String): (Path, Path, Path) = {
+      val arguments = root + Path.basic(role + "-server.args")
+      val pid = root + Path.basic(role + "-server.pid")
+      val path = executable(role + "-server", "printf '%s\\n' \"$@\" > " +
+        File.bash_path(arguments) + "\necho $$ > " + File.bash_path(pid) + "\nexec sleep 300\n")
+      (path, arguments, pid)
+    }
+    def lines(path: Path): List[String] = split_lines(File.read(path)).filter(_.nonEmpty)
+    def stopped(pid: Path): Boolean = {
+      val handle = ProcessHandle.of(Value.Long.parse(Library.trim_line(File.read(pid)))).nn
+      !handle.isPresent || !handle.get.nn.isAlive
+    }
+    val (embedder, embedder_args, embedder_pid) = fake("embedding")
     val failing = executable("failing-server", "echo 'cannot load model' >&2\nexit 3\n")
-    val server: Obj = Map("executable" -> fake.implode, "hf_repo" -> "test/fixture-GGUF:Q8_0",
+    val server: Obj = Map("executable" -> embedder.implode, "hf_repo" -> "test/fixture-GGUF:Q8_0",
       "pooling" -> "last", "port" -> stub.port, "arguments" -> List("-t", "2"))
-    val config_path = root + Path.basic("embedding-server.json")
+    val config_path = root + Path.basic("llama-servers.json")
     def search(server: Obj, base: Obj = config.removed("openai_embedding_base_url"),
-        ok: Boolean = true): Process_Result = {
-      write(config_path, base ++ Map(Embedding_Server.key -> server))
-      env.run("search", List("-c", config_path.implode, "-i", "plain", "commutativity"), ok = ok)
+        ok: Boolean = true, args: List[String] = Nil): Process_Result = {
+      write(config_path, base ++ Map(Llama_Server.Role.Embedding.key -> server))
+      env.run("search",
+        List("-c", config_path.implode, "-i", "plain") ::: args ::: List("commutativity"), ok = ok)
     }
 
     stub.health_failures = 2
     check(env.json(search(server)).contains("results"), "search through embedding server")
     check(stub.health_failures == 0, "embedding server awaited")
-    val args = split_lines(File.read(arguments)).filter(_.nonEmpty)
+    val args = lines(embedder_args)
     check(List(List("-hf", "test/fixture-GGUF:Q8_0"), List("--alias", "fixture"),
         List("--port", stub.port.toString), List("-np", "1"), List("--pooling", "last"))
-        .forall(args.containsSlice(_)) && args.takeRight(2) == List("-t", "2"),
+        .forall(args.containsSlice(_)) && args.contains("--embedding") &&
+        args.takeRight(2) == List("-t", "2"),
       "llama-server arguments: " + args.mkString(" "))
-    val handle = ProcessHandle.of(Value.Long.parse(Library.trim_line(File.read(pid)))).nn
-    check(!handle.isPresent || !handle.get.nn.isAlive, "embedding server stopped")
+    check(stopped(embedder_pid), "embedding server stopped")
 
     // On a free port, so that only the exit of the server ends its startup.
     val failure =
@@ -473,9 +536,41 @@ object Integration_Tests {
       "embedding server startup failure")
     search(server.removed("hf_repo"), ok = false)
     search(server, base = config, ok = false)
+    // A disabled server is not started: the configured endpoint serves instead.
+    Isabelle_System.rm_tree(embedder_args)
+    search(server ++ Map("enabled" -> false), base = config)
+    check(!embedder_args.is_file, "disabled embedding server")
+
+    // The query server starts with the first expanded query only, and replaces openai_base_url.
+    // A stub of its own reports it ready once the fake has recorded its arguments.
+    val (expander, expander_args, expander_pid) = fake("query")
+    val query_stub = new Stub(Map.empty)
+    query_stub.ready = () => expander_args.is_file
+    val query_server: Obj = Map("executable" -> expander.implode,
+      "hf_repo" -> "test/expander-GGUF:Q4_K_M", "port" -> query_stub.port, "context" -> 2048)
+    val expanding = config.removed("openai_embedding_base_url").removed("openai_base_url") ++
+      Map("llm_backend" -> "openai", "openai_query_model" -> "expander",
+        Llama_Server.Role.Query.key -> query_server)
+    search(server, base = expanding)
+    check(!expander_args.is_file, "query server not started without expansion")
+    check(env.json(search(server, base = expanding, args = List("-r")))
+      .get("refined_query").exists(_ != null), "expanded search through query server")
+    val query_args = lines(expander_args)
+    check(List(List("-hf", "test/expander-GGUF:Q4_K_M"), List("--alias", "expander"),
+        List("-c", "2048"), List("-np", "1")).forall(query_args.containsSlice(_)) &&
+        query_args.contains("--no-mmproj") && !query_args.contains("--embedding"),
+      "query server arguments: " + query_args.mkString(" "))
+    check(stopped(expander_pid), "query server stopped")
+    val disabled = expanding.updated(Llama_Server.Role.Query.key,
+      query_server.updated("enabled", false))
+    search(server, base = disabled, args = List("-r"), ok = false)
+    search(server, base = expanding.updated("llm_backend", "ollama"), args = List("-r"),
+      ok = false)
+    check(query_stub.completions().nonEmpty, "expansion by the query server")
+    query_stub.close()
   }
 
-  def http_api(env: Environment, stub: Stub, config_path: Path): Unit = {
+  def http_api(env: Environment, stub: Stub, config_path: Path, plain: Path): Unit = {
     val server = env.process("server", List("-c", config_path.implode, "-i", "plain", "-p", "0"))
     try {
       val api = {
@@ -530,6 +625,28 @@ object Integration_Tests {
         check(get("/search" + query)._1 == status, "HTTP status for " + query)
       val (code, found) = get("/search?query=test")
       check(code == 200 && list(found("results")).size == 3, "search over HTTP")
+
+      // Results name the local file of a document and the line of its source there, beside
+      // the online links; the website shows that file.
+      val hits = list(found("results")).map(obj)
+      check(hits.forall(h => str(h, "local_file").endsWith("/theorems.thy") &&
+        num(h, "local_line", 0) == num(h, "start_line", 0) + 2), "local sources")
+      val hit = hits.head
+      val (source_code, source_type, source_page) = fetch("/source?kind=theorems&id=" +
+        java.net.URLEncoder.encode(str(hit, "id"), "UTF-8"))
+      check(source_code == 200 && source_type.startsWith("text/html") &&
+        source_page.contains("<span id=\"L" + num(hit, "local_line", 0).toInt + "\" class=\"m\">"),
+        "local source page")
+      check(fetch("/source?kind=theorems&id=missing")._1 == 404, "no page for unknown documents")
+
+      // The server follows the index to a newly published generation.
+      val served = str(capabilities, "generation")
+      env.run("import", List("-f", plain.implode, "-i", "plain"))
+      val (_, followed) = get("/capabilities")
+      check(str(followed, "generation").startsWith("generation-") &&
+        str(followed, "generation") != served, "server follows a new generation")
+      env.run("prune", List("-i", "plain"))
+      check(get("/search?query=pruned")._1 == 200, "search after pruning the old generation")
       stub.mode = "dimension"
       check(get("/search?query=unavailable")._1 == 503, "unavailable embedding service")
       check(!bool(get("/capabilities")._2, "embedding_available"), "refreshed capabilities")
@@ -696,6 +813,10 @@ object Integration_Tests {
         val results = found()
         check(results.size == 2 && results.forall(d => str(d, "entry") == "Example-Submission"),
           "searchable entry")
+        check(list(manifest("afp-test")("corpora")).map(obj).forall(corpus =>
+          list(corpus.getOrElse(Index_Format.references, Nil)).map(obj).map(r => str(r, "input")) ==
+            Index.reference_inputs(object_at(object_at(corpus, "recipe"), "prompts"),
+              Corpus_Kind.parse(str(corpus, "kind")))), "reference embeddings recorded")
         // AFP sources link to the repository, not to the Isabelle library.
         check(results.forall(d => str(d, "theory_url").isEmpty && str(d, "remote_url").nonEmpty),
           "AFP links")

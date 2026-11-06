@@ -4,6 +4,8 @@
 # Built by isabelle scala_build
 isabelle/lib/*.jar
 isabelle/lib/*.shasum
+pide_ai/lib/*.jar
+pide_ai/lib/*.shasum
 
 # Files
 .directory

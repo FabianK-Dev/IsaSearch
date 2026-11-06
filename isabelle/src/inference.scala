@@ -1,6 +1,6 @@
 /*  Title:      IsaSearch/isabelle/src/inference.scala
 
-HTTP inference clients for user-managed model servers.
+HTTP inference clients for model servers, user-managed or started by the searching tools.
 */
 
 package isabelle.isasearch
@@ -19,7 +19,8 @@ object Inference {
 
   /** results **/
 
-  case class Failure(message: String) extends RuntimeException(message)
+  // User errors: their message is reported without the exception class.
+  case class Failure(override val message: String) extends Exn.User_Error(message)
 
   // A truncated completion was cut off at max_tokens on every attempt.
   case class Completion(
@@ -33,7 +34,13 @@ object Inference {
 
   /** inference client **/
 
-  class Client(val config: Config, store: Path = home) {
+  // The endpoints of the servers, if any, are part of the configuration; a server starts with
+  // the first request of its role.
+  class Client(
+    val config: Config,
+    store: Path = home,
+    servers: Option[Llama_Server.Servers] = None
+  ) {
 
     /* HTTP requests */
 
@@ -130,6 +137,7 @@ object Inference {
         .flatMap { batch =>
           val vectors = embedding_backend match {
             case Inference_Backend.OpenAI | Inference_Backend.LlamaCpp =>
+              servers.foreach(_.ensure(Llama_Server.Role.Embedding))
               val response = call(
                 endpoint("openai_embedding_base_url", "/embeddings"),
                 object_at(config.values, "embedding_extra_body") ++ Map(
@@ -207,8 +215,18 @@ object Inference {
     def model(role: Model_Role): String =
       config.string(llm_backend.name + "_" + role.name + "_model")
 
-    def configured(role: Model_Role): Boolean =
-      llm_backend != Inference_Backend.Disabled && model(role).nonEmpty
+    // A backend, a model, and an endpoint where the backend has no default.
+    def configured(role: Model_Role): Boolean = {
+      def endpoint(key: String): Boolean = config.string(key).nonEmpty
+      model(role).nonEmpty && (llm_backend match {
+        case Inference_Backend.Disabled => false
+        case Inference_Backend.OpenAI => endpoint("openai_base_url")
+        case Inference_Backend.LlamaCpp =>
+          endpoint("llamacpp_base_url") ||
+            role == Model_Role.Document && endpoint("llamacpp_document_base_url")
+        case _ => true
+      })
+    }
 
     private def request(prompt: String, role: Model_Role, health: Boolean): (String, Obj) = {
       if (!configured(role)) throw Failure("No " + role + " LLM is configured")
@@ -305,6 +323,7 @@ object Inference {
           truncated = bool(saved, "truncated")
         )
       }
+      if (role == Model_Role.Query) servers.foreach(_.ensure(Llama_Server.Role.Query))
       val attempts = if (health) 1 else config.positive("llm_attempts", 3)
       var text = ""
       // A completion cut off at max_tokens on every attempt is still accepted where its text
@@ -350,17 +369,22 @@ object Inference {
 
     /* embedding compatibility */
 
+    // The reference embeddings that the build of the index recorded are embedded again. An index
+    // without them compares two of its documents instead, whose inputs are long: up to a few
+    // seconds each on a laptop CPU, and a context that holds them.
     def validate_reference(corpus: Index.Corpus): Unit = {
-      val refs = corpus.all.take(2).toList
-      val actual = embed(refs.map(r => str(r._2, "embedding_input")), corpus.spec)
-      for (((n, _), v) <- refs.zip(actual)) {
-        val expected = corpus.vector(n)
-        val delta = distance(v, expected, Distance_Metric.Squared_Euclidean)
+      val references =
+        if (corpus.spec.references.nonEmpty) corpus.spec.references
+        else corpus.all.take(2).toList.map { case (n, record) =>
+          str(record, "embedding_input") -> corpus.vector(n)
+        }
+      val tolerance = config.number("embedding_reference_tolerance", 0.001)
+      for (((_, expected), actual) <- references.zip(embed(references.map(_._1), corpus.spec))) {
+        val delta = distance(actual, expected, Distance_Metric.Squared_Euclidean)
         val norm = expected.iterator.map(x => x.toDouble * x).sum
-        if (delta / math.max(norm, 1e-20) > config.number("embedding_reference_tolerance", 0.001))
-          throw Failure(
-            "Embedding reference mismatch: model, pooling, normalization or preprocessing differs from index"
-          )
+        if (delta / math.max(norm, 1e-20) > tolerance)
+          throw Failure("Embedding reference mismatch: model, pooling, normalization or " +
+            "preprocessing differs from index")
       }
     }
   }

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: run the IsaSearch benchmark
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" benchmark "$@"

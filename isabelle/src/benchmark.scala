@@ -156,7 +156,7 @@ object Benchmark {
   val strategies = Benchmark_Strategy.values.toList
 
   def run(
-    config: Config,
+    servers: Llama_Server.Servers,
     plain_index: String,
     metadata_index: String,
     data: Path,
@@ -172,13 +172,15 @@ object Benchmark {
     val names = selected.map(s => if (s.metadata) metadata_index else plain_index).distinct
     if (names.exists(_.isEmpty))
       error("Specify both -i INDEX and -m METADATA_INDEX for all six strategies")
-    val snapshots = names.map(n => n -> new Index.Snapshot(Index.current(n))).toMap
+    val config = servers.config
+    val sources = names.map(n => n -> new Index.Pinned(Index.current(n))).toMap
     try {
-      val engines = snapshots.map { case (n, s) => n -> new Search.Engine(s, config) }
+      val engines = sources.map { case (n, s) => n -> new Search.Engine(s, servers) }
       selected.foreach { s =>
         val name = if (s.metadata) metadata_index else plain_index
         val engine = engines(name)
-        if (bool(engine.snapshot(Corpus_Kind.Theorems).spec.recipe, "add_metadata") != s.metadata)
+        if (bool(sources(name).snapshot(Corpus_Kind.Theorems).spec.recipe, "add_metadata") !=
+            s.metadata)
           error("Index metadata variant does not match strategy " + s)
         engine.ready(s.mode.expands)
       }
@@ -187,7 +189,8 @@ object Benchmark {
       selected.map { strategy =>
         val name = if (strategy.metadata) metadata_index else plain_index
         val engine = engines(name)
-        val corpus = engine.snapshot(Corpus_Kind.Theorems)
+        val snapshot = sources(name).snapshot
+        val corpus = snapshot(Corpus_Kind.Theorems)
         val found = present(corpus, rows.flatMap(parse_targets).flatten)
         val started_at = java.time.Instant.now().toString
         var results = Map.empty[String, JSON.T]
@@ -274,9 +277,9 @@ object Benchmark {
             "strategy" -> strategy.name,
             "index" -> name,
             "index_manifest_sha256" -> file_hash(
-              engine.snapshot.root + Path.basic(Index_Format.manifest)
+              snapshot.root + Path.basic(Index_Format.manifest)
             ),
-            "index_provenance" -> object_at(engine.snapshot.manifest, "provenance"),
+            "index_provenance" -> object_at(snapshot.manifest, "provenance"),
             "dataset_sha256" -> file_hash(data),
             "started_at" -> started_at,
             "finished_at" -> java.time.Instant.now().toString,
@@ -290,6 +293,6 @@ object Benchmark {
         result_path
       }
     }
-    finally { snapshots.values.foreach(_.close()) }
+    finally { sources.values.foreach(_.close()) }
   }
 }

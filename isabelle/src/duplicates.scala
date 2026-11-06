@@ -205,6 +205,7 @@ object Duplicates {
 
   def run(
     engine: Search.Engine,
+    snapshot: Index.Snapshot,
     entries: List[String],
     newest: Int,
     kinds: List[Corpus_Kind],
@@ -215,14 +216,14 @@ object Duplicates {
   ): Path = {
     val config = engine.config
     val settings = Settings(config)
-    engine.ready(false)
+    engine.ready(snapshot, false)
     val can_judge = judge && bool(engine.capabilities, "query_expansion")
     if (judge && !can_judge)
       Output.warning("LLM judge unavailable; reporting vector and syntactic evidence only")
     val targets = if (cross) Index.kinds else kinds
-    targets.foreach(engine.snapshot(_))
+    targets.foreach(snapshot(_))
     if (cross) {
-      val specs = targets.map(engine.snapshot(_).spec)
+      val specs = targets.map(snapshot(_).spec)
       if (
         specs
           .map(s =>
@@ -239,7 +240,7 @@ object Duplicates {
       )
         error("Cross-kind matching requires the same embedding space, metric and embed prompt")
     }
-    def documents(kind: Corpus_Kind): Iterator[Obj] = engine.snapshot(kind).all.map(_._2)
+    def documents(kind: Corpus_Kind): Iterator[Obj] = snapshot(kind).all.map(_._2)
     val dates = targets.iterator.flatMap(documents)
       .filter(d => str(d, "entry").nonEmpty)
       .map(d => str(d, "entry") -> str(d, "entry_date"))
@@ -256,7 +257,7 @@ object Duplicates {
     if (selected.isEmpty) error("No entries selected; supply -e ENTRY or import entry dates")
     selected.foreach(e => if (!dates.contains(e)) error("Entry not present in index: " + e))
     val sections = kinds.map { kind =>
-      val corpus = engine.snapshot(kind)
+      val corpus = snapshot(kind)
       val query_docs = documents(kind).filter(d => selected.contains(str(d, "entry"))).toList
         .sortBy(d => str(d, "id"))
       val analyses = query_docs.map { doc =>
@@ -268,7 +269,7 @@ object Duplicates {
         val self_pos = self_hits.indexWhere(r => str(r, "id") == id)
         val candidates = (if (cross) targets else List(kind))
           .flatMap { target =>
-            engine.snapshot(target).search(vector, settings.top_k, engine.candidates, e)
+            snapshot(target).search(vector, settings.top_k, engine.candidates, e)
           }
           .sortBy(d => (num(d, "distance", 0), str(d, "id")))
           .take(settings.top_k)
@@ -410,7 +411,7 @@ object Duplicates {
       "cross" -> cross,
       "all_candidates" -> all_candidates,
       "entries" -> selected,
-      "index_provenance" -> object_at(engine.snapshot.manifest, "provenance"),
+      "index_provenance" -> object_at(snapshot.manifest, "provenance"),
       "thresholds" -> thresholds,
       "sections" -> sections
     )

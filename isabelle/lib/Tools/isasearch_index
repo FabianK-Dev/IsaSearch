@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: build IsaSearch indexes from Isabelle sessions
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" index "$@"

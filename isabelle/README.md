@@ -21,8 +21,9 @@ The component is self-contained. It holds the benchmark dataset
 index (`benchmark/results`), the prompts (`prompts`), the configurations of index
 runs (`runs`, e.g. `runs/isabelle2026-gemma4`), and frozen reference
 outputs for its tests (`tests/goldens.json`). Compilation uses `etc/build.props`;
-registered Scala tools use a FindFacts-style launcher to include Isabelle's Solr
-classpath. No sbt, Maven, or extra JVM libraries are needed.
+the `isasearch_*` tools in `lib/Tools` run, as the FindFacts tools do, in a JVM of
+their own with Isabelle's Solr classpath (`lib/scripts/isasearch`). No sbt, Maven, or
+extra JVM libraries are needed.
 
 AFP registration is needed only for building new content. Register an AFP 2026
 installation with `isabelle components -u /path/to/afp` (registering its `thys`
@@ -48,7 +49,8 @@ manifests and duplicate reports copy this as `index_provenance`.
 
 Builds write their corpora in the [interchange format](INTERCHANGE.md) and publish
 them through the import that `isabelle isasearch_import -f DIR -i NAME` offers for
-any interchange directory. Imports validate into a new generation and publish only
+any interchange directory; the same command installs an exported generation as it is
+(see "Distribute indexes"). Imports validate into a new generation and publish only
 after all corpora succeed. Failed imports preserve the previous generation. Before
 publishing, every corpus is merged into a single Lucene segment, so that a search
 walks one HNSW graph rather than one per imported batch; a generation published
@@ -81,8 +83,10 @@ service is still required. A user-managed CPU embedding server can expose an
 OpenAI-compatible `/v1/embeddings` endpoint; configure its base URL and give it
 the same model identity, tokenizer, pooling, normalization, and truncation as
 the index. Endpoint aliases must match the model name recorded in the manifest.
-The client validates dimensions and re-embeds reference inputs before querying.
-A mismatch is an error rather than silently returning invalid similarities.
+The client validates dimensions and re-embeds reference inputs before querying: the
+reference embeddings that the build recorded (a few short queries), or two documents
+of each corpus for indexes built without them. A mismatch is an error rather than
+silently returning invalid similarities.
 
 ```sh
 isabelle isasearch_search 'a finite union of countable sets'
@@ -92,39 +96,66 @@ isabelle isasearch_search -c /path/to/config.json -i plain -k definitions 'a par
 isabelle isasearch_server -c /path/to/config.json -i plain -p 5001
 ```
 
-### Local embedding server
+### Local model servers
 
-Searches can start their embedder themselves instead of using a running endpoint. With an
-object `llamacpp_embedding_server` in the configuration, `isasearch_search`,
-`isasearch_server`, `isasearch_duplicates` and `isasearch_benchmark` start `llama-server`
-from llama.cpp on 127.0.0.1, wait until its `/health` reports ready, send their embedding
-requests there and stop it when they exit. Its output goes to
-`$ISASEARCH_HOME_USER/logs/llama-server-TIME.log`. llama.cpp must be installed (e.g.
-`brew install llama.cpp`, or a release binary from its GitHub page); llama.cpp offloads to
-a GPU (Metal, CUDA, Vulkan) when its build supports one and computes on the CPU otherwise.
-Index builds do not start a server. The default `etc/search.json` has this object:
+Searches can start their models themselves instead of using running endpoints. With an
+object `llamacpp_embedding_server` or `llamacpp_query_server` in the configuration,
+`isasearch_search`, `isasearch_server`, `isasearch_duplicates` and `isasearch_benchmark`
+start `llama-server` from llama.cpp on 127.0.0.1 when the model is first needed, wait until
+its `/health` reports ready, send the requests of its role there and stop it when they exit.
+The embedding server starts with the first search (or check of the embedder), the query
+server with the first expanded query, so a configured but unused expansion costs nothing.
+Their output goes to `$ISASEARCH_HOME_USER/logs/llama-server-ROLE-TIME.log`. llama.cpp must
+be installed (e.g. `brew install llama.cpp`, or a release binary from its GitHub page);
+llama.cpp offloads to a GPU (Metal, CUDA, Vulkan) when its build supports one and computes on
+the CPU otherwise. Index builds do not start servers.
+
+Both servers behave as the endpoints they replace, so a configuration for local models
+differs from one for remote servers only in these objects: the embedding server answers
+under `openai_embedding_model` and replaces `openai_embedding_base_url`, the query server
+answers under `openai_query_model`, replaces `openai_base_url` and needs `llm_backend`
+`openai`. Prompts, `openai_extra_body` and `sampling_parameters` apply unchanged.
+Configuring an object and the endpoint it replaces is an error; `"enabled": false` keeps an
+object without using it.
+
+The default `etc/search.json` runs the embedder of the released index and carries the query
+model of the server that builds it, Gemma 4 26B-A4B (the QAT model at `UD-Q4_K_XL`, as served
+there), with the server's sampling parameters, disabled:
 
 ```json
 "openai_embedding_model": "Qwen3-Embedding-4B",
 "llamacpp_embedding_server": {
   "hf_repo": "Qwen/Qwen3-Embedding-4B-GGUF:Q8_0",
   "pooling": "last"
+},
+"llm_backend": "openai",
+"openai_query_model": "gemma-4-26B-A4B-it-qat",
+"llamacpp_query_server": {
+  "enabled": false,
+  "hf_repo": "unsloth/gemma-4-26B-A4B-it-qat-GGUF:UD-Q4_K_XL"
 }
 ```
 
+Setting `enabled` to `true` (in a copy of the file, see above) turns on query expansion: the
+first expanded query downloads the model (14 GB) and starts it; on an M2 Pro an expansion
+takes about 4 s, and the running model kept about 5.4 GB resident (see
+`runs/isabelle2026-gemma4/README.md`). Without the object, or with it disabled, query
+expansion is not configured and searches never expand.
+
 | Key | Meaning |
 | --- | --- |
+| `enabled` | `false` keeps the object without starting a server (default `true`) |
 | `hf_repo` | Hugging Face model `user/repo:quant`; llama.cpp downloads it into its cache on first use |
 | `model_file` | a local GGUF file instead (Isabelle path syntax) |
-| `pooling` | pooling of the model, e.g. `last` for Qwen3-Embedding; default: from the GGUF |
-| `context` | context in tokens, one slot (default 4096); must hold the reference inputs |
+| `pooling` | embedding only: pooling of the model, e.g. `last` for Qwen3-Embedding; default: from the GGUF |
+| `context` | context in tokens, one slot (default 4096) |
 | `port` | port on 127.0.0.1 (default: a free one) |
 | `executable` | the server program (default `llama-server`) |
 | `arguments` | further llama-server arguments, e.g. `["-ngl", "0"]` for CPU only |
 | `startup_timeout` | seconds until ready, including a first download (default 1800) |
 
-The server answers under `openai_embedding_model`, which must be the model of the index,
-and replaces `openai_embedding_base_url`; configuring both is an error.
+The query server is started without a multimodal projector (`--no-mmproj`), which llama.cpp
+would otherwise download with an `hf_repo`.
 
 Instead of an environment variable, `openai_api_key_file` names a private file with
 the key, e.g. `$ISASEARCH_HOME_USER/api_key` (`chmod 600`); it takes precedence over
@@ -176,13 +207,21 @@ links appear where results have them.
 
 ## HTTP API
 
-- `GET /capabilities` returns `corpora`, `definition_search`,
-  `embedding_available`, `embedding_error`, `query_expansion`, and
-  `query_expansion_error`.
+- `GET /capabilities` returns `generation` (the generation served), `corpora`,
+  `definition_search`, `embedding_available`, `embedding_error`, `query_expansion`,
+  and `query_expansion_error`.
 - `GET /search?query=...&kind=theorems&refine_query=false` returns `results`,
   `duration`, `refined_query`, plus `elapsed_duration` and `cache_hit`.
   Results retain source fields, descriptions, links, and distances. Exact
   embedding inputs and internal description artifacts are not exposed.
+- Results link to their sources online (`remote_url` and `entry_url` for the AFP,
+  `theory_url` for the Isabelle library) and on this machine: where the variable of
+  their `file` is set (`AFP` for a registered AFP, `ISABELLE_HOME`) and the file exists,
+  `local_file` is its path and `local_line` the line of the document's source in it.
+  The local file may be another version than the indexed one: `local_line` is the
+  occurrence of the source nearest to `start_line`, and missing if the file no longer
+  contains it. The website links both; its local link opens
+  `GET /source?kind=...&id=...`, the local file with line numbers and the source marked.
 - `kind` is `theorems` or `definitions`. Query expansion defaults to off. Enabling
   it concatenates the original and expanded queries. An explicit request fails
   with HTTP 503 if the configured query LLM is unavailable; it never silently
@@ -190,7 +229,13 @@ links appear where results have them.
 
 Capability state is refreshed periodically and updated after inference failures.
 Model availability is checked through real inference, not just the existence of
-a configured URL. Search and API startup never build a corpus.
+a configured URL; a local query server that has not started yet counts as available.
+Search and API startup never build a corpus.
+
+The server follows its index: every request reads `current.json` and opens a newly
+published generation, from a build or an import, so a server never needs a restart for
+new data. The previous generation is closed when its last request ends; a generation that
+fails to open is reported and leaves the previous one in service.
 
 ## Build and resume
 
@@ -313,16 +358,24 @@ isabelle isasearch_export -i plain -D /path/to/directory
 isabelle isasearch_import -f /path/to/directory/isasearch-plain -i plain
 ```
 
-`isasearch_export` writes the current generation of an index as an interchange
-directory `isasearch-NAME`: the stored records and their original vectors in
-document order, and the manifest of the generation with new file checksums. It
-does not depend on the bundled Lucene version, and `isasearch_import` reads it
-back on any machine. The run `runs/isabelle2026-gemma4` publishes such exports as
+`isasearch_export` writes the current generation of an index to a directory
+`isasearch-NAME`, ready to search: copies of the generation's files as they are, with
+their checksums and the Lucene version in its manifest (see
+[INTERCHANGE.md](INTERCHANGE.md)). `isasearch_import` installs such a directory in
+seconds: it checks the files, moves the directory into place (copies it from another
+file system), opens it and publishes it. It needs the Lucene of the same Isabelle
+release.
+
+`-F interchange` writes the interchange format instead: the stored records and
+their original vectors in document order, and the manifest of the generation with
+new file checksums. It does not depend on the bundled Lucene version, and
+`isasearch_import` indexes it anew on any machine, which takes half an hour for the
+whole AFP. The run `runs/isabelle2026-gemma4` publishes exported generations as
 GitHub releases; see its README.
 
 `isasearch_prune -i NAME` removes the generations of an index other than its
 current one. A server that still has an old generation open keeps reading it
-until it stops.
+until its last request on it ends.
 
 ## Duplicate analysis
 
@@ -412,10 +465,11 @@ corrupted.
 
 `isasearch_integration_test` runs the command-line tools in isolated Isabelle user
 directories against a deterministic local inference stub: interchange import,
-search over all inference backends with retries and failures, the HTTP API and
-the website with its assets, a started embedding server (with a fake `llama-server`),
-packaged indexes, query caching, benchmarks, and duplicate analysis with judge
-failures. With a registered AFP it also builds, updates, and prunes corpora
+reference embeddings, search over all inference backends with retries and failures,
+the HTTP API and the website with its assets, a server following a newly published
+generation, started embedding and query servers (with fake `llama-server`s), exported
+generations and their installation, packaged indexes, query caching, benchmarks, and
+duplicate analysis with judge failures. With a registered AFP it also builds, updates, and prunes corpora
 from `Example-Submission`. No real model is contacted.
 
 Application choices use enums in `src/domain.scala`; parsing and serialization

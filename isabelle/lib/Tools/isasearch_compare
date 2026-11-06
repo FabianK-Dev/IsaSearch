@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: compare IsaSearch benchmark results
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" compare "$@"

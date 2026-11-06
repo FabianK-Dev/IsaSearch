@@ -39,8 +39,20 @@ object Tests {
       val options = Options.init(prefs = "")
       val shipped = Config.default(options)
       assert(shipped.base == (component + Path.explode("etc")).absolute)
-      val command = Embedding_Server.command(shipped, 8080)
+      val command = Llama_Server.command(shipped, Llama_Server.Role.Embedding, 8080)
       assert(command.containsSlice(List("-hf", "Qwen/Qwen3-Embedding-4B-GGUF:Q8_0")))
+      // Query expansion is shipped disabled: one switch turns on the server's model locally.
+      assert(Llama_Server.roles(shipped) == List(Llama_Server.Role.Embedding))
+      assert(!new Inference.Client(shipped).configured(Model_Role.Query))
+      val expanding = shipped.updated(Llama_Server.Role.Query.key,
+        object_at(shipped.values, Llama_Server.Role.Query.key).updated("enabled", true))
+      val query = Llama_Server.command(expanding, Llama_Server.Role.Query, 8081)
+      assert(query.containsSlice(List("--alias", "gemma-4-26B-A4B-it-qat")) &&
+        query.contains("--no-mmproj") && !query.contains("--embedding"))
+      using(new Llama_Server.Servers(expanding)) { servers =>
+        assert(new Inference.Client(servers.config).configured(Model_Role.Query))
+        assert(servers.waiting(Llama_Server.Role.Query), "Servers start on first use")
+      }
       assert(Config.default(options.string.update("isasearch_config", "")).values.isEmpty)
       var rejected = false
       try { Config.default(options.string.update("isasearch_config", "$ISASEARCH_HOME/missing")) }

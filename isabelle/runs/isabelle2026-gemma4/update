@@ -4,12 +4,23 @@
 # state of it on GitHub (README.md, "Automatic updates"). Meant for an hourly cron job; a run
 # that finds nothing new exits silently.
 #
-# Usage: update [-f]    -f: build even if the AFP has not changed
+# Usage: update [-f] [-o DIR]
+#   -f      build even if the AFP has not changed
+#   -o DIR  write the assets and notes of the release to DIR instead of publishing them on
+#           GitHub, even if they equal the last release; needs no token and leaves the
+#           release state as it is
 
 set -euo pipefail
 
 FORCE=false
-[ "${1:-}" = "-f" ] && FORCE=true
+OUTPUT=""
+while getopts "fo:" OPT; do
+  case "$OPT" in
+    f) FORCE=true ;;
+    o) OUTPUT="$OPTARG" ;;
+    *) exit 2 ;;
+  esac
+done
 
 RUN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INDEX=plain
@@ -85,26 +96,29 @@ fi
 # release
 
 BUILT="$(state built)"
-[ "$BUILT" != "$(state released)" ] || exit 0
-[ -s "$TOKEN_FILE" ] || {
-  echo "Missing GitHub token $TOKEN_FILE; not released" >&2
-  exit 0
-}
+if [ -z "$OUTPUT" ]; then
+  [ "$BUILT" != "$(state released)" ] || exit 0
+  [ -s "$TOKEN_FILE" ] || {
+    echo "Missing GitHub token $TOKEN_FILE; not released" >&2
+    exit 0
+  }
+fi
 log_start
 # The release names the commit that built it, so that commit must be all there is.
-git -C "$RUN" diff --quiet HEAD ||
-  {
-    echo "The component checkout has local changes; not released" >&2
-    exit 1
-  }
+if [ -z "$OUTPUT" ] && ! git -C "$RUN" diff --quiet HEAD; then
+  echo "The component checkout has local changes; not released" >&2
+  exit 1
+fi
 
 WORK="$STATE/release"
 rm -rf "$WORK"
 mkdir -p "$WORK/assets"
 trap 'rm -rf "$WORK"' EXIT
-EXPORT="$(isabelle isasearch_export -i "$INDEX" -D "$WORK" | tail -n 1)"
+# The generation as it is, ready to search; its manifest keeps the checksums of the corpus
+# data, which identify the index across builds.
+EXPORT="$(isabelle isasearch_export -F generation -i "$INDEX" -D "$WORK" | tail -n 1)"
 FILES="$(json "$EXPORT/manifest.json" '[c["files"] for c in d["corpora"]]')"
-if [ "$FILES" = "$(state released_files)" ]; then
+if [ -z "$OUTPUT" ] && [ "$FILES" = "$(state released_files)" ]; then
   echo "Index data unchanged since the last release"
   echo "$BUILT" >"$STATE/released"
   exit 0
@@ -114,6 +128,8 @@ DATE="$(date -u +%Y%m%d)"
 TAG="index-$INDEX-$DATE-afp-$BUILT"
 NAME="isasearch-$INDEX-$DATE-afp-$BUILT"
 COMMIT="$(git -C "$RUN" rev-parse HEAD)"
+# Only a release written with -o may come from a checkout with local changes.
+git -C "$RUN" diff --quiet HEAD || COMMIT="$COMMIT with local changes"
 echo "Packing $NAME"
 tar -C "$(dirname "$EXPORT")" -cf - "$(basename "$EXPORT")" | zstd -q -T0 -10 |
   split -b "$PART_SIZE" -d -a 3 - "$WORK/assets/$NAME.tar.zst."
@@ -129,10 +145,14 @@ The \`$INDEX\` index of IsaSearch for Isabelle2026 and the AFP 2026 at revision 
 $COUNTS, embedded with $MODEL. Built by the component at $COMMIT with
 \`isabelle/runs/isabelle2026-gemma4/plain.json\`.
 
-Download all \`$NAME.tar.zst.*\` parts, then unpack and import them:
+Download all \`$NAME.tar.zst.*\` parts, then unpack and install them:
 
     cat $NAME.tar.zst.* | zstd -d | tar -x
     isabelle isasearch_import -f isasearch-$INDEX -i $INDEX
+
+The parts hold the index ready to search: the import checks its files and moves the
+directory into place. \`isabelle isasearch_export -F interchange\` writes the documents and
+vectors of an installed index for other Lucene versions and tools.
 
 Search it on a laptop with \`isabelle isasearch_server -i $INDEX\`, whose default configuration
 \`isabelle/etc/search.json\` runs the query embedder on the same machine.
@@ -140,6 +160,14 @@ Search it on a laptop with \`isabelle isasearch_server -i $INDEX\`, whose defaul
 manifest of the index with its provenance.
 EOF
 )"
+
+if [ -n "$OUTPUT" ]; then
+  mkdir -p "$OUTPUT"
+  mv "$WORK"/assets/* "$OUTPUT"/
+  printf '%s\n' "$NOTES" >"$OUTPUT/$NAME.notes.md"
+  echo "Release assets of $TAG in $OUTPUT"
+  exit 0
+fi
 
 API="https://api.github.com/repos/$REPOSITORY/releases"
 github() {
