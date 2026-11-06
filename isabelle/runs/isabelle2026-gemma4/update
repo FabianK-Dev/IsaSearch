@@ -134,7 +134,8 @@ Download all \`$NAME.tar.zst.*\` parts, then unpack and import them:
     cat $NAME.tar.zst.* | zstd -d | tar -x
     isabelle isasearch_import -f isasearch-$INDEX -i $INDEX
 
-Search it on a laptop with \`isabelle/runs/isabelle2026-gemma4/laptop.json\`.
+Search it on a laptop with \`isabelle isasearch_server -i $INDEX\`, whose default configuration
+\`isabelle/etc/search.json\` runs the query embedder on the same machine.
 \`SHA256SUMS\` lists the checksums of the assets, and \`$NAME.manifest.json\` is the
 manifest of the index with its provenance.
 EOF

@@ -73,14 +73,15 @@ isabelle isasearch_import -f isasearch-plain -i plain
 
 ## Search on a laptop
 
-`laptop.json` searches this index without a generative model. The searching tools start
+The component's default configuration `etc/search.json` (option `isasearch_config`)
+searches this index without a generative model. The searching tools start
 llama.cpp's `llama-server` with the Q8_0 quantization of the official
 `Qwen/Qwen3-Embedding-4B-GGUF` on the same machine, on the GPU if llama.cpp supports one
 there and on the CPU otherwise. llama.cpp must be installed; the first start downloads the
 model (4.3 GB) into llama.cpp's cache:
 
 ```sh
-isabelle isasearch_server -c laptop.json -i plain
+isabelle isasearch_server
 ```
 
 The context of one slot of 4096 tokens holds the inputs of the reference check at search

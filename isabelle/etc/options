@@ -1,4 +1,7 @@
 section "IsaSearch"
 
-option isasearch_index : string = "local"
+option isasearch_index : string = "plain"
+  -- "index of the tools without -i; releases are imported as plain"
 option isasearch_port : int = 5001
+option isasearch_config : string = "$ISASEARCH_HOME/etc/search.json"
+  -- "configuration of searching tools without -c (empty: none)"

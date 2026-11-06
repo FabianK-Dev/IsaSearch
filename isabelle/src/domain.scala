@@ -166,6 +166,9 @@ enum Tool_Command(val name: String) extends Named_Value {
   case Compare extends Tool_Command("compare")
   case Test extends Tool_Command("test")
   case Integration_Test extends Tool_Command("integration_test")
+
+  // Tools that embed queries, and so fall back to the default configuration without -c.
+  def searches: Boolean = this == Search || this == Serve || this == Duplicates || this == Benchmark
 }
 
 object Tool_Command {

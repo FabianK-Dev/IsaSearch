@@ -54,12 +54,13 @@ object Main {
     import Data._
     if (argv.isEmpty) error("Missing IsaSearch tool name")
     val tool = Tool_Command.parse(argv.head)
+    val options = Options.init()
     var config_paths = List.empty[Path]
     var index_names = List.empty[String]
     var metadata_index = ""
     var out = home + Path.basic("reports")
     var input: Option[Path] = None
-    var port = Options.init().int("isasearch_port")
+    var port = options.int("isasearch_port")
     var refine = false
     var no_build = false
     var cross = false
@@ -73,9 +74,11 @@ object Main {
     val usage = """
 Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
 
-  -c FILE   JSON configuration (paths relative to this file)
-  -i NAME   built index name (default local); index: repeat -c FILE -i NAME
-            to build several indexes from one session build
+  -c FILE   JSON configuration (paths relative to this file); searching tools
+            default to option isasearch_config
+  -i NAME   index name (default option isasearch_index: """ +
+      options.string("isasearch_index") + """); index: repeat
+            -c FILE -i NAME to build several indexes from one session build
   -m NAME   benchmark index built with metadata
   -D DIR    output directory (reports, component or export parent)
   -f PATH   interchange directory (import) or benchmark CSV
@@ -126,9 +129,9 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
     )
     val args = getopts(argv.tail.toList)
     // Only isasearch_index pairs repeated -c and -i options; elsewhere the last one counts.
-    def load(p: Path): Config = Config(read(p), p.absolute.dir)
-    val config = config_paths.lastOption.map(load).getOrElse(Config(Map.empty))
-    val index = index_names.lastOption.getOrElse(Options.init().string("isasearch_index"))
+    val config = config_paths.lastOption.map(Config.load).getOrElse(
+      if (tool.searches) Config.default(options) else Config(Map.empty))
+    val index = index_names.lastOption.getOrElse(options.string("isasearch_index"))
     // Index builds run for days: their progress is also kept in a log file.
     val names = if (index_names.isEmpty) List(index) else index_names
     val log = home + Path.explode("logs") +
@@ -142,7 +145,7 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       case Tool_Command.Index =>
         val builds =
           if (index_names.isEmpty && config_paths.size <= 1) List(config -> index)
-          else if (config_paths.size == index_names.size) config_paths.map(load).zip(index_names)
+          else if (config_paths.size == index_names.size) config_paths.map(Config.load).zip(index_names)
           else error("Pair each configuration -c FILE with an index name -i NAME")
         if (builds.exists(build => Embedding_Server.requested(build._1)))
           error(Embedding_Server.key + " serves searches; builds use openai_embedding_base_url")

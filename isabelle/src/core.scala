@@ -239,3 +239,18 @@ case class Config(values: Data.Obj, base: Path = Path.current) {
     obj(redact(values))
   }
 }
+
+object Config {
+  def load(path: Path): Config = Config(Data.read(path), path.absolute.dir)
+
+  // Searching tools without -c read the file of option isasearch_config, by default the
+  // component's etc/search.json; users point the option at their own file.
+  def default(options: Options): Config =
+    proper_string(options.string("isasearch_config")) match {
+      case None => Config(Map.empty)
+      case Some(s) =>
+        val path = Path.explode(s).expand
+        if (!path.is_file) error("Missing configuration file " + path + " (option isasearch_config)")
+        load(path)
+    }
+}

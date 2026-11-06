@@ -56,10 +56,24 @@ without this merge stays slow until it is imported or built again. Reported cosi
 distance and squared Euclidean distance are computed from the retained vectors,
 independently of Lucene's scores.
 
+Indexes live by name in `$ISASEARCH_HOME_USER/indexes/NAME`. The tools select one with
+`-i NAME`; without it they use the Isabelle option `isasearch_index`, by default `plain`, the
+name under which the released index is imported.
+
 ## Configure inference and search
 
-Copy `etc/config.example.json` and adjust URLs and model names. Relative paths
-are resolved against that configuration file. Prompts default to the component's
+Without `-c`, the searching tools (`isasearch_search`, `isasearch_server`,
+`isasearch_duplicates`, `isasearch_benchmark`) read the configuration named by the
+Isabelle option `isasearch_config`. It defaults to the component's `etc/search.json`, which
+searches the released index on the local machine: it starts llama.cpp with the Q8_0
+quantization of `Qwen3-Embedding-4B` (see "Local embedding server") and uses no generative
+model. To change it, copy the file, edit the copy, and point the option at it in
+`$ISABELLE_HOME_USER/etc/preferences`, e.g. `isasearch_config = "~/isasearch.json"`; an
+empty value means no default. `-c FILE` replaces the default for one call. Index builds
+take no default and need `-c`.
+
+For other setups, copy `etc/config.example.json` and adjust URLs and model names. Relative
+paths are resolved against that configuration file. Prompts default to the component's
 `prompts/qwen3-gemma`; set `prompts_folder` to use another folder.
 
 For search without a generative LLM, leave `llm_backend` as `none`. An embedding
@@ -71,6 +85,7 @@ The client validates dimensions and re-embeds reference inputs before querying.
 A mismatch is an error rather than silently returning invalid similarities.
 
 ```sh
+isabelle isasearch_search 'a finite union of countable sets'
 export ISASEARCH_API_KEY='your-server-key'
 isabelle isasearch_search -c /path/to/config.json -i plain 'a finite union of countable sets'
 isabelle isasearch_search -c /path/to/config.json -i plain -k definitions 'a partial order'
@@ -87,7 +102,7 @@ requests there and stop it when they exit. Its output goes to
 `$ISASEARCH_HOME_USER/logs/llama-server-TIME.log`. llama.cpp must be installed (e.g.
 `brew install llama.cpp`, or a release binary from its GitHub page); llama.cpp offloads to
 a GPU (Metal, CUDA, Vulkan) when its build supports one and computes on the CPU otherwise.
-Index builds do not start a server.
+Index builds do not start a server. The default `etc/search.json` has this object:
 
 ```json
 "openai_embedding_model": "Qwen3-Embedding-4B",

@@ -33,6 +33,22 @@ object Tests {
     assert(Benchmark.csv("ID,query\r\na,\"hello,\nworld\"\r\n").head("query") == "hello,\nworld")
 
 
+    /* default configuration */
+
+    {
+      val options = Options.init(prefs = "")
+      val shipped = Config.default(options)
+      assert(shipped.base == (component + Path.explode("etc")).absolute)
+      val command = Embedding_Server.command(shipped, 8080)
+      assert(command.containsSlice(List("-hf", "Qwen/Qwen3-Embedding-4B-GGUF:Q8_0")))
+      assert(Config.default(options.string.update("isasearch_config", "")).values.isEmpty)
+      var rejected = false
+      try { Config.default(options.string.update("isasearch_config", "$ISASEARCH_HOME/missing")) }
+      catch { case ERROR(_) => rejected = true }
+      assert(rejected, "Missing default configuration")
+    }
+
+
     /* golden outputs */
 
     {
