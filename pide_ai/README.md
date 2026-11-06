@@ -61,3 +61,11 @@ e.g. `llamacpp_query_server` in `search.json` (see `isabelle/README.md`).
   next search uses it.
 - Packages generate facts that have no source of their own (`list.induct`, `foo.simps`); the
   index does not contain them. `find_theorems` and PIDE AI's `find_entities` do.
+- Results are compact unless the call asks for `details`: names, theory, AFP entry, `context`
+  (the locale or class qualifier of the name), statement, distance, availability and the local
+  source, or the online source where there is no local one. Copies of a statement are one hit
+  (`copies`), represented by the copy the session can use best.
+- `available` (`loaded`, `known`), `source`, `entries` and `mentions` narrow the search. The
+  tool turns availability into the AFP entries (selected before ranking) and sessions (checked
+  on the nearest documents) of the running session for the search server, and checks every
+  hit against it.

@@ -89,10 +89,16 @@
 - [ ] **Try the PIDE AI extension with agents.** `pide_ai` in this repository offers the search
   as PIDE AI's tool `isasearch`, with an agent skill; it builds with PIDE AI's `main` and
   Isabelle2026 and runs the engine inside the PIDE AI server (opened on the first call, closed
-  with the server). Open: how agents use it on real formalization tasks, whether the compact
-  results carry what they need, and whether `availability` (loaded, known, unavailable) is the
-  right signal; theorems and definitions in one call (item under "Search") would save agents a
-  second call. Ask Kevin whether the extension should live here or among his extensions.
+  with the server). Ask Kevin whether the extension should live here or among his extensions.
+
+  First feedback of an agent (2026-11-06, about 60 hits) and what came of it: compact results
+  by default (`details` for descriptions, all names and online links), numbered fact selections
+  folded into one name and at most 20 names, filters by availability, source, AFP entry and
+  mentioned tokens, copies of a statement as one hit (the Zippy entry copies `List`, `Set`,
+  `GCD`, `Limits`, `Binomial` and `Finite_Set` and outranked the HOL originals in 7 queries),
+  and the locale or class qualifier of a hit's name as `context`. Still open from it: the items
+  below on descriptions, notation queries, entry-level search, goal queries and generated facts;
+  theorems and definitions in one call (item under "Search") would save agents a second call.
 
 ## Search
 
@@ -112,6 +118,34 @@
   by raw score; otherwise normalize per corpus or interleave by rank. Query refinement also uses
   a prompt per corpus (`Prompt.Expand`), so a combined search either refines once per corpus
   or needs one shared refinement prompt.
+
+- [ ] **Match notation and names, not only descriptions.** Queries in Isabelle notation do worse
+  than prose (agent feedback: `card ...` and `sum_list ...` queries missed, the source writing
+  `∑x←xs`), and a wrong description ranks its fact wrongly however right the statement is. A
+  second signal from the statement would help both: BM25 over statements and names (cheap,
+  Lucene has it; also the remedy for named-theorem queries noted under the small query
+  encoder), or an embedding of the statement itself (a second vector per document, so a
+  rebuild and twice the vectors). Merge the rankings, e.g. by reciprocal rank fusion, and
+  measure on the benchmark, whose queries are prose: add notation queries first. The tool's
+  `mentions` filter is the manual stopgap.
+
+- [ ] **Search AFP entries as a whole.** "A verified SAT solver" returns scattered lemmas at
+  distances 0.30-0.42, because the corpora hold single facts and definitions. Every record
+  already carries its entry's metadata (title, abstract, date): a third corpus of entries,
+  embedding title and abstract (about 1,000 documents, minutes to build), would answer such
+  questions, and a combined search could offer entries next to facts.
+
+- [ ] **Search from a goal.** Agents mostly look at a subgoal, not at prose. A tool argument
+  with theory, line and subgoal could take the goal from PIDE and use it as the query. Measure
+  first how goal text retrieves (it is notation, see above), with and without query expansion,
+  which could turn a goal into prose.
+
+- [ ] **Collapse restatements that differ in their terminal proof.** `collapse` merges hits with
+  the same `Text_Preparation.statement`, which drops a structured `proof` but keeps `by ...`,
+  so `lemma a: "P" by simp` and `lemma b: "P" by auto` stay apart. Cutting the statement at the
+  first proof command needs Isabelle's outer syntax tokens rather than a regular expression; it
+  would also sharpen the duplicate analysis and the informalization input, whose goldens and
+  prompts change with it.
 
 - [ ] **Expand queries with a smaller local model.** Local expansion behaves as on the server
   since 2026-11-06: `llamacpp_query_server` starts llama.cpp with the server's query model
@@ -202,6 +236,16 @@
   that were already made from a cut statement: the checksum covers `src`, not the excerpt, so those
   entries have to be deleted by hand to be redone.
 
+- [ ] **Find out why descriptions go wrong.** An agent found five wrong descriptions in about
+  60 hits: `gnf` (Greibach normal form) described as Gröbner, `Brzozowski` (the minimisation
+  construction) as a derivative and ranked first for a derivative query, `size_list_pointwise`
+  as a sum lemma, `principal_ideal_domain.bezout` with real numbers and integers, and
+  `countable_union_of_Union` as about countable sets. Each guesses from a name instead of reading
+  the definitions it depends on. Candidates: the entry's title and abstract and the locale (next
+  item) in the describe prompt, the definitions of the constants a statement uses, a check of
+  description against statement by the duplicate judge's model, and the larger describe model.
+  Measure on a sample with hand-checked descriptions before rebuilding.
+
 - [ ] **Show the LLM the enclosing locale when it describes a locale-interior document.**
   Lemmas and definitions inside a `locale`/`context` block are covered — each is its own outer
   command, so FindFacts gives it its own block — but the block is *just the statement*: the
@@ -259,6 +303,14 @@
   FindFacts, which the Isabelle component could host beside its FindFacts export. A cheaper middle ground: mention the generated fact names inside
   the *generating* block's description, so "list.induct" is at least findable by name through
   the description text.
+
+  An agent's view (2026-11-06): the names of a hit of the generating command already list the
+  generated facts (`deriv.induct`, introduction rules), so they are reachable in two steps;
+  what is missing is matching their statements, e.g. `rtrancl_into_rtrancl` lost to AFP
+  restatements of itself. Worth indexing in its view: introduction rules of inductive
+  definitions, the induction rules of `function`, and the map/set/rel facts of datatypes
+  (`list.set_map`), tagged as generated so that a search can leave them out; not `.cases`,
+  `.exhaust`, `.inject`, `.distinct`, `.split`, `.size` or `.simps`.
 
 ## Build ergonomics
 

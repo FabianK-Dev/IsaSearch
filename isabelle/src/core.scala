@@ -185,6 +185,32 @@ object Text_Preparation {
   def strip_proof(source: String): String =
     proof.findFirstMatchIn(source).map(m => source.take(m.start)).getOrElse(source)
 
+  private lazy val command_prefix =
+    ("^\\s*(?:" + Data.str(Data.read(Data.component + Path.explode("etc/scoring.json")),
+      "commands") + ")\\b").r
+  private val name_prefix = "^\\s*[A-Za-z_][A-Za-z0-9_'.]*\\s*(?:\\[[^\\]]*\\])?\\s*:(?!:)".r
+  private val spaces = "(?U)\\s+".r
+
+  // What a source states: without its command, name, attributes and structured proof, with white
+  // space normalized. Restatements of a fact under another name state the same.
+  def statement(source: String): String = {
+    val text =
+      name_prefix.replaceFirstIn(command_prefix.replaceFirstIn(strip_proof(source), " "), " ")
+    Library.trim_string(spaces.replaceAllIn(text, " "))
+  }
+
+  // Whether a statement mentions a token: an identifier as a whole component of a name
+  // (`countable` in `Countable_Set.countable`, neither in `uncountable` nor in
+  // `countable_union_of`), anything else, e.g. a symbol, as a part of the text. Symbols may be
+  // given as `\<Union>` or `⋃`.
+  def mentions(statement: String, token: String): Boolean = {
+    val t = Symbol.decode(token)
+    if (t.forall(c => Character.isLetterOrDigit(c) || c == '_' || c == '\'' || c == '.'))
+      ("(?<![\\p{L}\\p{N}_'])" + java.util.regex.Pattern.quote(t) + "(?![\\p{L}\\p{N}_'])").r
+        .findFirstIn(statement).nonEmpty
+    else statement.contains(t)
+  }
+
   def metadata(text: String): String =
     space_explode(' ', Word.lowercase(text).replacing("\\b[a-z]{1,3}\\b|[^a-z ]".r -> " "))
       .filter(w => w.nonEmpty && !stopwords(w))

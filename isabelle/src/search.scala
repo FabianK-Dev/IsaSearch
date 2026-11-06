@@ -72,6 +72,43 @@ object Search {
   }
 
 
+  /** statements **/
+
+  // Hits with the same statement (Text_Preparation.statement), e.g. of a theory that an AFP
+  // entry copies or of a fact restated under another name, as one result: ranked by its nearest
+  // copy, represented by a copy of the distribution if there is one, the others under "copies".
+  // Copies are those among the hits up to the last result.
+  def collapse(ranked: Iterator[Obj], limit: Int): List[Obj] = {
+    val groups = scala.collection.mutable.LinkedHashMap.empty[String, List[Obj]]
+    var more = true
+    while (more && ranked.hasNext) {
+      val record = ranked.next()
+      val key = Text_Preparation.statement(str(record, "src"))
+      if (groups.contains(key)) groups(key) = groups(key) :+ record
+      else if (groups.size < limit) groups(key) = List(record)
+      else more = false
+    }
+    groups.values.toList.map { copies =>
+      val result = copies.find(str(_, "entry").isEmpty).getOrElse(copies.head)
+      result.updated("copies", copies.filterNot(_ eq result))
+    }
+  }
+
+  // The qualifier between the theory and the first name that a command declares, e.g. the locale
+  // `gd_term` of `Reduced_GB.gd_term.is_reduced_GB_unique` in theory `Groebner_Bases.Reduced_GB`:
+  // usually the locale or class that a fact or constant is stated in, otherwise a name space.
+  // The facts that definitions generate (e.g. `deriv.simps`) are qualified by their constant.
+  def qualifier(record: Obj): Option[String] = {
+    val theory = Long_Name.base_name(str(record, "theory"))
+    val declared = strings(record, "consts") ::: strings(record, "typs") match {
+      case Nil => strings(record, "thms")
+      case names => names
+    }
+    declared.headOption.flatMap(name => Library.try_unprefix(theory + ".", name))
+      .map(Long_Name.qualifier).filter(_.nonEmpty)
+  }
+
+
   /** search service **/
 
   // Searches over the snapshots of an index source, with the inference endpoints of the
@@ -152,15 +189,21 @@ object Search {
       query: String,
       kind: Corpus_Kind = Corpus_Kind.Theorems,
       mode: Query_Mode = Query_Mode.Original,
-      limit: Int = 100
-    ): Obj = use(search(_, query, kind, mode, limit))
+      limit: Int = 100,
+      filter: Search_Filter = Search_Filter(),
+      collapse: Boolean = false
+    ): Obj = use(search(_, query, kind, mode, limit, filter, collapse))
 
+    // The nearest documents of the filter, the copies of a statement as one result if
+    // `collapse` is set.
     def search(
       snapshot: Index.Snapshot,
       query: String,
       kind: Corpus_Kind,
       mode: Query_Mode,
-      limit: Int
+      limit: Int,
+      filter: Search_Filter,
+      collapse: Boolean
     ): Obj = {
       if (Library.trim_string(query).isEmpty) throw Bad_Request("query must not be empty")
       if (limit < 1 || limit > 1000) throw Bad_Request("limit must be between 1 and 1000")
@@ -195,13 +238,18 @@ object Search {
           embedding_error = msg
           throw Unavailable(msg)
       }
-      val results = Local_Sources(corpus
-        .search(vector, limit, candidates)
-        .map(_.removed("embedding_input").removed("description_artifact")))
+      val nearest = corpus.ranked(vector, math.max(limit, candidates), filter)
+        .filter(filter.admits)
+        .map(_.removed("embedding_input").removed("description_artifact"))
+      val results =
+        if (collapse) Search.collapse(nearest, limit).map(result =>
+          result.updated("copies", Local_Sources(list(result("copies")).map(obj))))
+        else nearest.take(limit).toList
+      val located = Local_Sources(results)
       val elapsed = (System.nanoTime() - start) / 1e9
       val legacy = completion.filter(_.cached).map(c => elapsed + c.duration).getOrElse(elapsed)
       Map(
-        "results" -> results,
+        "results" -> located,
         "duration" -> legacy,
         "elapsed_duration" -> elapsed,
         "cache_hit" -> completion.exists(_.cached),
@@ -227,11 +275,35 @@ object Search {
     }
   }
 
-  def boolean(s: String): Boolean = Word.lowercase(s) match {
-    case "true" => true
-    case "false" => false
-    case _ => throw Bad_Request("refine_query must be true or false")
+  def boolean(args: Map[String, String], name: String): Boolean =
+    Word.lowercase(args.getOrElse(name, "false")) match {
+      case "true" => true
+      case "false" => false
+      case _ => throw Bad_Request(name + " must be true or false")
+    }
+
+  // The filter of a search request: `source` (all, distribution or afp), `entries` and
+  // `sessions` (comma separated), `mentions` (separated by spaces).
+  def filter(args: Map[String, String]): Search_Filter = {
+    def names(name: String, sep: Char): Option[List[String]] =
+      args.get(name).map(s => space_explode(sep, s).map(Library.trim_string).filter(_.nonEmpty))
+    try {
+      Search_Filter(
+        source = Search_Source.parse(args.getOrElse("source", Search_Source.All.name)),
+        entries = names("entries", ',').map(_.toSet),
+        sessions = names("sessions", ',').map(_.toSet),
+        mentions = args.get("mentions").toList.flatMap(s =>
+          s.split("\\s+").nn.toList.map(_.nn).filter(_.nonEmpty)))
+    }
+    catch { case ERROR(msg) => throw Bad_Request(msg) }
   }
+
+  // The parameters of a filter, as `filter` reads them.
+  def filter_parameters(filter: Search_Filter): List[(String, String)] =
+    List("source" -> filter.source.name) :::
+    filter.entries.map(es => "entries" -> es.toList.sorted.mkString(",")).toList :::
+    filter.sessions.map(ss => "sessions" -> ss.toList.sorted.mkString(",")).toList :::
+    (if (filter.mentions.isEmpty) Nil else List("mentions" -> filter.mentions.mkString(" ")))
 
 
   /** HTTP services **/
@@ -377,9 +449,10 @@ object Search {
             kind = try { Corpus_Kind.parse(args.getOrElse("kind", Corpus_Kind.Theorems.name)) }
             catch { case ERROR(msg) => throw Bad_Request(msg) },
             mode =
-              if (boolean(args.getOrElse("refine_query", "false"))) Query_Mode.Combined
-              else Query_Mode.Original,
-            limit = args.getOrElse("limit", "100").toInt
+              if (boolean(args, "refine_query")) Query_Mode.Combined else Query_Mode.Original,
+            limit = args.getOrElse("limit", "100").toInt,
+            filter = filter(args),
+            collapse = boolean(args, "collapse")
           )
         }
       ) ::: (if (editors.isEmpty) Nil

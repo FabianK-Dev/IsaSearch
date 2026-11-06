@@ -95,6 +95,44 @@ object Benchmark_Strategy {
 }
 
 
+/** search filters **/
+
+// The part of the corpus a document comes from: the Isabelle distribution or the AFP.
+enum Search_Source(val name: String) extends Named_Value {
+  case All extends Search_Source("all")
+  case Distribution extends Search_Source("distribution")
+  case AFP extends Search_Source("afp")
+
+  def distribution: Boolean = this != AFP
+  def afp: Boolean = this != Distribution
+}
+
+object Search_Source {
+  def parse(name: String): Search_Source = Named_Value.parse(values.toList, name, "source")
+}
+
+// The documents a search considers. The index selects them by source and AFP entry (`entries`
+// restricts the AFP part; None admits every entry) before its nearest-neighbour search; the
+// session and the tokens a statement must mention are checked on the nearest documents.
+case class Search_Filter(
+  source: Search_Source = Search_Source.All,
+  entries: Option[Set[String]] = None,
+  sessions: Option[Set[String]] = None,
+  mentions: List[String] = Nil
+) {
+  if (!source.afp && entries.nonEmpty) error("AFP entries of a search of the distribution")
+  if (entries.exists(_.contains(""))) error("Empty AFP entry name")
+  if (mentions.exists(m => m.isEmpty || m.exists(Character.isWhitespace)))
+    error("Mentioned tokens must be non-empty and without spaces")
+
+  def admits(record: Data.Obj): Boolean =
+    sessions.forall(_.contains(Data.str(record, "session"))) && {
+      lazy val statement = Text_Preparation.statement(Data.str(record, "src"))
+      mentions.forall(Text_Preparation.mentions(statement, _))
+    }
+}
+
+
 /** duplicate evidence **/
 
 enum Duplicate_Tier(val name: String) extends Named_Value {

@@ -46,17 +46,6 @@ object Duplicates {
 
   /** syntactic similarity **/
 
-  private lazy val command_prefix =
-    ("^\\s*(?:" + str(read(component + Path.explode("etc/scoring.json")), "commands") + ")\\b").r
-  private val name_prefix = "^\\s*[A-Za-z_][A-Za-z0-9_'.]*\\s*(?:\\[[^\\]]*\\])?\\s*:(?!:)".r
-  private val spaces = "(?U)\\s+".r
-
-  def normalized(s: String): String = {
-    val statement =
-      name_prefix.replaceFirstIn(command_prefix.replaceFirstIn(strip_proof(s), " "), " ")
-    Library.trim_string(spaces.replaceAllIn(statement, " "))
-  }
-
   // difflib.SequenceMatcher(None, a, b), including its default autojunk heuristic.
   def sequence_ratio(a0: String, b0: String): Double = {
     val a = a0.codePoints().nn.toArray.nn
@@ -112,8 +101,8 @@ object Duplicates {
   }
 
   def similarity(a: String, b: String): Double = {
-    val x = normalized(a)
-    val y = normalized(b)
+    val x = Text_Preparation.statement(a)
+    val y = Text_Preparation.statement(b)
     if (x.codePointCount(0, x.length) < min_statement_length ||
         y.codePointCount(0, y.length) < min_statement_length) 0.0
     else sequence_ratio(x, y)

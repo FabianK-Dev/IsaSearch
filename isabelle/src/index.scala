@@ -31,10 +31,13 @@ import org.apache.lucene.search.{
   ScoreDoc,
   BooleanQuery,
   BooleanClause,
-  MatchAllDocsQuery
+  MatchAllDocsQuery,
+  Query,
+  TermInSetQuery
 }
 import org.apache.lucene.index.Term
-import org.apache.lucene.util.Version
+import org.apache.lucene.util.{BytesRef, Version}
+import scala.jdk.CollectionConverters._
 import org.apache.solr.index.NoMergePolicyFactory
 
 
@@ -578,26 +581,52 @@ object Index {
       hits(searcher.search(new TermQuery(new Term("id", id)), 1)).headOption
         .map(hit => hit.doc -> record(hit.doc))
 
-    // The HNSW graph misses some nearest neighbours: up to `candidates` approximate hits are
-    // ranked by exact distance, and only the best `limit` records are read.
-    def search(v: Array[Float], limit: Int, candidates: Int, exclude: String = ""): List[Obj] = {
+    // The documents of the source and AFP entries of a filter, without those of the entry
+    // `exclude`: distribution documents have the empty entry.
+    private def prefilter(filter: Search_Filter, exclude: String): Option[Query] = {
+      def entry(name: String): Query = new TermQuery(new Term("entry", name))
+      val clauses: List[(Query, BooleanClause.Occur)] =
+        ((filter.source, filter.entries) match {
+          case (Search_Source.All, None) => Nil
+          case (Search_Source.Distribution, _) => List(entry("") -> BooleanClause.Occur.FILTER)
+          case (Search_Source.AFP, None) => List(entry("") -> BooleanClause.Occur.MUST_NOT)
+          case (source, Some(entries)) =>
+            val names = (if (source.distribution) entries + "" else entries).toList.sorted
+            List(new TermInSetQuery("entry", names.map(new BytesRef(_)).asJava) ->
+              BooleanClause.Occur.FILTER)
+        }) ::: (if (exclude.isEmpty) Nil else List(entry(exclude) -> BooleanClause.Occur.MUST_NOT))
+      if (clauses.isEmpty) None
+      else {
+        val builder = new BooleanQuery.Builder()
+        builder.add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST)
+        for ((query, occur) <- clauses) builder.add(query, occur)
+        Some(builder.build().nn)
+      }
+    }
+
+    // The HNSW graph misses some nearest neighbours: up to `k` approximate hits of the
+    // prefilter are ranked by exact distance, and their records are read as they are consumed.
+    def ranked(
+      v: Array[Float],
+      k: Int,
+      filter: Search_Filter = Search_Filter(),
+      exclude: String = ""
+    ): Iterator[Obj] = {
       validate(v, spec.dimension, spec.metric)
-      val k = math.min(math.max(limit, candidates), spec.count)
-      val query =
-        if (exclude.isEmpty) new KnnFloatVectorQuery("vector", v, k)
-        else {
-          val filter = new BooleanQuery.Builder()
-            .add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST).nn
-            .add(new TermQuery(new Term("entry", exclude)), BooleanClause.Occur.MUST_NOT).nn
-            .build()
-          new KnnFloatVectorQuery("vector", v, k, filter)
-        }
-      vectors(hits(searcher.search(query, k)).map(_.doc))
+      val count = math.min(k, spec.count)
+      val query = prefilter(filter, exclude) match {
+        case None => new KnnFloatVectorQuery("vector", v, count)
+        case Some(f) => new KnnFloatVectorQuery("vector", v, count, f)
+      }
+      vectors(hits(searcher.search(query, count)).map(_.doc))
         .map { case (n, id, vector) => (distance(v, vector, spec.metric), id, n) }
         .sortBy { case (d, id, _) => (d, id) }
-        .take(limit)
+        .iterator
         .map { case (d, _, n) => record(n).updated("distance", d) }
     }
+
+    def search(v: Array[Float], limit: Int, candidates: Int, exclude: String = ""): List[Obj] =
+      ranked(v, math.max(limit, candidates), exclude = exclude).take(limit).toList
   }
 
 

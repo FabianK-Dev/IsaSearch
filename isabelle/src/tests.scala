@@ -99,7 +99,7 @@ object Tests {
         }
       }
       for (item <- list(golden("normalized")).map(obj))
-        assert(Duplicates.normalized(str(item, "input")) == str(item, "expected"))
+        assert(Text_Preparation.statement(str(item, "input")) == str(item, "expected"))
       for (item <- list(golden("verdicts")).map(obj)) {
         val (value, reason) = Duplicates.verdict(str(item, "input"))
         assert(List(value.name, reason) == list(item("expected")))
@@ -128,6 +128,97 @@ object Tests {
       File.write(entries + Path.basic("CoreC++.toml"), "title = \"Core C++\"\n")
       assert(str(Corpus_Build.metadata(afp, "CoreC++"), "title") == "Core C++",
         "AFP entry names beyond index names")
+    }
+
+
+    /* statements and search filters */
+
+    {
+      val statement = Text_Preparation.statement(
+        "lemma countable_union_of_Union [simp]:\n  \"countable union_of P ⟹ ⋃ A ∈ X\"\nproof -")
+      assert(statement == "\"countable union_of P ⟹ ⋃ A ∈ X\"", statement)
+      assert(Text_Preparation.mentions(statement, "countable"))
+      assert(!Text_Preparation.mentions(statement, "union"), "Whole names only")
+      assert(!Text_Preparation.mentions("\"uncountable A\"", "countable"))
+      assert(Text_Preparation.mentions("\"Set.countable A\"", "countable"))
+      assert(Text_Preparation.mentions(statement, "\\<Union>") &&
+        Text_Preparation.mentions(statement, "⋃"))
+      assert(!Text_Preparation.mentions(statement, "\\<Inter>"))
+
+      def hit(id: String, entry: String, src: String, session: String = "S"): Obj =
+        Map("id" -> id, "entry" -> entry, "src" -> src, "session" -> session)
+      val ranked = List(
+        hit("a", "Zippy", "lemma set_map [simp]: \"set (map f xs) = f ` set xs\"\nby (rule x)"),
+        hit("b", "", "lemma set_map [simp]: \"set (map f xs) = f ` set xs\"\nby (rule x)"),
+        hit("c", "E", "lemma other: \"P\""),
+        hit("d", "F", "lemma restated:\n  \"set (map f xs) = f ` set xs\" by (rule x)"),
+        hit("e", "G", "lemma more: \"Q\""))
+      val collapsed = Search.collapse(ranked.iterator, 2)
+      assert(collapsed.map(str(_, "id")) == List("b", "c"),
+        "Copies as one result, represented by the distribution")
+      assert(list(collapsed.head("copies")).map(c => str(obj(c), "id")) == List("a", "d"))
+      assert(list(collapsed(1)("copies")).isEmpty)
+
+      assert(Search.qualifier(Map("theory" -> "Groebner_Bases.Reduced_GB",
+        "thms" -> List("Reduced_GB.gd_term.is_reduced_GB_unique"))).contains("gd_term"))
+      assert(Search.qualifier(Map("theory" -> "HOL.List",
+        "thms" -> List("List.set_map"))).isEmpty)
+      assert(Search.qualifier(Map("theory" -> "Regular-Sets.Pi", "thms" -> Nil,
+        "consts" -> List("Pi.embed.rderiv"))).contains("embed"))
+      assert(Search.qualifier(Map("theory" -> "Regular-Sets.Derivatives",
+        "thms" -> List("Derivatives.deriv_graph.intros(1)", "Derivatives.deriv.simps(1)"),
+        "consts" -> List("Derivatives.deriv_graph", "Derivatives.deriv"))).isEmpty,
+        "Generated facts are qualified by their constant")
+
+      val filter = Search_Filter(Search_Source.All, Some(Set("E", "F")), Some(Set("S")),
+        List("countable", "⋃"))
+      assert(Search.filter(Search.filter_parameters(filter).toMap) == filter)
+      assert(Search.filter(Map.empty) == Search_Filter())
+      assert(filter.admits(hit("x", "E", "lemma x: \"countable (⋃ A)\"")))
+      assert(!filter.admits(hit("x", "E", "lemma x: \"countable (⋃ A)\"", session = "T")))
+      assert(!filter.admits(hit("x", "E", "lemma countable: \"⋃ A\"")),
+        "Mentions in the statement, not in the name")
+      for (bad <- List(Map("source" -> "distribution", "entries" -> "E"),
+          Map("source" -> "nowhere"))) {
+        val rejected =
+          try { Search.filter(bad); false }
+          catch { case _: Search.Bad_Request => true }
+        assert(rejected, "Rejected filter: " + bad)
+      }
+    }
+
+
+    /* prefilter by source and AFP entry */
+
+    Isabelle_System.with_tmp_dir("isasearch-prefilter") { tmp =>
+      val schema = new Index.Schema(2, Distance_Metric.Cosine)
+      val docs = List("d0" -> "", "d1" -> "E", "d2" -> "F", "d3" -> "", "d4" -> "E")
+      using(Solr.init(tmp + Path.basic("solr")).init_database("theorems", schema)) { db =>
+        db.transaction {
+          db.execute_batch_insert(docs.zipWithIndex.map { case ((id, entry), i) =>
+            (doc: Solr.Document) => {
+              doc.string(schema.id) = id
+              doc.string(schema.entry) = entry
+              doc.string(schema.record) = JSON.Format(Map("id" -> id, "entry" -> entry))
+              doc.double(schema.vector) = List(math.cos(i * 0.1), math.sin(i * 0.1))
+            }
+          })
+        }
+      }
+      val spec = Index.Spec(Map("kind" -> "theorems", "dimension" -> 2, "count" -> docs.size,
+        "metric" -> "cosine", "recipe" -> Map("model" -> "m", "add_metadata" -> false,
+          "prompts" -> Map("embed" -> "e", "retrieve" -> "r"))))
+      using(new Index.Corpus(tmp, spec)) { corpus =>
+        def ids(filter: Search_Filter, exclude: String = ""): List[String] =
+          corpus.ranked(Array(1f, 0f), 10, filter, exclude).map(str(_, "id")).toList
+        assert(ids(Search_Filter()) == List("d0", "d1", "d2", "d3", "d4"))
+        assert(ids(Search_Filter(Search_Source.Distribution)) == List("d0", "d3"))
+        assert(ids(Search_Filter(Search_Source.AFP)) == List("d1", "d2", "d4"))
+        assert(ids(Search_Filter(entries = Some(Set("E")))) == List("d0", "d1", "d3", "d4"))
+        assert(ids(Search_Filter(Search_Source.AFP, Some(Set("F")))) == List("d2"))
+        assert(ids(Search_Filter(Search_Source.AFP, Some(Set.empty))).isEmpty)
+        assert(ids(Search_Filter(Search_Source.AFP), exclude = "E") == List("d2"))
+      }
     }
 
 

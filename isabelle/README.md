@@ -214,6 +214,19 @@ links appear where results have them.
   `duration`, `refined_query`, plus `elapsed_duration` and `cache_hit`.
   Results retain source fields, descriptions, links, and distances. Exact
   embedding inputs and internal description artifacts are not exposed.
+  Optional parameters narrow and condense the results:
+  - `source=distribution` or `source=afp` (default `all`) and `entries=E1,E2` (only these AFP
+    entries, besides the distribution unless `source=afp`) select documents before the
+    nearest-neighbour search, so the ranking is exact within them.
+  - `sessions=S1,S2` and `mentions=T1 T2` keep the documents of these sessions whose statement
+    mentions every token: an identifier as a whole component of a name (`countable` matches
+    `Set.countable`, not `uncountable`), anything else such as `⋃` or `\<Union>` as text. They
+    apply to the nearest `search_candidates` documents of the selection (500 by default), so a
+    rare match may yield fewer results than `limit`.
+  - `collapse=true` returns the hits with the same statement (proof, command, name and
+    attributes aside), e.g. the copies of HOL theories in the AFP entry Zippy, as one result,
+    ranked by its nearest copy and represented by a copy from the distribution if there is
+    one; the others follow under `copies`.
 - Results link to their sources online (`remote_url` and `entry_url` for the AFP,
   `theory_url` for the Isabelle library) and on this machine: where the variable of
   their `file` is set (`AFP` for a registered AFP, `ISABELLE_HOME`) and the file exists,
