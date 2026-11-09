@@ -169,9 +169,12 @@ duplicates_notes() {
 }
 DUPLICATES_ASSETS=("$REPORT.json" "${REPORT}_near-exact.md" "${REPORT}_possible.md")
 
+# The token goes to curl as a configuration on its standard input, written by the shell's
+# printf, so that it never appears among the arguments of a process.
 github() {
-  curl -sS --fail-with-body -H "Authorization: Bearer $(cat "$TOKEN_FILE")" \
-    -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$@"
+  printf 'header = "Authorization: Bearer %s"\n' "$(<"$TOKEN_FILE")" |
+    curl -sS --fail-with-body -K - -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" "$@"
 }
 upload() { # URL FILE
   echo "Uploading $(basename "$2")"
