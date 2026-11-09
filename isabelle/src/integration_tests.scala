@@ -408,6 +408,7 @@ object Integration_Tests {
           Index_Format.generation, object_at(shipped_manifest, Index_Format.generation)
             .updated("lucene", "99.0.0")))
         env.run("import", List("-f", future.implode, "-i", "future"), ok = false)
+        releases(env, root, ship("release"), config_path)
         val generations = env.user + Path.explode("isasearch/indexes/plain")
         def count(): Int = File.read_dir(generations).count(_.startsWith("generation-"))
         env.run("import", List("-f", plain.implode, "-i", "plain"))
@@ -488,6 +489,70 @@ object Integration_Tests {
     }
 
   // Fake llama-servers record their arguments and wait; the stub answers on their port.
+  // A shipped generation released as runs/isabelle2026-gemma4/update releases it, by a local
+  // stand-in for the GitHub API (option isasearch_releases).
+  def releases(env: Environment, root: Path, shipped: Path, config_path: Path): Unit = {
+    val tar = root + Path.basic("release.tar")
+    Isabelle_System.gnutar("-cf " + File.bash_path(tar) + " " + File.bash_path(shipped.base),
+      dir = shipped.dir).check
+    val packed = Bytes.read(tar)
+      .compress(Compress.Options_Zstd(), cache = Compress.Cache.make()).make_array
+    val half = packed.length / 2
+    val parts = List(packed.take(half), packed.drop(half)).zipWithIndex.map { case (b, i) =>
+      ("isasearch-plain-20261109-afp-0726d9f1e0bf.tar.zst.00" + i) -> b
+    }
+    val sums = parts.map { case (name, b) => hash(b) + "  " + name }.mkString("", "\n", "\n")
+    val bad_sums = parts.map { case (name, _) => "0" * 64 + "  " + name }.mkString("", "\n", "\n")
+    val files = (parts ::: List("SHA256SUMS" -> UTF8.bytes(sums),
+      "bad/SHA256SUMS" -> UTF8.bytes(bad_sums))).toMap
+    val server =
+      HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress, 0), 0).nn
+    val url = "http://127.0.0.1:" + server.getAddress.nn.getPort
+    def release(tag: String, sums: String): Obj = Map(
+      "tag_name" -> tag, "draft" -> false, "prerelease" -> false,
+      "published_at" -> "2026-11-09T00:00:00Z",
+      "assets" -> ((parts.map(_._1) ::: List(sums)).map(name => Map(
+        "name" -> name.split('/').last, "size" -> files(name).length.toLong,
+        "browser_download_url" -> (url + "/assets/" + name)))))
+    val listing = List(
+      release("index-plain-20261109-afp-0726d9f1e0bf", "SHA256SUMS"),
+      release("index-plain-20261108-afp-1111111111aa", "bad/SHA256SUMS"))
+    server.createContext("/", { (http: HttpExchange | Null) =>
+      val exchange = http.nn
+      val uri = exchange.getRequestURI.nn
+      val body =
+        if (uri.getPath.nn == "/releases")
+          Some(UTF8.bytes(JSON.Format(if (uri.getQuery.nn.endsWith("page=1")) listing else Nil)))
+        else files.get(uri.getPath.nn.stripPrefix("/assets/"))
+      body match {
+        case Some(bytes) =>
+          exchange.sendResponseHeaders(200, bytes.length.toLong)
+          using(exchange.getResponseBody.nn)(_.write(bytes))
+        case None => exchange.sendResponseHeaders(404, -1)
+      }
+      exchange.close()
+    })
+    server.start()
+    try {
+      val option = List("-o", "isasearch_releases=" + url + "/releases")
+      val unregistered = env.run("import", option ::: List("-i", "released"), ok = false)
+      check(unregistered.err.contains("No registered AFP") &&
+        unregistered.err.contains("-R TAG"), "release without AFP and terminal:\n" +
+        unregistered.err)
+      env.run("import", option ::: List("-R", "index-plain-20261108-afp-1111111111aa",
+        "-i", "released"), ok = false)
+      val downloads = env.user + Path.explode("isasearch/downloads")
+      check(!(downloads + Path.explode("index-plain-20261108-afp-1111111111aa/" +
+        parts.head._1)).is_file, "part with a bad checksum discarded")
+      env.run("import", option ::: List("-R", "index-plain-20261109-afp-0726d9f1e0bf",
+        "-i", "released"))
+      check(!(downloads + Path.basic("index-plain-20261109-afp-0726d9f1e0bf")).is_dir,
+        "downloaded parts removed after the import")
+      env.run("search", List("-c", config_path.implode, "-i", "released", "commutativity"))
+    }
+    finally { server.stop(0) }
+  }
+
   def llama_servers(env: Environment, stub: Stub, root: Path, config: Obj): Unit = {
     def executable(name: String, script: String): Path = {
       val path = root + Path.basic(name)

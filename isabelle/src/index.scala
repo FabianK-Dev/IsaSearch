@@ -408,12 +408,8 @@ object Index {
     if (files.isEmpty) error("Generation without files")
     progress.echo("Checking " + files.size + " files of the generation ...")
     for ((file, hash) <- files.toList.sortBy(_._1)) {
-      // Relative names of plain elements: nothing outside the directory, no variables.
-      if (!file.matches("[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*") ||
-          space_explode('/', file).exists(e => e == "." || e == "..") ||
-          file == Index_Format.manifest)
-        error("Bad generation file name: " + quote(file))
-      val path = source + Path.explode(file)
+      if (file == Index_Format.manifest) error("Bad generation file name: " + quote(file))
+      val path = source + relative_path(file)
       if (!path.is_file || file_hash(path) != hash.toString)
         error("Checksum mismatch: " + file)
     }

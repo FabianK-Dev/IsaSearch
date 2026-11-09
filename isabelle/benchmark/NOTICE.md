@@ -1,19 +1,13 @@
-# English stopwords provenance
+# English stopwords
 
-`stopwords_english.txt` is the English file from NLTK's stopwords corpus,
-retrieved on 2026-09-05 from:
+`stopwords_english.txt` is the English list of NLTK's stopwords corpus, retrieved on 2026-09-05
+from <https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.zip>.
+A fixed copy keeps metadata preprocessing stable without downloads at run time.
 
-https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.zip
+`STOPWORDS_README` is the unchanged upstream README. It credits PostgreSQL's Snowball stopword
+lists and names the NLTK additions to the English list.
 
-`STOPWORDS_README` is the unchanged upstream README. It credits PostgreSQL's
-Snowball stopword lists and identifies the NLTK English additions. Keeping this
-fixed copy keeps metadata preprocessing stable without runtime downloads.
-Benchmark query inputs are replayed from the saved paper results.
-
-The NLTK package descriptor does not specify a license:
-https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.xml
-
-Accordingly, this copy does not invent or substitute an NLTK software license for
-the corpus. The upstream provenance notice is retained. Snowball's own software
-license is available at https://github.com/snowballstem/snowball/blob/master/COPYING;
-it is not evidence of a separate license grant for all NLTK corpus additions.
+The [NLTK package descriptor](https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.xml)
+states no license, so none is assumed here. Snowball's software license
+(<https://github.com/snowballstem/snowball/blob/master/COPYING>) does not necessarily cover the
+NLTK additions.

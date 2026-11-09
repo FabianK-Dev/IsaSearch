@@ -9,6 +9,7 @@ sources = \
   src/inference.scala \
   src/llama_server.scala \
   src/index.scala \
+  src/release.scala \
   src/corpus.scala \
   src/search.scala \
   src/duplicates.scala \

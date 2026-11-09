@@ -1,59 +1,39 @@
 # Paper benchmark baselines
 
-The six flat JSON files in this directory are the original per-query results for
-*AI-assisted theorem search in Isabelle*. They are tracked in Git and can be passed
-directly to `isabelle isasearch_compare`. No separate paper checkout is needed to
-run a comparison.
+The six JSON files here are the original per-query results of *AI-assisted theorem search in
+Isabelle*. `isabelle isasearch_compare` reads them directly.
 
 | Strategy | Query | Metadata | Result file |
 | --- | --- | --- | --- |
-| baseline | Original | No | [baseline](baseline_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
-| R | Expanded | No | [R](R_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
-| UR | Original + expanded | No | [UR](UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
-| M | Original | Yes | [M](M_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
-| MR | Expanded | Yes | [MR](MR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
-| MUR | Original + expanded | Yes | [MUR](MUR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
+| baseline | original | no | [baseline](baseline_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
+| R | expanded | no | [R](R_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
+| UR | original + expanded | no | [UR](UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
+| M | original | yes | [M](M_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
+| MR | expanded | yes | [MR](MR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
+| MUR | original + expanded | yes | [MUR](MUR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json) |
 
-Each baseline evaluates 85 targets with three query types, totaling 255 queries.
-The result files contain individual queries and metrics as well as summaries, so
-the comparison can account for changed coverage and noisy-query text.
-The benchmark replays the UR file's saved inputs for all strategies, checking
-its hash against the index below. All six historical files use the same query inputs.
-They ship with the Isabelle component, which reads them from this directory.
+Each file evaluates 85 targets with three query types (255 queries) and holds the individual
+queries, their metrics and summaries. All six use the same query inputs; the benchmark replays
+those of the UR file, checking its hash. Keep these files unchanged.
 
-From the repository root, compare a new UR run with the matching paper baseline
-(replace `RUN_DIRECTORY` with the strategy directory printed by the benchmark):
+Compare a new run with a baseline, from the repository root (`RUN_DIRECTORY` is the strategy
+directory the benchmark prints, or a result file):
 
-```bash
+```sh
 isabelle isasearch_compare \
   isabelle/benchmark/results/UR_microsoft-Phi-3.5-mini-instruct_Phi-3-mini-4k-instruct.Q4_0.gguf.json \
   RUN_DIRECTORY
 ```
 
-The second argument can also be a flat result JSON, such as
-`isabelle/benchmark/results/UR_beaker_gemma4_beaker_gemma4.json`.
+## Provenance
 
-## Verification and provenance
+[`paper-baselines.json`](paper-baselines.json) identifies the six files by SHA-256 and records
+the paper revision that verifies them: repository `ai-assisted-theorem-search-in-isabelle`,
+commit `0b456d06dd7a4630549162a6bdaf56b285480938`, table `tab:suchstrategien_tabelle` of
+`paper/AFP-AI-search.tex`.
 
-[paper-baselines.json](paper-baselines.json) identifies the six files by SHA-256
-and records the paper source revision used to verify them:
-
-- Repository: `ai-assisted-theorem-search-in-isabelle`
-- Commit: `0b456d06dd7a4630549162a6bdaf56b285480938`
-- Source: `paper/AFP-AI-search.tex`, table `tab:suchstrategien_tabelle`
-
-All 96 retrieval values (Hit@10, NDCG, mean reciprocal rank and mean rank, across
-four query groups and six strategies) match the paper's three-decimal rounding.
-Some timing values differ, notably for UR, so the JSON durations should not be
-treated as an exact transcription of the published timing column. The comparison
-command omits timing.
-
-These are historical results without a contemporaneous run manifest. The paper
-revision above verifies the published table; it is not the revision of the code
-or corpus used for the original experiment. Those exact historical revisions and
-the complete runtime configuration are unknown here. The index records that
-limitation instead of assigning today's configuration to the old runs.
-
-Keep these baseline JSON files unchanged. New runs belong in their own timestamped
-directories with `results.json` and `manifest.json` as described in the component
-README.
+All 96 retrieval values (Hit@10, NDCG, mean reciprocal rank and mean rank, for four query
+groups and six strategies) match the paper's three-decimal rounding. Some timings differ,
+notably for UR, so the durations are not an exact transcription of the published timing
+column; the comparison omits timing. The code, corpus and configuration of the original runs
+are unknown; the paper revision verifies only the published table.

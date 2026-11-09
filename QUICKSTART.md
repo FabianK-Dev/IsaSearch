@@ -1,10 +1,24 @@
 # Quickstart: search the AFP on your machine
 
-Search the theorems and definitions of the AFP and the Isabelle distribution locally, with the
-index and embeddings of a release. Nothing is computed beyond embedding your queries.
+Search the theorems and definitions of the AFP and the Isabelle distribution locally, with a
+released index. Your machine only embeds the queries.
 
-You need Isabelle2026, llama.cpp (`llama-server`, e.g. `brew install llama.cpp`), `zstd`,
-16 GB of memory and about 11 GB of disk (5.7 GB index, 4.3 GB embedding model).
+## Requirements
+
+- [Isabelle2026](https://isabelle.in.tum.de), with `isabelle` on your `PATH` (e.g.
+  `/Applications/Isabelle2026.app/bin` on macOS, `Isabelle2026/bin` on Linux). On Windows, run
+  all commands in Isabelle's Cygwin terminal (`Cygwin-Terminal.bat` in the Isabelle directory).
+- llama.cpp's `llama-server` on your `PATH`:
+  - macOS: `brew install llama.cpp`;
+  - Linux: `sudo apt install llama.cpp` on Ubuntu 25.10 or newer and Debian unstable; on older
+    releases, unpack a prebuilt binary from the
+    [llama.cpp releases](https://github.com/ggml-org/llama.cpp/releases) (e.g.
+    `llama-*-bin-ubuntu-x64.zip`) and add its directory to `PATH`;
+  - Windows: `winget install llama.cpp`.
+- 16 GB of memory and about 16 GB of free disk: 5.7 GB for the index, 4.3 GB for the embedding
+  model, and 5 GB for the download while the index is being installed.
+
+Tested on macOS. Linux should work the same way; Windows is untested.
 
 ## 1. Register the component
 
@@ -14,20 +28,19 @@ cd IsaSearch
 isabelle components -u "$PWD/isabelle"
 ```
 
-## 2. Install the index of a release
+If you have no `git`, download the repository as a ZIP file from GitHub and unpack it instead.
 
-Download all assets of the newest
-[release](https://github.com/FabianK-Dev/IsaSearch/releases) (the `isasearch-plain-*.tar.zst.*`
-parts, the manifest and `SHA256SUMS`) into one directory, then:
+## 2. Install the index
 
 ```sh
-shasum -a 256 -c SHA256SUMS
-cat isasearch-plain-*.tar.zst.* | zstd -d | tar -x
-isabelle isasearch_import -f isasearch-plain -i plain
+isabelle isasearch_import
 ```
 
-The parts hold the index ready to search: the import checks its files and moves the
-unpacked directory into place, which takes seconds.
+This downloads a released index (5 GB), checks it and installs it. With a registered AFP
+(`isabelle components -u /path/to/afp`), it takes the release of your AFP's revision. Without
+an AFP, or if there is no release for your revision, it lists the releases and asks which one
+to install. `-R TAG` names a release directly. An interrupted download resumes where it
+stopped.
 
 ## 3. Search
 
@@ -37,22 +50,22 @@ isabelle isasearch_search -k definitions 'the greatest common divisor'
 isabelle isasearch_server
 ```
 
-The server serves the website at <http://localhost:5001>. The first search starts
-`llama-server` with the query embedder and downloads it (4.3 GB) once; later searches take
-under a second.
+`isasearch_server` serves the website at <http://localhost:5001>. The first search starts
+`llama-server` with the query embedder and downloads the model (4.3 GB) once; later searches
+take under a second.
 
-Results link to the AFP repository and the Isabelle library online. With a registered AFP
-(`isabelle components -u /path/to/afp`), they also link to its theory files on your machine,
-and the website opens them in Isabelle/jEdit or Isabelle/VSCode at the right line (see
-[`isabelle/README.md`](isabelle/README.md#http-api) for reusing a running jEdit).
+Results link to the AFP and the Isabelle library online. With a registered AFP, they also
+link to its theory files on your machine, and the website opens them in Isabelle/jEdit or
+Isabelle/VSCode at the right line.
 
 ## Optional
 
-- **Query expansion**: copy `isabelle/etc/search.json`, set `"enabled": true` under
-  `llamacpp_query_server`, and point the Isabelle option `isasearch_config` at the copy (in
-  `$ISABELLE_HOME_USER/etc/preferences`). Then `isasearch_search -r` and the website's
-  refinement checkbox expand queries with the model of the server (a 14 GB download, about
-  4 s per query on an M2 Pro).
+- **Query expansion**: an LLM rewrites the query before the search. Copy
+  `isabelle/etc/search.json`, set `"enabled": true` under `llamacpp_query_server`, and point
+  the Isabelle option `isasearch_config` at the copy with a line
+  `isasearch_config = "/path/to/search.json"` in `$ISABELLE_HOME_USER/etc/preferences`.
+  Then `isasearch_search -r` and the website's refinement checkbox expand queries (a 14 GB
+  model; about 4 s per query on an M2 Pro).
 - **Agents**: [`pide_ai`](pide_ai) offers the search as a tool of PIDE AI.
 
 More in [`isabelle/README.md`](isabelle/README.md).

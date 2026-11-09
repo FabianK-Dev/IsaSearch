@@ -171,6 +171,15 @@ object Data {
     s
   }
 
+  // A relative name of plain elements, as in shipped generations and their archives: nothing
+  // outside its directory, no variables.
+  def relative_path(name: String): Path = {
+    if (!name.matches("[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*") ||
+        space_explode('/', name).exists(e => e == "." || e == ".."))
+      error("Bad relative file name: " + quote(name))
+    Path.explode(name)
+  }
+
   def home: Path = Path.explode("$ISASEARCH_HOME_USER")
 
   def component: Path = Path.explode("$ISASEARCH_HOME")

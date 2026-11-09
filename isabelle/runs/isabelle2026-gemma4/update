@@ -24,7 +24,8 @@ done
 
 RUN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INDEX=plain
-REPOSITORY=FabianK-Dev/IsaSearch
+# GitHub API URL of the releases, shared with isasearch_import.
+API="$(isabelle options -g isasearch_releases)"
 AFP="$(isabelle getenv -b AFP_BASE)"
 HOME_USER="$(isabelle getenv -b ISASEARCH_HOME_USER)"
 STATE="$HOME_USER/update"
@@ -145,17 +146,16 @@ The \`$INDEX\` index of IsaSearch for Isabelle2026 and the AFP 2026 at revision 
 $COUNTS, embedded with $MODEL. Built by the component at $COMMIT with
 \`isabelle/runs/isabelle2026-gemma4/plain.json\`.
 
-Download all \`$NAME.tar.zst.*\` parts, then unpack and install them:
+Install it with the IsaSearch component (see its QUICKSTART.md):
+
+    isabelle isasearch_import -R $TAG
+
+Without \`-R\`, \`isasearch_import\` installs the release of the registered AFP's revision.
+By hand: download the \`$NAME.tar.zst.*\` parts, then
 
     cat $NAME.tar.zst.* | zstd -d | tar -x
     isabelle isasearch_import -f isasearch-$INDEX -i $INDEX
 
-The parts hold the index ready to search: the import checks its files and moves the
-directory into place. \`isabelle isasearch_export -F interchange\` writes the documents and
-vectors of an installed index for other Lucene versions and tools.
-
-Search it on a laptop with \`isabelle isasearch_server -i $INDEX\`, whose default configuration
-\`isabelle/etc/search.json\` runs the query embedder on the same machine.
 \`SHA256SUMS\` lists the checksums of the assets, and \`$NAME.manifest.json\` is the
 manifest of the index with its provenance.
 EOF
@@ -169,7 +169,6 @@ if [ -n "$OUTPUT" ]; then
   exit 0
 fi
 
-API="https://api.github.com/repos/$REPOSITORY/releases"
 github() {
   curl -sS --fail-with-body -H "Authorization: Bearer $(cat "$TOKEN_FILE")" \
     -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$@"
@@ -180,17 +179,18 @@ python3 -c 'import json, sys; json.dump(dict(tag_name=sys.argv[1], target_commit
   "$TAG" "$COMMIT" "$NAME" "$NOTES" "$REQUEST"
 github -X POST "$API" --data-binary "@$REQUEST" >"$WORK/created.json"
 RELEASE="$(json "$WORK/created.json" 'd["id"]')"
+UPLOAD="$(json "$WORK/created.json" 'd["upload_url"].split("{")[0]')"
 # A failed upload leaves no half release behind: the draft goes, and the next run retries.
 trap 'github -X DELETE "$API/$RELEASE" > /dev/null || true; rm -rf "$WORK"' EXIT
 for ASSET in "$WORK"/assets/*; do
   echo "Uploading $(basename "$ASSET")"
   github -X POST -H "Content-Type: application/octet-stream" -T "$ASSET" \
-    "https://uploads.github.com/repos/$REPOSITORY/releases/$RELEASE/assets?name=$(basename "$ASSET")" \
+    "$UPLOAD?name=$(basename "$ASSET")" \
     >/dev/null
 done
-github -X PATCH "$API/$RELEASE" -d '{"draft": false}' >/dev/null
+github -X PATCH "$API/$RELEASE" -d '{"draft": false}' >"$WORK/published.json"
 trap 'rm -rf "$WORK"' EXIT
 
 echo "$BUILT" >"$STATE/released"
 echo "$FILES" >"$STATE/released_files"
-echo "Released $TAG: https://github.com/$REPOSITORY/releases/tag/$TAG"
+echo "Released $TAG: $(json "$WORK/published.json" 'd["html_url"]')"

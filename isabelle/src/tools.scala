@@ -37,6 +37,7 @@ object Main {
     var metadata_index = ""
     var out = home + Path.basic("reports")
     var input: Option[Path] = None
+    var release = ""
     var port: Option[Int] = None
     var refine = false
     var no_build = false
@@ -60,6 +61,7 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -m NAME   benchmark index built with metadata
   -D DIR    output directory (reports, component or export parent)
   -f PATH   exported index directory (import) or benchmark CSV
+  -R TAG    release to import (default: the one of the registered AFP, else ask)
   -F FORMAT export format: generation (default) or interchange
   -o OPTION override Isabelle system OPTION (via NAME=VAL or NAME)
   -p PORT   API port (default option isasearch_port: 5001; loopback only)
@@ -74,8 +76,11 @@ Usage: isabelle isasearch_""" + tool + """ [OPTIONS] [ARGS ...]
   -s LIST   benchmark strategies: baseline,R,UR,M,MR,MUR or all
   -v        verbose progress
 
-Import: -f DIR, an exported generation (installed as it is, moving DIR when it
-  is on the same file system) or interchange data (indexed anew).
+Import: without -f, downloads and installs a released index (option
+  isasearch_releases): the release of the registered AFP's revision, the one of
+  -R TAG, or one chosen when asked. -f DIR installs an exported generation as it
+  is (moving DIR when it is on the same file system) or indexes interchange data
+  anew.
 Index: SESSION ... (or isabelle_sessions in config).
 Search: QUERY. Index_build: -D component output directory.
 Export: -D DIR writes the current generation to DIR/isasearch-NAME, ready to
@@ -92,6 +97,7 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       "m:" -> (s => metadata_index = safe_name(s)),
       "D:" -> (s => out = Path.explode(s)),
       "f:" -> (s => input = Some(Path.explode(s))),
+      "R:" -> (s => release = s),
       "F:" -> (s => export_format = Export_Format.parse(s)),
       "o:" -> (s => options = options + s),
       "p:" -> (s => port = Some(Value.Int.parse(s))),
@@ -127,7 +133,13 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       else new Console_Progress(verbose = verbose)
     tool match {
       case Tool_Command.Import =>
-        Index.import_index(input.getOrElse(error("Use -f EXPORT_DIR")), index, progress)
+        input match {
+          case Some(dir) =>
+            if (release.nonEmpty) error("Use either -f DIR or -R TAG")
+            Index.import_index(dir, index, progress)
+          case None =>
+            Release.install(options.string("isasearch_releases"), release, index, progress)
+        }
       case Tool_Command.Index =>
         val builds =
           if (index_names.isEmpty && config_paths.size <= 1) List(config -> index)

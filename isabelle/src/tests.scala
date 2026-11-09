@@ -31,6 +31,19 @@ object Tests {
     assert(Data.template("{{x}} {q}", Map("q" -> "{untouched}")) == "{x} {untouched}")
     assert(Duplicates.sequence_ratio("abcd", "bcde") == 0.75)
     assert(Benchmark.csv("ID,query\r\na,\"hello,\nworld\"\r\n").head("query") == "hello,\nworld")
+    {
+      val newest_first = List("20261109-afp-0726d9f1e0bf", "20261108-afp-0726d9f1e0bf",
+        "20261101-afp-aaaaaaaaaaaa").map(t => Release.Info("index-plain-" + t, "", Nil))
+      def matching(id: String): Option[String] = Release.matching(newest_first, id).map(_.tag)
+      assert(matching("0726d9f1e0bf") == Some(newest_first.head.tag))
+      assert(matching("0726d9f1e0bf" + "0" * 28 + "+") == Some(newest_first.head.tag))
+      assert(matching("aaaaaaaaaaaa").contains("index-plain-20261101-afp-aaaaaaaaaaaa"))
+      assert(matching("bbbbbbbbbbbb").isEmpty && matching("").isEmpty)
+      assert(Data.relative_path("a/b.c").implode == "a/b.c")
+      for (bad <- List("../a", "/a", "a/../b", "$A/b", "~/a", "a//b"))
+        assert(Exn.result(Data.relative_path(bad)).isInstanceOf[Exn.Exn[?]],
+          "Bad relative path accepted: " + bad)
+    }
 
 
     /* default configuration */
