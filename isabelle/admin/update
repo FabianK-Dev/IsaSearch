@@ -9,9 +9,9 @@
 #   -i NAME   index name
 #   -f        build even if the AFP has not changed
 #   -e ENTRY  analyse ENTRY for duplicates as well (repeatable)
-#   -o DIR    write the assets and notes of the release to DIR instead of publishing them on
-#             GitHub, even if they equal the last release; needs no token and leaves the
-#             release state as it is
+#   -o DIR    dry run: write the assets and notes of the release to DIR instead of publishing
+#             them on GitHub, even if they equal the last release, and the duplicate analysis
+#             as well; needs no token and leaves the release and analysis state as it is
 
 set -euo pipefail
 
@@ -117,44 +117,48 @@ fi
 # duplicate analysis
 
 # The new entries and those of -e, against the index of the built revision. A new analysis of
-# a revision repeats the entries of its earlier one, so that a release has one report.
+# a revision repeats the entries of its earlier one, so that a release has one report. Releases
+# publish the analysis in the state; a dry run (-o) reads the state but analyses into its
+# output directory and changes nothing in the state.
 BUILT="$(state built)"
-ANALYSIS="$DUPLICATES/$BUILT"
-REPORT="$ANALYSIS/duplicates-afp-$BUILT"
+STORED="$DUPLICATES/$BUILT/duplicates-afp-$BUILT"
+if [ -n "$OUTPUT" ]; then REPORT="$OUTPUT/duplicates-afp-$BUILT"; else REPORT="$STORED"; fi
 analysed() {
-  [ -f "$REPORT.json" ] && json "$REPORT.json" '"\n".join(d["entries"] + d["missing_entries"])'
+  [ -f "$STORED.json" ] && json "$STORED.json" '"\n".join(d["entries"] + d["missing_entries"])'
 }
-[ ${#ENTRIES[@]} -eq 0 ] || printf '%s\n' "${ENTRIES[@]}" >>"$PENDING"
-SELECTED="$( (cat "$PENDING" 2>/dev/null; [ ! -s "$PENDING" ] || analysed) | sort -u | grep . || true)"
+[ -n "$OUTPUT" ] || [ ${#ENTRIES[@]} -eq 0 ] || printf '%s\n' "${ENTRIES[@]}" >>"$PENDING"
+REQUESTED="$( (cat "$PENDING" 2>/dev/null || true
+  [ -z "$OUTPUT" ] || [ ${#ENTRIES[@]} -eq 0 ] || printf '%s\n' "${ENTRIES[@]}") | grep . || true)"
+SELECTED="$( (echo "$REQUESTED"; [ -z "$REQUESTED" ] || analysed) | sort -u | grep . || true)"
 read -r FAILED FAILED_AT <<<"$(state duplicates_failed)"
 if [ -z "$SELECTED" ]; then
   :
-elif [ "${FAILED:-}" = "$BUILT" ] && [ $(($(date +%s) - ${FAILED_AT:-0})) -lt $RETRY_SECONDS ] &&
-  [ ${#ENTRIES[@]} -eq 0 ]; then
+elif [ -z "$OUTPUT" ] && [ "${FAILED:-}" = "$BUILT" ] &&
+  [ $(($(date +%s) - ${FAILED_AT:-0})) -lt $RETRY_SECONDS ] && [ ${#ENTRIES[@]} -eq 0 ]; then
   :
 else
   log_start
   echo "Duplicate analysis of" $SELECTED
-  rm -rf "$ANALYSIS.tmp"
-  mkdir -p "$ANALYSIS.tmp"
+  ANALYSIS="$(mktemp -d "$STATE/duplicates.XXXXXX")"
   ARGS=()
   for ENTRY in $SELECTED; do ARGS+=(-e "$ENTRY"); done
-  if isabelle isasearch_duplicates -c "$CONFIG" -i "$INDEX" -k all "${ARGS[@]}" \
-    -D "$ANALYSIS.tmp"; then
-    NEW="$(find "$ANALYSIS.tmp" -name 'experiment_*.json')"
-    rm -rf "$ANALYSIS"
-    mkdir -p "$ANALYSIS"
+  if isabelle isasearch_duplicates -c "$CONFIG" -i "$INDEX" -k all "${ARGS[@]}" -D "$ANALYSIS"
+  then
+    NEW="$(find "$ANALYSIS" -name 'experiment_*.json')"
+    mkdir -p "$(dirname "$REPORT")"
     mv "$NEW" "$REPORT.json"
     for VIEW in possible near-exact summary; do
       mv "${NEW%.json}_$VIEW.md" "${REPORT}_$VIEW.md"
     done
-    rm -rf "$ANALYSIS.tmp" "$PENDING" "$STATE/duplicates_failed"
+    [ -n "$OUTPUT" ] || rm -f "$PENDING" "$STATE/duplicates_failed"
   else
-    rm -rf "$ANALYSIS.tmp"
-    echo "$BUILT $(date +%s)" >"$STATE/duplicates_failed"
+    [ -n "$OUTPUT" ] || echo "$BUILT $(date +%s)" >"$STATE/duplicates_failed"
     echo "Duplicate analysis failed; retrying after 24 hours or with a newer AFP" >&2
   fi
+  rm -rf "$ANALYSIS"
 fi
+# A dry run without a new analysis shows the one that a release would publish.
+[ -f "$REPORT.json" ] || REPORT="$STORED"
 
 # release
 

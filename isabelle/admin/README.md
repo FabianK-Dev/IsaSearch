@@ -41,8 +41,10 @@ revisions, `duplicates_pending` the entries still to analyse); runs that do some
 - `-f` builds even without new changesets.
 - `-e ENTRY` (repeatable) analyses `ENTRY` as well, together with the entries already
   analysed for the revision, e.g. to analyse an entry again.
-- `-o DIR` writes the assets and notes to `DIR` instead of publishing them, without a token and
-  without touching the release state.
+- `-o DIR` is a dry run: it writes the release's assets and notes, and a duplicate analysis
+  that `-e` or pending entries call for, to `DIR` instead of publishing them. It needs no
+  token and leaves the release and analysis state as it is, so a later run publishes nothing
+  of it. A build that it makes is real, though.
 
 On the server, cron runs it hourly for the run
 [`isabelle2026-gemma4`](../runs/isabelle2026-gemma4/README.md). Errors before a run's log
