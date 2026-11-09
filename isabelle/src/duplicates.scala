@@ -282,8 +282,12 @@ object Duplicates {
                 )
               )
               try {
-                val (v, reason) = verdict(engine.inference.generate(prompt).text)
-                c = c ++ Map("verdict" -> v.name, "justification" -> reason)
+                // A judgement cut off in its justification still has its verdict.
+                val completion = engine.inference.generate(prompt,
+                  accept_truncated = text => verdict(text)._1 != Verdict.Unknown)
+                val (v, reason) = verdict(completion.text)
+                c = c ++ Map("verdict" -> v.name, "justification" -> reason) ++
+                  (if (completion.truncated) Map("judge_truncated" -> true) else Map.empty)
               }
               catch {
                 case exn: Inference.Failure =>

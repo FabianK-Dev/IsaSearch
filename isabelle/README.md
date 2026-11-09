@@ -301,8 +301,10 @@ Reports go to `$ISASEARCH_HOME_USER/reports` or `-D DIR`: a JSON file with all e
 `_possible.md` view of the flagged candidates, a `_near-exact.md` view with source excerpts,
 and a `_summary.md` table per entry. Entries of `-e` that are not in the index, e.g. because
 their sessions failed to build, are listed as `missing_entries`.
-Failed judge requests are retried, then recorded as `judge_error` and never cached. More than
-5% failed self-retrieval checks make the tool fail after saving the evidence.
+Failed judge requests are retried, then recorded as `judge_error` and never cached. A
+judgement cut off at `max_tokens` counts if its verdict is complete, and is marked
+`judge_truncated`. More than 5% failed self-retrieval checks make the tool fail after saving
+the evidence.
 
 ## Benchmarks
 

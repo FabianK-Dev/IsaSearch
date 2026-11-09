@@ -859,6 +859,24 @@ object Integration_Tests {
     val retried = object_at(object_at(recovered, "sections"), "definitions")
     check(num(object_at(retried, "aggregates"), "judge_failures", 1) == 0 &&
       str(first_candidates(retried).head, "verdict") == "DUPLICATE", "judge retry")
+
+    // A judgement cut off at max_tokens counts if its verdict is complete, and is a failure
+    // otherwise.
+    configure(List("enable_llm_output_cache" -> false))
+    stub.truncate_completion_contains = "Compare "
+    val cut = first_candidates(object_at(object_at(
+      read(analysis(root + Path.basic("truncated-judge"))), "sections"), "definitions")).head
+    check(str(cut, "verdict") == "DUPLICATE" && bool(cut, "judge_truncated") &&
+      !cut.contains("judge_error"), "truncated judgement with a verdict")
+    val judge_answer = stub.completion_text
+    stub.completion_text = Prompt.Begin + "Both items"
+    val no_verdict = object_at(object_at(
+      read(analysis(root + Path.basic("truncated-no-verdict"))), "sections"), "definitions")
+    check(num(object_at(no_verdict, "aggregates"), "judge_failures", 0) == 1 &&
+      str(first_candidates(no_verdict).head, "judge_error").startsWith("Truncated"),
+      "truncated judgement without a verdict")
+    stub.completion_text = judge_answer
+    stub.truncate_completion_contains = ""
   }
 
 

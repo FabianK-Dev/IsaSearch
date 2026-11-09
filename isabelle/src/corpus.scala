@@ -333,7 +333,8 @@ object Corpus_Build {
       val meta = metadata_cache.getOrElseUpdate(entry_name, metadata(afp, entry_name))
       val text = prompt(block, kind, meta)
       val completion =
-        inference.generate(text, role = Model_Role.Document, cached = true, accept_truncated = true)
+        inference.generate(text, role = Model_Role.Document, cached = true,
+          accept_truncated = _ => true)
       val checksum = new java.util.zip.Adler32()
       checksum.update(UTF8.bytes(src))
       val description = marked(completion.text)

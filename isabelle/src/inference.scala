@@ -307,7 +307,7 @@ object Inference {
       role: Model_Role = Model_Role.Query,
       health: Boolean = false,
       cached: Boolean = config.boolean("enable_llm_output_cache", true),
-      accept_truncated: Boolean = false
+      accept_truncated: String => Boolean = _ => false
     ): Completion = {
       val (url, body) = request(prompt, role, health)
       val start = System.nanoTime()
@@ -326,8 +326,9 @@ object Inference {
       if (role == Model_Role.Query) servers.foreach(_.ensure(Llama_Server.Role.Query))
       val attempts = if (health) 1 else config.positive("llm_attempts", 3)
       var text = ""
-      // A completion cut off at max_tokens on every attempt is still accepted where its text
-      // is better than none (corpus descriptions), and reported as truncated.
+      // A completion cut off at max_tokens on every attempt is still accepted, and reported as
+      // truncated, where the caller finds its text usable: a corpus description is better than
+      // none, a duplicate verdict is complete before its justification.
       var truncated_text = ""
       var failure: Option[Failure] = None
       var attempt = 0
@@ -343,7 +344,7 @@ object Inference {
           completion_text(response) match {
             case (complete, false) => text = complete
             case (partial, true) =>
-              truncated_text = partial
+              if (accept_truncated(partial)) truncated_text = partial
               failure = Some(Failure("Truncated completion; increase max_tokens"))
           }
         }
@@ -355,7 +356,7 @@ object Inference {
         if (text.isEmpty && attempt < attempts)
           Thread.sleep(math.min(30000L, 1000L << (attempt - 1)))
       }
-      val truncated = text.isEmpty && accept_truncated && truncated_text.nonEmpty
+      val truncated = text.isEmpty && truncated_text.nonEmpty
       if (truncated) text = truncated_text
       if (text.isEmpty) throw failure.getOrElse(Failure("Empty LLM completion"))
       val elapsed = (System.nanoTime() - start) / 1e9
