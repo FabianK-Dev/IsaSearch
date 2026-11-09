@@ -489,8 +489,8 @@ object Integration_Tests {
     }
 
   // Fake llama-servers record their arguments and wait; the stub answers on their port.
-  // A shipped generation released as runs/isabelle2026-gemma4/update releases it, by a local
-  // stand-in for the GitHub API (option isasearch_releases).
+  // A shipped generation, released as admin/update releases it and served by a local stand-in
+  // for the GitHub API (option isasearch_releases).
   def releases(env: Environment, root: Path, shipped: Path, config_path: Path): Unit = {
     val tar = root + Path.basic("release.tar")
     Isabelle_System.gnutar("-cf " + File.bash_path(tar) + " " + File.bash_path(shipped.base),

@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #
-# Keeps the plain index of this run current with the registered AFP, analyses new AFP entries
-# for duplicates, and releases every new state of the index with that analysis on GitHub
-# (README.md, "Automatic updates"). Meant for an hourly cron job; a run that finds nothing new
-# exits silently.
+# Keeps an index current with the registered AFP, analyses new AFP entries for duplicates, and
+# releases every new state of the index with that analysis on GitHub (README.md). Meant for an
+# hourly cron job; a run that finds nothing new exits silently.
 #
-# Usage: update [-f] [-e ENTRY] [-o DIR]
+# Usage: update -c CONFIG -i NAME [-f] [-e ENTRY] [-o DIR]
+#   -c CONFIG build configuration of the index, tracked in this repository
+#   -i NAME   index name
 #   -f        build even if the AFP has not changed
 #   -e ENTRY  analyse ENTRY for duplicates as well (repeatable)
 #   -o DIR    write the assets and notes of the release to DIR instead of publishing them on
@@ -14,11 +15,15 @@
 
 set -euo pipefail
 
+CONFIG=""
+INDEX=""
 FORCE=false
 ENTRIES=()
 OUTPUT=""
-while getopts "fe:o:" OPT; do
+while getopts "c:i:fe:o:" OPT; do
   case "$OPT" in
+    c) CONFIG="$(cd "$(dirname "$OPTARG")" && pwd)/$(basename "$OPTARG")" ;;
+    i) INDEX="$OPTARG" ;;
     f) FORCE=true ;;
     e) ENTRIES+=("$OPTARG") ;;
     o) OUTPUT="$OPTARG" ;;
@@ -26,13 +31,17 @@ while getopts "fe:o:" OPT; do
   esac
 done
 
-RUN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INDEX=plain
+[ -f "$CONFIG" ] && [ -n "$INDEX" ] || {
+  echo "Usage: update -c CONFIG -i NAME [-f] [-e ENTRY] [-o DIR]" >&2
+  exit 2
+}
+# A directory of the component checkout, whose commit a release names.
+REPOSITORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # GitHub API URL of the releases, shared with isasearch_import.
 API="$(isabelle options -g isasearch_releases)"
 AFP="$(isabelle getenv -b AFP_BASE)"
 HOME_USER="$(isabelle getenv -b ISASEARCH_HOME_USER)"
-STATE="$HOME_USER/update"
+STATE="$HOME_USER/update/$INDEX"
 TOKEN_FILE="$HOME_USER/github_token"
 RETRY_SECONDS=$((24 * 3600))
 # Duplicate analyses by AFP revision, and the entries still to analyse.
@@ -41,7 +50,8 @@ PENDING="$STATE/duplicates_pending"
 PART_SIZE=1900M
 
 mkdir -p "$STATE" "$HOME_USER/logs"
-exec 9>"$STATE/lock"
+# Runs never overlap, also for different indexes.
+exec 9>"$HOME_USER/update/lock"
 flock -n 9 || exit 0
 
 json() { python3 -c "import json, sys; d = json.load(open(sys.argv[1])); print($2)" "$1"; }
@@ -89,7 +99,7 @@ if [ "$TIP" != "$BUILT" ] || "$FORCE"; then
     log_start
     echo "Updating the AFP from $BUILT to $TIP"
     hg -R "$AFP" update -q -r "$TIP"
-    if isabelle isasearch_index -c "$RUN/plain.json" -i "$INDEX"; then
+    if isabelle isasearch_index -c "$CONFIG" -i "$INDEX"; then
       # A new AFP entry adds its metadata file.
       hg --cwd "$AFP" status -a -n --rev "$BUILT" --rev "$TIP" path:metadata/entries |
         sed -n 's|^metadata/entries/\(.*\)\.toml$|\1|p' >>"$PENDING"
@@ -129,7 +139,7 @@ else
   mkdir -p "$ANALYSIS.tmp"
   ARGS=()
   for ENTRY in $SELECTED; do ARGS+=(-e "$ENTRY"); done
-  if isabelle isasearch_duplicates -c "$RUN/plain.json" -i "$INDEX" -k all "${ARGS[@]}" \
+  if isabelle isasearch_duplicates -c "$CONFIG" -i "$INDEX" -k all "${ARGS[@]}" \
     -D "$ANALYSIS.tmp"; then
     NEW="$(find "$ANALYSIS.tmp" -name 'experiment_*.json')"
     rm -rf "$ANALYSIS"
@@ -218,11 +228,16 @@ if [ -z "$OUTPUT" ]; then
   }
 fi
 log_start
-# The release names the commit that built it, so that commit must be all there is.
-if [ -z "$OUTPUT" ] && ! git -C "$RUN" diff --quiet HEAD; then
-  echo "The component checkout has local changes; not released" >&2
+# The release names the commit that built it and the configuration in it, so that commit must
+# be all there is.
+CONFIG_NAME="$(git -C "$(dirname "$CONFIG")" ls-files --full-name -- "$(basename "$CONFIG")" \
+  2>/dev/null || true)"
+if [ -z "$OUTPUT" ] && { ! git -C "$REPOSITORY" diff --quiet HEAD || [ -z "$CONFIG_NAME" ]; }
+then
+  echo "The component checkout has local changes or does not track $CONFIG; not released" >&2
   exit 1
 fi
+[ -n "$CONFIG_NAME" ] || CONFIG_NAME="$CONFIG"
 
 WORK="$STATE/release"
 rm -rf "$WORK"
@@ -241,9 +256,9 @@ fi
 DATE="$(date -u +%Y%m%d)"
 TAG="index-$INDEX-$DATE-afp-$BUILT"
 NAME="isasearch-$INDEX-$DATE-afp-$BUILT"
-COMMIT="$(git -C "$RUN" rev-parse HEAD)"
+COMMIT="$(git -C "$REPOSITORY" rev-parse HEAD)"
 # Only a release written with -o may come from a checkout with local changes.
-git -C "$RUN" diff --quiet HEAD || COMMIT="$COMMIT with local changes"
+git -C "$REPOSITORY" diff --quiet HEAD || COMMIT="$COMMIT with local changes"
 echo "Packing $NAME"
 tar -C "$(dirname "$EXPORT")" -cf - "$(basename "$EXPORT")" | zstd -q -T0 -10 |
   split -b "$PART_SIZE" -d -a 3 - "$WORK/assets/$NAME.tar.zst."
@@ -254,11 +269,13 @@ cp "$EXPORT/manifest.json" "$WORK/assets/$NAME.manifest.json"
 COUNTS="$(json "$EXPORT/manifest.json" \
   '", ".join(str(c["count"]) + " " + c["kind"] for c in d["corpora"])')"
 MODEL="$(json "$EXPORT/manifest.json" 'd["corpora"][0]["recipe"]["model"]')"
+SOURCES="$(json "$EXPORT/manifest.json" \
+  'd["provenance"]["isabelle"]["identifier"] + " and the AFP " + d["provenance"]["afp"]["version"]')"
 NOTES="$(
   cat <<EOF
-The \`$INDEX\` index of IsaSearch for Isabelle2026 and the AFP 2026 at revision \`$BUILT\`:
+The \`$INDEX\` index of IsaSearch for $SOURCES at revision \`$BUILT\`:
 $COUNTS, embedded with $MODEL. Built by the component at $COMMIT with
-\`isabelle/runs/isabelle2026-gemma4/plain.json\`.
+\`$CONFIG_NAME\`.
 
 Install it with the IsaSearch component (see its QUICKSTART.md):
 

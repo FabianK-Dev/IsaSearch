@@ -23,7 +23,7 @@
      sessions first; probably a few GB.
 
 - [ ] **Finish the index releases for laptops without a GPU.** Releases are published by
-  `isabelle/runs/isabelle2026-gemma4/update` (parts, manifest, `SHA256SUMS`, notes), and
+  `isabelle/admin/update` (parts, manifest, `SHA256SUMS`, notes), and
   `isabelle isasearch_import` without `-f` installs one. A laptop needs only the index (about
   515,000 documents with 2560-dimensional float32 vectors of `Qwen3-Embedding-4B`: 5.3 GB of
   vectors, about 6 GB per generation) and the Q8_0 GGUF as query embedder (measurements on an

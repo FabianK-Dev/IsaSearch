@@ -60,7 +60,7 @@ The parts are downloaded to `$ISASEARCH_HOME_USER/downloads/TAG`, checked agains
 `SHA256SUMS`, unpacked and installed; the directory is removed afterwards. Complete parts of an
 interrupted download are kept and not downloaded again. No external `zstd` or `tar` is needed.
 
-Releases are made by [`runs/isabelle2026-gemma4/update`](runs/isabelle2026-gemma4/README.md).
+Releases are made by [`admin/update`](admin/README.md).
 
 ### Export and import
 

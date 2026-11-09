@@ -1,7 +1,7 @@
 /*  Title:      IsaSearch/isabelle/src/release.scala
 
-Released indexes: exported generations, published as GitHub releases by the run
-runs/isabelle2026-gemma4/update, and their download and installation.
+Released indexes: exported generations, published as GitHub releases by admin/update, and their
+download and installation.
 */
 
 package isabelle.isasearch

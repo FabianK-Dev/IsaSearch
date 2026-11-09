@@ -25,70 +25,14 @@ A build from scratch takes days, so run it in tmux; progress is also logged to
 index and the stored descriptions and embeddings. The stores on the server hold those of the
 earlier deployment, so a build there only describes new documents.
 
-## Automatic updates and releases
+## Releases
 
-[`update`](update) keeps the index current with the AFP 2026, analyses new entries for
-duplicates, and releases every new state on GitHub (option `isasearch_releases`):
+The server keeps this index current with the AFP 2026 and releases it with
+[`admin/update`](../../admin/README.md), from the repository root:
 
-1. It pulls the registered AFP (`AFP_BASE`, a clean clone of `afp-2026`) and updates it to the
-   newest changeset. If the changesets since the last build touch `thys` or `metadata`, it
-   builds the index again and prunes the older generations; otherwise it only records the
-   revision.
-2. After a build, it runs `isasearch_duplicates -k all` on the entries that the changesets
-   added (each adds `metadata/entries/ENTRY.toml`), against the new index and with the LLM
-   judge of `plain.json`. The report goes to `$ISASEARCH_HOME_USER/update/duplicates/REVISION`.
-   Entries whose sessions failed to build are listed as not in the index.
-3. It exports the new generation (`isasearch_export`), compresses it with zstd, splits it into
-   parts below GitHub's 2 GiB limit, and publishes them as release
-   `index-plain-DATE-afp-REVISION` with the manifest, `SHA256SUMS` and notes, unless the data
-   equals that of the last release. The release names the component commit that built it, so
-   the checkout must be pushed and clean. The duplicate analysis of the revision is part of
-   the release: the reports `duplicates-afp-REVISION.json`, `_near-exact.md` and
-   `_possible.md`, and a table per entry in the notes.
-
-`isasearch_import` relies on this layout: it matches `REVISION` against the user's AFP and
-installs the parts.
-
-Runs never overlap. A failed build is retried after 24 hours or when the AFP moves again; a
-failed release is retried by the next run and its draft deleted. A failed duplicate analysis
-does not hold up the release: it is retried after 24 hours or with the next build, and a
-later report is attached to the release of its revision, replacing an earlier one. State lives
-in `$ISASEARCH_HOME_USER/update` (`built` and `released` are AFP revisions,
-`duplicates_pending` the entries still to analyse); runs that do something log to
-`$ISASEARCH_HOME_USER/logs/update-*.log`.
-
-- `update -f` builds even without new changesets.
-- `update -e ENTRY` (repeatable) analyses ENTRY as well, together with the entries already
-  analysed for the revision, e.g. to analyse an entry again.
-- `update -o DIR` writes the assets and notes to `DIR` instead of publishing them, without a
-  token and without touching the release state.
-
-Cron runs it hourly on the server; errors before a run's log starts (e.g. a failed `hg pull`)
-go to `update-errors.log`:
-
+```sh
+isabelle/admin/update -c isabelle/runs/isabelle2026-gemma4/plain.json -i plain
 ```
-PATH=/home/adm-mgrgh/.local/bin:/usr/local/bin:/usr/bin:/bin
-17 * * * * /home/adm-mgrgh/IsaSearch-component/isabelle/runs/isabelle2026-gemma4/update > /dev/null 2>> /home/adm-mgrgh/.isabelle/Isabelle2026/isasearch/logs/update-errors.log
-```
-
-## Server setup
-
-On a Linux machine with access to the model servers:
-
-1. Install Isabelle2026 with `isabelle` on the cron `PATH`, and `hg`, `git`, `python3`, `zstd`,
-   `curl` and GNU coreutils (`flock`, `split`, `sha256sum`).
-2. Clone `afp-2026` (see the component README, "Provenance") and this repository, and register
-   both: `isabelle components -u AFP` and `isabelle components -u REPOSITORY/isabelle`.
-3. In `$ISABELLE_HOME_USER/etc/settings`, raise the JVM limits:
-   `ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms2g -Xmx24g -Xss128m"`.
-4. Put the model servers' key in `$ISASEARCH_HOME_USER/api_key` and a GitHub token in
-   `$ISASEARCH_HOME_USER/github_token` (both `chmod 600`). The repository belongs to another
-   account, which fine-grained tokens cannot reach, so it is a classic token with the
-   `public_repo` scope of an account with push access. Without it, `update` builds and skips
-   the release.
-5. Run the first build by hand (above), or copy the stores `llm_cache` and `embeddings` from
-   `$ISASEARCH_HOME_USER` of the old server to skip describing everything again.
-6. Install the cron job above.
 
 ## Laptop measurements
 
