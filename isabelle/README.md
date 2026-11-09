@@ -17,7 +17,8 @@ Isabelle's Solr classpath (`lib/scripts/isasearch`).
 | `isasearch_benchmark`, `isasearch_compare` | the paper's benchmark and comparisons of runs |
 | `isasearch_test`, `isasearch_integration_test` | tests |
 
-`isabelle isasearch_TOOL -?` lists the options of every tool.
+`isabelle isasearch_search '-?'` lists the options of the tools (quoted, because zsh expands an
+unquoted `-?` as a file pattern).
 
 The component also holds the prompts (`prompts`), the benchmark dataset and the paper's
 results (`benchmark`), the configurations of index runs (`runs`), the website (`web`) and the
