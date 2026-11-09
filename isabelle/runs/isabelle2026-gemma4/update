@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 #
-# Keeps the plain index of this run current with the registered AFP and releases every new
-# state of it on GitHub (README.md, "Automatic updates"). Meant for an hourly cron job; a run
-# that finds nothing new exits silently.
+# Keeps the plain index of this run current with the registered AFP, analyses new AFP entries
+# for duplicates, and releases every new state of the index with that analysis on GitHub
+# (README.md, "Automatic updates"). Meant for an hourly cron job; a run that finds nothing new
+# exits silently.
 #
-# Usage: update [-f] [-o DIR]
-#   -f      build even if the AFP has not changed
-#   -o DIR  write the assets and notes of the release to DIR instead of publishing them on
-#           GitHub, even if they equal the last release; needs no token and leaves the
-#           release state as it is
+# Usage: update [-f] [-e ENTRY] [-o DIR]
+#   -f        build even if the AFP has not changed
+#   -e ENTRY  analyse ENTRY for duplicates as well (repeatable)
+#   -o DIR    write the assets and notes of the release to DIR instead of publishing them on
+#             GitHub, even if they equal the last release; needs no token and leaves the
+#             release state as it is
 
 set -euo pipefail
 
 FORCE=false
+ENTRIES=()
 OUTPUT=""
-while getopts "fo:" OPT; do
+while getopts "fe:o:" OPT; do
   case "$OPT" in
     f) FORCE=true ;;
+    e) ENTRIES+=("$OPTARG") ;;
     o) OUTPUT="$OPTARG" ;;
     *) exit 2 ;;
   esac
@@ -31,6 +35,9 @@ HOME_USER="$(isabelle getenv -b ISASEARCH_HOME_USER)"
 STATE="$HOME_USER/update"
 TOKEN_FILE="$HOME_USER/github_token"
 RETRY_SECONDS=$((24 * 3600))
+# Duplicate analyses by AFP revision, and the entries still to analyse.
+DUPLICATES="$STATE/duplicates"
+PENDING="$STATE/duplicates_pending"
 PART_SIZE=1900M
 
 mkdir -p "$STATE" "$HOME_USER/logs"
@@ -83,6 +90,9 @@ if [ "$TIP" != "$BUILT" ] || "$FORCE"; then
     echo "Updating the AFP from $BUILT to $TIP"
     hg -R "$AFP" update -q -r "$TIP"
     if isabelle isasearch_index -c "$RUN/plain.json" -i "$INDEX"; then
+      # A new AFP entry adds its metadata file.
+      hg --cwd "$AFP" status -a -n --rev "$BUILT" --rev "$TIP" path:metadata/entries |
+        sed -n 's|^metadata/entries/\(.*\)\.toml$|\1|p' >>"$PENDING"
       echo "$TIP" >"$STATE/built"
       rm -f "$STATE/failed"
       isabelle isasearch_prune -i "$INDEX"
@@ -94,11 +104,114 @@ if [ "$TIP" != "$BUILT" ] || "$FORCE"; then
   fi
 fi
 
+# duplicate analysis
+
+# The new entries and those of -e, against the index of the built revision. A new analysis of
+# a revision repeats the entries of its earlier one, so that a release has one report.
+BUILT="$(state built)"
+ANALYSIS="$DUPLICATES/$BUILT"
+REPORT="$ANALYSIS/duplicates-afp-$BUILT"
+analysed() {
+  [ -f "$REPORT.json" ] && json "$REPORT.json" '"\n".join(d["entries"] + d["missing_entries"])'
+}
+[ ${#ENTRIES[@]} -eq 0 ] || printf '%s\n' "${ENTRIES[@]}" >>"$PENDING"
+SELECTED="$( (cat "$PENDING" 2>/dev/null; [ ! -s "$PENDING" ] || analysed) | sort -u | grep . || true)"
+read -r FAILED FAILED_AT <<<"$(state duplicates_failed)"
+if [ -z "$SELECTED" ]; then
+  :
+elif [ "${FAILED:-}" = "$BUILT" ] && [ $(($(date +%s) - ${FAILED_AT:-0})) -lt $RETRY_SECONDS ] &&
+  [ ${#ENTRIES[@]} -eq 0 ]; then
+  :
+else
+  log_start
+  echo "Duplicate analysis of" $SELECTED
+  rm -rf "$ANALYSIS.tmp"
+  mkdir -p "$ANALYSIS.tmp"
+  ARGS=()
+  for ENTRY in $SELECTED; do ARGS+=(-e "$ENTRY"); done
+  if isabelle isasearch_duplicates -c "$RUN/plain.json" -i "$INDEX" -k all "${ARGS[@]}" \
+    -D "$ANALYSIS.tmp"; then
+    NEW="$(find "$ANALYSIS.tmp" -name 'experiment_*.json')"
+    rm -rf "$ANALYSIS"
+    mkdir -p "$ANALYSIS"
+    mv "$NEW" "$REPORT.json"
+    for VIEW in possible near-exact summary; do
+      mv "${NEW%.json}_$VIEW.md" "${REPORT}_$VIEW.md"
+    done
+    rm -rf "$ANALYSIS.tmp" "$PENDING" "$STATE/duplicates_failed"
+  else
+    rm -rf "$ANALYSIS.tmp"
+    echo "$BUILT $(date +%s)" >"$STATE/duplicates_failed"
+    echo "Duplicate analysis failed; retrying after 24 hours or with a newer AFP" >&2
+  fi
+fi
+
 # release
 
-BUILT="$(state built)"
+# The section of the release notes on the duplicate analysis of the built revision.
+duplicates_notes() {
+  [ -f "${REPORT}_summary.md" ] || return 0
+  printf '\n## Duplicate analysis of new entries\n\n'
+  cat "${REPORT}_summary.md"
+  printf '\nThe candidates with sources and links are in `%s` and `%s`, all evidence in `%s`.\n' \
+    "$(basename "${REPORT}_near-exact.md")" "$(basename "${REPORT}_possible.md")" \
+    "$(basename "$REPORT.json")"
+}
+DUPLICATES_ASSETS=("$REPORT.json" "${REPORT}_near-exact.md" "${REPORT}_possible.md")
+
+github() {
+  curl -sS --fail-with-body -H "Authorization: Bearer $(cat "$TOKEN_FILE")" \
+    -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$@"
+}
+upload() { # URL FILE
+  echo "Uploading $(basename "$2")"
+  github -X POST -H "Content-Type: application/octet-stream" -T "$2" "$1?name=$(basename "$2")" \
+    >/dev/null
+}
+
+# An analysis that ends after the release of its revision is attached to that release: its
+# assets replace those of an earlier analysis, its section the earlier section of the notes.
+attach_duplicates() {
+  local work release
+  work="$(mktemp -d)"
+  github "$API?per_page=100" >"$work/releases.json"
+  release="$(json "$work/releases.json" \
+    'next((str(r["id"]) for r in d if r["tag_name"].endswith("-afp-'"$BUILT"'")), "")')"
+  if [ -z "$release" ]; then
+    echo "No release of $BUILT for its duplicate analysis"
+  else
+    github "$API/$release" >"$work/release.json"
+    for ASSET in $(json "$work/release.json" '" ".join(str(a["id"]) for a in d["assets"]
+        if a["name"].startswith("duplicates-"))'); do
+      github -X DELETE "$API/assets/$ASSET" >/dev/null
+    done
+    duplicates_notes >"$work/section.md"
+    python3 -c 'import json, sys
+r = json.load(open(sys.argv[1]))
+body = r["body"].split("\n## Duplicate analysis of new entries\n")[0].rstrip("\n")
+json.dump(dict(body=body + "\n" + open(sys.argv[2]).read()), open(sys.argv[3], "w"))' \
+      "$work/release.json" "$work/section.md" "$work/request.json"
+    github -X PATCH "$API/$release" --data-binary "@$work/request.json" >/dev/null
+    for ASSET in "${DUPLICATES_ASSETS[@]}"; do
+      upload "$(json "$work/release.json" 'd["upload_url"].split("{")[0]')" "$ASSET"
+    done
+    echo "Attached the duplicate analysis to $(json "$work/release.json" 'd["html_url"]')"
+  fi
+  sha256sum <"$REPORT.json" >"$STATE/duplicates_released"
+  rm -rf "$work"
+}
+duplicates_released() {
+  [ ! -f "$REPORT.json" ] || [ "$(sha256sum <"$REPORT.json")" = "$(state duplicates_released)" ]
+}
+
 if [ -z "$OUTPUT" ]; then
-  [ "$BUILT" != "$(state released)" ] || exit 0
+  if [ "$BUILT" = "$(state released)" ]; then
+    if ! duplicates_released && [ -s "$TOKEN_FILE" ]; then
+      log_start
+      attach_duplicates
+    fi
+    exit 0
+  fi
   [ -s "$TOKEN_FILE" ] || {
     echo "Missing GitHub token $TOKEN_FILE; not released" >&2
     exit 0
@@ -135,6 +248,7 @@ echo "Packing $NAME"
 tar -C "$(dirname "$EXPORT")" -cf - "$(basename "$EXPORT")" | zstd -q -T0 -10 |
   split -b "$PART_SIZE" -d -a 3 - "$WORK/assets/$NAME.tar.zst."
 cp "$EXPORT/manifest.json" "$WORK/assets/$NAME.manifest.json"
+[ ! -f "$REPORT.json" ] || cp "${DUPLICATES_ASSETS[@]}" "$WORK/assets/"
 (cd "$WORK/assets" && sha256sum -- * >SHA256SUMS)
 
 COUNTS="$(json "$EXPORT/manifest.json" \
@@ -158,6 +272,7 @@ By hand: download the \`$NAME.tar.zst.*\` parts, then
 
 \`SHA256SUMS\` lists the checksums of the assets, and \`$NAME.manifest.json\` is the
 manifest of the index with its provenance.
+$(duplicates_notes)
 EOF
 )"
 
@@ -169,10 +284,6 @@ if [ -n "$OUTPUT" ]; then
   exit 0
 fi
 
-github() {
-  curl -sS --fail-with-body -H "Authorization: Bearer $(cat "$TOKEN_FILE")" \
-    -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$@"
-}
 REQUEST="$WORK/release.json"
 python3 -c 'import json, sys; json.dump(dict(tag_name=sys.argv[1], target_commitish=sys.argv[2],
   name=sys.argv[3], body=sys.argv[4], draft=True), open(sys.argv[5], "w"))' \
@@ -182,15 +293,11 @@ RELEASE="$(json "$WORK/created.json" 'd["id"]')"
 UPLOAD="$(json "$WORK/created.json" 'd["upload_url"].split("{")[0]')"
 # A failed upload leaves no half release behind: the draft goes, and the next run retries.
 trap 'github -X DELETE "$API/$RELEASE" > /dev/null || true; rm -rf "$WORK"' EXIT
-for ASSET in "$WORK"/assets/*; do
-  echo "Uploading $(basename "$ASSET")"
-  github -X POST -H "Content-Type: application/octet-stream" -T "$ASSET" \
-    "$UPLOAD?name=$(basename "$ASSET")" \
-    >/dev/null
-done
+for ASSET in "$WORK"/assets/*; do upload "$UPLOAD" "$ASSET"; done
 github -X PATCH "$API/$RELEASE" -d '{"draft": false}' >"$WORK/published.json"
 trap 'rm -rf "$WORK"' EXIT
 
 echo "$BUILT" >"$STATE/released"
 echo "$FILES" >"$STATE/released_files"
+[ ! -f "$REPORT.json" ] || sha256sum <"$REPORT.json" >"$STATE/duplicates_released"
 echo "Released $TAG: $(json "$WORK/published.json" 'd["html_url"]')"

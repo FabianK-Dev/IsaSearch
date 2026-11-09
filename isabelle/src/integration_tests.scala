@@ -814,8 +814,19 @@ object Integration_Tests {
     def first_candidates(section: Obj): List[Obj] =
       list(obj(list(obj(list(section("entries")).head)("items")).head)("candidates")).map(obj)
 
-    val report = read(analysis(root + Path.basic("reports"), "-k", "all", "-x"))
+    val report_path = analysis(root + Path.basic("reports"), "-k", "all", "-x", "-e", "Missing")
+    val report = read(report_path)
     check(bool(report, "llm_judge"), "judged duplicates")
+    check(same(report("entries"), List("A")) && same(report("missing_entries"), List("Missing")),
+      "entry missing from the index reported")
+    val summary = report_path.dir + Path.basic(report_path.drop_ext.file_name + "_summary.md")
+    val summary_text = File.read(summary)
+    check(summary_text == Duplicate_Report.summary(report) &&
+      summary_text.contains("| A | definitions |") &&
+      summary_text.contains("Not in the index, e.g. because a session failed to build: Missing."),
+      "summary view:\n" + summary_text)
+    env.run("duplicates", List("-c", config_path.implode, "-i", "plain", "-e", "Missing",
+      "-D", (root + Path.basic("missing")).implode), ok = false)
     for (section <- sections(report)) {
       check(num(object_at(section, "self_retrieval"), "failure_fraction", 1) == 0,
         "self retrieval")

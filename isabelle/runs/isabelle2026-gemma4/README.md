@@ -27,28 +27,39 @@ earlier deployment, so a build there only describes new documents.
 
 ## Automatic updates and releases
 
-[`update`](update) keeps the index current with the AFP 2026 and releases every new state on
-GitHub (option `isasearch_releases`):
+[`update`](update) keeps the index current with the AFP 2026, analyses new entries for
+duplicates, and releases every new state on GitHub (option `isasearch_releases`):
 
 1. It pulls the registered AFP (`AFP_BASE`, a clean clone of `afp-2026`) and updates it to the
    newest changeset. If the changesets since the last build touch `thys` or `metadata`, it
    builds the index again and prunes the older generations; otherwise it only records the
    revision.
-2. It exports the new generation (`isasearch_export`), compresses it with zstd, splits it into
+2. After a build, it runs `isasearch_duplicates -k all` on the entries that the changesets
+   added (each adds `metadata/entries/ENTRY.toml`), against the new index and with the LLM
+   judge of `plain.json`. The report goes to `$ISASEARCH_HOME_USER/update/duplicates/REVISION`.
+   Entries whose sessions failed to build are listed as not in the index.
+3. It exports the new generation (`isasearch_export`), compresses it with zstd, splits it into
    parts below GitHub's 2 GiB limit, and publishes them as release
    `index-plain-DATE-afp-REVISION` with the manifest, `SHA256SUMS` and notes, unless the data
    equals that of the last release. The release names the component commit that built it, so
-   the checkout must be pushed and clean.
+   the checkout must be pushed and clean. The duplicate analysis of the revision is part of
+   the release: the reports `duplicates-afp-REVISION.json`, `_near-exact.md` and
+   `_possible.md`, and a table per entry in the notes.
 
 `isasearch_import` relies on this layout: it matches `REVISION` against the user's AFP and
 installs the parts.
 
 Runs never overlap. A failed build is retried after 24 hours or when the AFP moves again; a
-failed release is retried by the next run and its draft deleted. State lives in
-`$ISASEARCH_HOME_USER/update` (`built` and `released` are AFP revisions); runs that do
-something log to `$ISASEARCH_HOME_USER/logs/update-*.log`.
+failed release is retried by the next run and its draft deleted. A failed duplicate analysis
+does not hold up the release: it is retried after 24 hours or with the next build, and a
+later report is attached to the release of its revision, replacing an earlier one. State lives
+in `$ISASEARCH_HOME_USER/update` (`built` and `released` are AFP revisions,
+`duplicates_pending` the entries still to analyse); runs that do something log to
+`$ISASEARCH_HOME_USER/logs/update-*.log`.
 
 - `update -f` builds even without new changesets.
+- `update -e ENTRY` (repeatable) analyses ENTRY as well, together with the entries already
+  analysed for the revision, e.g. to analyse an entry again.
 - `update -o DIR` writes the assets and notes to `DIR` instead of publishing them, without a
   token and without touching the release state.
 

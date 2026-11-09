@@ -198,9 +198,43 @@ object Duplicate_Report {
     lines.mkString("\n") + "\n"
   }
 
-  def write_views(report: Obj, target: Path): Unit =
+  /** summary **/
+
+  // Per entry and kind, the analysed documents and those whose best candidate is in each tier:
+  // a short view, e.g. for the notes of a release.
+  def summary(report: Obj): String = {
+    val tiers = Duplicates.tiers.map(_.name)
+    val rows =
+      for {
+        (kind, section) <- object_at(report, "sections").toList
+        entry <- list(obj(section)("entries")).map(obj)
+      } yield {
+        val items = list(entry("items")).map(obj)
+        val counts = tiers.map(t => items.count(i => str(i, "best_tier") == t).toString)
+        (markdown_text(str(entry, "entry")) :: kind :: num(entry, "documents", 0).toInt.toString ::
+          counts).mkString("| ", " | ", " |")
+      }
+    val missing = JSON.strings_default(report, "missing_entries").getOrElse(Nil)
+    (List(
+      "Duplicate analysis of the new entries against the indexed AFP and Isabelle library. " +
+        "The counts are documents whose closest candidate is in a tier; candidates guide " +
+        "human review and do not establish duplication." +
+        (if (bool(report, "llm_judge")) "" else " LLM judging was disabled."),
+      "",
+      "| Entry | Kind | Documents | " + tiers.mkString(" | ") + " |",
+      "| --- | --- | ---: | " + tiers.map(_ => "---:").mkString(" | ") + " |"
+    ) ::: rows.sorted ::: (
+      if (missing.isEmpty) Nil
+      else List("", "Not in the index, e.g. because a session failed to build: " +
+        missing.map(markdown_text).mkString(", ") + ".")
+    )).mkString("", "\n", "\n")
+  }
+
+  def write_views(report: Obj, target: Path): Unit = {
     for ((name, exact) <- List(("possible", false), ("near-exact", true))) {
       val path = target.dir + Path.basic(target.base.file_name + "_" + name + ".md")
       File.write(path, render(report, near_exact_only = exact))
     }
+    File.write(target.dir + Path.basic(target.base.file_name + "_summary.md"), summary(report))
+  }
 }

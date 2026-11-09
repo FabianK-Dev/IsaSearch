@@ -298,7 +298,9 @@ Thresholds and their defaults: `dedup_top_k` 10, `dedup_distance_threshold` 0.3,
 `dedup_max_judged_per_item` 3. Distances depend on the index's metric.
 
 Reports go to `$ISASEARCH_HOME_USER/reports` or `-D DIR`: a JSON file with all evidence, a
-`_possible.md` view of the flagged candidates and a `_near-exact.md` view with source excerpts.
+`_possible.md` view of the flagged candidates, a `_near-exact.md` view with source excerpts,
+and a `_summary.md` table per entry. Entries of `-e` that are not in the index, e.g. because
+their sessions failed to build, are listed as `missing_entries`.
 Failed judge requests are retried, then recorded as `judge_error` and never cached. More than
 5% failed self-retrieval checks make the tool fail after saving the evidence.
 

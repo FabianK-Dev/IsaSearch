@@ -234,8 +234,12 @@ object Duplicates {
       .filter(d => str(d, "entry").nonEmpty)
       .map(d => str(d, "entry") -> str(d, "entry_date"))
       .toMap
+    // Requested entries without documents, e.g. because their sessions failed to build, are
+    // reported as missing.
+    val missing = entries.distinct.filterNot(dates.contains)
+    missing.foreach(e => Output.warning("Entry not present in index: " + e))
     val selected =
-      if (entries.nonEmpty) entries.distinct
+      if (entries.nonEmpty) entries.distinct.filter(dates.contains)
       else
         dates.toList
           .filter(_._2.nonEmpty)
@@ -243,8 +247,7 @@ object Duplicates {
           .reverse
           .take(newest)
           .map(_._1)
-    if (selected.isEmpty) error("No entries selected; supply -e ENTRY or import entry dates")
-    selected.foreach(e => if (!dates.contains(e)) error("Entry not present in index: " + e))
+    if (selected.isEmpty) error("No entries selected; supply indexed entries with -e ENTRY")
     val sections = kinds.map { kind =>
       val corpus = snapshot(kind)
       val query_docs = documents(kind).filter(d => selected.contains(str(d, "entry"))).toList
@@ -400,6 +403,7 @@ object Duplicates {
       "cross" -> cross,
       "all_candidates" -> all_candidates,
       "entries" -> selected,
+      "missing_entries" -> missing,
       "index_provenance" -> object_at(snapshot.manifest, "provenance"),
       "thresholds" -> thresholds,
       "sections" -> sections
