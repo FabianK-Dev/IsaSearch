@@ -1,0 +1,28 @@
+{
+  "embedding_backend": "openai",
+  "openai_embedding_model": "Qwen3-Embedding-4B",
+  "embedding_reference_tolerance": 0.005,
+  "llamacpp_embedding_server": {
+    "hf_repo": "Qwen/Qwen3-Embedding-4B-GGUF:Q8_0",
+    "pooling": "last"
+  },
+  "llm_backend": "openai",
+  "openai_query_model": "gemma-4-26B-A4B-it-qat",
+  "openai_extra_body": {
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "sampling_parameters": {
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": -1,
+    "min_p": 0,
+    "max_tokens": 512,
+    "stop": []
+  },
+  "llamacpp_query_server": {
+    "enabled": false,
+    "hf_repo": "unsloth/gemma-4-26B-A4B-it-qat-GGUF:UD-Q4_K_XL"
+  }
+}

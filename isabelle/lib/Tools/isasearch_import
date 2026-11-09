@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: import an exported IsaSearch index
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" import "$@"

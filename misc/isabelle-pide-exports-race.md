@@ -1,0 +1,147 @@
+# Isabelle2026: session builds can lose the PIDE exports of all theories
+
+## Summary
+
+A batch build occasionally stores a session without the PIDE exports of its theories
+(`PIDE/document_id`, `PIDE/files`, `PIDE/markup`, `PIDE/messages`, ...), although the build
+succeeds and all other exports (`theory/...`, `document/...`) are present. All theories of the
+session are affected at once. Tools that read theories through `Build.read_theory` see none of
+them: Find_Facts reports `No snapshot for theory ...` for each and indexes nothing from the
+session.
+
+The cause appears to be a race in `Session.nodes_status_buffer` (`src/Pure/PIDE/session.scala`):
+if its thread wakes between the prover exit and `Session.stop`, it discards the finished
+theories instead of posting them, so the `finished_theories` consumer in `Build_Job` never
+writes their exports.
+
+## Environment
+
+- Isabelle2026 release (`isabelle version -i`: `096842708b28`), Linux x86_64 (Debian 13),
+  8 cores, 47 GB RAM.
+- AFP 2026, Mercurial clone at tag `Isabelle2026` (`bc4afd781172`).
+- One `Build.build` of all AFP sessions and the HOL sessions of the distribution,
+  `max_jobs = 2`, `timeout_scale = 3`, over about 33 hours.
+
+## Observation
+
+Afterwards, 67 of the 1,168 session databases (`heaps/*/log/*.db`), about 6 %, contain
+exports but no `PIDE/document_id` for any theory, among them `HOL-Algebra`, `Core_DOM`,
+`Flyspeck-Tame`, `Isabelle_DOF`, `Complex_Bounded_Operators`, `Optics` and `Szpilrajn`. The
+other 1,101 have PIDE exports for all theories. No ROOT option sets the affected sessions
+apart, and their builds are spread evenly over the run (1 to 9 per hour).
+
+In `Core_DOM.db`, for example, every theory has only `theory/...` and `document/...` exports;
+`Core_DOM.Node_removeChild` has:
+
+```
+document/latex  theory/axioms  theory/consts  theory/other/fact
+theory/other_kinds  theory/parents  theory/thms
+```
+
+Find_Facts (`find_facts_index`) then warns for each theory:
+
+```
+### No snapshot for theory Core_DOM.Document_getElementById
+### No snapshot for theory Core_DOM.Node_insertBefore
+### No snapshot for theory Core_DOM.Node_removeChild
+### No snapshot for theory Core_DOM.Core_DOM_Tests
+```
+
+`Build.read_theory` (`src/Pure/Build/build.scala`) returns `None` because
+`theory_context.document_id()` finds no `PIDE/document_id` (`Export.DOCUMENT_ID`,
+`src/Pure/Build/export.scala`).
+
+## Reproduction
+
+Small sessions are hit often. On the idle machine above, the AFP entry
+`Lifting_the_Exponent` (one theory, parent `HOL-Number_Theory`), copied to a directory `$R`
+with its session renamed to `LTE_Test`, lost its PIDE exports in one of three consecutive
+builds:
+
+```sh
+for i in 1 2 3; do
+  isabelle build -c -d "$R" LTE_Test
+  sqlite3 "$(isabelle getenv -b ISABELLE_HEAPS)/$(isabelle getenv -b ML_IDENTIFIER)/log/LTE_Test.db" \
+    "SELECT COUNT(*) FROM isabelle_exports WHERE name = 'PIDE/document_id'"
+done
+```
+
+Each build succeeds (about 4 s); the counts are `1`, `0`, `1`. In the AFP build, this session
+lost its exports in all four of its builds.
+
+## Cause
+
+`Build_Job` writes the PIDE exports in its consumer of `session.finished_theories`
+(`src/Pure/Build/build_job.scala`, line 380 ff.), one `Session.Finished_Theory` per theory.
+These events come from `Session.nodes_status_buffer` (`src/Pure/PIDE/session.scala`,
+line 395 ff.):
+
+1. When the prover exits, `handle_exit` (line 661) calls
+   `nodes_status_buffer.finish_theory(snapshot)` for every theory. This only adds the snapshot
+   to `State.finished_theories`; `State.finished` is still `false`.
+2. The buffer thread runs `main()` every `nodes_status_delay` (`editor_output_delay`, 0.1 s by
+   default). Each run takes the state and resets it in one step (line 432):
+
+   ```scala
+   val current = state.change_result(st => (st, st.reset))
+   ```
+
+   `State.reset` (line 409) clears `finished_theories`, but the taken theories are posted only
+   if the state was already finished (line 467):
+
+   ```scala
+   if (current.finished) {
+     for (thy_snapshot <- current.finished_theories) {
+       finished_theories.post(...)
+     }
+   }
+   ```
+
+3. Only `nodes_status_buffer.shutdown()` (line 483) sets `State.finished`, called from
+   `Session.stop()` (line 929; the call is at line 941). `Build_Job` calls `session.stop()`
+   after `process.await_shutdown()` and cancelling the timeout (`build_job.scala`,
+   lines 491-500).
+
+If `main()` runs after step 1 and before step 3, it takes all finished theories with
+`finished = false`, resets them and posts nothing; the final run after `shutdown()` has
+nothing left to post. Whether this happens depends on the timing of the prover exit, the
+0.1 s polling and the shutdown in `Build_Job`, which fits the observed rate and the absence of
+any pattern among the affected sessions.
+
+## Suggested fix
+
+Keep finished theories in the buffer until they can be posted, e.g. reset them only together
+with the final state:
+
+```scala
+val current =
+  state.change_result(st => (st, if (st.finished) st.reset else st.copy(changed_nodes = Set.empty)))
+```
+
+Alternatively, post `finished_theories` whenever present, without waiting for `finished`:
+`finish_theory` is only called from `handle_exit`, so the theories are complete at that point.
+
+## Detecting affected sessions
+
+A build database is affected if some theory has exports but no `PIDE/document_id`:
+
+```sql
+SELECT theory_name FROM isabelle_exports
+GROUP BY theory_name
+HAVING SUM(name = 'PIDE/document_id') = 0;
+```
+
+In Scala: group `Export.read_entry_names(db, session)` by theory and look for a theory
+without `Export.DOCUMENT_ID`.
+
+## Workaround in IsaSearch
+
+Building an affected session again restores its exports unless the race hits again, but the
+new heap rebuilds all descendants. In the build above that meant 144 sessions: the 67 affected
+and 77 descendants (49 of `HOL-Algebra` alone). Of these, 8 lost their exports again, and
+`Lifting_the_Exponent` once more in a third build.
+
+IsaSearch (`Corpus_Build.build_sessions`, `isabelle/src/corpus.scala`) therefore checks every
+built session with `missing_exports`, cleans the output of incomplete sessions and builds them
+again, up to `export_rounds = 3` builds in all, and leaves out and reports those that remain
+incomplete.

@@ -1,0 +1,4 @@
+# -*- shell-script -*- :mode=shellscript:
+
+ISASEARCH_PIDE_AI_HOME="$COMPONENT"
+ISASEARCH_PIDE_AI_JAR="$ISASEARCH_PIDE_AI_HOME/lib/isasearch_pide_ai.jar"

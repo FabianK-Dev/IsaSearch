@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: package an IsaSearch index as a data component
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" index_build "$@"

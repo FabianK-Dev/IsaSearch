@@ -1,0 +1,11 @@
+# -*- shell-script -*-
+ISASEARCH_HOME="$COMPONENT"
+ISASEARCH_JAR="$ISASEARCH_HOME/lib/isasearch.jar"
+ISASEARCH_HOME_USER="$ISABELLE_HOME_USER/isasearch"
+ISABELLE_TOOLS="$ISABELLE_TOOLS:$ISASEARCH_HOME/lib/Tools"
+ISASEARCH_INDEXES="${ISASEARCH_INDEXES:-}"
+if [ -d "$ISASEARCH_HOME/lib/indexes" ]; then
+  for INDEX in "$ISASEARCH_HOME"/lib/indexes/*.db; do
+    [ ! -f "$INDEX" ] || ISASEARCH_INDEXES="$ISASEARCH_INDEXES:$INDEX"
+  done
+fi

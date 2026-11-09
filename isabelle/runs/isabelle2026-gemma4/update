@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+#
+# Keeps the plain index of this run current with the registered AFP and releases every new
+# state of it on GitHub (README.md, "Automatic updates"). Meant for an hourly cron job; a run
+# that finds nothing new exits silently.
+#
+# Usage: update [-f] [-o DIR]
+#   -f      build even if the AFP has not changed
+#   -o DIR  write the assets and notes of the release to DIR instead of publishing them on
+#           GitHub, even if they equal the last release; needs no token and leaves the
+#           release state as it is
+
+set -euo pipefail
+
+FORCE=false
+OUTPUT=""
+while getopts "fo:" OPT; do
+  case "$OPT" in
+    f) FORCE=true ;;
+    o) OUTPUT="$OPTARG" ;;
+    *) exit 2 ;;
+  esac
+done
+
+RUN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INDEX=plain
+# GitHub API URL of the releases, shared with isasearch_import.
+API="$(isabelle options -g isasearch_releases)"
+AFP="$(isabelle getenv -b AFP_BASE)"
+HOME_USER="$(isabelle getenv -b ISASEARCH_HOME_USER)"
+STATE="$HOME_USER/update"
+TOKEN_FILE="$HOME_USER/github_token"
+RETRY_SECONDS=$((24 * 3600))
+PART_SIZE=1900M
+
+mkdir -p "$STATE" "$HOME_USER/logs"
+exec 9>"$STATE/lock"
+flock -n 9 || exit 0
+
+json() { python3 -c "import json, sys; d = json.load(open(sys.argv[1])); print($2)" "$1"; }
+state() { cat "$STATE/$1" 2>/dev/null || true; }
+log_start() {
+  [ -n "${LOG:-}" ] && return
+  LOG="$HOME_USER/logs/update-$(date -u +%Y%m%d-%H%M%S).log"
+  exec > >(tee -a "$LOG") 2>&1
+  echo "Log: $LOG"
+}
+
+INDEX_DIR="$HOME_USER/indexes/$INDEX"
+generation() { echo "$INDEX_DIR/$(json "$INDEX_DIR/current.json" 'd["generation"]')"; }
+
+# AFP
+
+[ -n "$AFP" ] || {
+  echo "No registered AFP" >&2
+  exit 2
+}
+case "$(hg -R "$AFP" id -i)" in
+  *+)
+    echo "The AFP checkout $AFP has local changes" >&2
+    exit 2
+    ;;
+esac
+hg -R "$AFP" pull -q
+TIP="$(hg -R "$AFP" id -i -r tip)"
+# The AFP revision of the published index, until the first build of this script.
+[ -n "$(state built)" ] ||
+  json "$(generation)/manifest.json" 'd["provenance"]["afp"]["id"].rstrip("+")' >"$STATE/built"
+BUILT="$(state built)"
+
+if [ "$TIP" != "$BUILT" ] || "$FORCE"; then
+  # Paths of the AFP root; a failing hg ends the run instead of reading as no change.
+  CHANGED="$(hg -R "$AFP" status --rev "$BUILT" --rev "$TIP" path:thys path:metadata)"
+  read -r FAILED FAILED_AT <<<"$(state failed)"
+  if [ "${FAILED:-}" = "$TIP" ] && [ $(($(date +%s) - ${FAILED_AT:-0})) -lt $RETRY_SECONDS ] &&
+    ! "$FORCE"; then
+    :
+  elif [ -z "$CHANGED" ] && ! "$FORCE"; then
+    hg -R "$AFP" update -q -r "$TIP"
+    echo "$TIP" >"$STATE/built"
+  else
+    log_start
+    echo "Updating the AFP from $BUILT to $TIP"
+    hg -R "$AFP" update -q -r "$TIP"
+    if isabelle isasearch_index -c "$RUN/plain.json" -i "$INDEX"; then
+      echo "$TIP" >"$STATE/built"
+      rm -f "$STATE/failed"
+      isabelle isasearch_prune -i "$INDEX"
+    else
+      echo "$TIP $(date +%s)" >"$STATE/failed"
+      echo "Index build failed; retrying $TIP after 24 hours or with a newer AFP" >&2
+      exit 1
+    fi
+  fi
+fi
+
+# release
+
+BUILT="$(state built)"
+if [ -z "$OUTPUT" ]; then
+  [ "$BUILT" != "$(state released)" ] || exit 0
+  [ -s "$TOKEN_FILE" ] || {
+    echo "Missing GitHub token $TOKEN_FILE; not released" >&2
+    exit 0
+  }
+fi
+log_start
+# The release names the commit that built it, so that commit must be all there is.
+if [ -z "$OUTPUT" ] && ! git -C "$RUN" diff --quiet HEAD; then
+  echo "The component checkout has local changes; not released" >&2
+  exit 1
+fi
+
+WORK="$STATE/release"
+rm -rf "$WORK"
+mkdir -p "$WORK/assets"
+trap 'rm -rf "$WORK"' EXIT
+# The generation as it is, ready to search; its manifest keeps the checksums of the corpus
+# data, which identify the index across builds.
+EXPORT="$(isabelle isasearch_export -F generation -i "$INDEX" -D "$WORK" | tail -n 1)"
+FILES="$(json "$EXPORT/manifest.json" '[c["files"] for c in d["corpora"]]')"
+if [ -z "$OUTPUT" ] && [ "$FILES" = "$(state released_files)" ]; then
+  echo "Index data unchanged since the last release"
+  echo "$BUILT" >"$STATE/released"
+  exit 0
+fi
+
+DATE="$(date -u +%Y%m%d)"
+TAG="index-$INDEX-$DATE-afp-$BUILT"
+NAME="isasearch-$INDEX-$DATE-afp-$BUILT"
+COMMIT="$(git -C "$RUN" rev-parse HEAD)"
+# Only a release written with -o may come from a checkout with local changes.
+git -C "$RUN" diff --quiet HEAD || COMMIT="$COMMIT with local changes"
+echo "Packing $NAME"
+tar -C "$(dirname "$EXPORT")" -cf - "$(basename "$EXPORT")" | zstd -q -T0 -10 |
+  split -b "$PART_SIZE" -d -a 3 - "$WORK/assets/$NAME.tar.zst."
+cp "$EXPORT/manifest.json" "$WORK/assets/$NAME.manifest.json"
+(cd "$WORK/assets" && sha256sum -- * >SHA256SUMS)
+
+COUNTS="$(json "$EXPORT/manifest.json" \
+  '", ".join(str(c["count"]) + " " + c["kind"] for c in d["corpora"])')"
+MODEL="$(json "$EXPORT/manifest.json" 'd["corpora"][0]["recipe"]["model"]')"
+NOTES="$(
+  cat <<EOF
+The \`$INDEX\` index of IsaSearch for Isabelle2026 and the AFP 2026 at revision \`$BUILT\`:
+$COUNTS, embedded with $MODEL. Built by the component at $COMMIT with
+\`isabelle/runs/isabelle2026-gemma4/plain.json\`.
+
+Install it with the IsaSearch component (see its QUICKSTART.md):
+
+    isabelle isasearch_import -R $TAG
+
+Without \`-R\`, \`isasearch_import\` installs the release of the registered AFP's revision.
+By hand: download the \`$NAME.tar.zst.*\` parts, then
+
+    cat $NAME.tar.zst.* | zstd -d | tar -x
+    isabelle isasearch_import -f isasearch-$INDEX -i $INDEX
+
+\`SHA256SUMS\` lists the checksums of the assets, and \`$NAME.manifest.json\` is the
+manifest of the index with its provenance.
+EOF
+)"
+
+if [ -n "$OUTPUT" ]; then
+  mkdir -p "$OUTPUT"
+  mv "$WORK"/assets/* "$OUTPUT"/
+  printf '%s\n' "$NOTES" >"$OUTPUT/$NAME.notes.md"
+  echo "Release assets of $TAG in $OUTPUT"
+  exit 0
+fi
+
+github() {
+  curl -sS --fail-with-body -H "Authorization: Bearer $(cat "$TOKEN_FILE")" \
+    -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "$@"
+}
+REQUEST="$WORK/release.json"
+python3 -c 'import json, sys; json.dump(dict(tag_name=sys.argv[1], target_commitish=sys.argv[2],
+  name=sys.argv[3], body=sys.argv[4], draft=True), open(sys.argv[5], "w"))' \
+  "$TAG" "$COMMIT" "$NAME" "$NOTES" "$REQUEST"
+github -X POST "$API" --data-binary "@$REQUEST" >"$WORK/created.json"
+RELEASE="$(json "$WORK/created.json" 'd["id"]')"
+UPLOAD="$(json "$WORK/created.json" 'd["upload_url"].split("{")[0]')"
+# A failed upload leaves no half release behind: the draft goes, and the next run retries.
+trap 'github -X DELETE "$API/$RELEASE" > /dev/null || true; rm -rf "$WORK"' EXIT
+for ASSET in "$WORK"/assets/*; do
+  echo "Uploading $(basename "$ASSET")"
+  github -X POST -H "Content-Type: application/octet-stream" -T "$ASSET" \
+    "$UPLOAD?name=$(basename "$ASSET")" \
+    >/dev/null
+done
+github -X PATCH "$API/$RELEASE" -d '{"draft": false}' >"$WORK/published.json"
+trap 'rm -rf "$WORK"' EXIT
+
+echo "$BUILT" >"$STATE/released"
+echo "$FILES" >"$STATE/released_files"
+echo "Released $TAG: $(json "$WORK/published.json" 'd["html_url"]')"

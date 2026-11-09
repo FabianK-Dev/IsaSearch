@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AFP AI Search</title>
+    <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="vendor/latex.js/css/katex.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <b>AFP AI Search</b>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Search</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://files.sketis.net/Isabelle_Workshop_2026/Isabelle_2026_paper8.pdf" target="_blank" rel="noopener">Paper</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://github.com/FabianK-Dev/IsaSearch" target="_blank" rel="noopener">Repository</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://github.com/FabianK-Dev/IsaSearch/blob/main/isabelle/README.md#http-api" target="_blank" rel="noopener" title="The HTTP API of this server: search from scripts and other tools">API</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="my-3"></div>
+
+        <div class="alert alert-danger" role="alert" id="embeddingError" style="display: none;"></div>
+
+        <form>
+            <div class="mb-3">
+                <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem or definition to search for</label>
+                <textarea class="form-control" id="searchInput" rows="2" placeholder="Examples: a^2 + b^2 = c^2,
+bijections have inverses, bubblesort, ..."></textarea>
+            </div>
+            <div class="mb-3" id="kindSelector" style="display: none;">
+                <label class="form-label"><b>Search in:</b></label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="searchKind" id="kindTheorems" value="theorems" checked>
+                        <label class="form-check-label" for="kindTheorems">Theorems</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="searchKind" id="kindDefinitions" value="definitions">
+                        <label class="form-check-label" for="kindDefinitions"><a href="#" data-bs-toggle="tooltip" data-bs-title="Search definitional commands (definition, fun, datatype, ...) instead of theorems, lemmas, corollaries and propositions.">Definitions</a></label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="disableRefineCheck">
+                <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but may decrease search accuracy.">Disable query refinement</a></label>
+                <div class="form-text" id="refineUnavailable" style="display: none;"></div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="search();" id="searchButton">Search</button>
+        </form>
+
+        <div class="my-3"></div>
+
+        <div class="alert alert-info" role="alert" id="LLMRefinedQueryParent" style="display: none;">
+            <h6><span class="badge text-bg-primary" id="">LLM-refined query</span></h6>
+            <div id="LLMRefinedQuery"></div>
+        </div>
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" id="aiWarning" style="display: none;">
+            <strong>⚠️ Warning:</strong> Refined queries and summaries are AI-generated and may be inaccurate. Please use as guidance only.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card" style="display: none;" id="theoremTemplate">
+            <div class="card-body">
+                <h6 id="theoremTitle"></h6>
+                <p style="font-size: 14px" id="theoremMetadata"></p>
+
+                <div class="alert alert-light lh-1" role="alert" style="font-family: 'Courier New', Courier, monospace; font-size: 16px;" id="theoremCode"></div>
+
+                <p>
+                    <a href="javascript:void(0)" role="button" style="display: none; font-size: 14px;" id="theoremCodeExpand">+ Expand</a>
+                </p>
+
+                <h6><span class="badge text-bg-primary" id="">LLM Summary</span></h6>
+                <p id="theoremLLMSummary" style="font-size: 16px;"></p>
+
+                <div id="theoremSources"></div>
+            </div>
+        </div>
+
+        <div class="mb-3" id="searchResults">
+            <!-- Search results will be displayed here using JavaScript -->
+        </div>
+    </div>
+
+    <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="vendor/latex.js/latex.js"></script>
+
+    <script>
+        // Initialize tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        let firstSearch = true;
+        // The editors in which the server opens local files (option isasearch_editors).
+        let editors = [];
+
+        // Definition search is only available if the server has a definitions corpus, so the
+        // selector stays hidden until the server says otherwise.
+        fetch("/capabilities")
+        .then(response => response.json())
+        .then(res => {
+            editors = res.editors || [];
+
+            if (res.definition_search) {
+                document.getElementById("kindSelector").style.display = "block";
+            }
+
+            if (!res.query_expansion) {
+                const check = document.getElementById("disableRefineCheck");
+                const note = document.getElementById("refineUnavailable");
+                check.checked = true;
+                check.disabled = true;
+                note.innerText = "Query refinement is unavailable on this server: " + res.query_expansion_error;
+                note.style.display = "block";
+            }
+
+            if (!res.embedding_available) {
+                const alert = document.getElementById("embeddingError");
+                alert.innerText = "Search is unavailable: " + res.embedding_error;
+                alert.style.display = "block";
+            }
+        })
+        .catch(err => console.log(err));
+
+        // Links that do not apply to a result are empty.
+        function addLink(parent, url, text) {
+            if (!url)
+                return;
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.innerText = text;
+            parent.prepend(link, " | ");
+        }
+
+        // Asks the server to open the local file of a result in an editor at its line.
+        function addEditorLink(parent, el, editor) {
+            const link = document.createElement("a");
+            link.href = "javascript:void(0)";
+            link.innerText = "Open in " + editor.title + (el.local_line ? "" : " (changed)");
+            link.addEventListener("click", () => {
+                fetch("open?editor=" + encodeURIComponent(editor.name) +
+                    "&kind=" + encodeURIComponent(el.kind) + "&id=" + encodeURIComponent(el.id),
+                    { method: "POST", headers: { "X-IsaSearch": "open" } })
+                .then(response => response.json().then(body => {
+                    if (!response.ok)
+                        alert("Could not open the file in " + editor.title + ": " + body.error);
+                }))
+                .catch(err => alert("Could not open the file in " + editor.title + ": " + err));
+            });
+            parent.prepend(link, " | ");
+        }
+
+        function search() {
+            const input = document.getElementById("searchInput").value;
+            const refineQuery = !document.getElementById("disableRefineCheck").checked;
+            const kind = document.querySelector('input[name="searchKind"]:checked').value;
+            const resultList = document.getElementById("searchResults");
+            const template = document.getElementById("theoremTemplate");
+            const llmRefinedQuery = document.getElementById("LLMRefinedQuery");
+            const llmRefinedQueryParent = document.getElementById("LLMRefinedQueryParent");
+            const aiWarning = document.getElementById("aiWarning");
+
+            if (!input)
+                return;
+
+            const searchButton = document.getElementById("searchButton");
+            searchButton.innerText = "Searching...";
+
+            fetch("/search?query=" + encodeURIComponent(input) + "&refine_query=" + refineQuery + "&kind=" + encodeURIComponent(kind))
+            .then(response => {
+                if (!response.ok) {
+                    searchButton.innerText = "Search";
+
+                    response.text().then(res => {
+                        // The search endpoint reports its own errors as JSON with an 'error' key.
+                        let message = res;
+
+                        try {
+                            const parsed = JSON.parse(res);
+
+                            if (parsed.error) {
+                                message = parsed.error;
+                            }
+                        } catch(err) {
+                            console.log(err);
+                        }
+
+                        resultList.innerText = "An error occured:\n" + message;
+                    });
+                } else {
+                    response.json().then(res => {
+                        searchButton.innerText = "Search";
+                        resultList.innerHTML = "";
+                        llmRefinedQuery.innerHTML = "";
+
+                        if (firstSearch) {
+                            firstSearch = false;
+                            aiWarning.style.display = "block";
+                        }
+
+                        if (res.refined_query) {
+                            llmRefinedQueryParent.style.display = "block";
+
+                            try {
+                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
+                                generator = latexjs.parse(res.refined_query.replace("):\n", "): ").trim(), { generator: generator })
+                                llmRefinedQuery.appendChild(generator.domFragment());
+                            } catch(err) {
+                                console.log(err);
+                                llmRefinedQuery.innerText = res.refined_query.replace("):\n", "): ").trim();
+                            }
+                        } else {
+                            llmRefinedQueryParent.style.display = "none";
+                        }
+
+                        for (const el of res.results) {
+                            let node = template.cloneNode(true);
+                            node.src_code = el.src;
+
+                            node.style.display = "block";
+                            node.querySelector("#theoremTitle").innerText = el.theory;
+                            const metadata = node.querySelector("#theoremMetadata");
+                            metadata.innerText = "Distance: ~" + Math.round(el.distance * 10000) / 10000 + " | Start line: " + el.start_line
+                            addLink(metadata, el.remote_url, "Open file");
+                            addLink(metadata, el.entry_url, "Show entry");
+                            addLink(metadata, el.theory_url, "Open theory");
+                            if (el.local_file) {
+                                addLink(metadata,
+                                    "source?kind=" + encodeURIComponent(el.kind) +
+                                    "&id=" + encodeURIComponent(el.id) +
+                                    (el.local_line ? "#L" + el.local_line : ""),
+                                    el.local_line ? "View local file" : "View local file (changed)");
+                                for (const editor of editors.slice().reverse())
+                                    addEditorLink(metadata, el, editor);
+                            }
+
+                            if (node.src_code.split("\n").length > 5) {
+                                node.querySelector("#theoremCode").innerText = node.src_code.split("\n").slice(0, 5).join("\n")
+                                node.querySelector("#theoremCode").innerHTML = node.querySelector("#theoremCode").innerHTML + "<br><b>... (collapsed)</b>";
+                                node.querySelector("#theoremCodeExpand").style.display = "block";
+
+                                node.querySelector("#theoremCodeExpand").addEventListener("click", () => {
+                                    node.querySelector("#theoremCode").innerText = node.src_code;
+                                    node.querySelector("#theoremCodeExpand").style.display = "none";
+                                });
+                            } else {
+                                node.querySelector("#theoremCode").innerText = node.src_code
+                            }
+
+                            let llm_description = el.llm_description.replace("):\n", "): ").trim();
+
+                            try {
+                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
+                                generator = latexjs.parse(llm_description, { generator: generator })
+                                node.querySelector("#theoremLLMSummary").appendChild(generator.domFragment());
+                            } catch(err) {
+                                node.querySelector("#theoremLLMSummary").innerText = llm_description;
+                            }
+
+                            resultList.append(node);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

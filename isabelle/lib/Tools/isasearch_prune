@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: remove old generations of an IsaSearch index
+
+exec "$ISASEARCH_HOME/lib/scripts/isasearch" prune "$@"

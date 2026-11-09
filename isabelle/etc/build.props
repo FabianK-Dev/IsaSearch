@@ -1,0 +1,21 @@
+title = IsaSearch
+module = $ISASEARCH_JAR
+requirements = \
+  env:ISABELLE_SCALA_JAR \
+  env:SOLR_JARS
+sources = \
+  src/domain.scala \
+  src/core.scala \
+  src/inference.scala \
+  src/llama_server.scala \
+  src/index.scala \
+  src/release.scala \
+  src/corpus.scala \
+  src/search.scala \
+  src/duplicates.scala \
+  src/duplicate_report.scala \
+  src/benchmark.scala \
+  src/compare.scala \
+  src/tools.scala \
+  src/tests.scala \
+  src/integration_tests.scala
