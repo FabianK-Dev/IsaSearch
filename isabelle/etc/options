@@ -5,6 +5,8 @@ option isasearch_index : string = "plain"
 option isasearch_port : int = 5001
 option isasearch_editors : string = "jedit,vscode"
   -- "editors in which the website opens local files on the server's machine: jedit, vscode (comma separated; empty: none)"
+option isasearch_hosts : string = ""
+  -- "further names by which requests may address the server, besides those of this machine: e.g. its public name behind a reverse proxy (comma separated)"
 option isasearch_config : string = "$ISASEARCH_HOME/etc/search.json"
   -- "configuration of searching tools without -c (empty: none)"
 option isasearch_releases : string = "https://api.github.com/repos/FabianK-Dev/IsaSearch/releases"

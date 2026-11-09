@@ -9,6 +9,7 @@ package isabelle.isasearch
 import isabelle._
 
 import java.net.URLDecoder
+import java.util.concurrent.Executors
 import com.sun.net.httpserver.{HttpExchange, HttpHandler}
 
 
@@ -32,14 +33,22 @@ object Search {
   // document's source there; the local file may be another version than the indexed one, and
   // without the source in it the line is left out.
   object Local_Sources {
+    // The roots of indexed sources. The records of an imported index are not trusted to name
+    // other files of this machine: only files below these roots are read, shown and opened.
+    val roots: List[String] = List("AFP", "ISABELLE_HOME")
+
     def file(record: Obj): Option[Path] = {
       val name = str(record, "file")
-      val variable = name.takeWhile(_ != '/')
-      if (!variable.matches("[A-Za-z_][A-Za-z0-9_]*") || name.length <= variable.length + 1 ||
-          Isabelle_System.getenv(variable).isEmpty) None
-      else
-        try { Some(Path.explode("$" + name).expand).filter(_.is_file) }
-        catch { case ERROR(_) => None }
+      for {
+        root <- roots.find(root => name.startsWith(root + "/"))
+        if Isabelle_System.getenv(root).nonEmpty
+        rest = name.drop(root.length + 1)
+        if Path.is_wellformed(rest)
+        relative = Path.explode(rest)
+        if relative.all_basic
+        path = (Path.variable(root) + relative).expand
+        if path.is_file
+      } yield path
     }
 
     // The line of the occurrence of the source nearest to the indexed start line.
@@ -53,6 +62,13 @@ object Search {
           .map(i => text.take(i).count(_ == '\n') + 1)
           .minByOption((n: Int) => (math.abs(n - start), n))
     }
+
+    // The lines of that occurrence: none if the text does not contain the source.
+    def lines(text: String, record: Obj): Range =
+      line(text, record) match {
+        case Some(first) => first until first + split_lines(str(record, "src")).length
+        case None => Range(0, 0)
+      }
 
     // Theory text with symbols decoded and Unix line ends, as in the sources of the index.
     def text(path: Path): String = Symbol.decode(File.read(path)).replace("\r\n", "\n").nn
@@ -129,6 +145,11 @@ object Search {
     @volatile private var query_error = "Query expansion is not configured"
     @volatile private var checked = 0L
     @volatile private var checked_root: Option[Path] = None
+
+    // A request that fails does not decide the availability for the others: its input may be
+    // the reason, e.g. a query beyond the context of the embedder. The services are checked
+    // again with the next request instead.
+    private def recheck(): Unit = checked = 0L
 
     // The embedder is checked against the references of every corpus, again when the snapshot
     // changes. A query server that has not started yet counts as available: it starts with the
@@ -218,26 +239,21 @@ object Search {
             template(Index.prompt(corpus.spec, Prompt.Expand), Map("search_query" -> query))
           try { Some(inference.generate(prompt)) }
           catch {
-            case exn: Inference.Failure =>
-              query_error = exn.message
-              throw Unavailable(query_error)
             case ERROR(msg) =>
-              query_error = msg
+              recheck()
               throw Unavailable(msg)
           }
         }
       val refined = completion.map(c => marked(c.text))
       val text = refined.map(r => mode.combine(query, r)).getOrElse(query)
       val input = template(Index.prompt(corpus.spec, Prompt.Retrieve), Map("search_query" -> text))
-      val vector = try { inference.embed(List(input), corpus.spec).head }
-      catch {
-        case exn: Inference.Failure =>
-          embedding_error = exn.message
-          throw Unavailable(embedding_error)
-        case ERROR(msg) =>
-          embedding_error = msg
-          throw Unavailable(msg)
-      }
+      val vector =
+        try { inference.embed(List(input), corpus.spec).head }
+        catch {
+          case ERROR(msg) =>
+            recheck()
+            throw Unavailable(msg)
+        }
       val nearest = corpus.ranked(vector, math.max(limit, candidates), filter)
         .filter(filter.admits)
         .map(_.removed("embedding_input").removed("description_artifact"))
@@ -262,7 +278,9 @@ object Search {
   /** HTTP requests **/
 
   def parameters(raw: String | Null): Map[String, String] = {
-    def decode(s: String): String = URLDecoder.decode(s, "UTF-8").nn
+    def decode(s: String): String =
+      try { URLDecoder.decode(s, "UTF-8").nn }
+      catch { case _: IllegalArgumentException => throw Bad_Request("Malformed request parameter") }
 
     proper_string(raw) match {
       case None => Map.empty
@@ -280,6 +298,13 @@ object Search {
       case "true" => true
       case "false" => false
       case _ => throw Bad_Request(name + " must be true or false")
+    }
+
+  def integer(args: Map[String, String], name: String, default: Int): Int =
+    args.get(name) match {
+      case None => default
+      case Some(Value.Int(n)) => n
+      case Some(_) => throw Bad_Request(name + " must be an integer")
     }
 
   // The filter of a search request: `source` (all, distribution or afp), `entries` and
@@ -336,8 +361,6 @@ object Search {
         }
         catch {
           case exn: Bad_Request => respond(400, Map("error" -> exn.message))
-          case exn: IllegalArgumentException =>
-            respond(400, Map("error" -> "Invalid request parameter"))
           case exn: Unavailable => respond(503, Map("error" -> exn.message))
           case exn: Inference.Failure => respond(503, Map("error" -> exn.message))
           case ERROR(msg) => respond(500, Map("error" -> msg))
@@ -347,6 +370,46 @@ object Search {
         finally { exchange.close() }
       }
     }
+
+
+  /** local requests **/
+
+  // The server is for this machine. A page of another site can still reach it, by a name that
+  // is rebound to this machine after the page has loaded, and its requests then count as
+  // requests of the server's own page. They keep that name in their Host header, so a request
+  // must name the server as this machine does, or by a name of option isasearch_hosts, e.g. the
+  // public name that a reverse proxy passes on.
+  val loopback_hosts: Set[String] = Set("localhost", "127.0.0.1", "[::1]")
+
+  def hosts(names: String): Set[String] =
+    loopback_hosts ++
+      space_explode(',', names).map(s => Word.lowercase(Library.trim_string(s))).filter(_.nonEmpty)
+
+  // The host of a Host header, without its port.
+  def host_name(header: String): String = {
+    val host = Word.lowercase(Library.trim_string(header))
+    if (host.startsWith("[")) host.take(host.indexOf(']') + 1) else host.takeWhile(_ != ':')
+  }
+
+  def local(hosts: Set[String])(service: HTTP.Service): HTTP.Service =
+    new HTTP.Service(service.name) {
+      def apply(request: HTTP.Request): Option[HTTP.Response] = service(request)
+
+      override def handler(server_name: String): HttpHandler = {
+        val handler = service.handler(server_name)
+
+        { (http: HttpExchange | Null) =>
+          val exchange = http.nn
+          val host = proper_string(exchange.getRequestHeaders.nn.getFirst("Host")).map(host_name)
+          if (host.exists(hosts)) handler.handle(exchange)
+          else {
+            try { HTTP.Response.text("Unknown host of this server").write(exchange, 403) }
+            finally { exchange.close() }
+          }
+        }
+      }
+    }
+
 
   /** website **/
 
@@ -377,19 +440,21 @@ object Search {
   def source(engine: Engine): HTTP.Service =
     new HTTP.Service("source") {
       def apply(request: HTTP.Request): Option[HTTP.Response] = {
-        val args = parameters(request.uri.getRawQuery)
-        val kind =
-          try { Corpus_Kind.parse(args.getOrElse("kind", Corpus_Kind.Theorems.name)) }
+        // A page for a document: without one for malformed parameters.
+        val (kind, id) =
+          try {
+            val args = parameters(request.uri.getRawQuery)
+            (Corpus_Kind.parse(args.getOrElse("kind", Corpus_Kind.Theorems.name)),
+              args.getOrElse("id", ""))
+          }
           catch { case ERROR(_) => return None }
-        val record = engine.use(snapshot =>
-          snapshot.corpora.get(kind).flatMap(_.get(args.getOrElse("id", ""))).map(_._2))
+        val record = engine.use(snapshot => snapshot.corpora.get(kind).flatMap(_.get(id)).map(_._2))
         for { r <- record; path <- Local_Sources.file(r) } yield {
           val text = Local_Sources.text(path)
-          val first = Local_Sources.line(text, r).getOrElse(0)
-          val last = first + split_lines(str(r, "src")).length - 1
+          val marked = Local_Sources.lines(text, r)
           val lines = split_lines(text).zipWithIndex.map { case (line, i) =>
             val n = i + 1
-            "<span id=\"L" + n + "\"" + (if (first <= n && n <= last) " class=\"m\"" else "") +
+            "<span id=\"L" + n + "\"" + (if (marked.contains(n)) " class=\"m\"" else "") +
               "><a href=\"#L" + n + "\">" + n + "</a>" + HTML.output(line) + "</span>"
           }
           HTTP.Response.html(
@@ -433,11 +498,14 @@ object Search {
     Map("editor" -> editor.name, "file" -> File.platform_path(path)) ++ line.map("line" -> _)
   }
 
-  def server(engine: Engine, port: Int, editors: List[Isabelle_Editor] = Nil): HTTP.Server =
-    HTTP.server(
-      port,
-      name = "",
-      services = List(
+  def server(
+    engine: Engine,
+    port: Int,
+    editors: List[Isabelle_Editor] = Nil,
+    hosts: Set[String] = loopback_hosts
+  ): HTTP.Server = {
+    val services =
+      List(
         website,
         source(engine),
         service("capabilities")(_ =>
@@ -450,12 +518,21 @@ object Search {
             catch { case ERROR(msg) => throw Bad_Request(msg) },
             mode =
               if (boolean(args, "refine_query")) Query_Mode.Combined else Query_Mode.Original,
-            limit = args.getOrElse("limit", "100").toInt,
+            limit = integer(args, "limit", 100),
             filter = filter(args),
             collapse = boolean(args, "collapse")
           )
         }
       ) ::: (if (editors.isEmpty) Nil
              else List(service("open", post = true)(open_in_editor(engine, editors, _))))
-    )
+    val server = HTTP.server(port, name = "", services = services.map(local(hosts)))
+    // Isabelle's HTTP server handles its requests one after the other. Here a request may wait
+    // for a model, so requests are handled concurrently, by daemon threads that end with the
+    // tool.
+    server.http_server.setExecutor(
+      Executors.newFixedThreadPool(Multithreading.max_threads(), { (main: Runnable | Null) =>
+        Isabelle_Thread.create(main.nn, name = "isasearch_server", daemon = true)
+      }))
+    server
+  }
 }

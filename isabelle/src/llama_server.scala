@@ -22,10 +22,10 @@ object Llama_Server {
   // A configuration with the object of a role has the searching tools start llama-server on
   // loopback when the role is first needed, and send its requests there instead of to the
   // endpoint of the role. With "enabled": false the object is kept but nothing is started.
-  enum Role(val name: String, val key: String, val endpoint: String) extends Named_Value {
+  enum Role(val name: String, val key: String, val endpoint: Endpoint) extends Named_Value {
     case Embedding
-      extends Role("embedding", "llamacpp_embedding_server", "openai_embedding_base_url")
-    case Query extends Role("query", "llamacpp_query_server", "openai_base_url")
+      extends Role("embedding", "llamacpp_embedding_server", Endpoint.OpenAI_Embedding)
+    case Query extends Role("query", "llamacpp_query_server", Endpoint.OpenAI)
 
     def description: String = name + " server"
   }
@@ -54,8 +54,11 @@ object Llama_Server {
   // llama.cpp keeps its GPU offload default (all layers, if any).
   def command(config: Config, role: Role, port: Int): List[String] = {
     val settings = this.settings(config, role).getOrElse(error("No enabled " + role.key))
-    if (config.string(role.endpoint).nonEmpty)
-      error("Configure either " + role.endpoint + " or " + role.key + ", not both")
+    if (config.string(role.endpoint.url).nonEmpty)
+      error("Configure either " + role.endpoint.url + " or " + role.key + ", not both")
+    // The key of the replaced endpoint would go to the server on this machine.
+    for (key <- role.endpoint.key_settings if config.string(key).nonEmpty)
+      error(role.key + " takes no API key: remove " + key)
     role match {
       case Role.Embedding =>
         val backend = Inference_Backend.parse(
@@ -98,12 +101,6 @@ object Llama_Server {
   def startup_timeout(settings: Config): Time =
     Time.seconds(settings.positive("startup_timeout", 1800).toDouble)
 
-  def port(config: Config, role: Role): Int =
-    settings(config, role).map(_.integer("port", 0)).getOrElse(0) match {
-      case 0 => using(new ServerSocket(0, 1, InetAddress.getLoopbackAddress))(_.getLocalPort)
-      case n => n
-    }
-
 
   /** managed servers **/
 
@@ -114,13 +111,11 @@ object Llama_Server {
   // starts on the first request of its role and again if it has stopped.
   class Servers(base: Config) extends AutoCloseable {
     private val managed: Map[Role, Managed] =
-      roles(base).map { role =>
-        val port = Llama_Server.port(base, role)
-        role -> new Managed(role, command(base, role, port), port)
-      }.toMap
+      roles(base).map(role => role -> new Managed(role)).toMap
 
     val config: Config =
-      managed.values.foldLeft(base)((config, m) => config.updated(m.role.endpoint, m.url + "/v1"))
+      managed.values.foldLeft(base)((config, m) =>
+        config.updated(m.role.endpoint.url, m.url + "/v1"))
 
     def requested(role: Role): Boolean = managed.contains(role)
 
@@ -142,9 +137,27 @@ object Llama_Server {
       }
     }
 
-    private class Managed(val role: Role, command: List[String], port: Int) {
-      val url: String = "http://127.0.0.1:" + port
+    private class Managed(val role: Role) {
       private val settings = Llama_Server.settings(base, role).get
+
+      // Without a port in its settings, the server gets a free one. A socket of this process
+      // holds that port until the server starts, which may be long after: otherwise another
+      // process could take it meanwhile and receive the requests in place of the server.
+      private var reserved: Option[ServerSocket] =
+        if (settings.integer("port", 0) != 0) None
+        else Some(new ServerSocket(0, 1, InetAddress.getLoopbackAddress))
+
+      private def release(): Unit = synchronized {
+        reserved.foreach(_.close())
+        reserved = None
+      }
+
+      private val port: Int = reserved.map(_.getLocalPort).getOrElse(settings.integer("port", 0))
+      val url: String = "http://127.0.0.1:" + port
+
+      private val command: List[String] =
+        try { Llama_Server.command(base, role, port) }
+        catch { case exn: Throwable => release(); throw exn }
 
       // Read without the lock, which a startup holds for as long as a download takes.
       @volatile private var process: Option[(Bash.Process, Future[Int])] = None
@@ -160,6 +173,7 @@ object Llama_Server {
       def close(): Unit = {
         closed = true
         synchronized {
+          release()
           process.foreach(_._1.terminate())
           process = None
         }
@@ -174,6 +188,7 @@ object Llama_Server {
             .map(" (its first start downloads " + _ + ")").getOrElse("")
         Output.writeln("Starting " + command.head + " as " + role.description + download +
           "; log: " + log.expand.implode)
+        release()
         val process = Bash.process(
           "exec " + Bash.strings(command) + " > " + File.bash_path(log) + " 2>&1",
           description = "llama-server")
@@ -187,16 +202,23 @@ object Llama_Server {
             try { http.send(health, HttpResponse.BodyHandlers.discarding()).nn.statusCode() == 200 }
             catch { case _: java.io.IOException => false }
           val deadline = Time.now() + startup_timeout(settings)
-          while (!ready) {
+          // The server must still run when its port answers: one that could not bind the port
+          // has stopped, and the answer is from another process.
+          var started = false
+          while (!started) {
             if (closed) error("The " + role.description + " was closed during startup")
+            val answers = ready
             if (exit.is_finished) {
               val tail = split_lines(File.read(log)).filter(_.nonEmpty).takeRight(20)
               error(cat_lines(
                 (command.head + " stopped during startup (return code " + exit.join + ")") :: tail))
             }
-            if (Time.now() > deadline)
-              error(command.head + " did not become ready in time; see " + log.expand.implode)
-            Time.seconds(0.5).sleep()
+            if (answers) started = true
+            else {
+              if (Time.now() > deadline)
+                error(command.head + " did not become ready in time; see " + log.expand.implode)
+              Time.seconds(0.5).sleep()
+            }
           }
         }
         catch {

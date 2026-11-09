@@ -65,6 +65,22 @@ object Tests {
       using(new Llama_Server.Servers(expanding)) { servers =>
         assert(new Inference.Client(servers.config).configured(Model_Role.Query))
         assert(servers.waiting(Llama_Server.Role.Query), "Servers start on first use")
+        // The free port of a server is held for it until it starts.
+        val url = new java.net.URI(servers.config.string(Endpoint.OpenAI.url))
+        val taken =
+          try {
+            new java.net.ServerSocket(url.getPort, 1, java.net.InetAddress.getLoopbackAddress)
+              .close()
+            false
+          }
+          catch { case _: java.io.IOException => true }
+        assert(taken, "Port of a waiting server reserved")
+      }
+      // A started server replaces an endpoint, whose key it must not receive.
+      for (setting <- Endpoint.OpenAI_Embedding.key_settings) {
+        val keyed = shipped.updated(setting, "secret")
+        assert(Exn.result(Llama_Server.command(keyed, Llama_Server.Role.Embedding, 8080))
+          .isInstanceOf[Exn.Exn[?]], "Key of a replaced endpoint accepted: " + setting)
       }
       assert(Config.default(options.string.update("isasearch_config", "")).values.isEmpty)
       var rejected = false
@@ -198,6 +214,44 @@ object Tests {
           catch { case _: Search.Bad_Request => true }
         assert(rejected, "Rejected filter: " + bad)
       }
+    }
+
+
+    /* requests and local sources */
+
+    {
+      def rejected(body: => Any): Boolean =
+        try { body; false }
+        catch { case _: Search.Bad_Request => true }
+      assert(Search.parameters("query=a%20b&kind") == Map("query" -> "a b", "kind" -> ""))
+      assert(rejected(Search.parameters("id=%zz")), "Malformed escape")
+      assert(Search.integer(Map("limit" -> "7"), "limit", 100) == 7 &&
+        Search.integer(Map.empty, "limit", 100) == 100)
+      assert(rejected(Search.integer(Map("limit" -> "many"), "limit", 100)))
+
+      val hosts = Search.hosts("Search.Example.org, proxy")
+      for (header <- List("localhost:5001", "LOCALHOST", "127.0.0.1:5001", "[::1]:5001",
+          "search.example.org", "proxy:8080"))
+        assert(hosts(Search.host_name(header)), "Host of this server: " + header)
+      for (header <- List("evil.example:5001", "localhost.evil.example", "[::1", "", ":5001"))
+        assert(!hosts(Search.host_name(header)), "Foreign host: " + header)
+      assert(!Search.loopback_hosts(Search.host_name("search.example.org")))
+
+      // Only files below the roots of indexed sources, whatever a record of an index names.
+      def local(file: String): Option[Path] = Search.Local_Sources.file(Map("file" -> file))
+      for (file <- List("ISABELLE_HOME/src/HOL/HOL.thy", "ISABELLE_HOME/src/Pure/../HOL/HOL.thy"))
+        assert(local(file).contains(Path.explode("$ISABELLE_HOME/src/HOL/HOL.thy").expand),
+          "Local file of the sources: " + file)
+      for (file <- List("ISABELLE_HOME/../ROOTS", "ISABELLE_HOME/src/../../ROOTS",
+          "ISABELLE_HOME//etc/passwd", "ISABELLE_HOME/~/.profile", "ISABELLE_HOME/$HOME/.profile",
+          "ISABELLE_HOME_USER/etc/settings", "HOME/.profile", "USER_HOME/.profile",
+          "ISASEARCH_HOME/etc/options", "/etc/passwd", "ISABELLE_HOME", "ISABELLE_HOME/", ""))
+        assert(local(file).isEmpty, "Local file outside the sources: " + file)
+
+      val text = "theory T\n\nlemma a:\n  \"P\"\n\nend\n"
+      assert(Search.Local_Sources.lines(text, Map("src" -> "lemma a:\n  \"P\"")) == (3 until 5))
+      assert(Search.Local_Sources.lines(text, Map("src" -> "lemma b:\n  \"Q\"")).isEmpty,
+        "No lines of a source that the file lacks")
     }
 
 

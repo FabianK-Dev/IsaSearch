@@ -110,7 +110,7 @@ Vulkan) if its build supports one, otherwise on the CPU. Logs go to
 The embedding server replaces `openai_embedding_base_url` and answers as
 `openai_embedding_model`; the query server replaces `openai_base_url`, answers as
 `openai_query_model` and needs `llm_backend: "openai"`. Configuring both an object and the
-endpoint it replaces is an error.
+endpoint it replaces, or an API key of that endpoint, is an error.
 
 ```json
 "openai_embedding_model": "Qwen3-Embedding-4B",
@@ -150,9 +150,13 @@ searches without a generative model.
 | `llamacpp` | `llamacpp_base_url`, optional `llamacpp_document_base_url`, `llamacpp_document_model`, `llamacpp_query_model` | an OpenAI-compatible endpoint |
 
 Generation uses `sampling_parameters`; provider extensions go in `openai_extra_body`,
-`ollama_options`, `llamacpp_extra_body` and `embedding_extra_body`. API keys come from the
-environment variable `openai_api_key_env` or the private file `openai_api_key_file`
-(`chmod 600`), which takes precedence. Keys never enter indexes.
+`ollama_options`, `llamacpp_extra_body` and `embedding_extra_body`.
+
+Every endpoint `NAME_base_url` has an API key of its own, sent to that endpoint only: the
+private file `NAME_api_key_file` (`chmod 600`), which takes precedence, or the environment
+variable `NAME_api_key_env`. So `openai_api_key_file` is the key of `openai_base_url`, and
+`openai_embedding_base_url` needs `openai_embedding_api_key_file`, also for the same server
+and key. Keys never enter indexes.
 
 The embedder must match the index: same model, pooling, normalization and truncation, and an
 endpoint alias equal to the model name in the index manifest. Before searching, the tools embed
@@ -170,9 +174,13 @@ and transient errors are retried with backoff.
 ## Website and HTTP API
 
 `isabelle isasearch_server [-p PORT]` serves the search page at its root
-(<http://localhost:5001> by default) and the API below. It binds to loopback; put an
-authenticated reverse proxy in front for remote access. The page's libraries are vendored in
-`web/vendor`, so it works offline. Its controls follow `/capabilities`.
+(<http://localhost:5001> by default) and the API below. It binds to loopback and answers only
+requests whose `Host` is this machine (`localhost`, `127.0.0.1`, `[::1]`), so that pages of
+other sites cannot use it; other requests get 403. For remote access, put an authenticated
+reverse proxy in front and name the host it passes on in the option `isasearch_hosts` (comma
+separated), e.g. `-o isasearch_hosts=search.example.org`. Requests are handled concurrently.
+The page's libraries are vendored in `web/vendor`, so it works offline. Its controls follow
+`/capabilities`.
 
 - `GET /capabilities`: `generation`, `corpora`, `definition_search`, `embedding_available`,
   `embedding_error`, `query_expansion`, `query_expansion_error`, and `editors`.
@@ -201,9 +209,9 @@ authenticated reverse proxy in front for remote access. The page's libraries are
 
 Results link online (`remote_url` and `entry_url` for the AFP, `theory_url` for the Isabelle
 library) and locally: `local_file` and `local_line` where `$AFP` or `$ISABELLE_HOME` is set and
-the file exists. The local file may be a different version; `local_line` is the occurrence of
-the source nearest to the indexed line, and missing if the file no longer contains it.
-Invalid parameters return 400.
+the file exists below it; an index cannot name other files of the machine. The local file may
+be a different version; `local_line` is the occurrence of the source nearest to the indexed
+line, and missing if the file no longer contains it. Invalid parameters return 400.
 
 ## Building indexes
 

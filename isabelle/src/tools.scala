@@ -146,7 +146,7 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
           else if (config_paths.size == index_names.size) config_paths.map(Config.load).zip(index_names)
           else error("Pair each configuration -c FILE with an index name -i NAME")
         for ((build, _) <- builds; role <- Llama_Server.roles(build))
-          error(role.key + " serves searches; builds use " + role.endpoint)
+          error(role.key + " serves searches; builds use " + role.endpoint.url)
         progress.echo("Log: " + log.expand.implode)
         Corpus_Build.run(builds, args, no_build, progress)
       case Tool_Command.Package_Index => progress.echo(Index.package_index(index, out).implode)
@@ -184,7 +184,8 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
           using(new Index.Live(index)) { source =>
             val server = Search.server(new Search.Engine(source, servers),
               port.getOrElse(options.int("isasearch_port")),
-              editors = Isabelle_Editor.list(options.string("isasearch_editors")))
+              editors = Isabelle_Editor.list(options.string("isasearch_editors")),
+              hosts = Search.hosts(options.string("isasearch_hosts")))
             server.start()
             progress.echo("IsaSearch API: " + server.url)
             try { new java.util.concurrent.CountDownLatch(1).await() }

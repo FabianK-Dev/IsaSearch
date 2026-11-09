@@ -64,6 +64,23 @@ enum Model_Role(val name: String) extends Named_Value {
   case Query extends Model_Role("query")
 }
 
+// The model endpoints of a configuration. Each has settings of its own: NAME_base_url, and for
+// its API key NAME_api_key_file, NAME_api_key_env or NAME_api_key, so that a key goes to its
+// endpoint only.
+enum Endpoint(val name: String, val default_url: String = "") extends Named_Value {
+  case OpenAI extends Endpoint("openai")
+  case OpenAI_Embedding extends Endpoint("openai_embedding")
+  case Ollama extends Endpoint("ollama", "http://localhost:11434")
+  case LlamaCpp extends Endpoint("llamacpp")
+  case LlamaCpp_Document extends Endpoint("llamacpp_document")
+
+  def url: String = name + "_base_url"
+  def key_file: String = name + "_api_key_file"
+  def key_env: String = name + "_api_key_env"
+  def key: String = name + "_api_key"
+  def key_settings: List[String] = List(key_file, key_env, key)
+}
+
 
 /** query strategies **/
 

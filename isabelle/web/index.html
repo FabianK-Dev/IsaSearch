@@ -148,9 +148,54 @@ bijections have inverses, bubblesort, ..."></textarea>
         })
         .catch(err => console.log(err));
 
+        // Addresses and LLM-written text come from the index and the models, which the page
+        // does not trust: it follows web addresses only, e.g. no javascript: address.
+        function isWebAddress(url) {
+            try {
+                return ["http:", "https:"].includes(new URL(url, document.baseURI).protocol);
+            } catch(err) {
+                return false;
+            }
+        }
+
+        // LLM-written text is rendered as LaTeX, which can also link (\href) and load
+        // (\includegraphics): the rendered text keeps its links to web addresses and references
+        // within itself, and nothing that loads or runs.
+        function renderLatex(parent, text) {
+            try {
+                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
+                generator = latexjs.parse(text, { generator: generator })
+                const fragment = generator.domFragment();
+
+                for (const el of fragment.querySelectorAll("*")) {
+                    if (["script", "style", "link", "base", "meta", "iframe", "frame", "object", "embed",
+                            "img", "image", "picture", "source", "video", "audio", "form",
+                            "foreignobject"].includes(el.localName.toLowerCase())) {
+                        el.remove();
+                        continue;
+                    }
+
+                    for (const attribute of [...el.attributes]) {
+                        const name = attribute.name.toLowerCase();
+                        const link = name === "href" || name === "xlink:href";
+
+                        if (name.startsWith("on") || ["src", "srcset", "action", "formaction"].includes(name) ||
+                                link && !attribute.value.startsWith("#") && !isWebAddress(attribute.value)) {
+                            el.removeAttribute(attribute.name);
+                        }
+                    }
+                }
+
+                parent.appendChild(fragment);
+            } catch(err) {
+                console.log(err);
+                parent.innerText = text;
+            }
+        }
+
         // Links that do not apply to a result are empty.
         function addLink(parent, url, text) {
-            if (!url)
+            if (!url || !isWebAddress(url))
                 return;
 
             const link = document.createElement("a");
@@ -229,15 +274,7 @@ bijections have inverses, bubblesort, ..."></textarea>
 
                         if (res.refined_query) {
                             llmRefinedQueryParent.style.display = "block";
-
-                            try {
-                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
-                                generator = latexjs.parse(res.refined_query.replace("):\n", "): ").trim(), { generator: generator })
-                                llmRefinedQuery.appendChild(generator.domFragment());
-                            } catch(err) {
-                                console.log(err);
-                                llmRefinedQuery.innerText = res.refined_query.replace("):\n", "): ").trim();
-                            }
+                            renderLatex(llmRefinedQuery, res.refined_query.replace("):\n", "): ").trim());
                         } else {
                             llmRefinedQueryParent.style.display = "none";
                         }
@@ -276,15 +313,8 @@ bijections have inverses, bubblesort, ..."></textarea>
                                 node.querySelector("#theoremCode").innerText = node.src_code
                             }
 
-                            let llm_description = el.llm_description.replace("):\n", "): ").trim();
-
-                            try {
-                                let generator = new latexjs.HtmlGenerator({ hyphenate: true })
-                                generator = latexjs.parse(llm_description, { generator: generator })
-                                node.querySelector("#theoremLLMSummary").appendChild(generator.domFragment());
-                            } catch(err) {
-                                node.querySelector("#theoremLLMSummary").innerText = llm_description;
-                            }
+                            renderLatex(node.querySelector("#theoremLLMSummary"),
+                                el.llm_description.replace("):\n", "): ").trim());
 
                             resultList.append(node);
                         }

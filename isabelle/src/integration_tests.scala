@@ -52,7 +52,8 @@ object Integration_Tests {
         value <- proper_string(System.getenv(name))
       } result.put(name, value)
       result.put("USER_HOME", home.absolute.implode)
-      result.put("ISASEARCH_TEST_SOURCES", (root + Path.basic("sources")).absolute.implode)
+      // The sources of fixtures stand in for the AFP, unless an AFP component is registered.
+      result.put("AFP", (root + Path.basic("sources")).absolute.implode)
       result.put("ISASEARCH_TEST_KEY", "test-key")
       result
     }
@@ -97,6 +98,8 @@ object Integration_Tests {
   /** inference stub **/
 
   class Stub(vectors: Map[String, List[Double]]) {
+    // The key that requests must carry: none in place of a started server, which gets no key.
+    @volatile var key = "test-key"
     @volatile var mode = "ok"
     @volatile var llm_up = true
     @volatile var transient = 0
@@ -184,8 +187,8 @@ object Integration_Tests {
           val body = obj(JSON.parse(Bytes.read_stream(exchange.getRequestBody.nn).text))
           synchronized { log += path -> body }
           val authorized =
-            proper_string(exchange.getRequestHeaders.nn.getFirst("Authorization"))
-              .contains("Bearer test-key")
+            proper_string(exchange.getRequestHeaders.nn.getFirst("Authorization")) ==
+              proper_string(key).map("Bearer " + _)
           (if (authorized) payload(path, body) else None) match {
             case Some(result) =>
               val bytes = UTF8.bytes(JSON.Format(result))
@@ -245,14 +248,14 @@ object Integration_Tests {
         embeddings += text -> vector.toList.map(_.toDouble)
         val checksum = new java.util.zip.Adler32()
         checksum.update(UTF8.bytes(source))
-        // Local sources: the file of the document, relative to $ISASEARCH_TEST_SOURCES, holds
-        // its source two lines below the indexed start line.
+        // Local sources: the file of the document, relative to $AFP, holds its source two lines
+        // below the indexed start line.
         val file = sources.map { dir =>
           val name = e + "/" + kind.name + ".thy"
           val theory = Isabelle_System.make_directory(dir + Path.basic(e)) +
             Path.basic(kind.name).thy
           File.write(theory, "theory T imports Main begin\n\n" + "\n" * i + source + "\n\nend\n")
-          "file" -> ("ISASEARCH_TEST_SOURCES/" + name)
+          "file" -> ("AFP/" + name)
         }
         val record = Map(
           "id" -> id, "src" -> source, "entity_kname" -> ("T.x" + i + "|thm"), "entry" -> e,
@@ -321,6 +324,7 @@ object Integration_Tests {
           "embedding_backend" -> "openai",
           "openai_embedding_model" -> "fixture",
           "openai_embedding_base_url" -> (stub.url + "/v1"),
+          "openai_embedding_api_key_env" -> "ISASEARCH_TEST_KEY",
           "openai_base_url" -> (stub.url + "/v1"),
           "openai_api_key_env" -> "ISASEARCH_TEST_KEY",
           "llm_backend" -> "none",
@@ -418,13 +422,19 @@ object Integration_Tests {
         env.run("search", search("pruned"))
 
         progress.echo("Inference backends and failures ...")
+        // Every endpoint gets its own key and no other: without it, the stub refuses.
         for (backend <- List("openai", "ollama", "llamacpp")) {
           configure("llm_backend" -> backend,
             "embedding_backend" -> (if (backend == "ollama") "ollama" else "openai"),
             (backend + "_query_model") -> "fixture",
             "ollama_base_url" -> stub.url, "llamacpp_base_url" -> stub.url)
+          if (backend != "openai") env.run("search", search("-r", "commutativity"), ok = false)
+          configure((backend + "_api_key_env") -> "ISASEARCH_TEST_KEY")
           env.run("search", search("-r", "commutativity"))
         }
+        write(config_path, config - Endpoint.OpenAI_Embedding.key_env)
+        env.run("search", search("commutativity"), ok = false)
+        configure()
         stub.transient = 1
         env.run("search", search("retry"))
         check(stub.transient == 0, "transient failure retried")
@@ -577,13 +587,19 @@ object Integration_Tests {
     val server: Obj = Map("executable" -> embedder.implode, "hf_repo" -> "test/fixture-GGUF:Q8_0",
       "pooling" -> "last", "port" -> stub.port, "arguments" -> List("-t", "2"))
     val config_path = root + Path.basic("llama-servers.json")
-    def search(server: Obj, base: Obj = config.removed("openai_embedding_base_url"),
-        ok: Boolean = true, args: List[String] = Nil): Process_Result = {
+    // A started server replaces an endpoint and gets no API key: the stub in its place accepts
+    // requests without a key only.
+    def replaced(config: Obj, endpoint: Endpoint): Obj =
+      config -- (endpoint.url :: endpoint.key_settings)
+    val local = replaced(config, Endpoint.OpenAI_Embedding)
+    def search(server: Obj, base: Obj = local, ok: Boolean = true, args: List[String] = Nil)
+        : Process_Result = {
       write(config_path, base ++ Map(Llama_Server.Role.Embedding.key -> server))
       env.run("search",
         List("-c", config_path.implode, "-i", "plain") ::: args ::: List("commutativity"), ok = ok)
     }
 
+    stub.key = ""
     stub.health_failures = 2
     check(env.json(search(server)).contains("results"), "search through embedding server")
     check(stub.health_failures == 0, "embedding server awaited")
@@ -602,19 +618,24 @@ object Integration_Tests {
       "embedding server startup failure")
     search(server.removed("hf_repo"), ok = false)
     search(server, base = config, ok = false)
-    // A disabled server is not started: the configured endpoint serves instead.
+    check(cat_lines(search(server, base = config.removed(Endpoint.OpenAI_Embedding.url),
+      ok = false).err_lines).contains("takes no API key"), "key of a replaced endpoint refused")
+    // A disabled server is not started: the configured endpoint serves instead, with its key.
     Isabelle_System.rm_tree(embedder_args)
+    stub.key = "test-key"
     search(server ++ Map("enabled" -> false), base = config)
     check(!embedder_args.is_file, "disabled embedding server")
+    stub.key = ""
 
     // The query server starts with the first expanded query only, and replaces openai_base_url.
     // A stub of its own reports it ready once the fake has recorded its arguments.
     val (expander, expander_args, expander_pid) = fake("query")
     val query_stub = new Stub(Map.empty)
+    query_stub.key = ""
     query_stub.ready = () => expander_args.is_file
     val query_server: Obj = Map("executable" -> expander.implode,
       "hf_repo" -> "test/expander-GGUF:Q4_K_M", "port" -> query_stub.port, "context" -> 2048)
-    val expanding = config.removed("openai_embedding_base_url").removed("openai_base_url") ++
+    val expanding = replaced(local, Endpoint.OpenAI) ++
       Map("llm_backend" -> "openai", "openai_query_model" -> "expander",
         Llama_Server.Role.Query.key -> query_server)
     search(server, base = expanding)
@@ -634,6 +655,7 @@ object Integration_Tests {
       ok = false)
     check(query_stub.completions().nonEmpty, "expansion by the query server")
     query_stub.close()
+    stub.key = "test-key"
   }
 
   // The URL that a started server reports.
@@ -677,6 +699,19 @@ object Integration_Tests {
           HttpResponse.BodyHandlers.ofString()).nn
         val content_type = response.headers().nn.firstValue("Content-Type").nn.orElse("").nn
         (response.statusCode(), content_type, response.body().nn)
+      }
+
+      // The status of a request that names a server by a host, as a page of that host would.
+      def status(base: String, host: String): Int = {
+        val uri = URI.create(base).nn
+        using(new java.net.Socket(uri.getHost, uri.getPort)) { socket =>
+          socket.getOutputStream.nn.write(UTF8.bytes(
+            "GET /capabilities HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"))
+          val reader = new java.io.BufferedReader(
+            new java.io.InputStreamReader(socket.getInputStream, UTF8.charset))
+          val line = proper_value(reader.readLine()).getOrElse(error("No HTTP response"))
+          Value.Int.parse(space_explode(' ', line)(1))
+        }
       }
 
       val (page_code, page_type, page) = fetch("/")
@@ -724,6 +759,23 @@ object Integration_Tests {
         str(followed, "generation") != served, "server follows a new generation")
       env.run("prune", List("-i", "plain"))
       check(get("/search?query=pruned")._1 == 200, "search after pruning the old generation")
+
+      // The server answers requests that name it as this machine does, not those of a page of
+      // another host whose name leads here.
+      for (host <- List("localhost", "127.0.0.1:" + URI.create(api).nn.getPort))
+        check(status(api, host) == 200, "request to " + host)
+      check(status(api, "attacker.example") == 403, "request to a foreign host")
+
+      // Requests are handled concurrently: the page is served while a search waits for its
+      // embedding. That search fails for its input, which leaves the service available.
+      stub.fail_input_contains = "refused input"
+      val refused = Future.thread("search") { get("/search?query=refused+input")._1 }
+      Time.seconds(0.5).sleep()
+      check(fetch("/")._1 == 200 && !refused.is_finished, "concurrent requests")
+      check(refused.join == 503, "search with a refused input")
+      check(get("/search?query=test")._1 == 200, "search after a failed request")
+      stub.fail_input_contains = ""
+
       stub.mode = "dimension"
       check(get("/search?query=unavailable")._1 == 503, "unavailable embedding service")
       check(!bool(get("/capabilities")._2, "embedding_available"), "refreshed capabilities")
@@ -739,11 +791,14 @@ object Integration_Tests {
       check(post(api, request.replace("editor=vscode", "editor=emacs").nn, header = true) == 400,
         "open in an unknown editor")
       check(get(request)._1 == 405, "open by GET")
-      // A server for other machines turns editors off.
+      // A server for other machines turns editors off and names the host of its proxy.
       val shared = env.process("server",
-        List("-c", config_path.implode, "-i", "plain", "-o", "isasearch_editors=", "-p", "0"))
+        List("-c", config_path.implode, "-i", "plain", "-o", "isasearch_editors=",
+          "-o", "isasearch_hosts=search.example.org", "-p", "0"))
       try {
         val shared_api = api_url(shared)
+        check(status(shared_api, "search.example.org") == 200 &&
+          status(shared_api, "attacker.example") == 403, "hosts of a shared server")
         val editors = list(obj(JSON.parse(client.send(
           HttpRequest.newBuilder(URI.create(shared_api + "/capabilities")).nn.GET().nn.build(),
           HttpResponse.BodyHandlers.ofString()).nn.body().nn)).getOrElse("editors", Nil))
@@ -895,6 +950,7 @@ object Integration_Tests {
           "embedding_backend" -> "openai",
           "openai_embedding_model" -> "fixture",
           "openai_embedding_base_url" -> (stub.url + "/v1"),
+          "openai_embedding_api_key_env" -> "ISASEARCH_TEST_KEY",
           "openai_base_url" -> (stub.url + "/v1"),
           "openai_api_key_env" -> "ISASEARCH_TEST_KEY",
           "llm_backend" -> "openai",

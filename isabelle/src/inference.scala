@@ -49,13 +49,13 @@ object Inference {
       .connectTimeout(Duration.ofSeconds(config.positive("inference_connect_timeout", 10))).nn
       .build().nn
 
-    // A key file (Isabelle path syntax, e.g. $ISASEARCH_HOME_USER/api_key) keeps the key out of
-    // the environment of other processes; it takes precedence over a variable and a literal.
-    def key: String = {
-      val file = config.string("openai_api_key_file")
-      val env = config.string("openai_api_key_env")
-      if (file.nonEmpty) {
-        val path = config.path("openai_api_key_file", "")
+    // The key of an endpoint. A key file (Isabelle path syntax, e.g. $ISASEARCH_HOME_USER/api_key)
+    // keeps it out of the environment of other processes; the file takes precedence over a
+    // variable and a literal.
+    private def key(endpoint: Endpoint): String = {
+      val env = config.string(endpoint.key_env)
+      if (config.string(endpoint.key_file).nonEmpty) {
+        val path = config.path(endpoint.key_file, "")
         if (!path.is_file) throw Failure("Missing API key file: " + path.implode)
         proper_string(Library.trim_line(File.read(path)))
           .getOrElse(throw Failure("Empty API key file: " + path.implode))
@@ -63,11 +63,22 @@ object Inference {
       else if (env.nonEmpty)
         proper_string(System.getenv(env))
           .getOrElse(throw Failure("Missing API key environment variable: " + env))
-      else config.string("openai_api_key")
+      else config.string(endpoint.key)
     }
 
-    private def call(url: String, body: Obj, attempts: Int, health: Boolean = false): Obj = {
-      val uri = URI.create(url).nn
+    // A request to a path of an endpoint, with the key of that endpoint and no other.
+    private def call(
+      endpoint: Endpoint,
+      path: String,
+      body: Obj,
+      attempts: Int,
+      health: Boolean = false
+    ): Obj = {
+      val base = config.string(endpoint.url, endpoint.default_url).stripSuffix("/")
+      if (base.isEmpty) throw Failure("Configure " + endpoint.url)
+      val uri =
+        try { URI.create(base + path).nn }
+        catch { case _: IllegalArgumentException => throw Failure("Bad " + endpoint.url) }
       if (!proper_string(uri.getScheme).exists(Set("http", "https")) || uri.getUserInfo != null)
         throw Failure("Inference URL must be HTTP(S) without embedded credentials")
       val timeout =
@@ -77,7 +88,7 @@ object Inference {
         .newBuilder(uri).nn
         .timeout(Duration.ofSeconds(timeout)).nn
         .header("Content-Type", "application/json").nn
-      if (key.nonEmpty) builder.header("Authorization", "Bearer " + key)
+      proper_string(key(endpoint)).foreach(k => builder.header("Authorization", "Bearer " + k))
       val request = builder.POST(HttpRequest.BodyPublishers.ofString(JSON.Format(body))).nn.build()
       var last = "Inference request failed"
       var attempt = 0
@@ -98,12 +109,6 @@ object Inference {
         attempt += 1
       }
       throw Failure(last)
-    }
-
-    private def endpoint(key: String, suffix: String, default: String = ""): String = {
-      val base = config.string(key, default).stripSuffix("/")
-      if (base.isEmpty) throw Failure("Configure " + key)
-      base + suffix
     }
 
 
@@ -139,7 +144,8 @@ object Inference {
             case Inference_Backend.OpenAI | Inference_Backend.LlamaCpp =>
               servers.foreach(_.ensure(Llama_Server.Role.Embedding))
               val response = call(
-                endpoint("openai_embedding_base_url", "/embeddings"),
+                Endpoint.OpenAI_Embedding,
+                "/embeddings",
                 object_at(config.values, "embedding_extra_body") ++ Map(
                   "model" -> model,
                   "input" -> batch
@@ -160,7 +166,8 @@ object Inference {
                 )
             case Inference_Backend.Ollama =>
               val response = call(
-                endpoint("ollama_base_url", "/api/embed", "http://localhost:11434"),
+                Endpoint.Ollama,
+                "/api/embed",
                 object_at(config.values, "embedding_extra_body") ++ Map(
                   "model" -> model,
                   "input" -> batch,
@@ -217,18 +224,23 @@ object Inference {
 
     // A backend, a model, and an endpoint where the backend has no default.
     def configured(role: Model_Role): Boolean = {
-      def endpoint(key: String): Boolean = config.string(key).nonEmpty
+      def located(endpoint: Endpoint): Boolean = config.string(endpoint.url).nonEmpty
       model(role).nonEmpty && (llm_backend match {
         case Inference_Backend.Disabled => false
-        case Inference_Backend.OpenAI => endpoint("openai_base_url")
+        case Inference_Backend.OpenAI => located(Endpoint.OpenAI)
         case Inference_Backend.LlamaCpp =>
-          endpoint("llamacpp_base_url") ||
-            role == Model_Role.Document && endpoint("llamacpp_document_base_url")
+          located(Endpoint.LlamaCpp) ||
+            role == Model_Role.Document && located(Endpoint.LlamaCpp_Document)
         case _ => true
       })
     }
 
-    private def request(prompt: String, role: Model_Role, health: Boolean): (String, Obj) = {
+    // The endpoint of a completion, its path there and the body of the request.
+    private def request(
+      prompt: String,
+      role: Model_Role,
+      health: Boolean
+    ): (Endpoint, String, Obj) = {
       if (!configured(role)) throw Failure("No " + role + " LLM is configured")
       val sampling = object_at(config.values, "sampling_parameters")
       val common = Map[String, JSON.T](
@@ -242,7 +254,8 @@ object Inference {
       llm_backend match {
         case Inference_Backend.OpenAI =>
           (
-            endpoint("openai_base_url", "/chat/completions"),
+            Endpoint.OpenAI,
+            "/chat/completions",
             common ++ object_at(config.values, "openai_extra_body") ++
               Map(
                 "model" -> model(role),
@@ -253,7 +266,8 @@ object Inference {
           )
         case Inference_Backend.Ollama =>
           (
-            endpoint("ollama_base_url", "/api/generate", "http://localhost:11434"),
+            Endpoint.Ollama,
+            "/api/generate",
             Map(
               "model" -> model(role),
               "prompt" -> prompt,
@@ -263,12 +277,13 @@ object Inference {
             )
           )
         case Inference_Backend.LlamaCpp =>
-          val baseKey =
-            if (role == Model_Role.Document && config.string("llamacpp_document_base_url").nonEmpty)
-              "llamacpp_document_base_url"
-            else "llamacpp_base_url"
+          val endpoint =
+            if (role == Model_Role.Document &&
+                config.string(Endpoint.LlamaCpp_Document.url).nonEmpty) Endpoint.LlamaCpp_Document
+            else Endpoint.LlamaCpp
           (
-            endpoint(baseKey, "/completion"),
+            endpoint,
+            "/completion",
             common ++ object_at(config.values, "llamacpp_extra_body") ++ Map(
               "prompt" -> prompt,
               "n_predict" -> tokens,
@@ -309,7 +324,7 @@ object Inference {
       cached: Boolean = config.boolean("enable_llm_output_cache", true),
       accept_truncated: String => Boolean = _ => false
     ): Completion = {
-      val (url, body) = request(prompt, role, health)
+      val (endpoint, path, body) = request(prompt, role, health)
       val start = System.nanoTime()
       val cache = output_path(role, body)
       val useCache = !health && cached
@@ -340,7 +355,7 @@ object Inference {
             body.updated("options", object_at(body, "options").updated("temperature", 0.3))
           else body.updated("temperature", 0.3)
         try {
-          val response = call(url, retry_body, 1, health = health)
+          val response = call(endpoint, path, retry_body, 1, health = health)
           completion_text(response) match {
             case (complete, false) => text = complete
             case (partial, true) =>
