@@ -915,14 +915,17 @@ object Integration_Tests {
     check(num(object_at(retried, "aggregates"), "judge_failures", 1) == 0 &&
       str(first_candidates(retried).head, "verdict") == "DUPLICATE", "judge retry")
 
-    // A judgement cut off at max_tokens counts if its verdict is complete, and is a failure
-    // otherwise.
+    // A judgement cut off at max_tokens counts if its verdict is complete, without another
+    // request, and is a failure otherwise.
     configure(List("enable_llm_output_cache" -> false))
     stub.truncate_completion_contains = "Compare "
+    val before_cut = stub.calls.size
     val cut = first_candidates(object_at(object_at(
       read(analysis(root + Path.basic("truncated-judge"))), "sections"), "definitions")).head
     check(str(cut, "verdict") == "DUPLICATE" && bool(cut, "judge_truncated") &&
       !cut.contains("judge_error"), "truncated judgement with a verdict")
+    check(stub.completions(since = before_cut).count(b =>
+      stub.prompt(b).startsWith("Compare ")) == 1, "truncated judgement with a verdict kept")
     val judge_answer = stub.completion_text
     stub.completion_text = Prompt.Begin + "Both items"
     val no_verdict = object_at(object_at(

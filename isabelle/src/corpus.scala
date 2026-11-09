@@ -334,7 +334,7 @@ object Corpus_Build {
       val text = prompt(block, kind, meta)
       val completion =
         inference.generate(text, role = Model_Role.Document, cached = true,
-          accept_truncated = _ => true)
+          cut_off = _ => Inference.Cut_Off.Fallback)
       val checksum = new java.util.zip.Adler32()
       checksum.update(UTF8.bytes(src))
       val description = marked(completion.text)

@@ -22,7 +22,14 @@ object Inference {
   // User errors: their message is reported without the exception class.
   case class Failure(override val message: String) extends Exn.User_Error(message)
 
-  // A truncated completion was cut off at max_tokens on every attempt.
+  // What a caller makes of a completion that was cut off at max_tokens: nothing; a result if
+  // no attempt completes, as a corpus description is better than none; or a result as it is,
+  // as a duplicate verdict is complete before its justification.
+  enum Cut_Off {
+    case Unusable, Fallback, Sufficient
+  }
+
+  // A truncated completion was cut off at max_tokens.
   case class Completion(
     text: String,
     duration: Double,
@@ -322,7 +329,7 @@ object Inference {
       role: Model_Role = Model_Role.Query,
       health: Boolean = false,
       cached: Boolean = config.boolean("enable_llm_output_cache", true),
-      accept_truncated: String => Boolean = _ => false
+      cut_off: String => Cut_Off = _ => Cut_Off.Unusable
     ): Completion = {
       val (endpoint, path, body) = request(prompt, role, health)
       val start = System.nanoTime()
@@ -341,10 +348,10 @@ object Inference {
       if (role == Model_Role.Query) servers.foreach(_.ensure(Llama_Server.Role.Query))
       val attempts = if (health) 1 else config.positive("llm_attempts", 3)
       var text = ""
-      // A completion cut off at max_tokens on every attempt is still accepted, and reported as
-      // truncated, where the caller finds its text usable: a corpus description is better than
-      // none, a duplicate verdict is complete before its justification.
-      var truncated_text = ""
+      // A cut-off completion that suffices ends the attempts like a complete one. A fallback is
+      // the result if every attempt is cut off. Both are reported as truncated.
+      var truncated = false
+      var fallback = ""
       var failure: Option[Failure] = None
       var attempt = 0
       while (attempt < attempts && text.isEmpty) {
@@ -359,8 +366,15 @@ object Inference {
           completion_text(response) match {
             case (complete, false) => text = complete
             case (partial, true) =>
-              if (accept_truncated(partial)) truncated_text = partial
-              failure = Some(Failure("Truncated completion; increase max_tokens"))
+              val usable = cut_off(partial)
+              if (usable == Cut_Off.Sufficient) {
+                text = partial
+                truncated = true
+              }
+              else {
+                if (usable == Cut_Off.Fallback) fallback = partial
+                failure = Some(Failure("Truncated completion; increase max_tokens"))
+              }
           }
         }
         catch {
@@ -371,8 +385,10 @@ object Inference {
         if (text.isEmpty && attempt < attempts)
           Thread.sleep(math.min(30000L, 1000L << (attempt - 1)))
       }
-      val truncated = text.isEmpty && truncated_text.nonEmpty
-      if (truncated) text = truncated_text
+      if (text.isEmpty && fallback.nonEmpty) {
+        text = fallback
+        truncated = true
+      }
       if (text.isEmpty) throw failure.getOrElse(Failure("Empty LLM completion"))
       val elapsed = (System.nanoTime() - start) / 1e9
       if (useCache) {
