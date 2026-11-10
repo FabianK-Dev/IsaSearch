@@ -46,7 +46,9 @@
 
         <div class="alert alert-danger" role="alert" id="embeddingError" style="display: none;"></div>
 
-        <form>
+        <!-- Firefox would restore the state of the controls on a reload, from before the
+             capabilities were known. -->
+        <form autocomplete="off">
             <div class="mb-3">
                 <label for="searchInput" class="form-label"><b>Search:</b> Name, description or formula of a theorem or definition to search for</label>
                 <textarea class="form-control" id="searchInput" rows="2" placeholder="Examples: a^2 + b^2 = c^2,
@@ -66,11 +68,11 @@ bijections have inverses, bubblesort, ..."></textarea>
                 </div>
             </div>
             <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="disableRefineCheck">
+                <input type="checkbox" class="form-check-input" id="disableRefineCheck" disabled>
                 <label class="form-check-label" for="disableRefineCheck"><a href="#" data-bs-toggle="tooltip" data-bs-title="By default a LLM will refine the search query to improve the search results. This can be disabled which increases search speed but may decrease search accuracy.">Disable query refinement</a></label>
                 <div class="form-text" id="refineUnavailable" style="display: none;"></div>
             </div>
-            <button type="button" class="btn btn-primary" onclick="search();" id="searchButton">Search</button>
+            <button type="button" class="btn btn-primary" onclick="search();" id="searchButton" disabled>Starting...</button>
         </form>
 
         <div class="my-3"></div>
@@ -120,6 +122,15 @@ bijections have inverses, bubblesort, ..."></textarea>
         // The editors in which the server opens local files (option isasearch_editors).
         let editors = [];
 
+        // Searching waits for the capabilities, which may take as long as the embedder needs to
+        // start: until then it is unknown whether the server can refine queries.
+        function enableSearch(refinement) {
+            document.getElementById("disableRefineCheck").disabled = !refinement;
+            const searchButton = document.getElementById("searchButton");
+            searchButton.innerText = "Search";
+            searchButton.disabled = false;
+        }
+
         // Definition search is only available if the server has a definitions corpus, so the
         // selector stays hidden until the server says otherwise.
         fetch("/capabilities")
@@ -135,7 +146,6 @@ bijections have inverses, bubblesort, ..."></textarea>
                 const check = document.getElementById("disableRefineCheck");
                 const note = document.getElementById("refineUnavailable");
                 check.checked = true;
-                check.disabled = true;
                 note.innerText = "Query refinement is unavailable on this server: " + res.query_expansion_error;
                 note.style.display = "block";
             }
@@ -145,8 +155,14 @@ bijections have inverses, bubblesort, ..."></textarea>
                 alert.innerText = "Search is unavailable: " + res.embedding_error;
                 alert.style.display = "block";
             }
+
+            enableSearch(res.query_expansion);
         })
-        .catch(err => console.log(err));
+        // Without the capabilities the searches report what fails.
+        .catch(err => {
+            console.log(err);
+            enableSearch(true);
+        });
 
         // Addresses and LLM-written text come from the index and the models, which the page
         // does not trust: it follows web addresses only, e.g. no javascript: address.
