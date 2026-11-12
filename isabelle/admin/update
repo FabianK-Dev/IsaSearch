@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
 # Keeps an index current with the registered AFP, analyses new AFP entries for duplicates, and
-# releases every new state of the index with that analysis on GitHub (README.md). Meant for an
-# hourly cron job; a run that finds nothing new exits silently.
+# releases every new state of the index with that analysis on GitHub (README.md), together with
+# the AFP revisions that each release covers. Meant for an hourly cron job; a run that finds
+# nothing new exits silently.
 #
 # Usage: update -c CONFIG -i NAME [-f] [-e ENTRY] [-o DIR]
 #   -c CONFIG build configuration of the index, tracked in this repository
@@ -47,6 +48,9 @@ RETRY_SECONDS=$((24 * 3600))
 # Duplicate analyses by AFP revision, and the entries still to analyse.
 DUPLICATES="$STATE/duplicates"
 PENDING="$STATE/duplicates_pending"
+# The AFP revisions that the releases cover, published with the newest release.
+REVISIONS_ASSET="afp-revisions.json"
+REVISIONS="$STATE/$REVISIONS_ASSET"
 PART_SIZE=1900M
 
 mkdir -p "$STATE" "$HOME_USER/logs"
@@ -229,18 +233,83 @@ duplicates_released() {
   [ ! -f "$REPORT.json" ] || [ "$(sha256sum <"$REPORT.json")" = "$(state duplicates_released)" ]
 }
 
+# afp_revisions FILE SINCE BUILT [TAG]: the covered revisions of FILE extended by the changesets
+# after SINCE up to BUILT, which TAG releases or which kept the index data of SINCE.
+afp_revisions() {
+  "$REPOSITORY/afp_revisions" "$AFP" "$@"
+}
+
+# The covered revisions of the releases before afp-revisions.json: each release covers the
+# changesets after the previous one that equal it in theories and metadata, the newest release
+# also those up to the released revision.
+backfill_revisions() {
+  local work since="" tag
+  work="$(mktemp -d)"
+  echo '{"revisions": {}}' >"$work/revisions.json"
+  github "$API?per_page=100" >"$work/releases.json"
+  for tag in $(json "$work/releases.json" '" ".join(r["tag_name"]
+      for r in sorted(d, key=lambda r: r["published_at"] or "")
+      if not r["draft"] and not r["prerelease"] and
+        re.fullmatch(re.escape(a[0]) + r"\d{8}-afp-[0-9a-f]+", r["tag_name"]))' "index-$INDEX-")
+  do
+    afp_revisions "$work/revisions.json" "$since" "${tag##*-afp-}" "$tag" >"$work/next.json"
+    mv "$work/next.json" "$work/revisions.json"
+    since="${tag##*-afp-}"
+  done
+  if [ -n "$since" ] && [ "$since" != "$(state released)" ]; then
+    afp_revisions "$work/revisions.json" "$since" "$(state released)" >"$work/next.json"
+    mv "$work/next.json" "$work/revisions.json"
+  fi
+  mv "$work/revisions.json" "$REVISIONS"
+  rm -rf "$work"
+  echo "Covered AFP revisions of the earlier releases: $REVISIONS"
+}
+
+# The covered revisions go with the release of the released revision, the newest one: they
+# replace its earlier asset.
+attach_revisions() {
+  local work tag
+  tag="$(json "$REVISIONS" 'next((r["release"] for n, r in d["revisions"].items()
+    if n.startswith(a[0])), "")' "$(state released)")"
+  if [ -z "$tag" ]; then
+    echo "No release covers $(state released)"
+  else
+    work="$(mktemp -d)"
+    github "$API/tags/$tag" >"$work/release.json"
+    for ASSET in $(json "$work/release.json" '" ".join(str(r["id"]) for r in d["assets"]
+        if r["name"] == a[0])' "$REVISIONS_ASSET"); do
+      github -X DELETE "$API/assets/$ASSET" >/dev/null
+    done
+    upload "$(json "$work/release.json" 'd["upload_url"].split("{")[0]')" "$REVISIONS"
+    echo "Attached the covered AFP revisions to $(json "$work/release.json" 'd["html_url"]')"
+    rm -rf "$work"
+  fi
+  sha256sum <"$REVISIONS" >"$STATE/revisions_released"
+}
+revisions_released() {
+  [ -f "$REVISIONS" ] && [ "$(sha256sum <"$REVISIONS")" = "$(state revisions_released)" ]
+}
+
 if [ -z "$OUTPUT" ]; then
+  [ -s "$TOKEN_FILE" ] || {
+    [ "$BUILT" = "$(state released)" ] || echo "Missing GitHub token $TOKEN_FILE; not released" >&2
+    exit 0
+  }
+  if [ ! -f "$REVISIONS" ] && [ -n "$(state released)" ]; then
+    log_start
+    backfill_revisions
+  fi
   if [ "$BUILT" = "$(state released)" ]; then
-    if ! duplicates_released && [ -s "$TOKEN_FILE" ]; then
+    if ! duplicates_released; then
       log_start
       attach_duplicates
     fi
+    if ! revisions_released; then
+      log_start
+      attach_revisions
+    fi
     exit 0
   fi
-  [ -s "$TOKEN_FILE" ] || {
-    echo "Missing GitHub token $TOKEN_FILE; not released" >&2
-    exit 0
-  }
 fi
 log_start
 # The release names the commit that built it and the configuration in it, so that commit must
@@ -264,7 +333,10 @@ EXPORT="$(isabelle isasearch_export -F generation -i "$INDEX" -D "$WORK" | tail 
 FILES="$(json "$EXPORT/manifest.json" '[c["files"] for c in d["corpora"]]')"
 if [ -z "$OUTPUT" ] && [ "$FILES" = "$(state released_files)" ]; then
   echo "Index data unchanged since the last release"
+  afp_revisions "$REVISIONS" "$(state released)" "$BUILT" >"$WORK/$REVISIONS_ASSET"
+  mv "$WORK/$REVISIONS_ASSET" "$REVISIONS"
   echo "$BUILT" >"$STATE/released"
+  attach_revisions
   exit 0
 fi
 
@@ -280,6 +352,8 @@ tar -C "$(dirname "$EXPORT")" -cf - "$(basename "$EXPORT")" | zstd -q -T0 -10 |
 cp "$EXPORT/manifest.json" "$WORK/assets/$NAME.manifest.json"
 [ ! -f "$REPORT.json" ] || cp "${DUPLICATES_ASSETS[@]}" "$WORK/assets/"
 (cd "$WORK/assets" && sha256sum -- * >SHA256SUMS)
+# Later revisions without a new release extend it, so it has no checksum.
+afp_revisions "$REVISIONS" "$(state released)" "$BUILT" "$TAG" >"$WORK/assets/$REVISIONS_ASSET"
 
 COUNTS="$(json "$EXPORT/manifest.json" \
   '", ".join(str(c["count"]) + " " + c["kind"] for c in d["corpora"])')"
@@ -296,13 +370,15 @@ Install it with the IsaSearch component (see its QUICKSTART.md):
 
     isabelle isasearch_import -R $TAG
 
-Without \`-R\`, \`isasearch_import\` installs the release of the registered AFP's revision.
+Without \`-R\`, \`isasearch_import\` installs the release that covers the registered AFP's
+revision or its newest covered ancestor: \`$REVISIONS_ASSET\` lists the AFP revisions with the
+theories and metadata of a release, also those after this one that need no new release.
 By hand: download the \`$NAME.tar.zst.*\` parts, then
 
     cat $NAME.tar.zst.* | zstd -d | tar -x
     isabelle isasearch_import -f isasearch-$INDEX -i $INDEX
 
-\`SHA256SUMS\` lists the checksums of the assets, and \`$NAME.manifest.json\` is the
+\`SHA256SUMS\` lists the checksums of the other assets, and \`$NAME.manifest.json\` is the
 manifest of the index with its provenance.
 $(duplicates_notes)
 EOF
@@ -331,5 +407,7 @@ trap 'rm -rf "$WORK"' EXIT
 
 echo "$BUILT" >"$STATE/released"
 echo "$FILES" >"$STATE/released_files"
+cp "$WORK/assets/$REVISIONS_ASSET" "$REVISIONS"
+sha256sum <"$REVISIONS" >"$STATE/revisions_released"
 [ ! -f "$REPORT.json" ] || sha256sum <"$REPORT.json" >"$STATE/duplicates_released"
 echo "Released $TAG: $(json "$WORK/published.json" 'd["html_url"]')"

@@ -26,17 +26,31 @@ registered AFP, analyses new entries for duplicates, and releases every new stat
    release: the reports `duplicates-afp-REVISION.json`, `_near-exact.md` and `_possible.md`,
    and a table per entry in the notes. The release names the component commit that built it
    and `CONFIG` in it, so the checkout must be pushed and clean and track `CONFIG`.
+4. It records the AFP revisions that each release covers in `afp-revisions.json`: every
+   changeset since the last processed revision whose theories and metadata equal those of the
+   new revision goes to its release, one whose theories and metadata equal those of the last
+   processed revision to the release of that one. A revision whose index data equals that of
+   the last release (no build, or an unchanged export) needs no new release: the list, which
+   goes with the newest release, is replaced there. Each entry records the release and its
+   distance in changesets from the release's revision; the file is not in `SHA256SUMS`, as it
+   changes after the release. It also names the repository that the AFP clone pulls from
+   (`hg paths default`, without a password), which `isasearch_import` asks for the changesets
+   that are local to a user's clone. [`afp_revisions`](afp_revisions) computes it.
 
-`isasearch_import` relies on this layout: it matches `REVISION` against the user's AFP and
-installs the parts.
+`isasearch_import` relies on this layout: it looks up the user's AFP revision, or in a clone
+its newest covered ancestor, in `afp-revisions.json` of the newest release (or the `REVISION`
+of the tags) and installs the parts.
 
 Runs never overlap, also for different indexes. A failed build is retried after 24 hours or
 when the AFP moves again; a failed release is retried by the next run and its draft deleted. A
 failed duplicate analysis does not hold up the release: it is retried after 24 hours or with
 the next build, and a later report is attached to the release of its revision, replacing an
-earlier one. State lives in `$ISASEARCH_HOME_USER/update/NAME` (`built` and `released` are AFP
-revisions, `duplicates_pending` the entries still to analyse); runs that do something log to
-`$ISASEARCH_HOME_USER/logs/update-*.log`.
+earlier one. A failed upload of `afp-revisions.json` is retried by the next run. State lives in
+`$ISASEARCH_HOME_USER/update/NAME` (`built` and `released` are AFP revisions,
+`duplicates_pending` the entries still to analyse, `afp-revisions.json` the covered revisions);
+runs that do something log to `$ISASEARCH_HOME_USER/logs/update-*.log`. A state without
+`afp-revisions.json` gets it from the published releases of the index: each covers the
+changesets after the previous one with its theories and metadata.
 
 - `-f` builds even without new changesets.
 - `-e ENTRY` (repeatable) analyses `ENTRY` as well, together with the entries already
@@ -61,9 +75,9 @@ On a Linux machine with access to the model servers of the configuration:
 
 1. Install Isabelle2026 with `isabelle` on the cron `PATH`, and `hg`, `git`, `python3`,
    `zstd`, `curl` and GNU coreutils (`flock`, `split`, `sha256sum`).
-2. Clone the AFP (see the [component README](../README.md#provenance)) and this repository,
-   and register both: `isabelle components -u AFP` and
-   `isabelle components -u REPOSITORY/isabelle`.
+2. Clone the AFP (see the [component README](../README.md#provenance)) over HTTPS, so that
+   users can reach the repository that the releases name, and this repository, and register
+   both: `isabelle components -u AFP` and `isabelle components -u REPOSITORY/isabelle`.
 3. In `$ISABELLE_HOME_USER/etc/settings`, raise the JVM limits:
    `ISABELLE_TOOL_JAVA_OPTIONS="-Djava.awt.headless=true -Xms2g -Xmx24g -Xss128m"`.
 4. Put the model servers' key where the configuration expects it (e.g.

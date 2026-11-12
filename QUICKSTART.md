@@ -37,9 +37,10 @@ isabelle isasearch_import
 ```
 
 This downloads a released index (5 GB), checks it and installs it. With a registered AFP
-(`isabelle components -u /path/to/afp`), it takes the release of your AFP's revision. Without
-an AFP, or if there is no release for your revision, it lists the releases and asks which one
-to install. `-R TAG` names a release directly. An interrupted download resumes where it
+(`isabelle components -u /path/to/afp`), it takes the release that covers your AFP's revision,
+also when later AFP changesets did not change the index. In a Mercurial clone, it takes the
+release of the newest covered ancestor and warns about your local changesets. Without an AFP,
+or if no release covers your revision, it lists the releases and asks which one to install. `-R TAG` names a release directly. An interrupted download resumes where it
 stopped.
 
 ## 3. Search

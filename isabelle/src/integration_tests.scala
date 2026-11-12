@@ -412,7 +412,7 @@ object Integration_Tests {
           Index_Format.generation, object_at(shipped_manifest, Index_Format.generation)
             .updated("lucene", "99.0.0")))
         env.run("import", List("-f", future.implode, "-i", "future"), ok = false)
-        releases(env, root, ship("release"), config_path)
+        releases(env, root, ship("release"), config_path, List(component.expand, packaged))
         val generations = env.user + Path.explode("isasearch/indexes/plain")
         def count(): Int = File.read_dir(generations).count(_.startsWith("generation-"))
         env.run("import", List("-f", plain.implode, "-i", "plain"))
@@ -500,8 +500,10 @@ object Integration_Tests {
 
   // Fake llama-servers record their arguments and wait; the stub answers on their port.
   // A shipped generation, released as admin/update releases it and served by a local stand-in
-  // for the GitHub API (option isasearch_releases).
-  def releases(env: Environment, root: Path, shipped: Path, config_path: Path): Unit = {
+  // for the GitHub API (option isasearch_releases). The registered components are restored
+  // after a registered AFP clone chose a release.
+  def releases(env: Environment, root: Path, shipped: Path, config_path: Path,
+      registered: List[Path]): Unit = {
     val tar = root + Path.basic("release.tar")
     Isabelle_System.gnutar("-cf " + File.bash_path(tar) + " " + File.bash_path(shipped.base),
       dir = shipped.dir).check
@@ -513,20 +515,44 @@ object Integration_Tests {
     }
     val sums = parts.map { case (name, b) => hash(b) + "  " + name }.mkString("", "\n", "\n")
     val bad_sums = parts.map { case (name, _) => "0" * 64 + "  " + name }.mkString("", "\n", "\n")
+
+    // An AFP clone of the releases' AFP repository: the revision of a release, an AFP changeset
+    // without effect on the index, and a local changeset.
+    def commit(hg: Mercurial.Repository, path: String, text: String): String = {
+      val file = hg.root + Path.explode(path)
+      Isabelle_System.make_directory(file.dir)
+      File.write(file, text)
+      hg.command("commit", args = "-A -u test -d " + Bash.string("0 0") + " -m " +
+        Bash.string(path)).check
+      hg.log(rev = ".", template = "{node}")
+    }
+    val upstream = Mercurial.init_repository(root + Path.basic("afp-upstream"))
+    val released = commit(upstream, "etc/settings", "AFP_BASE=\"$COMPONENT\"\n")
+    val site = commit(upstream, "web/index.html", "site")
+    val afp = root + Path.basic("afp-clone")
+    commit(Mercurial.clone_repository(upstream.root.implode, afp), "thys/Local/Local.thy", "local")
+    val covering = "index-plain-20261110-afp-" + released.take(12)
+    val revisions = Map("repository" -> upstream.root.implode, "revisions" -> Map(
+      site -> Map[String, Any]("release" -> covering, "distance" -> 1)))
+
     val files = (parts ::: List("SHA256SUMS" -> UTF8.bytes(sums),
-      "bad/SHA256SUMS" -> UTF8.bytes(bad_sums))).toMap
+      "bad/SHA256SUMS" -> UTF8.bytes(bad_sums),
+      Release.revisions -> UTF8.bytes(JSON.Format(revisions)))).toMap
     val server =
       HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress, 0), 0).nn
     val url = "http://127.0.0.1:" + server.getAddress.nn.getPort
-    def release(tag: String, sums: String): Obj = Map(
+    def release(tag: String, published: String, assets: List[String]): Obj = Map(
       "tag_name" -> tag, "draft" -> false, "prerelease" -> false,
-      "published_at" -> "2026-11-09T00:00:00Z",
-      "assets" -> ((parts.map(_._1) ::: List(sums)).map(name => Map(
+      "published_at" -> published,
+      "assets" -> ((parts.map(_._1) ::: assets).map(name => Map(
         "name" -> name.split('/').last, "size" -> files(name).length.toLong,
         "browser_download_url" -> (url + "/assets/" + name)))))
     val listing = List(
-      release("index-plain-20261109-afp-0726d9f1e0bf", "SHA256SUMS"),
-      release("index-plain-20261108-afp-1111111111aa", "bad/SHA256SUMS"))
+      release(covering, "2026-11-10T00:00:00Z", List("SHA256SUMS", Release.revisions)),
+      release("index-plain-20261109-afp-0726d9f1e0bf", "2026-11-09T00:00:00Z",
+        List("SHA256SUMS")),
+      release("index-plain-20261108-afp-1111111111aa", "2026-11-08T00:00:00Z",
+        List("bad/SHA256SUMS")))
     server.createContext("/", { (http: HttpExchange | Null) =>
       val exchange = http.nn
       val uri = exchange.getRequestURI.nn
@@ -559,8 +585,23 @@ object Integration_Tests {
       check(!(downloads + Path.basic("index-plain-20261109-afp-0726d9f1e0bf")).is_dir,
         "downloaded parts removed after the import")
       env.run("search", List("-c", config_path.implode, "-i", "released", "commutativity"))
+
+      // The clone gets the release of its newest covered ancestor, with a warning.
+      env.register((registered :+ afp)*)
+      val chosen = env.run("import", option ::: List("-i", "covered"))
+      val output = cat_lines(chosen.out_lines ::: chosen.err_lines)
+      check(output.contains("Release for the registered AFP: " + covering) &&
+        output.contains("1 AFP changeset since the release, without effect on the index") &&
+        output.contains("1 local changeset not in the AFP repository") &&
+        output.contains("Not in the index: the changes to Local") &&
+        !output.contains("did not answer"),
+        "release of the newest covered ancestor:\n" + output)
+      env.run("search", List("-c", config_path.implode, "-i", "covered", "commutativity"))
     }
-    finally { server.stop(0) }
+    finally {
+      env.register(registered*)
+      server.stop(0)
+    }
   }
 
   def llama_servers(env: Environment, stub: Stub, root: Path, config: Obj): Unit = {

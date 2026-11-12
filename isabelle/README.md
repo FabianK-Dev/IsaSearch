@@ -52,9 +52,19 @@ generation in place.
 
 `isasearch_import` without `-f` installs a release from GitHub (option `isasearch_releases`):
 
-- with a registered AFP, the newest release of its revision;
+- with a registered AFP, the release that covers its revision: the one built from it, or the
+  one whose index data a later revision kept (its changesets touched neither theories nor
+  metadata, or left the index data unchanged). A Mercurial clone gets the release of its newest
+  covered ancestor, so local changesets and AFP changesets without a release yet do not
+  matter. The import warns about such changesets and about uncommitted changes, and names the
+  AFP entries whose changes are not in the index. It asks the AFP repository of the releases
+  (`hg outgoing`, revision ids only) which changesets are local; if that repository does not
+  answer within 30 seconds, the changesets that are not public count as local;
 - with `-R TAG`, that release;
 - otherwise it lists the releases and asks. Without a terminal, it fails and lists them.
+
+The covered revisions come from `afp-revisions.json` of the newest release, which
+`admin/update` extends with every AFP revision it processes.
 
 The parts are downloaded to `$ISASEARCH_HOME_USER/downloads/TAG`, checked against
 `SHA256SUMS`, unpacked and installed; the directory is removed afterwards. Complete parts of an

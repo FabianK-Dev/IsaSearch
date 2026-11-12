@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+#
+# Extends the AFP revisions that the releases of an index cover (afp-revisions.json, README.md)
+# by the changesets after SINCE up to BUILT, and writes the result to standard output.
+#
+# Usage: afp_revisions AFP REVISIONS SINCE BUILT [TAG]
+#   AFP        Mercurial clone of the AFP
+#   REVISIONS  covered revisions so far (a missing file covers none)
+#   SINCE      revision covered so far, an ancestor of BUILT; empty: only BUILT is added
+#   BUILT      revision whose index data release TAG holds
+#   TAG        release of BUILT (default: the release of SINCE, whose index data BUILT kept)
+#
+# A changeset whose theories and metadata equal those of BUILT goes to TAG, one whose theories
+# and metadata equal those of SINCE to the release of SINCE; the others have index data of
+# their own that no release holds. Each covered changeset records its distance in changesets
+# from the revision of its release. The result also names the repository that the AFP pulls
+# from, without credentials, for isasearch_import to tell AFP changesets from local ones.
+
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.parse
+
+AFP, REVISIONS, SINCE, BUILT = sys.argv[1:5]
+TAG = sys.argv[5] if len(sys.argv) > 5 else ""
+
+
+def hg(*args):
+    return subprocess.run(["hg", "-R", AFP, *args], check=True, capture_output=True,
+                          text=True, env=dict(os.environ, HGPLAIN="1")).stdout
+
+
+def nodes(revset):
+    return hg("log", "-r", revset, "-T", "{node}\n").split()
+
+
+# Theories and metadata are all that the index reads of the AFP (update builds on their changes).
+def same_sources(a, b):
+    return not hg("status", "-n", "--rev", a, "--rev", b, "path:thys", "path:metadata").strip()
+
+
+def repository():
+    try:
+        url = hg("paths", "default").strip()
+    except subprocess.CalledProcessError:
+        return ""
+    parts = urllib.parse.urlsplit(url)
+    if parts.password is not None:
+        host = parts.hostname or ""
+        if parts.port is not None:
+            host += ":" + str(parts.port)
+        url = urllib.parse.urlunsplit(parts._replace(netloc=host))
+    return url
+
+
+def release_revision(tag):
+    return re.fullmatch(r"index-.+-\d{8}-afp-([0-9a-f]+)", tag).group(1)
+
+
+data = {"revisions": {}}
+if os.path.exists(REVISIONS):
+    with open(REVISIONS) as f:
+        data = json.load(f)
+revisions = data["revisions"]
+data["repository"] = repository()
+
+since_tag = revisions.get(nodes(SINCE)[0], {}).get("release", "") if SINCE else ""
+tag = TAG or since_tag
+if not tag:
+    sys.exit("No release covers " + SINCE)
+
+for node in nodes("only(%s, %s)" % (BUILT, SINCE) if SINCE else BUILT):
+    if same_sources(node, BUILT):
+        release = tag
+    elif since_tag and same_sources(node, SINCE):
+        release = since_tag
+    else:
+        continue
+    distance = len(nodes("only(%s, %s)" % (node, release_revision(release))))
+    revisions[node] = {"release": release, "distance": distance}
+
+json.dump(data, sys.stdout, indent=1, sort_keys=True)
+print()

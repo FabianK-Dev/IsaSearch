@@ -34,15 +34,73 @@ object Tests {
     {
       val newest_first = List("20261109-afp-0726d9f1e0bf", "20261108-afp-0726d9f1e0bf",
         "20261101-afp-aaaaaaaaaaaa").map(t => Release.Info("index-plain-" + t, "", Nil))
-      def matching(id: String): Option[String] = Release.matching(newest_first, id).map(_.tag)
-      assert(matching("0726d9f1e0bf") == Some(newest_first.head.tag))
-      assert(matching("0726d9f1e0bf" + "0" * 28 + "+") == Some(newest_first.head.tag))
-      assert(matching("aaaaaaaaaaaa").contains("index-plain-20261101-afp-aaaaaaaaaaaa"))
-      assert(matching("bbbbbbbbbbbb").isEmpty && matching("").isEmpty)
+      def entry(release: String, distance: Int): Obj =
+        Map("release" -> release, "distance" -> distance)
+      val listing = Map("revisions" -> Map(
+        ("c" * 40) -> entry(newest_first(2).tag, 2),
+        ("d" * 40) -> entry("index-plain-20260101-afp-dddddddddddd", 0)))
+      val covered = Release.covered(newest_first, Some(listing))
+      def matching(id: String): Option[(String, Int)] =
+        Release.choice(covered, Release.AFP_Checkout(id))
+          .map(c => (c.release.tag, c.covered.distance))
+      assert(matching("0726d9f1e0bf") == Some((newest_first.head.tag, 0)))
+      assert(matching("0726d9f1e0bf" + "0" * 28 + "+") == Some((newest_first.head.tag, 0)))
+      assert(matching("aaaaaaaaaaaa") == Some(("index-plain-20261101-afp-aaaaaaaaaaaa", 0)))
+      assert(matching("cccccccccccc") == Some((newest_first(2).tag, 2)))
+      assert(matching("dddddddddddd").isEmpty && matching("bbbbbbbbbbbb").isEmpty &&
+        matching("").isEmpty)
       assert(Data.relative_path("a/b.c").implode == "a/b.c")
       for (bad <- List("../a", "/a", "a/../b", "$A/b", "~/a", "a//b"))
         assert(Exn.result(Data.relative_path(bad)).isInstanceOf[Exn.Exn[?]],
           "Bad relative path accepted: " + bad)
+    }
+
+    // A clone gets the release of its newest covered ancestor: after the release, one AFP
+    // changeset without effect on the index and one without a release yet, then local
+    // changesets, one of them public after a push to another repository.
+    Isabelle_System.with_tmp_dir("isasearch-clone") { dir =>
+      def commit(hg: Mercurial.Repository, path: String, message: String): String = {
+        val file = hg.root + Path.explode(path)
+        Isabelle_System.make_directory(file.dir)
+        File.write(file, message)
+        hg.command("commit", args = "-A -u test -d " + Bash.string("0 0") + " -m " +
+          Bash.string(message)).check
+        hg.log(rev = ".", template = "{node}")
+      }
+      val upstream = Mercurial.init_repository(dir + Path.basic("afp"))
+      val base = commit(upstream, "thys/A/A.thy", "released")
+      val site = commit(upstream, "web/index.html", "site")
+      commit(upstream, "thys/C/C.thy", "unreleased")
+      val hg = Mercurial.clone_repository(upstream.root.implode, dir + Path.basic("clone"))
+      commit(hg, "thys/B/B.thy", "pushed elsewhere")
+      hg.command("phase", args = "--public -r .").check
+      commit(hg, "metadata/entries/B.toml", "local")
+      File.write(hg.root + Path.explode("thys/A/A.thy"), "uncommitted")
+      val release = Release.Info("index-plain-20261111-afp-" + base.take(12), "", Nil)
+      val listing = Map("revisions" -> Map(
+        site -> Map[String, Any]("release" -> release.tag, "distance" -> 1)))
+      val covered = Release.covered(List(release), Some(listing))
+      val checkout = Release.AFP_Checkout(hg.id(rev = ""), Some(hg))
+      val chosen = Release.choice(covered, checkout, upstream.root.implode).get
+      assert(chosen.covered.id == site && chosen.published == 1 && chosen.local == 2 &&
+        !chosen.by_phase && chosen.changed == List("A", "B", "C"), chosen.toString)
+      assert(chosen.differences(checkout) == List(
+        "1 AFP changeset since the release, without effect on the index",
+        "1 AFP changeset without a release yet",
+        "2 local changesets not in the AFP repository",
+        "uncommitted changes",
+        "Not in the index: the changes to A, B, C (isasearch_index builds an index with them)"),
+        chosen.differences(checkout).toString)
+      // Without an answer from the AFP repository, the phases tell them apart.
+      val by_phase =
+        Release.choice(covered, checkout, (dir + Path.basic("missing")).implode).get
+      assert(by_phase.by_phase && by_phase.published == 2 && by_phase.local == 1 &&
+        by_phase.differences(checkout)
+          .contains("Local means not public here: the AFP repository did not answer"),
+        by_phase.toString)
+      // Without a listing, a release covers its own revision.
+      assert(Release.choice(Release.covered(List(release), None), checkout)
+        .exists(c => c.covered.id == base.take(12) && c.published == 3 && c.local == 1))
     }
 
 
