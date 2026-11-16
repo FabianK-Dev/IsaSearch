@@ -714,9 +714,16 @@ object Integration_Tests {
   }
 
   def http_api(env: Environment, stub: Stub, config_path: Path, plain: Path): Unit = {
+    def embeddings: Int = stub.calls.count(_._1.endsWith("embeddings"))
+    val started = embeddings
     val server = env.process("server", List("-c", config_path.implode, "-i", "plain", "-p", "0"))
     try {
       val api = api_url(server)
+
+      // The server checks the embedder as it starts, before any request.
+      val deadline = Time.now() + Time.seconds(30)
+      while (embeddings == started && Time.now() < deadline) Time.seconds(0.1).sleep()
+      check(embeddings > started, "embedder checked as the server starts")
       val client = HttpClient.newHttpClient().nn
 
       // The status of a POST request to a server, with or without the header of the website.
@@ -776,8 +783,11 @@ object Integration_Tests {
       for ((query, status) <- List(("?query=test&refine_query=true", 503), ("?query=", 400),
           ("?query=test&kind=bad", 400)))
         check(get("/search" + query)._1 == status, "HTTP status for " + query)
+      // The check holds for the generation: a search embeds its query only.
+      val checked = embeddings
       val (code, found) = get("/search?query=test")
       check(code == 200 && list(found("results")).size == 3, "search over HTTP")
+      check(embeddings == checked + 1, "embedder checked once per generation")
 
       // Results name the local file of a document and the line of its source there, beside
       // the online links; the website shows that file.

@@ -112,10 +112,11 @@ Relative paths in a configuration are resolved against its file; paths use Isabe
 
 With an object `llamacpp_embedding_server` or `llamacpp_query_server`, the searching tools
 start llama.cpp's `llama-server` on 127.0.0.1 when the model is first needed and stop it when
-they exit. The embedding server starts with the first search, the query server with the first
-expanded query. llama.cpp downloads the model on first use and runs on a GPU (Metal, CUDA,
-Vulkan) if its build supports one, otherwise on the CPU. Logs go to
-`$ISASEARCH_HOME_USER/logs/llama-server-ROLE-TIME.log`. Index builds never start servers.
+they exit. The embedding server starts with the first search (`isasearch_server`: as it
+starts), the query server with the first expanded query. llama.cpp downloads the model on
+first use and runs on a GPU (Metal, CUDA, Vulkan) if its build supports one, otherwise on the
+CPU. Logs go to `$ISASEARCH_HOME_USER/logs/llama-server-ROLE-TIME.log`. Index builds never
+start servers.
 
 The embedding server replaces `openai_embedding_base_url` and answers as
 `openai_embedding_model`; the query server replaces `openai_base_url`, answers as
@@ -147,6 +148,14 @@ resident.
 | `arguments` | further arguments, e.g. `["-ngl", "0"]` for CPU only |
 | `startup_timeout` | seconds until ready, including a first download (default 1800) |
 
+llama.cpp maps the model file into memory, so the system can drop the weights whenever other
+programs need the memory. On a machine short of memory, a search after a pause then reads them
+again, which takes tens of seconds for the 4.3 GB of the default embedder. With
+`"arguments": ["--load-mode", "mlock"]` (older builds: `["--mlock"]`) the weights stay in memory
+as long as the server runs, and other programs have that much less. Locking needs a memlock
+limit above the model size (`ulimit -l`; on Linux e.g. `USER - memlock unlimited` in
+`/etc/security/limits.conf`), otherwise the log of llama-server warns that it failed.
+
 ### Remote endpoints
 
 For other setups, start from [`etc/config.example.json`](etc/config.example.json).
@@ -169,16 +178,18 @@ variable `NAME_api_key_env`. So `openai_api_key_file` is the key of `openai_base
 and key. Keys never enter indexes.
 
 The embedder must match the index: same model, pooling, normalization and truncation, and an
-endpoint alias equal to the model name in the index manifest. Before searching, the tools embed
-the reference inputs of the index again (a few short queries recorded by the build; for older
-indexes, two documents per corpus) and fail if the vectors differ by more than
-`embedding_reference_tolerance` (relative squared error, default 0.001).
+endpoint alias equal to the model name in the index manifest. Before the first search of an
+index generation, and again after a request failed, the tools embed the reference inputs of
+the index again (a few short queries recorded by the build; for older indexes, two documents
+per corpus) and fail if the vectors differ by more than `embedding_reference_tolerance`
+(relative squared error, default 0.001).
 
 Other limits and their defaults: `llm_request_timeout` (600 s), `inference_connect_timeout` and
 `inference_health_timeout` (10 s), `llm_attempts` and `embedding_attempts` (3),
 `openai_embedding_batch_size` (32), `openai_embedding_max_characters` (8000 for new indexes),
-`capability_refresh_seconds` (30) and `search_candidates` (500: approximate neighbours ranked by
-exact distance before the limit applies, because the HNSW graph alone misses some). HTTP 429
+`capability_refresh_seconds` (30: until a failed check of the services is repeated) and
+`search_candidates` (500: approximate neighbours ranked by exact distance before the limit
+applies, because the HNSW graph alone misses some). HTTP 429
 and transient errors are retried with backoff.
 
 ## Website and HTTP API

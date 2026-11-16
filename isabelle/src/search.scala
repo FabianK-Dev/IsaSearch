@@ -143,27 +143,31 @@ object Search {
 
     @volatile private var embedding_error = "Embedding service has not been checked"
     @volatile private var query_error = "Query expansion is not configured"
-    @volatile private var checked = 0L
     @volatile private var checked_root: Option[Path] = None
+    @volatile private var failed_check: Option[Long] = None
 
     // A request that fails does not decide the availability for the others: its input may be
     // the reason, e.g. a query beyond the context of the embedder. The services are checked
     // again with the next request instead.
-    private def recheck(): Unit = checked = 0L
+    private def recheck(): Unit = checked_root = None
 
-    // The embedder is checked against the references of every corpus, again when the snapshot
-    // changes. A query server that has not started yet counts as available: it starts with the
-    // first expanded query rather than for a check.
-    def refresh(snapshot: Index.Snapshot, force: Boolean = false): Unit = synchronized {
-      if (force || !checked_root.contains(snapshot.root) || System.currentTimeMillis() - checked >
-          config.positive("capability_refresh_seconds", 30).toLong * 1000) {
+    // The services are checked once per snapshot: the embedder against the references of every
+    // corpus, which embeds them, and a running query server with a request. A check that
+    // passed holds until a request fails; one that failed is repeated after
+    // capability_refresh_seconds. A query server that has not started yet counts as available:
+    // it starts with the first expanded query rather than for a check.
+    def refresh(snapshot: Index.Snapshot): Unit = synchronized {
+      val retry = failed_check.exists(time => System.currentTimeMillis() - time >
+        config.positive("capability_refresh_seconds", 30).toLong * 1000)
+      if (retry || !checked_root.contains(snapshot.root)) {
+        var failed = false
         try {
           snapshot.corpora.values.foreach(inference.validate_reference)
           embedding_error = ""
         }
         catch {
-          case exn: Inference.Failure => embedding_error = exn.message
-          case ERROR(msg) => embedding_error = msg
+          case exn: Inference.Failure => embedding_error = exn.message; failed = true
+          case ERROR(msg) => embedding_error = msg; failed = true
         }
         if (!inference.configured(Model_Role.Query))
           query_error = "Query expansion is not configured"
@@ -174,13 +178,17 @@ object Search {
             query_error = ""
           }
           catch {
-            case exn: Inference.Failure => query_error = exn.message
-            case ERROR(msg) => query_error = msg
+            case exn: Inference.Failure => query_error = exn.message; failed = true
+            case ERROR(msg) => query_error = msg; failed = true
           }
-        checked = System.currentTimeMillis()
         checked_root = Some(snapshot.root)
+        failed_check = if (failed) Some(System.currentTimeMillis()) else None
       }
     }
+
+    // A server that keeps running checks the services as it starts, so that the first request
+    // does not wait for the embedder to start, e.g. to load its model.
+    def prepare(): Unit = use(refresh(_))
 
     def capabilities: Obj = use { snapshot =>
       refresh(snapshot)

@@ -182,12 +182,14 @@ Compare: PREVIOUS CURRENT (result files or strategy directories of benchmark run
       case Tool_Command.Serve =>
         using(new Llama_Server.Servers(config)) { servers =>
           using(new Index.Live(index)) { source =>
-            val server = Search.server(new Search.Engine(source, servers),
+            val engine = new Search.Engine(source, servers)
+            val server = Search.server(engine,
               port.getOrElse(options.int("isasearch_port")),
               editors = Isabelle_Editor.list(options.string("isasearch_editors")),
               hosts = Search.hosts(options.string("isasearch_hosts")))
             server.start()
             progress.echo("IsaSearch API: " + server.url)
+            Future.thread("isasearch_prepare", daemon = true) { engine.prepare() }
             try { new java.util.concurrent.CountDownLatch(1).await() }
             finally { server.stop() }
           }
